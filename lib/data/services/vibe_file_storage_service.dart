@@ -172,6 +172,35 @@ class VibeFileStorageService {
     }
   }
 
+  /// 覆盖已有 .naiv4vibebundle 文件
+  Future<void> overwriteBundleFile(
+    String filePath,
+    List<VibeReference> vibes,
+  ) async {
+    if (vibes.isEmpty) {
+      throw ArgumentError('vibes 不能为空');
+    }
+
+    final file = File(filePath);
+    if (!await file.exists()) {
+      throw StateError('Vibe Bundle 文件不存在: $filePath');
+    }
+
+    final extension = p.extension(filePath).toLowerCase();
+    if (extension != _bundleFileExtension) {
+      throw UnsupportedError('仅支持覆盖 $_bundleFileExtension 文件');
+    }
+
+    try {
+      final jsonString = _buildBundleJson(vibes);
+      await file.writeAsString(jsonString);
+      AppLogger.i('Vibe Bundle 文件覆盖成功: $filePath', _tag);
+    } catch (e, stackTrace) {
+      AppLogger.e('覆盖 Vibe Bundle 失败: $filePath', e, stackTrace, _tag);
+      rethrow;
+    }
+  }
+
   /// 从文件读取 Vibe 数据
   ///
   /// 对 bundle 文件返回第一个可用 Vibe。
@@ -577,6 +606,9 @@ class VibeFileStorageService {
     final generatedEntry = _buildBundleEntry(filePath, fallbackName, vibes);
 
     final encodings = vibes.map((v) => v.vibeEncoding).toList(growable: false);
+    final strengths = vibes.map((v) => v.strength).toList(growable: false);
+    final infoExtracted =
+        vibes.map((v) => v.infoExtracted).toList(growable: false);
 
     return _mergeWithExistingEntry(
       generatedEntry: generatedEntry,
@@ -588,6 +620,8 @@ class VibeFileStorageService {
       bundledVibePreviews:
           previews.isEmpty ? existingEntry?.bundledVibePreviews : previews,
       bundledVibeEncodings: encodings,
+      bundledVibeStrengths: strengths,
+      bundledVibeInfoExtracted: infoExtracted,
     );
   }
 
@@ -645,6 +679,8 @@ class VibeFileStorageService {
       bundledVibeNames: existingEntry.bundledVibeNames,
       bundledVibePreviews: existingEntry.bundledVibePreviews,
       bundledVibeEncodings: existingEntry.bundledVibeEncodings,
+      bundledVibeStrengths: existingEntry.bundledVibeStrengths,
+      bundledVibeInfoExtracted: existingEntry.bundledVibeInfoExtracted,
     );
   }
 

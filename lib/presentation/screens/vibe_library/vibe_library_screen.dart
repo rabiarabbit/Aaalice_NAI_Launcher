@@ -1410,6 +1410,7 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
               context: context,
               bundleName: bundleName,
               vibeNames: vibes.map((vibe) => vibe.displayName).toList(),
+              vibeReferences: vibes,
             );
             if (bundleResult == null) {
               return null;
@@ -1417,12 +1418,17 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
 
             switch (bundleResult.option) {
               case bundle_import_dialog.BundleImportOption.keepAsBundle:
-                return const BundleImportOption.keepAsBundle();
+                return BundleImportOption.keepAsBundle(
+                  configuredReferences: bundleResult.configuredVibes,
+                );
               case bundle_import_dialog.BundleImportOption.split:
-                return const BundleImportOption.split();
+                return BundleImportOption.split(
+                  configuredReferences: bundleResult.configuredVibes,
+                );
               case bundle_import_dialog.BundleImportOption.importSelected:
                 return BundleImportOption.select(
                   bundleResult.selectedIndices ?? const <int>[],
+                  configuredReferences: bundleResult.configuredVibes,
                 );
             }
           },
@@ -2147,6 +2153,7 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
       builder: (context) => bundle_import_dialog.VibeBundleImportDialog(
         bundleName: imageFile.source,
         vibeNames: vibes.map((v) => v.displayName).toList(),
+        vibeReferences: vibes,
       ),
     );
 
@@ -2172,16 +2179,20 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
     bundle_import_dialog.BundleImportResult result,
     List<VibeReference> vibes,
   ) {
+    final configuredVibes = result.configuredVibes != null &&
+            result.configuredVibes!.length == vibes.length
+        ? result.configuredVibes!
+        : vibes;
     switch (result.option) {
       case bundle_import_dialog.BundleImportOption.keepAsBundle:
       case bundle_import_dialog.BundleImportOption.split:
-        return vibes;
+        return configuredVibes;
       case bundle_import_dialog.BundleImportOption.importSelected:
         final indices = result.selectedIndices;
         if (indices == null || indices.isEmpty) return null;
         return indices
-            .where((index) => index >= 0 && index < vibes.length)
-            .map((index) => vibes[index])
+            .where((index) => index >= 0 && index < configuredVibes.length)
+            .map((index) => configuredVibes[index])
             .toList();
     }
   }

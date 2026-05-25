@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:nai_launcher/core/utils/vibe_file_parser.dart';
 import 'package:nai_launcher/core/utils/vibe_export_utils.dart';
 import 'package:nai_launcher/core/utils/vibe_image_embedder.dart';
 import 'package:nai_launcher/data/models/vibe/vibe_library_entry.dart';
@@ -149,6 +150,49 @@ void main() {
       expect(path, isNotNull);
       expect(p.basename(path!), 'Bundle_Name.naiv4vibebundle');
       expect(await File(path).exists(), isTrue);
+    });
+
+    test('exportToNaiv4VibeBundle preserves per-vibe info extracted', () async {
+      final tempDir = await Directory.systemTemp.createTemp(
+        'vibe_export_bundle_params_test_',
+      );
+      addTearDown(() async {
+        if (await tempDir.exists()) {
+          await tempDir.delete(recursive: true);
+        }
+      });
+
+      const vibes = [
+        VibeReference(
+          displayName: 'First',
+          vibeEncoding: 'encoded-first',
+          strength: 0.2,
+          infoExtracted: 0.3,
+          sourceType: VibeSourceType.naiv4vibe,
+        ),
+        VibeReference(
+          displayName: 'Second',
+          vibeEncoding: 'encoded-second',
+          strength: 0.4,
+          infoExtracted: 0.8,
+          sourceType: VibeSourceType.naiv4vibe,
+        ),
+      ];
+
+      final path = await VibeExportUtils.exportToNaiv4VibeBundle(
+        vibes,
+        'Bundle Params',
+        outputDirectory: tempDir.path,
+      );
+      expect(path, isNotNull);
+
+      final parsed = await VibeFileParser.fromBundle(
+        p.basename(path!),
+        await File(path).readAsBytes(),
+      );
+
+      expect(parsed.map((v) => v.strength), [0.2, 0.4]);
+      expect(parsed.map((v) => v.infoExtracted), [0.3, 0.8]);
     });
   });
 }

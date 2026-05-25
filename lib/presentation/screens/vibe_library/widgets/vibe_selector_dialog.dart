@@ -394,6 +394,8 @@ class _VibeSelectorDialogState extends ConsumerState<VibeSelectorDialog> {
               vibeEncoding: vibeRef.vibeEncoding,
               thumbnail: vibeRef.thumbnail,
               sourceType: vibeRef.sourceType,
+              strength: vibeRef.strength,
+              infoExtracted: vibeRef.infoExtracted,
             ),
           );
         } else {

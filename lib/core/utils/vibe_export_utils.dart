@@ -407,6 +407,7 @@ class VibeExportUtils {
       'name': vibe.displayName,
       'encodings': encodings,
       'importInfo': {
+        'information_extracted': vibe.infoExtracted,
         'strength': vibe.strength,
       },
     };

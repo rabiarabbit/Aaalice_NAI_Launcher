@@ -13,6 +13,7 @@ import '../../../../core/utils/vibe_file_parser.dart';
 import '../../../../core/utils/vibe_performance_diagnostics.dart';
 import '../../../../data/models/vibe/vibe_empty_state_info.dart';
 import '../../../../data/models/vibe/vibe_library_entry.dart';
+import '../../../../data/models/vibe/vibe_reference.dart';
 import '../../../../data/services/vibe_library_storage_service.dart';
 import '../../../providers/generation/generation_params_notifier.dart';
 import '../../../providers/selection_mode_provider.dart';
@@ -171,14 +172,22 @@ class _VibeLibraryContentViewState
         entry: resolvedEntry,
         heroTag: 'vibe_${resolvedEntry.id}',
         callbacks: VibeDetailCallbacks(
-          onSendToGeneration:
-              (entry, strength, infoExtracted, isShiftPressed) async {
+          onSendToGeneration: (
+            entry,
+            strength,
+            infoExtracted,
+            isShiftPressed, {
+            required bool applyParamOverrides,
+            int? bundleChildParamOverrideIndex,
+          }) async {
             await _sendEntryToGenerationWithParams(
               context,
               entry,
               strength,
               infoExtracted,
               isShiftPressed,
+              applyParamOverrides: applyParamOverrides,
+              bundleChildParamOverrideIndex: bundleChildParamOverrideIndex,
             );
           },
           onExport: (entry) {
@@ -190,8 +199,19 @@ class _VibeLibraryContentViewState
           onRename: (entry, newName) {
             return _renameSingleEntry(context, entry, newName);
           },
-          onSaveParams: (entry, strength, infoExtracted) async {
-            return _updateEntryParams(context, entry, strength, infoExtracted);
+          onSaveParams: (
+            entry,
+            strength,
+            infoExtracted,
+            bundleChildIndex,
+          ) async {
+            return _updateEntryParams(
+              context,
+              entry,
+              strength,
+              infoExtracted,
+              bundleChildIndex: bundleChildIndex,
+            );
           },
         ),
       );
@@ -301,15 +321,10 @@ class _VibeLibraryContentViewState
             final vibes = await VibeFileParser.fromBundle(fileName, bytes);
             bundleParsed = true;
 
-            // 应用条目的 strength 和 infoExtracted 到所有 vibes
-            final adjustedVibes = vibes
-                .map(
-                  (vibe) => vibe.copyWith(
-                    strength: entry.strength,
-                    infoExtracted: entry.infoExtracted,
-                  ),
-                )
-                .toList();
+            final adjustedVibes = buildBundleVibesForGeneration(
+              vibes,
+              bundleSource: actualEntry.displayName,
+            );
 
             // 检查是否超过16个限制（仅在追加模式下检查）
             if (!isShiftPressed &&
@@ -414,8 +429,10 @@ class _VibeLibraryContentViewState
     VibeLibraryEntry entry,
     double strength,
     double infoExtracted,
-    bool isShiftPressed,
-  ) async {
+    bool isShiftPressed, {
+    required bool applyParamOverrides,
+    int? bundleChildParamOverrideIndex,
+  }) async {
     final span = VibePerformanceDiagnostics.start(
       'content.sendEntryToGenerationWithParams',
       details: {
@@ -451,15 +468,13 @@ class _VibeLibraryContentViewState
             final vibes = await VibeFileParser.fromBundle(fileName, bytes);
             bundleParsed = true;
 
-            // 应用传入的参数到所有 vibes
-            final adjustedVibes = vibes
-                .map(
-                  (vibe) => vibe.copyWith(
-                    strength: strength,
-                    infoExtracted: infoExtracted,
-                  ),
-                )
-                .toList();
+            final adjustedVibes = buildBundleVibesForGeneration(
+              vibes,
+              bundleSource: entry.displayName,
+              strengthOverride: applyParamOverrides ? strength : null,
+              infoExtractedOverride: applyParamOverrides ? infoExtracted : null,
+              overrideIndex: bundleChildParamOverrideIndex,
+            );
 
             // 检查是否超过16个限制（仅在追加模式下检查）
             if (!isShiftPressed &&
@@ -514,10 +529,12 @@ class _VibeLibraryContentViewState
       }
 
       // 普通条目或 Bundle 文件不存在时，使用单个 vibe
-      final vibeRef = entry.toVibeReference().copyWith(
-            strength: strength,
-            infoExtracted: infoExtracted,
-          );
+      final vibeRef = applyParamOverrides
+          ? entry.toVibeReference().copyWith(
+                strength: strength,
+                infoExtracted: infoExtracted,
+              )
+          : entry.toVibeReference();
 
       if (isShiftPressed) {
         paramsNotifier.setVibeReferences([vibeRef]);
@@ -650,8 +667,59 @@ class _VibeLibraryContentViewState
     BuildContext context,
     VibeLibraryEntry entry,
     double strength,
-    double infoExtracted,
-  ) async {
+    double infoExtracted, {
+    int? bundleChildIndex,
+  }) async {
+    if (entry.isBundle) {
+      if (bundleChildIndex == null || bundleChildIndex < 0) {
+        return null;
+      }
+      final filePath = entry.filePath;
+      if (filePath == null || filePath.isEmpty) {
+        return null;
+      }
+
+      final file = File(filePath);
+      if (!await file.exists()) {
+        return null;
+      }
+
+      final bytes = await file.readAsBytes();
+      final childVibes = await VibeFileParser.fromBundle(
+        p.basename(filePath),
+        bytes,
+      );
+      if (bundleChildIndex >= childVibes.length) {
+        return null;
+      }
+
+      final generationParams = ref.read(generationParamsNotifierProvider);
+      final preparedVibeData = await ref
+          .read(generationParamsNotifierProvider.notifier)
+          .prepareVibeForLibraryParamSave(
+            childVibes[bundleChildIndex],
+            strength: strength,
+            infoExtracted: infoExtracted,
+            model: generationParams.model,
+          );
+      if (preparedVibeData == null) {
+        if (context.mounted) {
+          AppToast.error(context, '保存参数失败，Vibe 重新编码失败');
+        }
+        return null;
+      }
+
+      return ref
+          .read(vibeLibraryNotifierProvider.notifier)
+          .saveBundleChildParams(
+            entry.id,
+            childIndex: bundleChildIndex,
+            strength: strength,
+            infoExtracted: infoExtracted,
+            persistedVibeData: preparedVibeData,
+          );
+    }
+
     final generationParams = ref.read(generationParamsNotifierProvider);
     final preparedVibeData = await ref
         .read(generationParamsNotifierProvider.notifier)
@@ -715,6 +783,29 @@ Future<VibeLibraryEntry> resolveVibeDetailEntryForOpen(
       'resolvedId': entry.id,
     },
   );
+}
+
+List<VibeReference> buildBundleVibesForGeneration(
+  List<VibeReference> vibes, {
+  required String bundleSource,
+  double? strengthOverride,
+  double? infoExtractedOverride,
+  int? overrideIndex,
+}) {
+  return vibes.indexed.map((item) {
+    final (index, vibe) = item;
+    var next = vibe.copyWith(bundleSource: bundleSource);
+    final shouldOverride =
+        (strengthOverride != null || infoExtractedOverride != null) &&
+            (overrideIndex == null || overrideIndex == index);
+    if (shouldOverride) {
+      next = next.copyWith(
+        strength: strengthOverride ?? next.strength,
+        infoExtracted: infoExtractedOverride ?? next.infoExtracted,
+      );
+    }
+    return next;
+  }).toList(growable: false);
 }
 
 /// 自定义上下文菜单路由

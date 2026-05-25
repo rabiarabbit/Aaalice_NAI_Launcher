@@ -30,6 +30,8 @@ class VibeDetailParamPanel extends StatelessWidget {
   final ValueChanged<List<String>>? onTagsChanged;
   final bool canSaveParams;
   final bool showInfoExtractedControl;
+  final bool parametersEditable;
+  final String? parameterHint;
   final bool isRenaming;
   final bool isSavingParams;
 
@@ -49,6 +51,8 @@ class VibeDetailParamPanel extends StatelessWidget {
     this.onTagsChanged,
     this.canSaveParams = false,
     this.showInfoExtractedControl = true,
+    this.parametersEditable = true,
+    this.parameterHint,
     this.isRenaming = false,
     this.isSavingParams = false,
   });
@@ -88,6 +92,7 @@ class VibeDetailParamPanel extends StatelessWidget {
                         labelKey: 'strength',
                         value: strength,
                         onChanged: onStrengthChanged,
+                        enabled: parametersEditable,
                         description: '控制 Vibe 对生成结果的影响强度',
                       ),
                       if (showInfoExtractedControl) ...[
@@ -97,7 +102,26 @@ class VibeDetailParamPanel extends StatelessWidget {
                           labelKey: 'infoExtracted',
                           value: infoExtracted,
                           onChanged: onInfoExtractedChanged,
+                          enabled: parametersEditable,
                           description: '控制从原始图片提取的信息量（消耗 2 Anlas）',
+                        ),
+                      ],
+                      if (parameterHint != null) ...[
+                        const SizedBox(height: DesignTokens.spacingMd),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(DesignTokens.spacingSm),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.surfaceContainerHighest
+                                .withOpacity(0.2),
+                            borderRadius: DesignTokens.borderRadiusMd,
+                          ),
+                          child: Text(
+                            parameterHint!,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
                         ),
                       ],
                       const SizedBox(height: DesignTokens.spacingLg),
@@ -195,6 +219,7 @@ class VibeDetailParamPanel extends StatelessWidget {
     required String labelKey,
     required double value,
     required ValueChanged<double> onChanged,
+    required bool enabled,
     required String description,
   }) {
     final theme = Theme.of(context);
@@ -231,6 +256,7 @@ class VibeDetailParamPanel extends StatelessWidget {
               max: 1.0,
               width: 72,
               onChanged: onChanged,
+              enabled: enabled,
               textStyle: theme.textTheme.bodySmall?.copyWith(
                 fontWeight: FontWeight.w600,
                 fontFeatures: const [FontFeature.tabularFigures()],
@@ -260,7 +286,7 @@ class VibeDetailParamPanel extends StatelessWidget {
             min: sliderMin,
             max: 1.0,
             divisions: isInfoExtracted ? 200 : 100,
-            onChanged: onChanged,
+            onChanged: enabled ? onChanged : null,
           ),
         ),
       ],
