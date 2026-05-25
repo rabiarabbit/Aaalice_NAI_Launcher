@@ -12,6 +12,7 @@ import 'sections/queue_settings_section.dart';
 import 'sections/notification_settings_section.dart';
 import 'sections/about_settings_section.dart';
 import 'sections/comfyui_settings_section.dart';
+import 'sections/krita_bridge_settings_section.dart';
 import 'sections/prompt_assistant_settings_section.dart';
 
 /// 设置页面 Section 数据模型
@@ -113,6 +114,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         selectedIcon: Icons.auto_fix_high,
         label: 'ComfyUI',
         widget: ComfyUISettingsSection(),
+      ),
+      _SettingsSection(
+        icon: Icons.brush_outlined,
+        selectedIcon: Icons.brush,
+        label: 'Krita',
+        widget: KritaBridgeSettingsSection(),
       ),
       _SettingsSection(
         icon: Icons.info_outlined,

@@ -384,7 +384,7 @@ class ImageGenerationNotifier extends _$ImageGenerationNotifier {
   /// 将外部结果登记到历史记录，并可选地直接保存到本地图库
   ///
   /// [addToDisplay] 为 true 时，将图像插入中央预览列表首位（如 ComfyUI 超分结果）。
-  Future<void> registerExternalImage(
+  Future<String?> registerExternalImage(
     Uint8List imageBytes, {
     required ImageParams params,
     int? width,
@@ -440,10 +440,20 @@ class ImageGenerationNotifier extends _$ImageGenerationNotifier {
         saveDirectoryPath: saveDirectoryPath,
         syncToGalleryIndex: syncToGalleryIndex,
       );
-      return;
+      return _firstSavedPathForImage(generatedImage.id);
     }
 
     _preloadMetadataInBackground([generatedImage]);
+    return null;
+  }
+
+  String? _firstSavedPathForImage(String id) {
+    for (final image in state.history) {
+      if (image.id == id && image.filePath != null) {
+        return image.filePath;
+      }
+    }
+    return null;
   }
 
   Future<void> _saveImagesToGallery(

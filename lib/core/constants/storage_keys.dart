@@ -263,6 +263,9 @@ class StorageKeys {
   static const String comfyuiSeedvr2Tiled = 'comfyui_seedvr2_tiled';
   static const String comfyuiSeedvr2TileSize = 'comfyui_seedvr2_tile_size';
 
+  // Krita Bridge 设置
+  static const String kritaBridgeEnabled = 'krita_bridge_enabled';
+
   // 工作流设置
   static const String workflowEnhanceMagnitude = 'workflow_enhance_magnitude';
   static const String workflowEnhanceShowIndividualSettings =

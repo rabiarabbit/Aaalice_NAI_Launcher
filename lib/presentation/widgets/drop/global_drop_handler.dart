@@ -8,7 +8,6 @@ import 'package:nai_launcher/core/utils/localization_extension.dart';
 import 'package:nai_launcher/l10n/app_localizations.dart';
 import 'package:super_drag_and_drop/super_drag_and_drop.dart';
 
-import '../../../core/constants/api_constants.dart';
 import '../../../core/enums/precise_ref_type.dart';
 import '../../../core/utils/app_logger.dart';
 import '../../../data/models/gallery/nai_image_metadata.dart';
@@ -31,6 +30,7 @@ import '../../providers/replication_queue_provider.dart';
 import '../../providers/vibe_library_provider.dart';
 import '../../router/app_router.dart';
 import '../../utils/dropped_file_reader.dart';
+import '../../utils/metadata_import_applier.dart';
 import '../../utils/prompt_preset_import_utils.dart';
 import '../common/app_toast.dart';
 import '../metadata/metadata_import_dialog.dart';
@@ -693,8 +693,37 @@ class _GlobalDropHandlerState extends ConsumerState<GlobalDropHandler> {
       ref.read(characterPromptNotifierProvider.notifier).clearAllCharacters();
     }
 
-    // 应用基础参数
-    appliedCount += _applyBasicParams(metadata, options, notifier);
+    final currentModel = ref.read(generationParamsNotifierProvider).model;
+
+    // 应用提示词和生成参数
+    appliedCount += MetadataImportApplier.applyPromptAndGenerationParams(
+      metadata: metadata,
+      options: options,
+      currentModel: currentModel,
+      target: MetadataImportTarget(
+        updatePrompt: notifier.updatePrompt,
+        updateNegativePrompt: notifier.updateNegativePrompt,
+        updateSeed: notifier.updateSeed,
+        updateSteps: notifier.updateSteps,
+        updateScale: notifier.updateScale,
+        updateSize: notifier.updateSize,
+        updateSampler: notifier.updateSampler,
+        updateModel: notifier.updateModel,
+        updateSmea: notifier.updateSmea,
+        updateSmeaDyn: notifier.updateSmeaDyn,
+        updateVarietyPlus: notifier.updateVarietyPlus,
+        updateNoiseSchedule: notifier.updateNoiseSchedule,
+        updateCfgRescale: notifier.updateCfgRescale,
+        updateQualityToggle: (value) {
+          notifier.updateQualityToggle(value);
+          applyImportedQualityToggle(ref.read, value);
+        },
+        updateUcPreset: (value) {
+          notifier.updateUcPreset(value);
+          applyImportedUcPreset(ref.read, value);
+        },
+      ),
+    );
 
     // 应用多角色提示词
     if (options.importCharacterPrompts && hasCharacters) {
@@ -708,78 +737,7 @@ class _GlobalDropHandlerState extends ConsumerState<GlobalDropHandler> {
     // 应用结构化固定词
     appliedCount += await _applyFixedTags(metadata, options);
 
-    // 应用高级参数
-    appliedCount += _applyAdvancedParams(metadata, options, notifier);
-
     return appliedCount;
-  }
-
-  int _applyBasicParams(
-    dynamic metadata,
-    MetadataImportOptions options,
-    GenerationParamsNotifier notifier,
-  ) {
-    var count = 0;
-
-    if (options.importPrompt && metadata.prompt.isNotEmpty) {
-      notifier.updatePrompt(
-        metadata.hasSeparatedFields ? metadata.mainPrompt : metadata.prompt,
-      );
-      count++;
-    }
-
-    if (options.importNegativePrompt &&
-        (metadata.negativePrompt.isNotEmpty || options.importUcPreset)) {
-      notifier.updateNegativePrompt(
-        _resolveImportedNegativePrompt(
-          metadata,
-          importUcPreset: options.importUcPreset,
-        ),
-      );
-      count++;
-    }
-
-    if (options.importSeed && metadata.seed != null) {
-      notifier.updateSeed(metadata.seed!);
-      count++;
-    }
-
-    if (options.importSteps && metadata.steps != null) {
-      notifier.updateSteps(metadata.steps!);
-      count++;
-    }
-
-    if (options.importScale && metadata.scale != null) {
-      notifier.updateScale(metadata.scale!);
-      count++;
-    }
-
-    if (options.importSize &&
-        metadata.width != null &&
-        metadata.height != null) {
-      notifier.updateSize(metadata.width!, metadata.height!);
-      count++;
-    }
-
-    return count;
-  }
-
-  String _resolveImportedNegativePrompt(
-    NaiImageMetadata metadata, {
-    required bool importUcPreset,
-  }) {
-    final baseNegative = metadata.displayNegativePrompt;
-    if (!importUcPreset || metadata.ucPreset == null) {
-      return baseNegative;
-    }
-
-    final model =
-        metadata.model ?? ref.read(generationParamsNotifierProvider).model;
-    return UcPresets.stripPresetByInt(
-      baseNegative,
-      model,
-      metadata.ucPreset!,
-    );
   }
 
   Future<int> _applyFixedTags(
@@ -922,76 +880,6 @@ class _GlobalDropHandlerState extends ConsumerState<GlobalDropHandler> {
     return count;
   }
 
-  int _applyAdvancedParams(
-    dynamic metadata,
-    MetadataImportOptions options,
-    GenerationParamsNotifier notifier,
-  ) {
-    var count = 0;
-
-    count += _applyImportParam<String>(
-      options.importSampler,
-      metadata.sampler,
-      notifier.updateSampler,
-    );
-    count += _applyImportParam<String>(
-      options.importModel,
-      metadata.model,
-      notifier.updateModel,
-    );
-    count += _applyImportParam<bool>(
-      options.importSmea,
-      metadata.smea,
-      notifier.updateSmea,
-    );
-    count += _applyImportParam<bool>(
-      options.importSmeaDyn,
-      metadata.smeaDyn,
-      notifier.updateSmeaDyn,
-    );
-    count += _applyImportParam<bool>(
-      options.importVarietyPlus,
-      metadata.varietyPlus,
-      notifier.updateVarietyPlus,
-    );
-    count += _applyImportParam<String>(
-      options.importNoiseSchedule,
-      metadata.noiseSchedule,
-      notifier.updateNoiseSchedule,
-    );
-    count += _applyImportParam<double>(
-      options.importCfgRescale,
-      metadata.cfgRescale,
-      notifier.updateCfgRescale,
-    );
-
-    if (options.importQualityToggle && metadata.qualityToggle != null) {
-      notifier.updateQualityToggle(metadata.qualityToggle!);
-      applyImportedQualityToggle(ref.read, metadata.qualityToggle!);
-      count++;
-    }
-
-    if (options.importUcPreset && metadata.ucPreset != null) {
-      notifier.updateUcPreset(metadata.ucPreset!);
-      applyImportedUcPreset(ref.read, metadata.ucPreset!);
-      count++;
-    }
-
-    return count;
-  }
-
-  int _applyImportParam<T>(
-    bool shouldImport,
-    T? value,
-    void Function(T) updater,
-  ) {
-    if (!shouldImport || value == null) {
-      return 0;
-    }
-    updater(value);
-    return 1;
-  }
-
   Future<void> _handleAddToQueue(Uint8List bytes, AppLocalizations l10n) async {
     try {
       final metadata = await ImageMetadataService().getMetadataFromBytes(bytes);
@@ -1079,12 +967,17 @@ class _GlobalDropHandlerState extends ConsumerState<GlobalDropHandler> {
     AppLocalizations l10n,
   ) {
     final items = <Widget>[];
+    final currentModel = ref.read(generationParamsNotifierProvider).model;
     final negativePrompt = metadata is NaiImageMetadata
-        ? _resolveImportedNegativePrompt(
+        ? MetadataImportApplier.resolveImportedNegativePrompt(
             metadata,
             importUcPreset: options.importUcPreset,
+            currentModel: currentModel,
           )
         : metadata.negativePrompt;
+    final importableModel = metadata is NaiImageMetadata
+        ? MetadataImportApplier.resolveImportableModel(metadata)
+        : metadata.model;
 
     final itemConfigs = [
       (
@@ -1165,10 +1058,10 @@ class _GlobalDropHandlerState extends ConsumerState<GlobalDropHandler> {
         1,
       ),
       (
-        options.importModel && metadata.model != null,
+        options.importModel && importableModel != null,
         l10n.metadataImport_model,
-        metadata.model?.toString(),
-        1
+        importableModel?.toString(),
+        1,
       ),
       (
         options.importSmea && metadata.smea != null,

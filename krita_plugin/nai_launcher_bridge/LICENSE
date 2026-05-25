@@ -1,0 +1,7 @@
+SPDX-License-Identifier: GPL-3.0-or-later
+
+NAI Launcher Bridge for Krita is distributed under the GNU General Public
+License version 3 or later.
+
+The NAI Launcher desktop application remains a separate program that
+communicates with this plugin over a local WebSocket bridge.

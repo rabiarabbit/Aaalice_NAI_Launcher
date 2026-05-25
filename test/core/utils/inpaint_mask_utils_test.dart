@@ -132,7 +132,8 @@ void main() {
       expect(decoded.getPixel(12, 12).r.toInt(), equals(0));
     });
 
-    test('fillMaskRegionAtPoint should fill only the clicked closed region', () {
+    test('fillMaskRegionAtPoint should fill only the clicked closed region',
+        () {
       final source = img.Image(width: 32, height: 24);
       img.fill(source, color: img.ColorRgba8(0, 0, 0, 255));
       img.drawRect(
@@ -211,6 +212,54 @@ void main() {
       expect(decoded.getPixel(12, 12).r.toInt(), equals(255));
       expect(decoded.getPixel(4, 4).r.toInt(), equals(0));
       expect(decoded.getPixel(2, 2).r.toInt(), equals(0));
+    });
+
+    test('compositeGeneratedImage should preserve source outside mask', () {
+      final source = img.Image(width: 4, height: 4);
+      img.fill(source, color: img.ColorRgb8(10, 20, 30));
+
+      final generated = img.Image(width: 4, height: 4);
+      img.fill(generated, color: img.ColorRgb8(200, 210, 220));
+
+      final mask = img.Image(width: 4, height: 4);
+      img.fill(mask, color: img.ColorRgba8(0, 0, 0, 255));
+      mask.setPixelRgba(1, 1, 255, 255, 255, 255);
+      mask.setPixelRgba(2, 1, 255, 255, 255, 255);
+
+      final result = InpaintMaskUtils.compositeGeneratedImage(
+        sourceImage: Uint8List.fromList(img.encodePng(source)),
+        maskImage: Uint8List.fromList(img.encodePng(mask)),
+        generatedImage: Uint8List.fromList(img.encodePng(generated)),
+      );
+      final decoded = img.decodeImage(result)!;
+
+      expect(decoded.getPixel(1, 1).r.toInt(), equals(200));
+      expect(decoded.getPixel(2, 1).g.toInt(), equals(210));
+      expect(decoded.getPixel(0, 0).r.toInt(), equals(10));
+      expect(decoded.getPixel(0, 0).g.toInt(), equals(20));
+      expect(decoded.getPixel(0, 0).b.toInt(), equals(30));
+      expect(decoded.getPixel(3, 3).r.toInt(), equals(10));
+    });
+
+    test('extractGeneratedPatch should make pixels outside mask transparent',
+        () {
+      final generated = img.Image(width: 4, height: 4);
+      img.fill(generated, color: img.ColorRgba8(200, 210, 220, 255));
+
+      final mask = img.Image(width: 4, height: 4);
+      img.fill(mask, color: img.ColorRgba8(0, 0, 0, 255));
+      mask.setPixelRgba(1, 1, 255, 255, 255, 255);
+
+      final result = InpaintMaskUtils.extractGeneratedPatch(
+        maskImage: Uint8List.fromList(img.encodePng(mask)),
+        generatedImage: Uint8List.fromList(img.encodePng(generated)),
+      );
+      final decoded = img.decodeImage(result)!;
+
+      expect(decoded.getPixel(1, 1).a.toInt(), equals(255));
+      expect(decoded.getPixel(1, 1).r.toInt(), equals(200));
+      expect(decoded.getPixel(0, 0).a.toInt(), equals(0));
+      expect(decoded.getPixel(3, 3).a.toInt(), equals(0));
     });
   });
 }

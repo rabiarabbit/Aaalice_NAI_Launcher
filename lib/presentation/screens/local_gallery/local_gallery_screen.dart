@@ -10,7 +10,6 @@ import 'package:nai_launcher/core/utils/localization_extension.dart';
 import 'package:path/path.dart' as path;
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../core/constants/api_constants.dart';
 import '../../../core/constants/storage_keys.dart';
 import '../../../core/shortcuts/default_shortcuts.dart';
 import '../../../core/utils/app_logger.dart';
@@ -36,6 +35,8 @@ import '../../providers/reverse_prompt_provider.dart';
 import '../../router/app_router.dart';
 import '../../services/image_workflow_launcher.dart';
 import '../../utils/asset_protection_guard.dart';
+import '../../utils/krita_send_helper.dart';
+import '../../utils/metadata_import_applier.dart';
 import '../../utils/prompt_preset_import_utils.dart';
 import '../../providers/selection_mode_provider.dart';
 import '../../widgets/bulk_metadata_edit_dialog.dart';
@@ -917,62 +918,40 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
 
       var appliedCount = 0;
 
-      if (options.importPrompt && metadata.prompt.isNotEmpty) {
-        paramsNotifier.updatePrompt(_formatPrompt(metadata.prompt));
-        appliedCount++;
-      }
-
-      if (options.importNegativePrompt &&
-          (metadata.negativePrompt.isNotEmpty || options.importUcPreset)) {
-        paramsNotifier
-            .updateNegativePrompt(_formatPrompt(_resolveImportedNegativePrompt(
-          metadata,
-          importUcPreset: options.importUcPreset,
-        )));
-        appliedCount++;
-      }
+      final currentModel = ref.read(generationParamsNotifierProvider).model;
+      appliedCount += MetadataImportApplier.applyPromptAndGenerationParams(
+        metadata: metadata,
+        options: options,
+        currentModel: currentModel,
+        target: MetadataImportTarget(
+          updatePrompt: (value) =>
+              paramsNotifier.updatePrompt(_formatPrompt(value)),
+          updateNegativePrompt: (value) =>
+              paramsNotifier.updateNegativePrompt(_formatPrompt(value)),
+          updateSeed: paramsNotifier.updateSeed,
+          updateSteps: paramsNotifier.updateSteps,
+          updateScale: paramsNotifier.updateScale,
+          updateSize: paramsNotifier.updateSize,
+          updateSampler: paramsNotifier.updateSampler,
+          updateModel: paramsNotifier.updateModel,
+          updateSmea: paramsNotifier.updateSmea,
+          updateSmeaDyn: paramsNotifier.updateSmeaDyn,
+          updateVarietyPlus: paramsNotifier.updateVarietyPlus,
+          updateNoiseSchedule: paramsNotifier.updateNoiseSchedule,
+          updateCfgRescale: paramsNotifier.updateCfgRescale,
+          updateQualityToggle: (value) {
+            paramsNotifier.updateQualityToggle(value);
+            applyImportedQualityToggle(ref.read, value);
+          },
+          updateUcPreset: (value) {
+            paramsNotifier.updateUcPreset(value);
+            applyImportedUcPreset(ref.read, value);
+          },
+        ),
+      );
 
       if (options.importCharacterPrompts && hasCharacters) {
         _applyCharacterPrompts(metadata);
-        appliedCount++;
-      }
-
-      appliedCount += _applyParam(
-          options.importSeed, metadata.seed, paramsNotifier.updateSeed);
-      appliedCount += _applyParam(
-          options.importSteps, metadata.steps, paramsNotifier.updateSteps);
-      appliedCount += _applyParam(
-          options.importScale, metadata.scale, paramsNotifier.updateScale);
-      appliedCount += _applyParam(options.importSampler, metadata.sampler,
-          paramsNotifier.updateSampler);
-      appliedCount += _applyParam(
-          options.importModel, metadata.model, paramsNotifier.updateModel);
-      appliedCount += _applyParam(
-          options.importSmea, metadata.smea, paramsNotifier.updateSmea);
-      appliedCount += _applyParam(options.importSmeaDyn, metadata.smeaDyn,
-          paramsNotifier.updateSmeaDyn);
-      appliedCount += _applyParam(options.importVarietyPlus,
-          metadata.varietyPlus, paramsNotifier.updateVarietyPlus);
-      appliedCount += _applyParam(options.importNoiseSchedule,
-          metadata.noiseSchedule, paramsNotifier.updateNoiseSchedule);
-      appliedCount += _applyParam(options.importCfgRescale, metadata.cfgRescale,
-          paramsNotifier.updateCfgRescale);
-      if (options.importQualityToggle && metadata.qualityToggle != null) {
-        paramsNotifier.updateQualityToggle(metadata.qualityToggle!);
-        applyImportedQualityToggle(ref.read, metadata.qualityToggle!);
-        appliedCount++;
-      }
-
-      if (options.importUcPreset && metadata.ucPreset != null) {
-        paramsNotifier.updateUcPreset(metadata.ucPreset!);
-        applyImportedUcPreset(ref.read, metadata.ucPreset!);
-        appliedCount++;
-      }
-
-      if (options.importSize &&
-          metadata.width != null &&
-          metadata.height != null) {
-        paramsNotifier.updateSize(metadata.width!, metadata.height!);
         appliedCount++;
       }
 
@@ -980,7 +959,9 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
 
       if (appliedCount > 0) {
         AppToast.info(
-            context, context.l10n.metadataImport_appliedToMain(appliedCount));
+          context,
+          context.l10n.metadataImport_appliedToMain(appliedCount),
+        );
       } else {
         AppToast.warning(context, context.l10n.metadataImport_noParamsSelected);
       }
@@ -994,32 +975,6 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
 
   String _formatPrompt(String prompt) {
     return NaiPromptFormatter.format(SdToNaiConverter.convert(prompt));
-  }
-
-  String _resolveImportedNegativePrompt(
-    NaiImageMetadata metadata, {
-    required bool importUcPreset,
-  }) {
-    final baseNegative = metadata.displayNegativePrompt;
-    if (!importUcPreset || metadata.ucPreset == null) {
-      return baseNegative;
-    }
-
-    final model =
-        metadata.model ?? ref.read(generationParamsNotifierProvider).model;
-    return UcPresets.stripPresetByInt(
-      baseNegative,
-      model,
-      metadata.ucPreset!,
-    );
-  }
-
-  int _applyParam<T>(bool shouldApply, T? value, void Function(T) updater) {
-    if (shouldApply && value != null) {
-      updater(value);
-      return 1;
-    }
-    return 0;
   }
 
   void _applyCharacterPrompts(NaiImageMetadata metadata) {
@@ -1125,6 +1080,27 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
     }
   }
 
+  Future<void> _sendToKrita(LocalImageRecord record) async {
+    try {
+      final file = File(record.path);
+      if (!await file.exists()) {
+        if (mounted) AppToast.info(context, '图片文件不存在');
+        return;
+      }
+
+      final imageBytes = await file.readAsBytes();
+      if (!mounted) return;
+      KritaSendHelper.sendImageBytes(
+        context,
+        ref,
+        imageBytes,
+        name: path.basename(record.path),
+      );
+    } catch (e) {
+      if (mounted) AppToast.error(context, '发送到 Krita 失败: $e');
+    }
+  }
+
   Future<void> _showSendDestinationDialog(LocalImageRecord record) async {
     final destination = await ImageSendDestinationDialog.show(context, record);
     if (destination == null || !mounted) return;
@@ -1136,6 +1112,8 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
         await _sendToReversePrompt(record);
       case SendDestination.vibeTransfer:
         await _sendToVibeTransfer(record);
+      case SendDestination.krita:
+        await _sendToKrita(record);
     }
   }
 

@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nai_launcher/core/utils/localization_extension.dart';
 import 'package:nai_launcher/data/models/queue/replication_task.dart';
 import 'package:nai_launcher/presentation/providers/image_generation_provider.dart';
+import 'package:nai_launcher/presentation/providers/krita/krita_bridge_notifier.dart';
 import 'package:nai_launcher/presentation/providers/queue_execution_provider.dart';
 import 'package:nai_launcher/presentation/providers/replication_queue_provider.dart';
 import 'package:nai_launcher/presentation/router/app_router.dart';
@@ -34,13 +35,16 @@ class _GenerationControlsState extends ConsumerState<GenerationControls> {
   @override
   Widget build(BuildContext context) {
     final generationState = ref.watch(imageGenerationNotifierProvider);
+    final kritaBridgeState = ref.watch(kritaBridgeNotifierProvider);
     final nSamples = ref.watch(
       generationParamsNotifierProvider.select((params) => params.nSamples),
     );
-    final isGenerating = generationState.isGenerating;
+    final isLauncherGenerating = generationState.isGenerating;
+    final isGenerating =
+        isLauncherGenerating || kritaBridgeState.isBridgeGenerating;
 
     // 悬浮时显示取消，否则显示生成中
-    final showCancel = isGenerating && _isHovering;
+    final showCancel = isLauncherGenerating && _isHovering;
 
     final randomMode = ref.watch(randomPromptModeProvider);
 
@@ -68,9 +72,17 @@ class _GenerationControlsState extends ConsumerState<GenerationControls> {
           final currentGenerationState =
               ref.read(imageGenerationNotifierProvider);
           if (!currentGenerationState.isGenerating) {
+            final currentKritaBridgeState =
+                ref.read(kritaBridgeNotifierProvider);
+            if (currentKritaBridgeState.isBridgeGenerating) {
+              return;
+            }
             // 延迟一帧确保提示词已填充
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (!mounted) return;
+              final latestKritaBridgeState =
+                  ref.read(kritaBridgeNotifierProvider);
+              if (latestKritaBridgeState.isBridgeGenerating) return;
               final currentParams = ref.read(generationParamsNotifierProvider);
               if (currentParams.prompt.isNotEmpty) {
                 ref
@@ -235,6 +247,10 @@ class _GenerationControlsState extends ConsumerState<GenerationControls> {
     WidgetRef ref,
   ) {
     final params = ref.read(generationParamsNotifierProvider);
+    if (ref.read(kritaBridgeNotifierProvider).isBridgeGenerating) {
+      AppToast.warning(context, 'Krita Bridge 正在生成，请等待当前任务结束');
+      return;
+    }
     if (params.prompt.isEmpty) {
       AppToast.warning(context, context.l10n.generation_pleaseInputPrompt);
       return;

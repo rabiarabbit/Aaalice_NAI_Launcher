@@ -1,11 +1,16 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nai_launcher/core/constants/api_constants.dart';
 import 'package:nai_launcher/core/enums/precise_ref_type.dart';
 import 'package:nai_launcher/data/models/gallery/local_image_record.dart';
 import 'package:nai_launcher/data/models/gallery/nai_image_metadata.dart';
+import 'package:nai_launcher/data/models/metadata/metadata_import_options.dart';
 import 'package:nai_launcher/data/models/online_gallery/danbooru_post.dart';
+import 'package:nai_launcher/data/services/metadata/unified_metadata_parser.dart';
+import 'package:nai_launcher/presentation/utils/metadata_import_applier.dart';
 import 'package:nai_launcher/presentation/widgets/common/image_detail/image_detail_data.dart';
-import 'dart:convert';
 
 void main() {
   group('NaiImageMetadata', () {
@@ -53,7 +58,7 @@ void main() {
     });
 
     test(
-        'fromNaiComment should infer V4.5 Full model and heavy uc preset from raw NovelAI metadata',
+        'fromNaiComment should map known V4.5 source fingerprint without inferring uc preset',
         () {
       final preset = UcPresets.getPresetContent(
         ImageModels.animeDiffusionV45Full,
@@ -71,12 +76,162 @@ void main() {
         },
       );
 
+      expect(metadata.source, equals('NovelAI Diffusion V4.5 4BDE2A90'));
       expect(metadata.model, equals(ImageModels.animeDiffusionV45Full));
-      expect(metadata.ucPreset, equals(0));
+      expect(metadata.ucPreset, isNull);
       expect(
         metadata.displayNegativePrompt,
         equals('$preset, custom_negative'),
       );
+    });
+
+    test('fromNaiComment should prefer source over legacy Comment model field',
+        () {
+      final metadata = NaiImageMetadata.fromNaiComment(
+        {
+          'Comment': jsonEncode({
+            'prompt': '1girl',
+            'uc': 'bad hands',
+            'model': ImageModels.animeDiffusionV45Curated,
+          }),
+          'Software': 'NovelAI',
+          'Source': 'NovelAI Diffusion V4.5 4BDE2A90',
+        },
+      );
+
+      expect(metadata.source, equals('NovelAI Diffusion V4.5 4BDE2A90'));
+      expect(metadata.model, equals(ImageModels.animeDiffusionV45Full));
+    });
+
+    test('fromNaiComment should not infer model from ambiguous V4.5 source',
+        () {
+      final metadata = NaiImageMetadata.fromNaiComment(
+        {
+          'Comment': jsonEncode({
+            'prompt': '1girl',
+            'uc': 'bad hands',
+          }),
+          'Software': 'NovelAI',
+          'Source': 'NovelAI Diffusion V4.5',
+        },
+      );
+
+      expect(metadata.source, equals('NovelAI Diffusion V4.5'));
+      expect(metadata.model, isNull);
+    });
+
+    test('source model should override stale cached model values', () {
+      const metadata = NaiImageMetadata(
+        source: 'NovelAI Diffusion V4.5 4BDE2A90',
+        model: ImageModels.animeDiffusionV45Curated,
+        seed: 1,
+      );
+
+      expect(
+        metadata.effectiveModel,
+        equals(ImageModels.animeDiffusionV45Full),
+      );
+      expect(
+        metadata.upgradeFromRawJsonIfNeeded().model,
+        equals(ImageModels.animeDiffusionV45Full),
+      );
+    });
+
+    test('source-only metadata should resolve model for import', () {
+      const metadata = NaiImageMetadata(
+        source: 'NovelAI Diffusion V4.5 4BDE2A90',
+        seed: 1,
+      );
+
+      final applied = <String, Object?>{};
+      final count = MetadataImportApplier.applyPromptAndGenerationParams(
+        metadata: metadata,
+        options: const MetadataImportOptions(importModel: true),
+        currentModel: ImageModels.animeDiffusionV45Curated,
+        target: MetadataImportTarget(
+          updatePrompt: (_) {},
+          updateNegativePrompt: (_) {},
+          updateSeed: (_) {},
+          updateSteps: (_) {},
+          updateScale: (_) {},
+          updateSize: (width, height) {},
+          updateSampler: (_) {},
+          updateModel: (value) => applied['model'] = value,
+          updateSmea: (_) {},
+          updateSmeaDyn: (_) {},
+          updateVarietyPlus: (_) {},
+          updateNoiseSchedule: (_) {},
+          updateCfgRescale: (_) {},
+          updateQualityToggle: (_) {},
+          updateUcPreset: (_) {},
+        ),
+      );
+
+      expect(count, 1);
+      expect(applied['model'], equals(ImageModels.animeDiffusionV45Full));
+    });
+
+    test('real official PNG metadata should apply readable generation params',
+        () async {
+      final file = File(
+        r'C:\Users\10562\Pictures\78286cee-26bf-43c0-8c0a-5970d7aeb1ab.png',
+      );
+      if (!file.existsSync()) {
+        markTestSkipped('local official NovelAI PNG sample is not present');
+        return;
+      }
+
+      final result = UnifiedMetadataParser.parseFromPng(
+        await file.readAsBytes(),
+      );
+      expect(result.success, isTrue);
+      final metadata = result.metadata!;
+
+      final applied = <String, Object?>{};
+      final count = MetadataImportApplier.applyPromptAndGenerationParams(
+        metadata: metadata,
+        options: MetadataImportOptions.all(),
+        currentModel: ImageModels.animeDiffusionV45Curated,
+        target: MetadataImportTarget(
+          updatePrompt: (value) => applied['prompt'] = value,
+          updateNegativePrompt: (value) => applied['negativePrompt'] = value,
+          updateSeed: (value) => applied['seed'] = value,
+          updateSteps: (value) => applied['steps'] = value,
+          updateScale: (value) => applied['scale'] = value,
+          updateSize: (width, height) {
+            applied['width'] = width;
+            applied['height'] = height;
+          },
+          updateSampler: (value) => applied['sampler'] = value,
+          updateModel: (value) => applied['model'] = value,
+          updateSmea: (value) => applied['smea'] = value,
+          updateSmeaDyn: (value) => applied['smeaDyn'] = value,
+          updateVarietyPlus: (value) => applied['varietyPlus'] = value,
+          updateNoiseSchedule: (value) => applied['noiseSchedule'] = value,
+          updateCfgRescale: (value) => applied['cfgRescale'] = value,
+          updateQualityToggle: (value) => applied['qualityToggle'] = value,
+          updateUcPreset: (value) => applied['ucPreset'] = value,
+        ),
+      );
+
+      expect(metadata.source, equals('NovelAI Diffusion V4.5 4BDE2A90'));
+      expect(metadata.model, equals(ImageModels.animeDiffusionV45Full));
+      expect(metadata.prompt, isNotEmpty);
+      expect(metadata.negativePrompt, isNotEmpty);
+      expect(count, equals(12));
+      expect(applied['model'], equals(ImageModels.animeDiffusionV45Full));
+      expect(applied['seed'], equals(3451713783));
+      expect(applied['steps'], equals(28));
+      expect(applied['width'], equals(512));
+      expect(applied['height'], equals(1920));
+      expect(applied['scale'], equals(5.0));
+      expect(applied['sampler'], equals('k_dpmpp_2m'));
+      expect(applied['smea'], isFalse);
+      expect(applied['smeaDyn'], isFalse);
+      expect(applied['noiseSchedule'], equals('karras'));
+      expect(applied['cfgRescale'], equals(0.0));
+      expect(applied, isNot(contains('qualityToggle')));
+      expect(applied, isNot(contains('ucPreset')));
     });
 
     test('fromNaiComment should parse NovelAI Vibe array metadata', () {

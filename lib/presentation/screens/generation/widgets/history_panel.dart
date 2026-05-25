@@ -31,6 +31,7 @@ import '../../../widgets/common/draggable_memory_image.dart';
 import '../../../widgets/common/selectable_image_card.dart';
 import '../../../widgets/image_editor/image_editor_screen.dart';
 import '../../../utils/image_detail_opener.dart';
+import '../../../utils/krita_send_helper.dart';
 import '../../../widgets/common/themed_confirm_dialog.dart';
 import '../services/generation_save_service.dart';
 import '../../../widgets/common/themed_divider.dart';
@@ -574,6 +575,12 @@ class _HistoryPanelState extends ConsumerState<HistoryPanel> {
                     ref,
                     historyImage.bytes,
                   ),
+                  onSendToKrita: () => KritaSendHelper.sendImageBytes(
+                    context,
+                    ref,
+                    historyImage.bytes,
+                    name: 'history_${historyImage.id}.png',
+                  ),
                   onOpenInExplorer: () =>
                       _openImageInExplorer(context, historyImage),
                   onSaveToLibrary: (bytes, _) =>
@@ -695,6 +702,12 @@ class _HistoryPanelState extends ConsumerState<HistoryPanel> {
               ImageWorkflowLauncher.openDirectorTools(context, ref, imageBytes),
           onEnhance: () => ImageWorkflowLauncher.openEnhance(ref, imageBytes),
           onUpscale: () => ImageWorkflowLauncher.openUpscale(ref, imageBytes),
+          onSendToKrita: () => KritaSendHelper.sendImageBytes(
+            context,
+            ref,
+            image.bytes,
+            name: 'history_${image.id}.png',
+          ),
           onOpenInExplorer: () => _openImageInExplorer(context, image),
           onSaveToLibrary: (bytes, _) =>
               _showSaveToLibraryDialog(context, bytes),

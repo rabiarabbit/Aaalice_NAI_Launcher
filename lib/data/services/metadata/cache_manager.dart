@@ -20,7 +20,7 @@ class MetadataCacheManager {
   static const int _memoryCacheCapacity = 500;
   // Bump this whenever NaiImageMetadata parsing semantics change; cached values
   // are parsed snapshots, not raw PNG metadata.
-  static const int _currentCacheVersion = 3;
+  static const int _currentCacheVersion = 6;
 
   Box<String>? _persistentBox;
   final _memoryCache =
@@ -121,14 +121,14 @@ class MetadataCacheManager {
       if (version != null) {
         await box.put('_cacheVersion', version);
       }
-      } catch (e, stack) {
-        AppLogger.e(
-          'Failed to clear persistent cache',
-          e,
-          stack,
-          'MetadataCacheManager',
-        );
-      }
+    } catch (e, stack) {
+      AppLogger.e(
+        'Failed to clear persistent cache',
+        e,
+        stack,
+        'MetadataCacheManager',
+      );
+    }
   }
 
   /// 清除 L2 持久化缓存
@@ -140,14 +140,14 @@ class MetadataCacheManager {
       if (version != null) {
         await box.put('_cacheVersion', version);
       }
-      } catch (e, stack) {
-        AppLogger.e(
-          'Failed to clear persistent cache',
-          e,
-          stack,
-          'MetadataCacheManager',
-        );
-      }
+    } catch (e, stack) {
+      AppLogger.e(
+        'Failed to clear persistent cache',
+        e,
+        stack,
+        'MetadataCacheManager',
+      );
+    }
   }
 
   // ==================== 统计信息 ====================

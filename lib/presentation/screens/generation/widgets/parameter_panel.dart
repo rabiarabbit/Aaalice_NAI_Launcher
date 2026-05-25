@@ -7,6 +7,7 @@ import '../../../../core/utils/localization_extension.dart';
 import '../../../../data/models/image/resolution_preset.dart';
 import '../../../providers/generation/generation_params_selectors.dart';
 import '../../../providers/image_generation_provider.dart';
+import '../../../providers/krita/krita_bridge_notifier.dart';
 import '../../../utils/asset_protection_guard.dart';
 import '../../../widgets/common/themed_dropdown.dart';
 import '../../../widgets/common/themed_input.dart';
@@ -60,8 +61,11 @@ class _ParameterPanelState extends ConsumerState<ParameterPanel> {
       generationParamsNotifierProvider.select(selectParameterPanelViewData),
     );
     final generationState = ref.watch(imageGenerationNotifierProvider);
+    final kritaBridgeState = ref.watch(kritaBridgeNotifierProvider);
     final theme = Theme.of(context);
-    final isGenerating = generationState.isGenerating;
+    final isLauncherGenerating = generationState.isGenerating;
+    final isGenerating =
+        isLauncherGenerating || kritaBridgeState.isBridgeGenerating;
 
     _syncSeedController(params.seed);
 
@@ -80,10 +84,21 @@ class _ParameterPanelState extends ConsumerState<ParameterPanel> {
             height: 48,
             child: ThemedButton(
               onPressed: isGenerating
-                  ? () => ref
-                      .read(imageGenerationNotifierProvider.notifier)
-                      .cancel()
+                  ? (isLauncherGenerating
+                      ? () => ref
+                          .read(imageGenerationNotifierProvider.notifier)
+                          .cancel()
+                      : null)
                   : () async {
+                      if (ref
+                          .read(kritaBridgeNotifierProvider)
+                          .isBridgeGenerating) {
+                        AppToast.warning(
+                          context,
+                          'Krita Bridge 正在生成，请等待当前任务结束',
+                        );
+                        return;
+                      }
                       if (params.prompt.isEmpty) {
                         AppToast.info(
                           context,
@@ -104,15 +119,17 @@ class _ParameterPanelState extends ConsumerState<ParameterPanel> {
                           .generate(ref.read(generationParamsNotifierProvider));
                     },
               icon: isGenerating
-                  ? const Icon(Icons.stop)
+                  ? (isLauncherGenerating ? const Icon(Icons.stop) : null)
                   : const Icon(Icons.auto_awesome),
-              isLoading: isGenerating && false, // 不要显示加载圈，直接变 Cancel
+              isLoading: isGenerating && !isLauncherGenerating,
               label: Text(
                 isGenerating
-                    ? context.l10n.generation_cancelGeneration
+                    ? (isLauncherGenerating
+                        ? context.l10n.generation_cancelGeneration
+                        : context.l10n.generation_generating)
                     : context.l10n.generation_generateImage,
               ),
-              style: isGenerating
+              style: isLauncherGenerating
                   ? ThemedButtonStyle.outlined
                   : ThemedButtonStyle.filled,
             ),
@@ -386,7 +403,7 @@ class _ParameterPanelState extends ConsumerState<ParameterPanel> {
                 backgroundColor: ref
                         .watch(generationParamsNotifierProvider.notifier)
                         .isSeedLocked
-                    ? theme.colorScheme.primary.withOpacity(0.15)
+                    ? theme.colorScheme.primary.withValues(alpha: 0.15)
                     : theme.colorScheme.surfaceContainerHighest,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -452,7 +469,8 @@ class _ParameterPanelState extends ConsumerState<ParameterPanel> {
                       child: Text(
                         '高分辨率采样优化',
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurface.withOpacity(0.6),
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.6),
                         ),
                       ),
                     ),
@@ -811,7 +829,7 @@ class _SizeSelectorState extends State<_SizeSelector> {
                 '×',
                 style: TextStyle(
                   fontSize: 16,
-                  color: theme.colorScheme.onSurface.withOpacity(0.6),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
               ),
             ),
@@ -903,7 +921,7 @@ class _SmeaAutoButton extends StatelessWidget {
 
     return Material(
       color: isAuto
-          ? theme.colorScheme.primary.withOpacity(0.15)
+          ? theme.colorScheme.primary.withValues(alpha: 0.15)
           : theme.colorScheme.surfaceContainerHighest,
       borderRadius: BorderRadius.circular(8),
       child: InkWell(
@@ -914,8 +932,8 @@ class _SmeaAutoButton extends StatelessWidget {
           decoration: BoxDecoration(
             border: Border.all(
               color: isAuto
-                  ? theme.colorScheme.primary.withOpacity(0.5)
-                  : theme.colorScheme.outline.withOpacity(0.3),
+                  ? theme.colorScheme.primary.withValues(alpha: 0.5)
+                  : theme.colorScheme.outline.withValues(alpha: 0.3),
             ),
             borderRadius: BorderRadius.circular(8),
           ),
@@ -927,7 +945,7 @@ class _SmeaAutoButton extends StatelessWidget {
                 size: 18,
                 color: isAuto
                     ? theme.colorScheme.primary
-                    : theme.colorScheme.onSurface.withOpacity(0.5),
+                    : theme.colorScheme.onSurface.withValues(alpha: 0.5),
               ),
               const SizedBox(width: 4),
               Text(
@@ -937,7 +955,7 @@ class _SmeaAutoButton extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                   color: isAuto
                       ? theme.colorScheme.primary
-                      : theme.colorScheme.onSurface.withOpacity(0.7),
+                      : theme.colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
               ),
             ],
@@ -1003,10 +1021,10 @@ class _SmeaOptions extends StatelessWidget {
     required ThemeData theme,
   }) {
     final color = isDisabled
-        ? theme.colorScheme.onSurface.withOpacity(0.3)
+        ? theme.colorScheme.onSurface.withValues(alpha: 0.3)
         : (value
             ? theme.colorScheme.primary
-            : theme.colorScheme.onSurface.withOpacity(0.7));
+            : theme.colorScheme.onSurface.withValues(alpha: 0.7));
 
     return InkWell(
       onTap: isDisabled ? null : () => onChanged(!value),
@@ -1061,16 +1079,16 @@ class _ToggleButtonState extends State<_ToggleButton> {
     Color backgroundColor;
     if (widget.isEnabled) {
       backgroundColor = _isHovered
-          ? theme.colorScheme.primary.withOpacity(0.85)
+          ? theme.colorScheme.primary.withValues(alpha: 0.85)
           : theme.colorScheme.primary;
     } else {
       final baseColor = isDark
-          ? Colors.white.withOpacity(0.08)
-          : Colors.black.withOpacity(0.05);
+          ? Colors.white.withValues(alpha: 0.08)
+          : Colors.black.withValues(alpha: 0.05);
       backgroundColor = _isHovered
           ? (isDark
-              ? Colors.white.withOpacity(0.15)
-              : Colors.black.withOpacity(0.1))
+              ? Colors.white.withValues(alpha: 0.15)
+              : Colors.black.withValues(alpha: 0.1))
           : baseColor;
     }
 
@@ -1091,8 +1109,8 @@ class _ToggleButtonState extends State<_ToggleButton> {
               color: widget.isEnabled
                   ? theme.colorScheme.primary
                   : (_isHovered
-                      ? theme.colorScheme.outline.withOpacity(0.4)
-                      : theme.colorScheme.outline.withOpacity(0.2)),
+                      ? theme.colorScheme.outline.withValues(alpha: 0.4)
+                      : theme.colorScheme.outline.withValues(alpha: 0.2)),
               width: 1,
             ),
           ),
@@ -1115,7 +1133,7 @@ class _ToggleButtonState extends State<_ToggleButton> {
                   color: widget.isEnabled
                       ? theme.colorScheme.onPrimary
                       : theme.colorScheme.onSurface
-                          .withOpacity(_isHovered ? 0.8 : 0.6),
+                          .withValues(alpha: _isHovered ? 0.8 : 0.6),
                 ),
               ),
             ],
@@ -1164,7 +1182,7 @@ class _SeedIconButtonState extends State<_SeedIconButton> {
               size: 18,
               color: _isHovered
                   ? theme.colorScheme.primary
-                  : theme.colorScheme.onSurface.withOpacity(0.5),
+                  : theme.colorScheme.onSurface.withValues(alpha: 0.5),
             ),
           ),
         ),

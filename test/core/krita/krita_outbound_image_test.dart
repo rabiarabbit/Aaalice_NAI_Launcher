@@ -1,0 +1,65 @@
+import 'dart:typed_data';
+
+import 'package:flutter_test/flutter_test.dart';
+import 'package:image/image.dart' as img;
+import 'package:nai_launcher/core/krita/krita_outbound_image.dart';
+
+void main() {
+  group('KritaOutboundImage', () {
+    test('keeps png bytes and normalizes extension', () {
+      final png = _png();
+
+      final prepared = KritaOutboundImage.prepare(
+        png,
+        name: 'sample.jpeg',
+      );
+
+      expect(prepared.bytes, png);
+      expect(prepared.name, 'sample.png');
+    });
+
+    test('converts decodable non-png images to png', () {
+      final jpeg = Uint8List.fromList(img.encodeJpg(_image()));
+
+      final prepared = KritaOutboundImage.prepare(
+        jpeg,
+        name: 'photo.jpg',
+      );
+
+      expect(prepared.name, 'photo.png');
+      expect(_hasPngSignature(prepared.bytes), isTrue);
+      expect(img.decodePng(prepared.bytes), isNotNull);
+    });
+
+    test('rejects undecodable bytes', () {
+      expect(
+        () => KritaOutboundImage.prepare(
+          Uint8List.fromList([1, 2, 3]),
+          name: 'broken.bin',
+        ),
+        throwsFormatException,
+      );
+    });
+  });
+}
+
+img.Image _image() {
+  final image = img.Image(width: 4, height: 4);
+  img.fill(image, color: img.ColorRgb8(70, 45, 55));
+  return image;
+}
+
+Uint8List _png() => Uint8List.fromList(img.encodePng(_image()));
+
+bool _hasPngSignature(Uint8List bytes) {
+  const signature = [137, 80, 78, 71, 13, 10, 26, 10];
+  if (bytes.length < signature.length) {
+    return false;
+  }
+  for (var i = 0; i < signature.length; i += 1) {
+    if (bytes[i] != signature[i]) {
+      return false;
+    }
+  }
+  return true;
+}

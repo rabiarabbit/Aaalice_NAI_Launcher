@@ -13,6 +13,9 @@ enum SendDestination {
 
   /// 发送到Vibe Transfer
   vibeTransfer,
+
+  /// 发送到 Krita
+  krita,
 }
 
 /// 图片发送目标选择对话框
@@ -85,6 +88,14 @@ class ImageSendDestinationDialog extends StatelessWidget {
                       Navigator.of(context).pop(SendDestination.vibeTransfer)
                   : null,
             ),
+            const SizedBox(height: 8),
+            _buildOption(
+              context,
+              icon: Icons.brush_outlined,
+              title: 'Krita',
+              subtitle: '发送到已连接的 Krita 插件',
+              onTap: () => Navigator.of(context).pop(SendDestination.krita),
+            ),
           ],
         ),
       ),
@@ -109,8 +120,8 @@ class ImageSendDestinationDialog extends StatelessWidget {
 
     return Material(
       color: enabled
-          ? theme.colorScheme.surfaceContainerHighest.withOpacity(0.3)
-          : theme.colorScheme.surfaceContainerHighest.withOpacity(0.1),
+          ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3)
+          : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.1),
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
         onTap: onTap,
@@ -124,7 +135,7 @@ class ImageSendDestinationDialog extends StatelessWidget {
                 size: 24,
                 color: enabled
                     ? theme.colorScheme.primary
-                    : theme.colorScheme.onSurface.withOpacity(0.38),
+                    : theme.colorScheme.onSurface.withValues(alpha: 0.38),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -136,7 +147,9 @@ class ImageSendDestinationDialog extends StatelessWidget {
                       style: theme.textTheme.titleSmall?.copyWith(
                         color: enabled
                             ? theme.colorScheme.onSurface
-                            : theme.colorScheme.onSurface.withOpacity(0.38),
+                            : theme.colorScheme.onSurface.withValues(
+                                alpha: 0.38,
+                              ),
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -146,7 +159,9 @@ class ImageSendDestinationDialog extends StatelessWidget {
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: enabled
                             ? theme.colorScheme.onSurfaceVariant
-                            : theme.colorScheme.onSurface.withOpacity(0.38),
+                            : theme.colorScheme.onSurface.withValues(
+                                alpha: 0.38,
+                              ),
                       ),
                     ),
                   ],
@@ -156,13 +171,13 @@ class ImageSendDestinationDialog extends StatelessWidget {
                 Icon(
                   Icons.arrow_forward_ios,
                   size: 16,
-                  color: theme.colorScheme.onSurface.withOpacity(0.5),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                 )
               else
                 Icon(
                   Icons.block,
                   size: 16,
-                  color: theme.colorScheme.onSurface.withOpacity(0.38),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.38),
                 ),
             ],
           ),

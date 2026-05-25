@@ -10,8 +10,10 @@ import 'presentation/providers/font_provider.dart';
 import 'presentation/providers/font_scale_provider.dart';
 import 'presentation/providers/locale_provider.dart';
 import 'presentation/providers/background_refresh_provider.dart';
+import 'presentation/providers/krita/krita_bridge_notifier.dart';
 import 'presentation/providers/queue_execution_provider.dart';
-import 'presentation/providers/subscription_provider.dart' hide anlasBalanceProvider;
+import 'presentation/providers/subscription_provider.dart'
+    hide anlasBalanceProvider;
 import 'presentation/themes/app_theme.dart';
 import 'presentation/widgets/shortcuts/shortcut_aware_widget.dart';
 import 'presentation/widgets/shortcuts/shortcut_help_dialog.dart';
@@ -23,12 +25,14 @@ class AppBootstrapEffects extends ConsumerStatefulWidget {
   final Widget child;
   final ProviderListenable<dynamic>? anlasWatcher;
   final ProviderListenable<dynamic>? backgroundRefresh;
+  final ProviderListenable<dynamic>? kritaBridge;
 
   const AppBootstrapEffects({
     super.key,
     required this.child,
     this.anlasWatcher,
     this.backgroundRefresh,
+    this.kritaBridge,
   });
 
   @override
@@ -39,6 +43,7 @@ class AppBootstrapEffects extends ConsumerStatefulWidget {
 class _AppBootstrapEffectsState extends ConsumerState<AppBootstrapEffects> {
   ProviderSubscription<dynamic>? _anlasWatcherSubscription;
   ProviderSubscription<dynamic>? _backgroundRefreshSubscription;
+  ProviderSubscription<dynamic>? _kritaBridgeSubscription;
 
   @override
   void initState() {
@@ -51,12 +56,17 @@ class _AppBootstrapEffectsState extends ConsumerState<AppBootstrapEffects> {
       widget.backgroundRefresh ?? backgroundRefreshNotifierProvider,
       (_, __) {},
     );
+    _kritaBridgeSubscription = ref.listenManual(
+      widget.kritaBridge ?? kritaBridgeNotifierProvider,
+      (_, __) {},
+    );
   }
 
   @override
   void dispose() {
     _anlasWatcherSubscription?.close();
     _backgroundRefreshSubscription?.close();
+    _kritaBridgeSubscription?.close();
     super.dispose();
   }
 
