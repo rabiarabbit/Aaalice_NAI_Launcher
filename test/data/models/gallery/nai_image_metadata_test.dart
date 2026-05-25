@@ -218,7 +218,7 @@ void main() {
       expect(metadata.model, equals(ImageModels.animeDiffusionV45Full));
       expect(metadata.prompt, isNotEmpty);
       expect(metadata.negativePrompt, isNotEmpty);
-      expect(count, equals(12));
+      expect(count, equals(13));
       expect(applied['model'], equals(ImageModels.animeDiffusionV45Full));
       expect(applied['seed'], equals(3451713783));
       expect(applied['steps'], equals(28));
@@ -228,6 +228,7 @@ void main() {
       expect(applied['sampler'], equals('k_dpmpp_2m'));
       expect(applied['smea'], isFalse);
       expect(applied['smeaDyn'], isFalse);
+      expect(applied['varietyPlus'], isFalse);
       expect(applied['noiseSchedule'], equals('karras'));
       expect(applied['cfgRescale'], equals(0.0));
       expect(applied, isNot(contains('qualityToggle')));
@@ -288,6 +289,22 @@ void main() {
       );
 
       expect(metadata.varietyPlus, isTrue);
+    });
+
+    test('fromNaiComment should parse null skip cfg as Variety+ disabled', () {
+      final metadata = NaiImageMetadata.fromNaiComment(
+        {
+          'Comment': jsonEncode({
+            'prompt': '1girl',
+            'uc': 'bad hands',
+            'skip_cfg_above_sigma': null,
+          }),
+          'Software': 'NovelAI',
+          'Source': 'NovelAI Diffusion V4.5 4BDE2A90',
+        },
+      );
+
+      expect(metadata.varietyPlus, isFalse);
     });
 
     test('fromNaiComment should parse legacy Vibe reference shapes', () {

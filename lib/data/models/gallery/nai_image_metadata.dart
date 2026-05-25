@@ -1048,11 +1048,14 @@ class NaiImageMetadata with _$NaiImageMetadata {
         _safeGetBool(data, 'variety_plus') ?? _safeGetBool(data, 'varietyPlus');
     if (explicit != null) return explicit;
 
-    final skipCfgAbove = _firstDouble(
-      data,
-      const ['skip_cfg_above_sigma', 'skipCfgAboveSigma'],
-    );
-    if (skipCfgAbove != null) return skipCfgAbove > 0;
+    const skipCfgKeys = ['skip_cfg_above_sigma', 'skipCfgAboveSigma'];
+    for (final key in skipCfgKeys) {
+      if (!data.containsKey(key)) continue;
+      final value = data[key];
+      if (value == null) return false;
+      final skipCfgAbove = _toDouble(value);
+      if (skipCfgAbove != null) return skipCfgAbove > 0;
+    }
 
     return null;
   }
