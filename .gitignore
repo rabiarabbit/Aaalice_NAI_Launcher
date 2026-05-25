@@ -30,6 +30,10 @@ lib/generated_plugin_registrant.dart
 *.freezed.dart
 *.mocks.dart
 
+# Python 工具运行产物
+__pycache__/
+*.py[cod]
+
 
 # ===========================================================================
 # IDE 和编辑器文件
