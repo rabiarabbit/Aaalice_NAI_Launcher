@@ -82,7 +82,7 @@ class _PreciseReferencePanelState extends ConsumerState<PreciseReferencePanel> {
         ),
         decoration: BoxDecoration(
           color: showBackground
-              ? Colors.white.withOpacity(0.2)
+              ? Colors.white.withValues(alpha: 0.2)
               : theme.colorScheme.secondaryContainer,
           borderRadius: BorderRadius.circular(4),
         ),
@@ -104,8 +104,8 @@ class _PreciseReferencePanelState extends ConsumerState<PreciseReferencePanel> {
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
                   color: showBackground
-                      ? Colors.orange.withOpacity(0.9)
-                      : Colors.orange.withOpacity(0.15),
+                      ? Colors.orange.withValues(alpha: 0.9)
+                      : Colors.orange.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(4),
                   border: Border.all(
                     color: showBackground
@@ -152,7 +152,9 @@ class _PreciseReferencePanelState extends ConsumerState<PreciseReferencePanel> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.errorContainer.withOpacity(0.3),
+                  color: theme.colorScheme.errorContainer.withValues(
+                    alpha: 0.3,
+                  ),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
@@ -181,7 +183,7 @@ class _PreciseReferencePanelState extends ConsumerState<PreciseReferencePanel> {
             Text(
               context.l10n.preciseRef_description,
               style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.6),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             ),
             const SizedBox(height: 12),
@@ -236,29 +238,30 @@ class _PreciseReferencePanelState extends ConsumerState<PreciseReferencePanel> {
     try {
       final result = await FilePicker.platform.pickFiles(
         type: FileType.image,
-        allowMultiple: false,
+        allowMultiple: true,
       );
 
       if (result != null && result.files.isNotEmpty) {
-        final file = result.files.first;
-        Uint8List? bytes;
+        final notifier = ref.read(generationParamsNotifierProvider.notifier);
+        final addOperations = <Future<void>>[];
 
-        if (file.bytes != null) {
-          bytes = file.bytes;
-        } else if (file.path != null) {
-          bytes = await File(file.path!).readAsBytes();
+        for (final file in result.files) {
+          final bytes = await _readPickedImageBytes(file);
+          if (bytes == null) {
+            continue;
+          }
+
+          addOperations.add(
+            notifier.addPreciseReferenceFromImage(
+              bytes,
+              type: selectedType,
+              strength: 0.8,
+              fidelity: 1.0,
+            ),
+          );
         }
 
-        if (bytes != null) {
-          await ref
-              .read(generationParamsNotifierProvider.notifier)
-              .addPreciseReferenceFromImage(
-                bytes,
-                type: selectedType,
-                strength: 0.8,
-                fidelity: 1.0,
-              );
-        }
+        await Future.wait(addOperations);
       }
     } catch (e) {
       if (mounted) {
@@ -268,6 +271,19 @@ class _PreciseReferencePanelState extends ConsumerState<PreciseReferencePanel> {
         );
       }
     }
+  }
+
+  Future<Uint8List?> _readPickedImageBytes(PlatformFile file) async {
+    if (file.bytes != null) {
+      return file.bytes;
+    }
+
+    final path = file.path;
+    if (path == null) {
+      return null;
+    }
+
+    return File(path).readAsBytes();
   }
 
   /// 显示类型选择对话框
@@ -467,7 +483,7 @@ class _PreciseReferenceCard extends StatelessWidget {
 
   Widget _buildTypeDropdown(BuildContext context, ThemeData theme) {
     return DropdownButtonFormField<PreciseRefType>(
-      value: reference.type,
+      initialValue: reference.type,
       isDense: true,
       decoration: InputDecoration(
         labelText: context.l10n.preciseRef_referenceType,
