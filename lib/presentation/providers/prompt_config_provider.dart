@@ -7,7 +7,10 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../core/utils/app_logger.dart';
 import '../../data/models/prompt/default_presets.dart';
 import '../../data/models/prompt/prompt_config.dart';
+import '../../data/models/prompt/random_preset.dart';
 import '../../data/models/prompt/random_prompt_result.dart';
+import '../../data/services/random_preset_merger.dart';
+import '../../data/services/random_prompt_legacy_adapter.dart';
 import '../../data/services/random_prompt_generator.dart';
 import 'random_mode_provider.dart';
 import 'random_preset_provider.dart';
@@ -136,7 +139,7 @@ class PromptConfigNotifier extends _$PromptConfigNotifier {
 
   /// 统一随机提示词生成入口
   ///
-  /// 根据当前模式（官网/自定义）生成随机提示词
+  /// 根据当前模式（官网/自定义/混合）生成随机提示词
   /// [seed] 随机种子（可选）
   /// [isV4Model] 是否为 V4+ 模型（可选，默认 true）
   Future<RandomPromptResult> generateRandomPrompt({
@@ -144,42 +147,59 @@ class PromptConfigNotifier extends _$PromptConfigNotifier {
     bool isV4Model = true,
   }) async {
     final mode = ref.read(randomModeNotifierProvider);
+    final presetNotifier = ref.read(randomPresetNotifierProvider.notifier);
+    await presetNotifier.whenLoaded;
 
-    if (mode == RandomGenerationMode.naiOfficial) {
-      // 官网模式：使用 NAI 算法生成
-      return _generateNaiStylePrompt(seed: seed, isV4Model: isV4Model);
-    } else {
-      // 自定义模式：使用现有预设生成
-      return _generateCustomPrompt(seed: seed);
+    final presetState = ref.read(randomPresetNotifierProvider);
+    if (presetState.error != null) {
+      AppLogger.w(
+        'random preset state failed to load: ${presetState.error}',
+        'RandomGen',
+      );
+      throw StateError(presetState.error!);
     }
+
+    return switch (mode) {
+      RandomGenerationMode.naiOfficial => _generateOfficialPrompt(
+          seed: seed,
+          isV4Model: isV4Model,
+        ),
+      RandomGenerationMode.custom => _generateCustomPresetPrompt(
+          seed: seed,
+          isV4Model: isV4Model,
+        ),
+      RandomGenerationMode.hybrid => _generateHybridPrompt(
+          seed: seed,
+          isV4Model: isV4Model,
+        ),
+    };
   }
 
   /// 官网模式生成
-  Future<RandomPromptResult> _generateNaiStylePrompt({
+  Future<RandomPromptResult> _generateOfficialPrompt({
     int? seed,
     bool isV4Model = true,
   }) async {
     final generator = ref.read(randomPromptGeneratorProvider);
     final presetState = ref.read(randomPresetNotifierProvider);
 
-    // 优先使用用户预设生成
-    final preset = presetState.selectedPreset;
-    if (preset != null && preset.categories.isNotEmpty) {
+    final preset = presetState.defaultPreset;
+    if (preset.categories.isNotEmpty) {
       final result = await generator.generateFromPreset(
         preset: preset,
         isV4Model: isV4Model,
         seed: seed,
+        mode: RandomGenerationMode.naiOfficial,
       );
-      // 调试：输出生成结果详情
       AppLogger.d(
-        'generateFromPreset result: ${result.characterCount} characters, '
+        'official preset result: ${result.characterCount} characters, '
             'mainPrompt: ${result.mainPrompt}',
         'RandomGen',
       );
       return result;
     }
 
-    // 如果没有配置类别，使用原有 TagLibrary 方式
+    // 默认预设异常为空时，保留原始 TagLibrary 生成能力作为兜底。
     final filterConfig =
         ref.read(tagLibraryNotifierProvider).categoryFilterConfig;
     return generator.generateNaiStyle(
@@ -190,13 +210,72 @@ class PromptConfigNotifier extends _$PromptConfigNotifier {
   }
 
   /// 自定义模式生成
-  RandomPromptResult _generateCustomPrompt({int? seed}) {
-    final prompt = generatePrompt(seed: seed);
-    return RandomPromptResult(
-      mainPrompt: prompt,
-      mode: RandomGenerationMode.custom,
+  Future<RandomPromptResult> _generateCustomPresetPrompt({
+    int? seed,
+    bool isV4Model = true,
+  }) async {
+    final generator = ref.read(randomPromptGeneratorProvider);
+    final preset = _selectedCustomRandomPreset();
+
+    if (preset == null || preset.categories.isEmpty) {
+      return RandomPromptResult(
+        mainPrompt: '',
+        mode: RandomGenerationMode.custom,
+        seed: seed,
+      );
+    }
+
+    return generator.generateFromPreset(
+      preset: preset,
+      isV4Model: isV4Model,
       seed: seed,
+      mode: RandomGenerationMode.custom,
     );
+  }
+
+  /// 混合模式生成
+  Future<RandomPromptResult> _generateHybridPrompt({
+    int? seed,
+    bool isV4Model = true,
+  }) async {
+    final generator = ref.read(randomPromptGeneratorProvider);
+    final presetState = ref.read(randomPresetNotifierProvider);
+    final customPreset = _selectedCustomRandomPreset();
+
+    if (customPreset == null || customPreset.categories.isEmpty) {
+      return RandomPromptResult(
+        mainPrompt: '',
+        mode: RandomGenerationMode.hybrid,
+        seed: seed,
+      );
+    }
+
+    final mergedPreset = RandomPresetMerger.merge(
+      officialPreset: presetState.defaultPreset,
+      customPreset: customPreset,
+    );
+
+    return generator.generateFromPreset(
+      preset: mergedPreset,
+      isV4Model: isV4Model,
+      seed: seed,
+      mode: RandomGenerationMode.hybrid,
+    );
+  }
+
+  RandomPreset? _selectedCustomRandomPreset() {
+    final presetState = ref.read(randomPresetNotifierProvider);
+    final selectedPreset = presetState.selectedPreset;
+    if (selectedPreset != null && !selectedPreset.isDefault) {
+      return selectedPreset;
+    }
+
+    final legacyPreset = state.selectedPreset;
+    if (legacyPreset != null && legacyPreset.configs.isNotEmpty) {
+      return RandomPromptLegacyAdapter.fromPreset(legacyPreset);
+    }
+
+    return null;
   }
 
   /// 选择预设

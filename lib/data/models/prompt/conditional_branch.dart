@@ -105,6 +105,8 @@ class ConditionalBranchConfig with _$ConditionalBranchConfig {
     Map<String, String> context,
     int Function() randomInt,
   ) {
+    if (!enabled) return null;
+
     // 过滤出满足条件且启用的分支
     final eligibleBranches =
         branches.where((b) => b.enabled && b.checkCondition(context)).toList();

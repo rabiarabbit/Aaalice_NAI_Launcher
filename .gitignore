@@ -202,6 +202,20 @@ test_hive/
 # 但保留测试夹具
 !test/fixtures/
 
+# 保留随机配置模式补完测试
+!test/data/
+test/data/*
+!test/data/models/
+test/data/models/*
+!test/data/models/prompt/
+test/data/models/prompt/*
+!test/data/models/prompt/algorithm_config_test.dart
+!test/data/services/
+test/data/services/*
+!test/data/services/random_preset_merger_test.dart
+!test/data/services/random_prompt_legacy_adapter_test.dart
+!test/data/services/random_prompt_generator_preset_test.dart
+
 # 保留 Krita 桥接回归测试
 !test/core/
 test/core/*
@@ -215,6 +229,8 @@ test/presentation/*
 test/presentation/providers/*
 !test/presentation/providers/fixed_tags_provider_test.dart
 !test/presentation/providers/layout_state_provider_test.dart
+!test/presentation/providers/prompt_config_random_mode_test.dart
+!test/presentation/providers/random_mode_provider_test.dart
 !test/presentation/providers/krita/
 !test/presentation/providers/krita/*.dart
 !test/presentation/screens/
@@ -224,8 +240,14 @@ test/presentation/screens/generation/*
 !test/presentation/screens/generation/widgets/
 test/presentation/screens/generation/widgets/*
 !test/presentation/screens/generation/widgets/fixed_tags_sidebar_test.dart
+!test/presentation/screens/prompt_config/
+test/presentation/screens/prompt_config/*
+!test/presentation/screens/prompt_config/random_config_screen_test.dart
 !test/presentation/widgets/
 test/presentation/widgets/*
+!test/presentation/widgets/prompt/
+test/presentation/widgets/prompt/*
+!test/presentation/widgets/prompt/random_mode_selector_test.dart
 !test/presentation/widgets/gallery/
 test/presentation/widgets/gallery/*
 !test/presentation/widgets/gallery/image_send_destination_dialog_test.dart

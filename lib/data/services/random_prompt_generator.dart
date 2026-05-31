@@ -22,10 +22,10 @@ import '../models/prompt/weighted_tag.dart';
 import '../models/prompt/wordlist_entry.dart';
 import 'bracket_formatter.dart';
 import 'character_count_resolver.dart';
+import 'random_preset_generation_context.dart';
 import 'sequential_state_service.dart';
 import 'strategies/character_tag_generator.dart';
 import 'strategies/nai_style_generator_strategy.dart';
-import 'strategies/preset_generator_strategy.dart';
 import 'strategies/wordlist_generator_strategy.dart';
 import 'tag_library_service.dart';
 import 'variable_replacement_service.dart';
@@ -50,8 +50,6 @@ class RandomPromptGenerator {
   final VariableReplacementService _variableReplacementService;
   final CharacterTagGenerator _characterTagGenerator;
   final NaiStyleGeneratorStrategy _naiStyleGenerator;
-  // ignore: unused_field - Reserved for future preset generator implementation
-  final PresetGeneratorStrategy _presetGeneratorStrategy;
   final WordlistGeneratorStrategy _wordlistGeneratorStrategy;
 
   RandomPromptGenerator(
@@ -66,7 +64,6 @@ class RandomPromptGenerator {
         _variableReplacementService = VariableReplacementService(),
         _characterTagGenerator = CharacterTagGenerator(),
         _naiStyleGenerator = NaiStyleGeneratorStrategy(),
-        _presetGeneratorStrategy = PresetGeneratorStrategy(),
         _wordlistGeneratorStrategy = WordlistGeneratorStrategy();
 
   /// 获取过滤后的类别标签（根据分类级 Danbooru 补充配置）
@@ -525,6 +522,8 @@ class RandomPromptGenerator {
     required RandomPreset preset,
     bool isV4Model = true,
     int? seed,
+    RandomGenerationMode mode = RandomGenerationMode.naiOfficial,
+    DateTime? generationTime,
   }) async {
     final random = seed != null ? Random(seed) : Random();
 
@@ -533,9 +532,9 @@ class RandomPromptGenerator {
       'RandomGen',
     );
 
-    // 1. 从预设的 algorithmConfig 获取 characterCountConfig
-    final characterCountConfig = preset.algorithmConfig.characterCountConfig ??
-        CharacterCountConfig.naiDefault;
+    // 1. 从预设的 algorithmConfig 获取生成时有效的人数配置
+    final characterCountConfig =
+        preset.algorithmConfig.effectiveCharacterCountConfig;
 
     // 2. 按权重选择人数类别和标签选项
     final (category, tagOption) = _selectCharacterCountAndOption(
@@ -549,19 +548,47 @@ class RandomPromptGenerator {
       'RandomGen',
     );
 
+    final context = RandomPresetGenerationContext(
+      generationTime: generationTime,
+      characterCount:
+          category.count < 0 ? tagOption?.characterCount ?? 4 : category.count,
+    );
+    context.addVariable('character_count_category', category.id);
+
     // 3. 根据人数分支处理
     if (category.count == 0) {
       // 无人场景
-      return _generateNoHumanFromPreset(preset, random, seed, tagOption);
+      return _generateNoHumanFromPreset(
+        preset,
+        random,
+        seed,
+        tagOption,
+        mode,
+        context,
+      );
     }
 
     if (!isV4Model) {
       // 非 V4 模型：传统单提示词模式
-      return _generateLegacyFromPreset(preset, random, seed, tagOption);
+      return _generateLegacyFromPreset(
+        preset,
+        random,
+        seed,
+        tagOption,
+        mode,
+        context,
+      );
     }
 
     // V4+ 模型：多角色模式
-    return _generateMultiCharacterFromPreset(preset, random, seed, tagOption);
+    return _generateMultiCharacterFromPreset(
+      preset,
+      random,
+      seed,
+      tagOption,
+      mode,
+      context,
+    );
   }
 
   /// 选择人数类别和标签选项
@@ -597,6 +624,8 @@ class RandomPromptGenerator {
     Random random,
     int? seed,
     CharacterTagOption? tagOption,
+    RandomGenerationMode mode,
+    RandomPresetGenerationContext context,
   ) async {
     final mainTags = <String>[];
     final characters = <GeneratedCharacter>[];
@@ -611,6 +640,7 @@ class RandomPromptGenerator {
       preset,
       random,
       targetScope: TagScope.global,
+      context: context,
     );
     mainTags.addAll(globalTags);
 
@@ -633,6 +663,7 @@ class RandomPromptGenerator {
           random,
           targetScope: TagScope.character,
           characterGender: slotTag.characterTag,
+          context: context.forCharacter(slotTag.characterTag),
         );
         charTags.addAll(characterFeatures);
 
@@ -656,6 +687,7 @@ class RandomPromptGenerator {
         preset,
         random,
         targetScope: TagScope.character,
+        context: context.forCharacter('girl'),
       );
       if (charTags.isNotEmpty) {
         characters.add(
@@ -671,7 +703,7 @@ class RandomPromptGenerator {
       mainPrompt: mainTags.join(', '),
       characters: characters,
       seed: seed,
-    );
+    ).copyWith(mode: mode);
   }
 
   /// 从预设生成传统单提示词结果（非 V4 模型）
@@ -680,6 +712,8 @@ class RandomPromptGenerator {
     Random random,
     int? seed,
     CharacterTagOption? tagOption,
+    RandomGenerationMode mode,
+    RandomPresetGenerationContext context,
   ) async {
     final allTags = <String>[];
 
@@ -696,12 +730,16 @@ class RandomPromptGenerator {
     }
 
     // 生成所有类别的标签（不区分 scope）
-    final tags = await _generateFromPresetCategories(preset, random);
+    final tags = await _generateFromPresetCategories(
+      preset,
+      random,
+      context: context,
+    );
     allTags.addAll(tags);
 
     return RandomPromptResult(
       mainPrompt: allTags.join(', '),
-      mode: RandomGenerationMode.naiOfficial,
+      mode: mode,
       seed: seed,
     );
   }
@@ -712,6 +750,8 @@ class RandomPromptGenerator {
     Random random,
     int? seed,
     CharacterTagOption? tagOption,
+    RandomGenerationMode mode,
+    RandomPresetGenerationContext context,
   ) async {
     final mainTags = <String>[];
 
@@ -727,13 +767,14 @@ class RandomPromptGenerator {
       preset,
       random,
       targetScope: TagScope.global,
+      context: context,
     );
     mainTags.addAll(globalTags);
 
     return RandomPromptResult(
       mainPrompt: mainTags.join(', '),
       noHumans: true,
-      mode: RandomGenerationMode.naiOfficial,
+      mode: mode,
       seed: seed,
     );
   }
@@ -759,12 +800,31 @@ class RandomPromptGenerator {
     Random random, {
     TagScope targetScope = TagScope.all,
     String? characterGender,
+    RandomPresetGenerationContext? context,
   }) async {
     final results = <String>[];
+    final generationContext = context ?? RandomPresetGenerationContext();
+
+    if (!preset.algorithmConfig.isGlobalTimeConditionActive(
+      generationContext.generationTime,
+    )) {
+      return results;
+    }
 
     for (final category in preset.categories) {
       // 跳过禁用的类别
       if (!category.enabled) continue;
+
+      if (!preset.algorithmConfig.isCategoryGloballyVisible(
+            category.id,
+            generationContext.tagContext,
+          ) ||
+          !preset.algorithmConfig.isCategoryGloballyVisible(
+            category.key,
+            generationContext.tagContext,
+          )) {
+        continue;
+      }
 
       // 作用域过滤
       if (!category.isApplicableToScope(targetScope)) continue;
@@ -784,12 +844,34 @@ class RandomPromptGenerator {
         random,
         targetScope: targetScope,
         characterGender: characterGender,
+        context: generationContext,
+      );
+      generationContext.addCategoryTags(
+        category.key,
+        categoryTags,
+        categoryId: category.id,
       );
       results.addAll(categoryTags);
     }
 
+    final processed = preset.algorithmConfig.applyGlobalPostProcessRules(
+      results,
+      generationContext.tagContext,
+      variables: generationContext.variables,
+    );
+    generationContext.reconcileProcessedTags(
+      originalTags: results,
+      processedTags: processed,
+    );
+
     // 应用变量替换
-    return _applyVariableReplacement(results, preset, random);
+    final replaced = await _applyVariableReplacement(processed, preset, random);
+    return _applyEmphasis(
+      replaced,
+      preset.algorithmConfig.globalEmphasisProbability,
+      preset.algorithmConfig.globalEmphasisBracketCount,
+      random,
+    );
   }
 
   /// 从单个类别生成标签
@@ -801,12 +883,21 @@ class RandomPromptGenerator {
     Random random, {
     TagScope targetScope = TagScope.all,
     String? characterGender,
+    required RandomPresetGenerationContext context,
   }) async {
     // 过滤启用且符合条件的词组
     final enabledGroups = category.groups.where((g) {
       if (!g.enabled) return false;
       if (!g.isApplicableToScope(targetScope)) return false;
       if (characterGender != null && !g.isApplicableToGender(characterGender)) {
+        return false;
+      }
+      if (!g.isTimeConditionActive(context.generationTime)) return false;
+      if (!g.checkVisibility(context.tagContext)) return false;
+      final dependency = g.dependencyConfig;
+      if (dependency != null &&
+          dependency.enabled &&
+          !dependency.checkDependency(context.tagContext)) {
         return false;
       }
       return true;
@@ -829,7 +920,17 @@ class RandomPromptGenerator {
       if (random.nextDouble() > group.probability) continue;
 
       // 从词组生成标签
-      final tags = await _generateFromGroup(group, category, random);
+      final effectiveGroup = _applyDependencySelectionCount(
+        group,
+        context,
+        random,
+      );
+      final tags = await _generateFromGroup(
+        effectiveGroup,
+        category,
+        random,
+        context,
+      );
       results.addAll(tags);
     }
 
@@ -841,20 +942,71 @@ class RandomPromptGenerator {
     return results;
   }
 
+  RandomTagGroup _applyDependencySelectionCount(
+    RandomTagGroup group,
+    RandomPresetGenerationContext context,
+    Random random,
+  ) {
+    final dependency = group.dependencyConfig;
+    if (dependency == null || !dependency.enabled) return group;
+    if (group.selectionMode != SelectionMode.multipleNum) return group;
+
+    final sourceValue = dependency.sourceVariable != null
+        ? context.firstValueFor(dependency.sourceVariable!)
+        : context.firstValueFor(dependency.sourceCategoryId);
+    final effectiveSourceValue = sourceValue.isEmpty
+        ? '${context.countFor(dependency.sourceCategoryId)}'
+        : sourceValue;
+    final count = dependency.getCount(
+      effectiveSourceValue,
+      () => random.nextInt(1 << 30),
+    );
+    return group.copyWith(multipleNum: count);
+  }
+
   /// 从单个词组生成标签（支持递归嵌套）
   Future<List<String>> _generateFromGroup(
     RandomTagGroup group,
     RandomCategory category,
     Random random,
+    RandomPresetGenerationContext context,
   ) async {
+    final branchConfig = group.conditionalBranchConfig;
+    final branch = branchConfig != null && branchConfig.enabled
+        ? branchConfig.selectBranch(
+            context.variables,
+            () => random.nextInt(1 << 30),
+          )
+        : null;
+    if (branch != null) {
+      context.addVariable(group.name, branch.name);
+      if (branch.tagGroupIds.isNotEmpty && group.children.isNotEmpty) {
+        final branchChildren = group.children
+            .where((child) => branch.tagGroupIds.contains(child.id))
+            .toList();
+        if (branchChildren.isNotEmpty) {
+          final branchGroup = group.copyWith(
+            nodeType: TagGroupNodeType.config,
+            children: branchChildren,
+          );
+          return _generateFromNestedGroup(
+            branchGroup,
+            category,
+            random,
+            context,
+          );
+        }
+      }
+    }
+
     // 处理嵌套配置
     if (group.nodeType == TagGroupNodeType.config) {
-      return _generateFromNestedGroup(group, category, random);
+      return _generateFromNestedGroup(group, category, random, context);
     }
 
     // Pool 类型使用专门的生成逻辑
     if (group.sourceType == TagGroupSourceType.pool) {
-      return _generateFromPoolGroup(group, category, random);
+      return _generateFromPoolGroup(group, category, random, context);
     }
 
     // 获取标签列表：对于同步类型的组从缓存读取，否则使用内嵌标签
@@ -880,9 +1032,22 @@ class RandomPromptGenerator {
         : group.bracketMax;
 
     // 应用权重括号
-    final bracketedTags = selectedTags.map((t) {
+    var bracketedTags = selectedTags.map((t) {
       return _applyBrackets(t.tag, bracketMin, bracketMax, random);
     }).toList();
+
+    bracketedTags = _applyEmphasis(
+      bracketedTags,
+      group.emphasisProbability,
+      group.emphasisBracketCount,
+      random,
+    );
+
+    bracketedTags = group.applyPostProcessRules(
+      bracketedTags,
+      context.tagContext,
+      variables: context.variables,
+    );
 
     // 词组级打乱
     if (group.shuffle) {
@@ -903,6 +1068,7 @@ class RandomPromptGenerator {
     RandomTagGroup group,
     RandomCategory category,
     Random random,
+    RandomPresetGenerationContext context,
   ) async {
     final sourceId = group.sourceId;
     if (sourceId == null || sourceId.isEmpty) {
@@ -968,11 +1134,24 @@ class RandomPromptGenerator {
         : group.bracketMax;
 
     // 应用权重括号并格式化标签
-    return allTags.map((tag) {
+    var formattedTags = allTags.map((tag) {
       // 将下划线替换为空格
       final formattedTag = tag.replaceAll('_', ' ');
       return _applyBrackets(formattedTag, bracketMin, bracketMax, random);
     }).toList();
+
+    formattedTags = _applyEmphasis(
+      formattedTags,
+      group.emphasisProbability,
+      group.emphasisBracketCount,
+      random,
+    );
+
+    return group.applyPostProcessRules(
+      formattedTags,
+      context.tagContext,
+      variables: context.variables,
+    );
   }
 
   /// 从嵌套词组生成标签（递归）
@@ -980,6 +1159,7 @@ class RandomPromptGenerator {
     RandomTagGroup group,
     RandomCategory category,
     Random random,
+    RandomPresetGenerationContext context,
   ) async {
     final enabledChildren = group.children.where((c) => c.enabled).toList();
     if (enabledChildren.isEmpty) return [];
@@ -1000,7 +1180,12 @@ class RandomPromptGenerator {
       if (random.nextDouble() > child.probability) continue;
 
       // 递归生成
-      final childTags = await _generateFromGroup(child, category, random);
+      final childTags = await _generateFromGroup(
+        child,
+        category,
+        random,
+        context,
+      );
       results.addAll(childTags);
     }
 
@@ -1149,10 +1334,15 @@ class RandomPromptGenerator {
     String varName,
   ) async {
     // 在类别中查找匹配（按名称或 key）
+    final context = RandomPresetGenerationContext();
     for (final category in preset.categories) {
       // 检查类别本身
       if (category.name == varName || category.key == varName) {
-        final generated = await _generateFromCategory(category, random);
+        final generated = await _generateFromCategory(
+          category,
+          random,
+          context: context,
+        );
         return generated.join(', ');
       }
 
@@ -1163,6 +1353,7 @@ class RandomPromptGenerator {
             group,
             category,
             random,
+            context,
           );
           return generated.join(', ');
         }

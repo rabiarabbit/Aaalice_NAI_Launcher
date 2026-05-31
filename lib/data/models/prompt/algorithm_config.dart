@@ -99,6 +99,58 @@ class AlgorithmConfig with _$AlgorithmConfig {
   /// NAI 官网默认配置
   static const AlgorithmConfig naiDefault = AlgorithmConfig();
 
+  /// 生成时实际使用的人数配置。
+  ///
+  /// 旧版配置只保存 `characterCountWeights` 和 `genderWeights`。新随机预设
+  /// 以 `CharacterCountConfig` 为准；当新字段缺失时，把旧字段映射成等价的
+  /// 人数类别配置，避免 UI 展示的算法权重与生成器实际行为脱节。
+  CharacterCountConfig get effectiveCharacterCountConfig =>
+      characterCountConfig ?? toCharacterCountConfigFromLegacyWeights();
+
+  /// 将旧版人数/性别权重转换为新版 `CharacterCountConfig`。
+  CharacterCountConfig toCharacterCountConfigFromLegacyWeights() {
+    final countWeights = {
+      for (final weight in characterCountWeights)
+        if (weight.length >= 2) weight[0]: weight[1],
+    };
+    final femaleWeight = genderWeights['female'] ?? 60;
+    final maleWeight = genderWeights['male'] ?? 30;
+    final otherWeight = genderWeights['other'] ?? 10;
+
+    final categories = CharacterCountConfig.naiDefault.categories.map((cat) {
+      final categoryWeight = countWeights[cat.count] ?? cat.weight;
+      final tagOptions = cat.tagOptions.map((option) {
+        final optionWeight = switch (option.id) {
+          'solo_girl' => femaleWeight,
+          'solo_boy' => maleWeight,
+          'duo_2girls' => femaleWeight,
+          'duo_2boys' => maleWeight,
+          'duo_mixed' => ((femaleWeight + maleWeight + otherWeight) / 2)
+              .round()
+              .clamp(1, 100),
+          'trio_3girls' => femaleWeight,
+          'trio_3boys' => maleWeight,
+          'trio_2g1b' =>
+            ((femaleWeight * 2 + maleWeight) / 3).round().clamp(1, 100),
+          'trio_1g2b' =>
+            ((femaleWeight + maleWeight * 2) / 3).round().clamp(1, 100),
+          _ => option.weight,
+        };
+        return option.copyWith(weight: optionWeight);
+      }).toList();
+
+      return cat.copyWith(
+        weight: categoryWeight,
+        tagOptions: tagOptions,
+      );
+    }).toList();
+
+    return CharacterCountConfig(
+      categories: categories,
+      customSlotOptions: CharacterCountConfig.naiDefault.customSlotOptions,
+    );
+  }
+
   /// 获取角色数量权重的显示文本
   String get characterCountDisplayText {
     final buffer = StringBuffer();

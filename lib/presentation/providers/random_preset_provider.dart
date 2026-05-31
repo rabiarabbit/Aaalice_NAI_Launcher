@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:collection/collection.dart';
@@ -73,12 +74,20 @@ class RandomPresetNotifier extends _$RandomPresetNotifier {
   static const String _selectedIdKey = 'selected_preset_id';
 
   late Box<String> _box;
+  Completer<void>? _initCompleter;
+  bool _initStarted = false;
 
   @override
   RandomPresetState build() {
-    _init();
+    _initCompleter ??= Completer<void>();
+    if (!_initStarted) {
+      _initStarted = true;
+      _init();
+    }
     return const RandomPresetState(isLoading: true);
   }
+
+  Future<void> get whenLoaded => _initCompleter?.future ?? Future.value();
 
   Future<void> _init() async {
     try {
@@ -89,6 +98,19 @@ class RandomPresetNotifier extends _$RandomPresetNotifier {
         isLoading: false,
         error: '加载预设失败: $e',
       );
+    } finally {
+      if (_initCompleter != null && !_initCompleter!.isCompleted) {
+        _initCompleter!.complete();
+      }
+    }
+  }
+
+  Future<void> _ensureInitialized() async {
+    if (state.isLoading) {
+      await whenLoaded;
+    }
+    if (state.error != null) {
+      throw StateError(state.error!);
     }
   }
 
@@ -169,6 +191,7 @@ class RandomPresetNotifier extends _$RandomPresetNotifier {
 
   /// 选择预设
   Future<void> selectPreset(String id) async {
+    await _ensureInitialized();
     state = state.copyWith(selectedPresetId: id);
     await _box.put(_selectedIdKey, id);
   }
@@ -177,6 +200,7 @@ class RandomPresetNotifier extends _$RandomPresetNotifier {
   ///
   /// 当用户切换模型版本时，更新默认预设以匹配新版本
   Future<void> updateWordlistVersion(WordlistType version) async {
+    await _ensureInitialized();
     // 找到默认预设
     final defaultIndex = state.presets.indexWhere((p) => p.isDefault);
     if (defaultIndex == -1) return;
@@ -197,6 +221,7 @@ class RandomPresetNotifier extends _$RandomPresetNotifier {
     String? description,
     bool copyFromCurrent = true,
   }) async {
+    await _ensureInitialized();
     final currentPreset = state.selectedPreset;
     final isBasedOnDefault = copyFromCurrent &&
         (currentPreset?.isDefault == true ||
@@ -222,6 +247,7 @@ class RandomPresetNotifier extends _$RandomPresetNotifier {
 
   /// 更新预设
   Future<void> updatePreset(RandomPreset preset) async {
+    await _ensureInitialized();
     final index = state.presets.indexWhere((p) => p.id == preset.id);
     if (index == -1) return;
 
@@ -249,6 +275,7 @@ class RandomPresetNotifier extends _$RandomPresetNotifier {
 
   /// 添加预设到状态（用于预设复制）
   Future<void> addPreset(RandomPreset preset) async {
+    await _ensureInitialized();
     final newPresets = [...state.presets, preset];
     state = state.copyWith(
       presets: newPresets,
@@ -260,6 +287,7 @@ class RandomPresetNotifier extends _$RandomPresetNotifier {
 
   /// 删除预设
   Future<void> deletePreset(String id) async {
+    await _ensureInitialized();
     final preset = state.presets.firstWhereOrNull((p) => p.id == id);
     if (preset == null || preset.isDefault) return; // 不能删除默认预设或不存在的预设
 
@@ -284,6 +312,7 @@ class RandomPresetNotifier extends _$RandomPresetNotifier {
 
   /// 更新当前预设的算法配置
   Future<void> updateAlgorithmConfig(AlgorithmConfig config) async {
+    await _ensureInitialized();
     final preset = state.selectedPreset;
     if (preset == null) return;
 
@@ -294,6 +323,7 @@ class RandomPresetNotifier extends _$RandomPresetNotifier {
   Future<void> updateCategoryProbabilities(
     CategoryProbabilityConfig config,
   ) async {
+    await _ensureInitialized();
     final preset = state.selectedPreset;
     if (preset == null) return;
 
@@ -302,6 +332,7 @@ class RandomPresetNotifier extends _$RandomPresetNotifier {
 
   /// 更新当前预设的类别列表
   Future<void> updateCategories(List<RandomCategory> categories) async {
+    await _ensureInitialized();
     final preset = state.selectedPreset;
     if (preset == null) return;
 
@@ -310,6 +341,7 @@ class RandomPresetNotifier extends _$RandomPresetNotifier {
 
   /// 添加类别到当前预设
   Future<void> addCategory(RandomCategory category) async {
+    await _ensureInitialized();
     final preset = state.selectedPreset;
     if (preset == null) return;
 
@@ -318,6 +350,7 @@ class RandomPresetNotifier extends _$RandomPresetNotifier {
 
   /// 从当前预设删除类别（按 ID）
   Future<void> removeCategory(String categoryId) async {
+    await _ensureInitialized();
     final preset = state.selectedPreset;
     if (preset == null) return;
 
@@ -326,6 +359,7 @@ class RandomPresetNotifier extends _$RandomPresetNotifier {
 
   /// 从当前预设删除类别（按 key）
   Future<void> removeCategoryByKey(String categoryKey) async {
+    await _ensureInitialized();
     final preset = state.selectedPreset;
     if (preset == null) return;
 
@@ -334,6 +368,7 @@ class RandomPresetNotifier extends _$RandomPresetNotifier {
 
   /// 更新当前预设的单个类别
   Future<void> updateCategory(RandomCategory category) async {
+    await _ensureInitialized();
     final preset = state.selectedPreset;
     if (preset == null) return;
 
@@ -342,6 +377,7 @@ class RandomPresetNotifier extends _$RandomPresetNotifier {
 
   /// 更新或添加类别（按 key 匹配）
   Future<void> upsertCategoryByKey(RandomCategory category) async {
+    await _ensureInitialized();
     final preset = state.selectedPreset;
     if (preset == null) return;
 
@@ -350,6 +386,7 @@ class RandomPresetNotifier extends _$RandomPresetNotifier {
 
   /// 重置当前预设为默认配置
   Future<void> resetCurrentPreset() async {
+    await _ensureInitialized();
     final preset = state.selectedPreset;
     if (preset == null) return;
 
@@ -365,6 +402,7 @@ class RandomPresetNotifier extends _$RandomPresetNotifier {
 
   /// 导入预设
   Future<RandomPreset?> importPreset(String jsonString) async {
+    await _ensureInitialized();
     try {
       final data = jsonDecode(jsonString) as Map<String, dynamic>;
       final preset = RandomPreset.fromExportJson(data);
@@ -382,6 +420,7 @@ class RandomPresetNotifier extends _$RandomPresetNotifier {
 
   /// 复制预设
   Future<RandomPreset?> duplicatePreset(String id, String newName) async {
+    await _ensureInitialized();
     final source = state.presets.firstWhereOrNull((p) => p.id == id);
     if (source == null) return null;
 
@@ -398,6 +437,7 @@ class RandomPresetNotifier extends _$RandomPresetNotifier {
 
   /// 添加 Tag Group 映射到当前预设
   Future<void> addTagGroupMapping(TagGroupMapping mapping) async {
+    await _ensureInitialized();
     final preset = state.selectedPreset;
     if (preset == null) return;
 
@@ -406,6 +446,7 @@ class RandomPresetNotifier extends _$RandomPresetNotifier {
 
   /// 从当前预设删除 Tag Group 映射
   Future<void> removeTagGroupMapping(String mappingId) async {
+    await _ensureInitialized();
     final preset = state.selectedPreset;
     if (preset == null) return;
 
@@ -414,6 +455,7 @@ class RandomPresetNotifier extends _$RandomPresetNotifier {
 
   /// 更新当前预设的 Tag Group 映射
   Future<void> updateTagGroupMapping(TagGroupMapping mapping) async {
+    await _ensureInitialized();
     final preset = state.selectedPreset;
     if (preset == null) return;
 
@@ -422,6 +464,7 @@ class RandomPresetNotifier extends _$RandomPresetNotifier {
 
   /// 切换当前预设的 Tag Group 映射启用状态
   Future<void> toggleTagGroupMappingEnabled(String mappingId) async {
+    await _ensureInitialized();
     final preset = state.selectedPreset;
     if (preset == null) return;
 
@@ -432,6 +475,7 @@ class RandomPresetNotifier extends _$RandomPresetNotifier {
 
   /// 添加 Pool 映射到当前预设
   Future<void> addPoolMapping(PoolMapping mapping) async {
+    await _ensureInitialized();
     final preset = state.selectedPreset;
     if (preset == null) return;
 
@@ -440,6 +484,7 @@ class RandomPresetNotifier extends _$RandomPresetNotifier {
 
   /// 从当前预设删除 Pool 映射
   Future<void> removePoolMapping(String mappingId) async {
+    await _ensureInitialized();
     final preset = state.selectedPreset;
     if (preset == null) return;
 
@@ -448,6 +493,7 @@ class RandomPresetNotifier extends _$RandomPresetNotifier {
 
   /// 更新当前预设的 Pool 映射
   Future<void> updatePoolMapping(PoolMapping mapping) async {
+    await _ensureInitialized();
     final preset = state.selectedPreset;
     if (preset == null) return;
 
@@ -456,6 +502,7 @@ class RandomPresetNotifier extends _$RandomPresetNotifier {
 
   /// 切换当前预设的 Pool 映射启用状态
   Future<void> togglePoolMappingEnabled(String mappingId) async {
+    await _ensureInitialized();
     final preset = state.selectedPreset;
     if (preset == null) return;
 
@@ -472,6 +519,7 @@ class RandomPresetNotifier extends _$RandomPresetNotifier {
     String categoryKey,
     RandomTagGroup group,
   ) async {
+    await _ensureInitialized();
     final preset = state.selectedPreset;
     if (preset == null) {
       return;
@@ -491,6 +539,7 @@ class RandomPresetNotifier extends _$RandomPresetNotifier {
     String categoryKey,
     String groupId,
   ) async {
+    await _ensureInitialized();
     final preset = state.selectedPreset;
     if (preset == null) return;
 
@@ -506,6 +555,7 @@ class RandomPresetNotifier extends _$RandomPresetNotifier {
     String groupId,
     RandomTagGroup newGroup,
   ) async {
+    await _ensureInitialized();
     // 遍历所有预设，找到并更新匹配的词组
     for (final preset in state.presets) {
       var presetUpdated = false;
@@ -530,6 +580,7 @@ class RandomPresetNotifier extends _$RandomPresetNotifier {
 
   /// 切换分组启用状态
   Future<void> toggleGroupEnabled(String categoryKey, String groupId) async {
+    await _ensureInitialized();
     final preset = state.selectedPreset;
     if (preset == null) return;
 
@@ -558,6 +609,7 @@ class RandomPresetNotifier extends _$RandomPresetNotifier {
             })>
         groupInfoMap,
   ) async {
+    await _ensureInitialized();
     final preset = state.selectedPreset;
     if (preset == null) return;
 
@@ -608,6 +660,7 @@ class RandomPresetNotifier extends _$RandomPresetNotifier {
   /// 2. 保留用户自定义词组，但将其禁用（enabled = false）
   /// 3. 恢复类别配置
   Future<void> resetToDefault(String presetId) async {
+    await _ensureInitialized();
     final presetIndex = state.presets.indexWhere((p) => p.id == presetId);
     if (presetIndex == -1) return;
 
