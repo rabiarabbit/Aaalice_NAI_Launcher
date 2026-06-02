@@ -221,6 +221,9 @@ test/data/services/*
 test/core/*
 !test/core/krita/
 !test/core/krita/*.dart
+!test/core/utils/
+test/core/utils/*
+!test/core/utils/inpaint_outpaint_utils_test.dart
 
 # 保留本功能新增的固定标签侧栏回归测试
 !test/presentation/
@@ -231,6 +234,9 @@ test/presentation/providers/*
 !test/presentation/providers/layout_state_provider_test.dart
 !test/presentation/providers/prompt_config_random_mode_test.dart
 !test/presentation/providers/random_mode_provider_test.dart
+!test/presentation/providers/generation/
+test/presentation/providers/generation/*
+!test/presentation/providers/generation/image_workflow_controller_test.dart
 !test/presentation/providers/krita/
 !test/presentation/providers/krita/*.dart
 !test/presentation/screens/
@@ -251,6 +257,17 @@ test/presentation/widgets/prompt/*
 !test/presentation/widgets/gallery/
 test/presentation/widgets/gallery/*
 !test/presentation/widgets/gallery/image_send_destination_dialog_test.dart
+!test/presentation/widgets/image_editor/
+test/presentation/widgets/image_editor/*
+!test/presentation/widgets/image_editor/canvas/
+test/presentation/widgets/image_editor/canvas/*
+!test/presentation/widgets/image_editor/canvas/layer_painter_test.dart
+!test/presentation/widgets/image_editor/widgets/
+test/presentation/widgets/image_editor/widgets/*
+!test/presentation/widgets/image_editor/widgets/outpaint_edge_drag_overlay_test.dart
+!test/presentation/widgets/image_editor/widgets/panels/
+test/presentation/widgets/image_editor/widgets/panels/*
+!test/presentation/widgets/image_editor/widgets/panels/shift_edges_dialog_test.dart
 
 # 项目管理文件
 AGENTS.md

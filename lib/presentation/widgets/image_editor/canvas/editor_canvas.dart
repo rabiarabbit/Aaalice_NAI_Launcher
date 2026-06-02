@@ -11,11 +11,13 @@ import 'layer_painter.dart';
 class EditorCanvas extends StatefulWidget {
   final EditorState state;
   final bool suppressSelectionOverlay;
+  final bool showTransparentCanvasBackground;
 
   const EditorCanvas({
     super.key,
     required this.state,
     this.suppressSelectionOverlay = false,
+    this.showTransparentCanvasBackground = false,
   });
 
   @override
@@ -115,7 +117,11 @@ class _EditorCanvasState extends State<EditorCanvas>
                           // 图层绘制 - 不使用 RepaintBoundary 以避免缓存问题
                           Positioned.fill(
                             child: CustomPaint(
-                              painter: LayerPainter(state: widget.state),
+                              painter: LayerPainter(
+                                state: widget.state,
+                                showTransparentCanvasBackground:
+                                    widget.showTransparentCanvasBackground,
+                              ),
                             ),
                           ),
 

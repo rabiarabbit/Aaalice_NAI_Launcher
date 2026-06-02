@@ -11,7 +11,50 @@ import 'package:nai_launcher/presentation/widgets/image_editor/layers/layer_mana
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('reopened mask layer should remain visible above source and show new strokes', (
+  testWidgets(
+      'replaceLayerImage updates base image bytes and notifies listeners', (
+    tester,
+  ) async {
+    await tester.runAsync(() async {
+      final layerManager = LayerManager();
+      final originalBytes = _buildSolidPng(8, 8, const Color(0xFFAA3322));
+      final replacementBytes = _buildSolidPng(8, 8, const Color(0xFF2244AA));
+
+      final layer = await layerManager.addLayerFromImage(
+        originalBytes,
+        name: 'source',
+      );
+      expect(layer, isNotNull);
+
+      var notificationCount = 0;
+      layerManager.addListener(() {
+        notificationCount++;
+      });
+
+      final replaced = await layerManager.replaceLayerImage(
+        layer!.id,
+        replacementBytes,
+      );
+
+      expect(replaced, isTrue);
+      expect(layer.baseImageBytes, same(replacementBytes));
+      expect(notificationCount, equals(1));
+
+      final missingReplaced = await layerManager.replaceLayerImage(
+        'missing-layer',
+        originalBytes,
+      );
+
+      expect(missingReplaced, isFalse);
+      expect(notificationCount, equals(1));
+
+      layerManager.dispose();
+    });
+  });
+
+  testWidgets(
+      'reopened mask layer should remain visible above source and show new strokes',
+      (
     tester,
   ) async {
     await tester.runAsync(() async {

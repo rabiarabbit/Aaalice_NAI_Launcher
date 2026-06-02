@@ -173,6 +173,16 @@ class LayerManager extends ChangeNotifier {
     return layer;
   }
 
+  Future<bool> replaceLayerImage(String layerId, Uint8List imageBytes) async {
+    final layer = getLayerById(layerId);
+    if (layer == null) return false;
+
+    await layer.setBaseImage(imageBytes);
+    invalidateSnapshot();
+    notifyListeners();
+    return true;
+  }
+
   /// 从 ui.Image 创建图层
   ///
   /// **重要：此方法会接管 [image] 的所有权，调用者不应再使用或释放该图像。**
@@ -566,7 +576,11 @@ class LayerManager extends ChangeNotifier {
     // 反向遍历：面板上方的图层先画（底层），面板下方的图层后画（顶层）
     for (final layer in _layers.reversed) {
       if (layer.visible) {
-        layer.renderWithCache(canvas, canvasSize, viewportBounds: viewportBounds);
+        layer.renderWithCache(
+          canvas,
+          canvasSize,
+          viewportBounds: viewportBounds,
+        );
       }
     }
   }

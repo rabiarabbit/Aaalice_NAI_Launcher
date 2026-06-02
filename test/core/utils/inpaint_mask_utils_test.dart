@@ -43,6 +43,24 @@ void main() {
       expect(decoded.getPixel(1, 0).a.toInt(), greaterThan(0));
     });
 
+    test('maskToEditorOverlayAsync should match sync overlay output', () async {
+      final source = img.Image(width: 4, height: 4);
+      img.fill(source, color: img.ColorRgba8(0, 0, 0, 255));
+      source.setPixelRgba(2, 1, 255, 255, 255, 255);
+
+      final bytes = Uint8List.fromList(img.encodePng(source));
+      final syncResult = InpaintMaskUtils.maskToEditorOverlay(
+        bytes,
+        overlayAlpha: 160,
+      );
+      final asyncResult = await InpaintMaskUtils.maskToEditorOverlayAsync(
+        bytes,
+        overlayAlpha: 160,
+      );
+
+      expect(asyncResult, syncResult);
+    });
+
     test('prepareInpaintMaskBytes should close pinholes and expand mask edges',
         () {
       final source = img.Image(width: 7, height: 7);

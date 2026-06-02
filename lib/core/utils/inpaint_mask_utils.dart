@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:isolate';
 import 'dart:typed_data';
 import 'package:image/image.dart' as img;
 
@@ -404,6 +405,15 @@ class InpaintMaskUtils {
     }
 
     return Uint8List.fromList(img.encodePng(overlay));
+  }
+
+  static Future<Uint8List> maskToEditorOverlayAsync(
+    Uint8List bytes, {
+    int overlayAlpha = 140,
+  }) {
+    return Isolate.run(
+      () => maskToEditorOverlay(bytes, overlayAlpha: overlayAlpha),
+    );
   }
 
   static bool _isMaskedPixel(img.Pixel pixel) {

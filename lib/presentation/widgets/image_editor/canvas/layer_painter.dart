@@ -97,11 +97,15 @@ class _CheckerboardCache {
 /// 负责绘制所有图层内容
 class LayerPainter extends CustomPainter {
   final EditorState state;
+  final bool showTransparentCanvasBackground;
 
   /// 使用 renderNotifier 而非整个 state
   /// 这样只有在渲染相关变化时才会触发重绘
   /// 切换活动图层等 UI 操作不会导致画布重绘
-  LayerPainter({required this.state}) : super(repaint: state.renderNotifier);
+  LayerPainter({
+    required this.state,
+    this.showTransparentCanvasBackground = false,
+  }) : super(repaint: state.renderNotifier);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -138,10 +142,12 @@ class LayerPainter extends CustomPainter {
     _drawCheckerboard(canvas, canvasSize);
 
     // 绘制白色画布底色
-    canvas.drawRect(
-      Rect.fromLTWH(0, 0, canvasSize.width, canvasSize.height),
-      Paint()..color = Colors.white,
-    );
+    if (!showTransparentCanvasBackground) {
+      canvas.drawRect(
+        Rect.fromLTWH(0, 0, canvasSize.width, canvasSize.height),
+        Paint()..color = Colors.white,
+      );
+    }
 
     // 裁剪到画布范围，防止笔画超出边界
     canvas.clipRect(Rect.fromLTWH(0, 0, canvasSize.width, canvasSize.height));
@@ -151,7 +157,8 @@ class LayerPainter extends CustomPainter {
     final viewportBounds = controller.viewportBounds;
 
     // 绘制所有图层（传入视口边界以启用空间剔除优化）
-    state.layerManager.renderAll(canvas, canvasSize, viewportBounds: viewportBounds);
+    state.layerManager
+        .renderAll(canvas, canvasSize, viewportBounds: viewportBounds);
 
     // 绘制当前正在绘制的笔画
     if (state.isDrawing && state.currentStrokePoints.isNotEmpty) {
@@ -284,7 +291,8 @@ class LayerPainter extends CustomPainter {
     // repaint: renderNotifier 已经处理了渲染相关的变化监听
     // shouldRepaint 只需处理 CustomPainter 本身的属性变化
     // 返回 false 避免工具切换等无关操作触发不必要的重绘
-    return false;
+    return showTransparentCanvasBackground !=
+        oldDelegate.showTransparentCanvasBackground;
   }
 }
 

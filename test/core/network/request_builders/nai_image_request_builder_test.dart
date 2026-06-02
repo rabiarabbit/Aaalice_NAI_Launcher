@@ -347,6 +347,66 @@ void main() {
       expect(decodedMask.getPixel(7, 7).r.toInt(), equals(0));
     });
 
+    test('should send expanded infill source and mask dimensions for outpaint',
+        () async {
+      final expandedSource = _validPngBytes(width: 1472, height: 1664);
+      final expandedMask = img.Image(width: 1472, height: 1664);
+      img.fill(expandedMask, color: img.ColorRgba8(0, 0, 0, 255));
+      for (var y = 0; y < 64; y++) {
+        for (var x = 0; x < expandedMask.width; x++) {
+          expandedMask.setPixelRgba(x, y, 255, 255, 255, 255);
+        }
+      }
+
+      final params = ImageParams(
+        action: ImageGenerationAction.infill,
+        model: 'nai-diffusion-4-5-full',
+        width: 1472,
+        height: 1664,
+        sourceImage: expandedSource,
+        maskImage: Uint8List.fromList(img.encodePng(expandedMask)),
+        strength: 0.42,
+        noise: 0.13,
+        addOriginalImage: true,
+        vibeReferencesV4: const [
+          VibeReference(
+            displayName: 'pre',
+            vibeEncoding: 'pre-encoded',
+            sourceType: VibeSourceType.png,
+          ),
+        ],
+      );
+
+      final builder = NAIImageRequestBuilder(
+        params: params,
+        encodeVibe: _fakeEncodeVibe,
+      );
+
+      final result = await builder.build(sampler: 'k_euler');
+      final parameters = result.requestParameters;
+      final decodedSource =
+          img.decodeImage(base64Decode(parameters['image'] as String));
+      final decodedMask =
+          img.decodeImage(base64Decode(parameters['mask'] as String));
+
+      expect(parameters['width'], equals(1472));
+      expect(parameters['height'], equals(1664));
+      expect(
+        base64Decode(parameters['image'] as String),
+        equals(expandedSource),
+      );
+      expect(decodedSource, isNotNull);
+      expect(decodedMask, isNotNull);
+      expect('${decodedSource!.width}x${decodedSource.height}', '1472x1664');
+      expect('${decodedMask!.width}x${decodedMask.height}', '1472x1664');
+      expect(parameters['strength'], equals(0.42));
+      expect(parameters['noise'], equals(0.13));
+      expect(parameters['add_original_image'], isFalse);
+      expect(parameters.containsKey('reference_image_multiple'), isFalse);
+      expect(result.vibeEncodingMap, isEmpty);
+      expect(result.requestData['action'], equals('infill'));
+    });
+
     test('should allow focused inpaint masks to skip extra post expansion',
         () async {
       final singlePixelMask = img.Image(width: 16, height: 16);

@@ -76,6 +76,10 @@ class ImageWorkflowLauncher {
           'hasMaskChanges=${result.hasMaskChanges}, '
           'modifiedBytes=${result.modifiedImage?.length ?? 0}, '
           'maskBytes=${result.maskImage?.length ?? 0}, '
+          'hasOutpaintChanges=${result.hasOutpaintChanges}, '
+          'outpaintSourceBytes=${result.outpaintSourceImage?.length ?? 0}, '
+          'outpaintSourceWidth=${result.outpaintSourceWidth}, '
+          'outpaintSourceHeight=${result.outpaintSourceHeight}, '
           'focusRect=${result.focusAreaRect}, '
           'minContext=${result.minimumContextMegaPixels.toStringAsFixed(2)}, '
           'focusedEnabled=${result.focusedInpaintEnabled}',
@@ -96,10 +100,17 @@ class ImageWorkflowLauncher {
         ? result.maskImage
         : null;
     workflowNotifier.applyInpaintEditorResult(
+      sourceImage:
+          result.hasOutpaintChanges ? result.outpaintSourceImage : null,
+      sourceWidth:
+          result.hasOutpaintChanges ? result.outpaintSourceWidth : null,
+      sourceHeight:
+          result.hasOutpaintChanges ? result.outpaintSourceHeight : null,
       maskImage: effectiveMask,
       focusedInpaintEnabled: result.focusedInpaintEnabled,
       focusedSelectionRect: result.focusAreaRect,
       minimumContextMegaPixels: result.minimumContextMegaPixels,
+      forceDisableFocusedInpaint: result.hasOutpaintChanges,
     );
     if (effectiveMask != null) {
       AppToast.success(context, context.l10n.img2img_inpaintMaskReady);
