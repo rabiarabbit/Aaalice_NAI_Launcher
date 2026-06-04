@@ -330,6 +330,9 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
   }
 
   @visibleForTesting
+  Future<void> debugExportAndClose() => _exportAndClose();
+
+  @visibleForTesting
   void debugSetToolById(String toolId) {
     _state.setToolById(toolId);
   }
@@ -1866,7 +1869,10 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
           _state.layerManager.layerCount > 1;
 
       // 检查是否有蒙版修改
-      final hasMaskChanges = _hasMaskContent();
+      final virtualOutpaintMaskRects =
+          _virtualOutpaintFrame?.outpaintMaskRects ?? const <Rect>[];
+      final hasMaskChanges =
+          _hasMaskContent() || virtualOutpaintMaskRects.isNotEmpty;
       final focusAreaRect =
           _focusedInpaintEnabled ? _focusedSelectionState.committedRect : null;
       final focusedInpaintEnabled =
@@ -1902,6 +1908,8 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
             if (_sourceLayerId != null) _sourceLayerId!,
           },
           forceHardEdges: true,
+          additionalMaskRects: virtualOutpaintMaskRects,
+          preferCpuHardEdgeExport: true,
         );
         AppLogger.d(
           'Exported inpaint mask bytes: ${maskImage.length}',
@@ -1921,6 +1929,10 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
         );
       }
 
+      final materializedOutpaintSource = _isInpaintMode
+          ? await _materializeVirtualOutpaintSourceIfNeeded()
+          : null;
+
       // 关闭加载指示器
       if (mounted && loadingDialogShown) {
         Navigator.of(context, rootNavigator: true).pop();
@@ -1939,7 +1951,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
             focusAreaRect: focusAreaRect,
             minimumContextMegaPixels: _minimumContextMegaPixels,
             focusedInpaintEnabled: focusedInpaintEnabled,
-            outpaintSourceImage: _isInpaintMode ? _outpaintSourceImage : null,
+            outpaintSourceImage: materializedOutpaintSource,
             outpaintSourceWidth: _isInpaintMode ? _outpaintSourceWidth : null,
             outpaintSourceHeight: _isInpaintMode ? _outpaintSourceHeight : null,
             hasOutpaintChanges: _isInpaintMode && _hasOutpaintChanges,
@@ -1957,6 +1969,30 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
         AppToast.error(context, '导出失败: $e');
       }
     }
+  }
+
+  Future<Uint8List?> _materializeVirtualOutpaintSourceIfNeeded() async {
+    final frame = _virtualOutpaintFrame;
+    final sourceLayerId = _sourceLayerId;
+    if (!_isInpaintMode || frame == null || !frame.hasOutpaintChanges) {
+      return _outpaintSourceImage;
+    }
+    if (sourceLayerId == null) {
+      throw Exception('Unable to read current source image.');
+    }
+    final sourceLayer = _state.layerManager.getLayerById(sourceLayerId);
+    final sourceBytes = sourceLayer?.baseImageBytes;
+    if (sourceBytes == null) {
+      throw Exception('Unable to read current source image.');
+    }
+    final result = await InpaintOutpaintUtils.materializeVirtualFrameAsync(
+      sourceImage: sourceBytes,
+      frame: frame,
+    );
+    _outpaintSourceImage = result.sourceImage;
+    _outpaintSourceWidth = result.width;
+    _outpaintSourceHeight = result.height;
+    return result.sourceImage;
   }
 
   bool _hasMaskContent() {

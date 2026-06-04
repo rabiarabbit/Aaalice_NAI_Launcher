@@ -118,6 +118,106 @@ void main() {
   );
 
   testWidgets(
+    'Save and Close materializes virtual outpaint source and mask',
+    (tester) async {
+      await tester.binding.setSurfaceSize(const Size(1200, 800));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      ImageEditorResult? result;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Builder(
+            builder: (context) {
+              return TextButton(
+                onPressed: () async {
+                  result = await Navigator.of(context).push<ImageEditorResult>(
+                    MaterialPageRoute(
+                      builder: (context) => ImageEditorScreen(
+                        initialImage: _buildSolidPng(
+                          128,
+                          128,
+                          const Color(0xFFAA3322),
+                        ),
+                        mode: ImageEditorMode.inpaint,
+                        title: 'Inpaint test',
+                        initialShowLayerPanel: false,
+                      ),
+                    ),
+                  );
+                },
+                child: const Text('Open editor'),
+              );
+            },
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Open editor'));
+      await _pumpForAsyncEditorWork(tester);
+      await _pumpUntil(tester, () {
+        final state = tester.state(find.byType(ImageEditorScreen)) as dynamic;
+        return List<String>.from(state.debugLayerNames).contains('底图') &&
+            find.byType(EditorCanvas).evaluate().isNotEmpty;
+      });
+
+      final state = tester.state(find.byType(ImageEditorScreen)) as dynamic;
+      expect(state.debugCanvasSize, const Size(128, 128));
+      expect(state.debugHasMaskContent, isFalse);
+      expect(state.debugVirtualOutpaintMaskRects, isEmpty);
+
+      await tester.runAsync(() async {
+        await state.debugApplyOutpaintFrameDelta(
+          const OutpaintFrameDelta(right: 33),
+        );
+      });
+      await _pumpUntil(
+        tester,
+        () => state.debugCanvasSize == const Size(192, 128),
+      );
+
+      expect(state.debugHasMaskContent, isFalse);
+      expect(state.debugHasOutpaintChanges, isTrue);
+      expect(
+        state.debugVirtualOutpaintMaskRects,
+        contains(const Rect.fromLTRB(128, 0, 192, 128)),
+      );
+
+      await tester.runAsync(() async {
+        await state.debugExportAndClose();
+      });
+      await _pumpForAsyncEditorWork(tester);
+
+      expect(result, isNotNull);
+      expect(result!.hasOutpaintChanges, isTrue);
+      expect(result!.outpaintSourceImage, isNotNull);
+      expect(result!.outpaintSourceWidth, 192);
+      expect(result!.outpaintSourceHeight, 128);
+      expect(result!.maskImage, isNotNull);
+
+      final sourceImage = img.decodeImage(result!.outpaintSourceImage!);
+      expect(sourceImage, isNotNull);
+      expect(sourceImage!.width, 192);
+      expect(sourceImage.height, 128);
+
+      final maskImage = img.decodeImage(result!.maskImage!);
+      expect(maskImage, isNotNull);
+      expect(maskImage!.width, 192);
+      expect(maskImage.height, 128);
+
+      final outpaintPixel = maskImage.getPixel(160, 64);
+      expect(outpaintPixel.r, greaterThan(240));
+      expect(outpaintPixel.g, greaterThan(240));
+      expect(outpaintPixel.b, greaterThan(240));
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump();
+    },
+  );
+
+  testWidgets(
     'outpaint source replacement failure rolls back screen transaction',
     (tester) async {
       await tester.binding.setSurfaceSize(const Size(1200, 800));
