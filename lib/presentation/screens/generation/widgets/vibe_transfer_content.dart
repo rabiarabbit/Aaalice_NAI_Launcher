@@ -1,11 +1,15 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:super_drag_and_drop/super_drag_and_drop.dart';
 
 import '../../../../core/utils/localization_extension.dart';
 import '../../../../data/models/vibe/vibe_library_entry.dart';
 import '../../../../data/models/vibe/vibe_reference.dart';
 import '../../../providers/image_generation_provider.dart';
+import '../../../utils/dropped_file_reader.dart';
 import '../../../widgets/common/app_toast.dart';
 import 'recent_vibes_section.dart';
 import 'vibe_card.dart';
@@ -57,6 +61,10 @@ class VibeTransferContent extends ConsumerStatefulWidget {
   /// 从库导入的回调
   final VoidCallback? onImportFromLibrary;
 
+  /// 局部拖拽导入文件的回调
+  final Future<int> Function(String fileName, Uint8List bytes)?
+      onImportDroppedFile;
+
   /// 编码 Vibe 的回调
   final Future<String?> Function(
     Uint8List imageData, {
@@ -87,6 +95,7 @@ class VibeTransferContent extends ConsumerStatefulWidget {
     required this.onClearAll,
     this.onSaveToLibrary,
     this.onImportFromLibrary,
+    this.onImportDroppedFile,
     this.onEncode,
     required this.recentEntries,
     required this.isRecentCollapsed,
@@ -100,6 +109,8 @@ class VibeTransferContent extends ConsumerStatefulWidget {
 
 class _VibeTransferContentState extends ConsumerState<VibeTransferContent> {
   bool _isDraggingOver = false;
+  bool _isFileDraggingOver = false;
+  bool _isProcessingDroppedFiles = false;
 
   @override
   Widget build(BuildContext context) {
@@ -117,7 +128,7 @@ class _VibeTransferContentState extends ConsumerState<VibeTransferContent> {
           style: theme.textTheme.bodySmall?.copyWith(
             color: showBackground
                 ? Colors.white70
-                : theme.colorScheme.onSurface.withOpacity(0.6),
+                : theme.colorScheme.onSurface.withValues(alpha: 0.6),
           ),
         ),
         const SizedBox(height: 12),
@@ -137,16 +148,25 @@ class _VibeTransferContentState extends ConsumerState<VibeTransferContent> {
 
         // 添加按钮（有数据时显示）
         if (hasVibes && vibes.length < 16)
-          OutlinedButton.icon(
-            onPressed: widget.onAddVibe,
-            icon: const Icon(Icons.add, size: 18),
-            label: Text(context.l10n.vibe_addReference),
-            style: showBackground
-                ? OutlinedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    side: const BorderSide(color: Colors.white38),
-                  )
-                : null,
+          _wrapWithFileDropRegion(
+            child: OutlinedButton.icon(
+              onPressed: widget.onAddVibe,
+              icon: Icon(
+                _isFileDraggingOver ? Icons.file_download_rounded : Icons.add,
+                size: 18,
+              ),
+              label: Text(
+                _isFileDraggingOver
+                    ? '松开后添加风格参考'
+                    : context.l10n.vibe_addReference,
+              ),
+              style: showBackground
+                  ? OutlinedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      side: const BorderSide(color: Colors.white38),
+                    )
+                  : null,
+            ),
           ),
 
         // 最近使用的 Vibes
@@ -268,7 +288,7 @@ class _VibeTransferContentState extends ConsumerState<VibeTransferContent> {
                   )
                 : null,
             color: _isDraggingOver
-                ? theme.colorScheme.primaryContainer.withOpacity(0.3)
+                ? theme.colorScheme.primaryContainer.withValues(alpha: 0.3)
                 : null,
           ),
           child: Column(
@@ -350,12 +370,18 @@ class _VibeTransferContentState extends ConsumerState<VibeTransferContent> {
         children: [
           // 从文件添加
           Expanded(
-            child: _EmptyStateCard(
-              icon: Icons.add_photo_alternate_outlined,
-              title: context.l10n.vibe_addFromFileTitle,
-              subtitle: context.l10n.vibe_addFromFileSubtitle,
-              onTap: widget.onAddVibe,
-              theme: theme,
+            child: _wrapWithFileDropRegion(
+              child: _EmptyStateCard(
+                icon: _isFileDraggingOver
+                    ? Icons.file_download_rounded
+                    : Icons.add_photo_alternate_outlined,
+                title: _isFileDraggingOver
+                    ? '松开后添加风格参考'
+                    : context.l10n.vibe_addFromFileTitle,
+                subtitle: context.l10n.vibe_addFromFileSubtitle,
+                onTap: widget.onAddVibe,
+                theme: theme,
+              ),
             ),
           ),
           const SizedBox(width: 12),
@@ -372,6 +398,106 @@ class _VibeTransferContentState extends ConsumerState<VibeTransferContent> {
         ],
       ),
     );
+  }
+
+  Widget _wrapWithFileDropRegion({required Widget child}) {
+    if (widget.onImportDroppedFile == null) {
+      return child;
+    }
+
+    return DropRegion(
+      formats: Formats.standardFormats,
+      hitTestBehavior: HitTestBehavior.opaque,
+      onDropOver: (event) {
+        if (_isProcessingDroppedFiles || widget.vibes.length >= 16) {
+          return DropOperation.none;
+        }
+        if (event.session.allowedOperations.contains(DropOperation.copy)) {
+          if (!_isFileDraggingOver) {
+            setState(() => _isFileDraggingOver = true);
+          }
+          return DropOperation.copy;
+        }
+        return DropOperation.none;
+      },
+      onDropLeave: (_) {
+        if (_isFileDraggingOver) {
+          setState(() => _isFileDraggingOver = false);
+        }
+      },
+      onPerformDrop: (event) async {
+        setState(() => _isFileDraggingOver = false);
+        unawaited(_handleFileDrop(event));
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          border: _isFileDraggingOver
+              ? Border.all(
+                  color: Theme.of(context).colorScheme.primary,
+                  width: 2,
+                )
+              : null,
+        ),
+        child: child,
+      ),
+    );
+  }
+
+  Future<void> _handleFileDrop(PerformDropEvent event) async {
+    final importer = widget.onImportDroppedFile;
+    if (importer == null || _isProcessingDroppedFiles) {
+      return;
+    }
+
+    if (widget.vibes.length >= 16) {
+      AppToast.warning(context, context.l10n.vibe_maxReached);
+      return;
+    }
+
+    setState(() => _isProcessingDroppedFiles = true);
+    var handledAny = false;
+    var addedCount = 0;
+    try {
+      for (final item in event.session.items) {
+        final reader = item.dataReader;
+        if (reader == null) {
+          continue;
+        }
+
+        final file = await DroppedFileReader.read(
+          reader,
+          allowVibeFiles: true,
+          logTag: 'VibeTransferDrop',
+        );
+        if (file == null) {
+          continue;
+        }
+
+        handledAny = true;
+        addedCount += await importer(file.fileName, file.bytes);
+        if (!mounted) {
+          return;
+        }
+      }
+
+      if (!mounted) {
+        return;
+      }
+      if (!handledAny) {
+        AppToast.warning(context, '拖入源未提供可读取的图片或 Vibe 文件');
+      } else if (addedCount > 0) {
+        final message = addedCount == 1
+            ? context.l10n.drop_addedToVibe
+            : context.l10n.drop_addedMultipleToVibe(addedCount);
+        AppToast.success(context, message);
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isProcessingDroppedFiles = false);
+      }
+    }
   }
 }
 
@@ -415,8 +541,8 @@ class _EmptyStateCardState extends State<_EmptyStateCard> {
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
             color: _isHovered
-                ? theme.colorScheme.primary.withOpacity(0.5)
-                : theme.colorScheme.outlineVariant.withOpacity(0.5),
+                ? theme.colorScheme.primary.withValues(alpha: 0.5)
+                : theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
             width: _isHovered ? 2 : 1,
           ),
         ),
@@ -435,7 +561,7 @@ class _EmptyStateCardState extends State<_EmptyStateCard> {
                     size: 40,
                     color: _isHovered
                         ? theme.colorScheme.primary
-                        : theme.colorScheme.outline.withOpacity(0.6),
+                        : theme.colorScheme.outline.withValues(alpha: 0.6),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -444,7 +570,7 @@ class _EmptyStateCardState extends State<_EmptyStateCard> {
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: _isHovered
                         ? theme.colorScheme.primary
-                        : theme.colorScheme.onSurface.withOpacity(0.8),
+                        : theme.colorScheme.onSurface.withValues(alpha: 0.8),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -452,7 +578,7 @@ class _EmptyStateCardState extends State<_EmptyStateCard> {
                 Text(
                   widget.subtitle,
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurface.withOpacity(0.5),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                   ),
                   textAlign: TextAlign.center,
                 ),

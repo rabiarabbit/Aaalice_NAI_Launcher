@@ -18,7 +18,9 @@ import 'package:nai_launcher/presentation/providers/generation/generation_params
 import 'package:nai_launcher/presentation/providers/krita/krita_bridge_notifier.dart';
 import 'package:nai_launcher/presentation/screens/generation/widgets/parameter_panel.dart';
 import 'package:nai_launcher/presentation/screens/generation/widgets/precise_reference_panel.dart';
+import 'package:nai_launcher/presentation/screens/generation/widgets/vibe_transfer_content.dart';
 import 'package:nai_launcher/presentation/widgets/common/themed_slider.dart';
+import 'package:super_drag_and_drop/super_drag_and_drop.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -146,6 +148,46 @@ void main() {
     });
   });
 
+  group('VibeTransferContent', () {
+    testWidgets('exposes a local file drop region for add-from-file',
+        (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          child: MaterialApp(
+            locale: const Locale('en'),
+            supportedLocales: AppLocalizations.supportedLocales,
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            home: Scaffold(
+              body: SizedBox(
+                width: 720,
+                child: VibeTransferContent(
+                  vibes: const [],
+                  normalizeVibeStrength: true,
+                  showBackground: false,
+                  onAddVibe: () {},
+                  onAddLibraryVibe: (_) {},
+                  onRemoveVibe: (_) {},
+                  onUpdateStrength: (_, __) {},
+                  onUpdateInfoExtracted: (_, __) {},
+                  onClearAll: () {},
+                  onImportDroppedFile: (_, __) async => 0,
+                  recentEntries: const [],
+                  isRecentCollapsed: false,
+                  onToggleRecentCollapsed: () {},
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('Add from File'), findsOneWidget);
+      expect(find.byType(DropRegion), findsOneWidget);
+    });
+  });
+
   group('PreciseReferencePanel', () {
     testWidgets('imports every image selected for precise reference',
         (tester) async {
@@ -211,6 +253,7 @@ void main() {
 
       await tester.tap(find.text('Precise Reference'));
       await tester.pumpAndSettle();
+      expect(find.byType(DropRegion), findsOneWidget);
       await tester.tap(find.text('Add Reference'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Character'));

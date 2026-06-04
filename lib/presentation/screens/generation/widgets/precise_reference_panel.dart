@@ -1,15 +1,18 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:super_drag_and_drop/super_drag_and_drop.dart';
 
 import '../../../../../core/enums/precise_ref_type.dart';
 import '../../../../../core/extensions/precise_ref_type_extensions.dart';
 import '../../../../core/utils/localization_extension.dart';
 import '../../../../data/models/image/image_params.dart';
 import '../../../providers/image_generation_provider.dart';
+import '../../../utils/dropped_file_reader.dart';
 import '../../../widgets/common/app_toast.dart';
 import '../../../widgets/common/hover_image_preview.dart';
 import '../../../widgets/common/themed_divider.dart';
@@ -34,6 +37,8 @@ class PreciseReferencePanel extends ConsumerStatefulWidget {
 
 class _PreciseReferencePanelState extends ConsumerState<PreciseReferencePanel> {
   bool _isExpanded = false;
+  bool _isFileDraggingOver = false;
+  bool _isProcessingDroppedFiles = false;
 
   @override
   Widget build(BuildContext context) {
@@ -206,10 +211,20 @@ class _PreciseReferencePanelState extends ConsumerState<PreciseReferencePanel> {
             ],
 
             // 添加按钮
-            OutlinedButton.icon(
-              onPressed: isV4Model ? _addReference : null,
-              icon: const Icon(Icons.add, size: 18),
-              label: Text(context.l10n.preciseRef_addReference),
+            _buildAddReferenceDropTarget(
+              isV4Model: isV4Model,
+              child: OutlinedButton.icon(
+                onPressed: isV4Model ? _addReference : null,
+                icon: Icon(
+                  _isFileDraggingOver ? Icons.file_download_rounded : Icons.add,
+                  size: 18,
+                ),
+                label: Text(
+                  _isFileDraggingOver
+                      ? '松开后添加精准参考'
+                      : context.l10n.preciseRef_addReference,
+                ),
+              ),
             ),
 
             // 清除全部按钮
@@ -226,6 +241,54 @@ class _PreciseReferencePanelState extends ConsumerState<PreciseReferencePanel> {
             ],
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildAddReferenceDropTarget({
+    required bool isV4Model,
+    required Widget child,
+  }) {
+    if (!isV4Model) {
+      return child;
+    }
+
+    return DropRegion(
+      formats: Formats.standardFormats,
+      hitTestBehavior: HitTestBehavior.opaque,
+      onDropOver: (event) {
+        if (_isProcessingDroppedFiles) {
+          return DropOperation.none;
+        }
+        if (event.session.allowedOperations.contains(DropOperation.copy)) {
+          if (!_isFileDraggingOver) {
+            setState(() => _isFileDraggingOver = true);
+          }
+          return DropOperation.copy;
+        }
+        return DropOperation.none;
+      },
+      onDropLeave: (_) {
+        if (_isFileDraggingOver) {
+          setState(() => _isFileDraggingOver = false);
+        }
+      },
+      onPerformDrop: (event) async {
+        setState(() => _isFileDraggingOver = false);
+        unawaited(_handleDroppedReferences(event));
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          border: _isFileDraggingOver
+              ? Border.all(
+                  color: Theme.of(context).colorScheme.primary,
+                  width: 2,
+                )
+              : null,
+        ),
+        child: child,
       ),
     );
   }
@@ -269,6 +332,71 @@ class _PreciseReferencePanelState extends ConsumerState<PreciseReferencePanel> {
           context,
           context.l10n.img2img_selectFailed(e.toString()),
         );
+      }
+    }
+  }
+
+  Future<void> _handleDroppedReferences(PerformDropEvent event) async {
+    if (_isProcessingDroppedFiles) {
+      return;
+    }
+
+    setState(() => _isProcessingDroppedFiles = true);
+    try {
+      final files = <DroppedFileData>[];
+      for (final item in event.session.items) {
+        final reader = item.dataReader;
+        if (reader == null) {
+          continue;
+        }
+
+        final file = await DroppedFileReader.read(
+          reader,
+          logTag: 'PreciseReferenceDrop',
+        );
+        if (file != null) {
+          files.add(file);
+        }
+      }
+
+      if (!mounted) {
+        return;
+      }
+
+      if (files.isEmpty) {
+        AppToast.warning(context, '拖入源未提供可读取的图片文件或图片链接');
+        return;
+      }
+
+      final selectedType = await _showTypeSelectorDialog();
+      if (selectedType == null || !mounted) {
+        return;
+      }
+
+      final notifier = ref.read(generationParamsNotifierProvider.notifier);
+      final addOperations = files.map(
+        (file) => notifier.addPreciseReferenceFromImage(
+          file.bytes,
+          type: selectedType,
+          strength: 0.8,
+          fidelity: 1.0,
+        ),
+      );
+      await Future.wait(addOperations);
+
+      if (mounted) {
+        AppToast.success(context, '已添加 ${files.length} 个精准参考');
+      }
+    } catch (e) {
+      if (mounted) {
+        AppToast.error(
+          context,
+          context.l10n.img2img_selectFailed(e.toString()),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isProcessingDroppedFiles = false);
       }
     }
   }

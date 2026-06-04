@@ -166,6 +166,19 @@ class _UnifiedReferencePanelState extends ConsumerState<UnifiedReferencePanel> {
     await _loadRecentEntries();
   }
 
+  /// 添加 Vibe（从局部拖拽区域）
+  Future<int> _importDroppedVibeFile(String fileName, Uint8List bytes) async {
+    final handler = VibeImportHandler(ref: ref, context: context);
+    final addedCount = await handler.importDroppedFile(
+      fileName: fileName,
+      bytes: bytes,
+    );
+    if (addedCount > 0) {
+      await _loadRecentEntries();
+    }
+    return addedCount;
+  }
+
   /// 从库导入 Vibes
   Future<void> _importFromLibrary() async {
     final handler = VibeImportHandler(ref: ref, context: context);
@@ -368,6 +381,7 @@ class _UnifiedReferencePanelState extends ConsumerState<UnifiedReferencePanel> {
               onClearAll: _clearAllVibes,
               onSaveToLibrary: _saveToLibrary,
               onImportFromLibrary: _importFromLibrary,
+              onImportDroppedFile: _importDroppedVibeFile,
               onEncode: _encodeVibe,
               recentEntries: _recentEntries,
               isRecentCollapsed: _isRecentCollapsed,
