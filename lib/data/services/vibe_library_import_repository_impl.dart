@@ -1,4 +1,5 @@
 import '../models/vibe/vibe_library_entry.dart';
+import '../models/vibe/vibe_reference.dart';
 import 'vibe_import_service.dart';
 import 'vibe_library_storage_service.dart';
 
@@ -10,11 +11,19 @@ class VibeLibraryNotifierImportRepository
     required this.onGetAllEntries,
     required this.onFindEntryByName,
     required this.onSaveEntry,
+    this.onSaveBundleEntry,
   });
 
   final Future<List<VibeLibraryEntry>> Function() onGetAllEntries;
   final Future<VibeLibraryEntry?> Function(String name) onFindEntryByName;
   final Future<VibeLibraryEntry?> Function(VibeLibraryEntry) onSaveEntry;
+  final Future<VibeLibraryEntry?> Function(
+    List<VibeReference> vibes, {
+    required String name,
+    String? categoryId,
+    List<String>? tags,
+    VibeLibraryEntry? replaceEntry,
+  })? onSaveBundleEntry;
 
   @override
   Future<List<VibeLibraryEntry>> getAllEntries() async {
@@ -31,6 +40,32 @@ class VibeLibraryNotifierImportRepository
     final saved = await onSaveEntry(entry);
     if (saved == null) {
       throw StateError('Failed to save entry: ${entry.name}');
+    }
+    return saved;
+  }
+
+  @override
+  Future<VibeLibraryEntry> saveBundleEntry(
+    List<VibeReference> vibes, {
+    required String name,
+    String? categoryId,
+    List<String>? tags,
+    VibeLibraryEntry? replaceEntry,
+  }) async {
+    final saver = onSaveBundleEntry;
+    if (saver == null) {
+      throw StateError('Bundle import requires a bundle-aware repository');
+    }
+
+    final saved = await saver(
+      vibes,
+      name: name,
+      categoryId: categoryId,
+      tags: tags,
+      replaceEntry: replaceEntry,
+    );
+    if (saved == null) {
+      throw StateError('Failed to save bundle entry: $name');
     }
     return saved;
   }
@@ -59,5 +94,22 @@ class VibeLibraryStorageImportRepository
   @override
   Future<VibeLibraryEntry> saveEntry(VibeLibraryEntry entry) {
     return _storage.saveEntry(entry);
+  }
+
+  @override
+  Future<VibeLibraryEntry> saveBundleEntry(
+    List<VibeReference> vibes, {
+    required String name,
+    String? categoryId,
+    List<String>? tags,
+    VibeLibraryEntry? replaceEntry,
+  }) {
+    return _storage.saveBundleEntry(
+      vibes,
+      name: name,
+      categoryId: categoryId,
+      tags: tags,
+      replaceEntry: replaceEntry,
+    );
   }
 }

@@ -2,6 +2,19 @@
 
 ## [Unreleased]
 
+### Added
+
+- 新增 Krita Bridge 本地桥接实现，包含 Launcher 侧认证 WebSocket 服务、Krita 插件包、设置页开关、生成/图库发送到 Krita 入口、带备份/回滚的插件安装器、验收报告脚本与协议文档。
+- Krita Bridge 为本地回环桥接；NovelAI 凭据、请求构造、历史记录与 Anlas/统计仍保留在 Launcher 内部，Krita 插件只传输画布 PNG、提示词和控制参数。
+
+### Changed
+
+- Krita 插件在目标 Windows Krita 缺少 `PyQt5.QtWebSockets` 时会使用内置 stdlib WebSocket fallback，并将 fallback 回调转回 Qt 信号链路后再更新 Docker UI 或画布。
+
+### Validation
+
+- 已通过 Launcher/Krita 插件单元测试、Flutter analyze、Windows release build 和真实 Krita 命令行 PNG 往返验证；真实 Krita Python Plugin Manager 启用、Docker 加载和 GUI 画布写回仍需要用户确认后修改本机 Krita profile 才能闭环。
+
 ## [1.0.0-beta10] - 2026-05-09
 
 ### 更新日志

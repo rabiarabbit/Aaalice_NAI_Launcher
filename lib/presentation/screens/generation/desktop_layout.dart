@@ -10,6 +10,7 @@ import '../../../data/models/queue/replication_task.dart';
 import '../../providers/character_panel_dock_provider.dart';
 import '../../providers/character_prompt_provider.dart';
 import '../../providers/image_generation_provider.dart';
+import '../../providers/krita/krita_bridge_notifier.dart';
 import '../../providers/layout_state_provider.dart';
 import '../../providers/prompt_maximize_provider.dart';
 import '../../providers/replication_queue_provider.dart';
@@ -75,7 +76,10 @@ class _DesktopGenerationLayoutState
     final layoutState = ref.watch(layoutStateNotifierProvider);
     // 从 Provider 读取生成状态（用于快捷键回调）
     final generationState = ref.watch(imageGenerationNotifierProvider);
-    final isGenerating = generationState.isGenerating;
+    final kritaBridgeState = ref.watch(kritaBridgeNotifierProvider);
+    final isLauncherGenerating = generationState.isGenerating;
+    final isGenerating =
+        isLauncherGenerating || kritaBridgeState.isBridgeGenerating;
 
     // 定义快捷键动作映射（使用 ShortcutIds 常量）
     final shortcuts = <String, VoidCallback>{
@@ -87,7 +91,7 @@ class _DesktopGenerationLayoutState
       },
       // 取消生成
       ShortcutIds.cancelGeneration: () {
-        if (isGenerating) {
+        if (isLauncherGenerating) {
           ref.read(imageGenerationNotifierProvider.notifier).cancel();
         }
       },
@@ -239,6 +243,10 @@ class _DesktopGenerationLayoutState
 
   Future<void> _generateWithProtection() async {
     final currentParams = ref.read(generationParamsNotifierProvider);
+    if (ref.read(kritaBridgeNotifierProvider).isBridgeGenerating) {
+      AppToast.warning(context, 'Krita Bridge 正在生成，请等待当前任务结束');
+      return;
+    }
     if (currentParams.prompt.isEmpty) {
       return;
     }

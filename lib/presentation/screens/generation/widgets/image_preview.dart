@@ -35,6 +35,7 @@ import '../../../widgets/common/selectable_image_card.dart';
 import '../../../widgets/common/themed_switch.dart';
 import '../../../widgets/image_editor/image_editor_screen.dart';
 import '../../../utils/image_detail_opener.dart';
+import '../../../utils/krita_send_helper.dart';
 import '../../tag_library_page/widgets/entry_add_dialog.dart';
 import '../../../widgets/tag_library/tag_library_picker_dialog.dart';
 
@@ -230,6 +231,12 @@ class _ImagePreviewWidgetState extends ConsumerState<ImagePreviewWidget> {
                   ImageWorkflowLauncher.openEnhance(ref, imageBytes),
               onUpscale: () =>
                   ImageWorkflowLauncher.openUpscale(ref, imageBytes),
+              onSendToKrita: () => KritaSendHelper.sendImageBytes(
+                context,
+                ref,
+                image.bytes,
+                name: 'generation_${image.id}.png',
+              ),
               onSaveToLibrary: (bytes, _) =>
                   _showSaveToLibraryDialog(context, bytes),
             );
@@ -315,6 +322,12 @@ class _ImagePreviewWidgetState extends ConsumerState<ImagePreviewWidget> {
                   ImageWorkflowLauncher.openEnhance(ref, imageBytes),
               onUpscale: () =>
                   ImageWorkflowLauncher.openUpscale(ref, imageBytes),
+              onSendToKrita: () => KritaSendHelper.sendImageBytes(
+                context,
+                ref,
+                image.bytes,
+                name: 'generation_${image.id}.png',
+              ),
               onSaveToLibrary: (bytes, _) =>
                   _showSaveToLibraryDialog(context, bytes),
             );
@@ -519,6 +532,12 @@ class _ImagePreviewWidgetState extends ConsumerState<ImagePreviewWidget> {
         ),
         onEnhance: () => ImageWorkflowLauncher.openEnhance(ref, image.bytes),
         onUpscale: () => ImageWorkflowLauncher.openUpscale(ref, image.bytes),
+        onSendToKrita: () => KritaSendHelper.sendImageBytes(
+          context,
+          ref,
+          image.bytes,
+          name: 'generation_${image.id}.png',
+        ),
         onSaveToLibrary: (bytes, _) => _showSaveToLibraryDialog(context, bytes),
       ),
     );

@@ -164,55 +164,69 @@ class NaiImageMetadata with _$NaiImageMetadata {
 
   const NaiImageMetadata._();
 
+  /// 从 PNG Source 字段解析出的可用模型 ID。
+  String? get sourceModel => _modelIdFromSource(source);
+
+  /// 用于导入/展示的模型 ID。Source 是官方图片的模型来源，优先级高于旧缓存中的 model。
+  String? get effectiveModel => sourceModel ?? model;
+
   /// 从旧缓存里的 rawJson 补齐后来新增或更鲁棒解析出的字段。
   ///
   /// 历史版本的缓存可能已经保存了原始 Comment JSON，但当时还没有解析
   /// Vibe、Precise Reference 或 Variety+。读取缓存时重新按当前规则解析一次，
   /// 避免用户必须手动清缓存才能看到这些元数据。
   NaiImageMetadata upgradeFromRawJsonIfNeeded() {
-    final raw = rawJson;
-    if (raw == null || raw.isEmpty) return this;
-    if (!_rawJsonMayContainUpgradableFields(raw)) return this;
+    final sourceResolvedModel = sourceModel;
+    final base = sourceResolvedModel != null && model != sourceResolvedModel
+        ? copyWith(model: sourceResolvedModel)
+        : this;
+
+    final raw = base.rawJson;
+    if (raw == null || raw.isEmpty) return base;
+    if (!_rawJsonMayContainUpgradableFields(raw)) return base;
 
     try {
       final reparsed = _parseMetadataFromRawJson(
         raw,
-        software: software,
-        source: source,
+        software: base.software,
+        source: base.source,
       );
-      if (reparsed == null || !reparsed.hasData) return this;
+      if (reparsed == null || !reparsed.hasData) return base;
 
-      return copyWith(
-        characterPrompts: characterPrompts.isEmpty
+      return base.copyWith(
+        model: base.model ?? reparsed.model,
+        characterPrompts: base.characterPrompts.isEmpty
             ? reparsed.characterPrompts
-            : characterPrompts,
-        characterNegativePrompts: characterNegativePrompts.isEmpty
+            : base.characterPrompts,
+        characterNegativePrompts: base.characterNegativePrompts.isEmpty
             ? reparsed.characterNegativePrompts
-            : characterNegativePrompts,
-        characterInfos:
-            characterInfos.isEmpty ? reparsed.characterInfos : characterInfos,
-        vibeReferences:
-            vibeReferences.isEmpty ? reparsed.vibeReferences : vibeReferences,
-        varietyPlus: varietyPlus ?? reparsed.varietyPlus,
-        preciseReferenceImages: preciseReferenceImages.isEmpty
+            : base.characterNegativePrompts,
+        characterInfos: base.characterInfos.isEmpty
+            ? reparsed.characterInfos
+            : base.characterInfos,
+        vibeReferences: base.vibeReferences.isEmpty
+            ? reparsed.vibeReferences
+            : base.vibeReferences,
+        varietyPlus: base.varietyPlus ?? reparsed.varietyPlus,
+        preciseReferenceImages: base.preciseReferenceImages.isEmpty
             ? reparsed.preciseReferenceImages
-            : preciseReferenceImages,
-        preciseReferenceTypes: preciseReferenceTypes.isEmpty
+            : base.preciseReferenceImages,
+        preciseReferenceTypes: base.preciseReferenceTypes.isEmpty
             ? reparsed.preciseReferenceTypes
-            : preciseReferenceTypes,
-        preciseReferenceStrengths: preciseReferenceStrengths.isEmpty
+            : base.preciseReferenceTypes,
+        preciseReferenceStrengths: base.preciseReferenceStrengths.isEmpty
             ? reparsed.preciseReferenceStrengths
-            : preciseReferenceStrengths,
-        preciseReferenceFidelities: preciseReferenceFidelities.isEmpty
+            : base.preciseReferenceStrengths,
+        preciseReferenceFidelities: base.preciseReferenceFidelities.isEmpty
             ? reparsed.preciseReferenceFidelities
-            : preciseReferenceFidelities,
+            : base.preciseReferenceFidelities,
       );
     } catch (e) {
       AppLogger.w(
         'Failed to upgrade metadata from rawJson: $e',
         'NaiImageMetadata',
       );
-      return this;
+      return base;
     }
   }
 
@@ -303,16 +317,9 @@ class NaiImageMetadata with _$NaiImageMetadata {
       negativePrompt = commentData['uc'] as String? ?? '';
     } catch (_) {}
 
-    final inferredModel = _safeGetString(commentData, 'model') ??
-        _inferModelFromSource(
-          source,
-          prompt: prompt,
-          negativePrompt: negativePrompt,
-        );
-    final inferredUcPreset = _toInt(commentData['uc_preset']) ??
-        _inferUcPreset(negativePrompt, inferredModel);
-    final inferredQualityToggle = _safeGetBool(commentData, 'quality_toggle') ??
-        _inferQualityToggle(prompt, inferredModel);
+    final sourceModel = _modelIdFromSource(source);
+    final importedUcPreset = _toInt(commentData['uc_preset']);
+    final importedQualityToggle = _safeGetBool(commentData, 'quality_toggle');
 
     // 构建元数据对象（使用try-catch包装每个字段）
     try {
@@ -325,14 +332,14 @@ class NaiImageMetadata with _$NaiImageMetadata {
         scale: _extractScale(commentData),
         width: _toInt(commentData['width']),
         height: _toInt(commentData['height']),
-        model: inferredModel,
+        model: sourceModel,
         smea: _safeGetBool(commentData, 'sm'),
         smeaDyn: _safeGetBool(commentData, 'sm_dyn'),
         varietyPlus: _extractVarietyPlus(commentData),
         noiseSchedule: _safeGetString(commentData, 'noise_schedule'),
         cfgRescale: _toDouble(commentData['cfg_rescale']),
-        ucPreset: inferredUcPreset,
-        qualityToggle: inferredQualityToggle,
+        ucPreset: importedUcPreset,
+        qualityToggle: importedQualityToggle,
         isImg2Img: commentData['image'] != null,
         strength: _toDouble(commentData['strength']),
         noise: _toDouble(commentData['noise']),
@@ -1041,11 +1048,14 @@ class NaiImageMetadata with _$NaiImageMetadata {
         _safeGetBool(data, 'variety_plus') ?? _safeGetBool(data, 'varietyPlus');
     if (explicit != null) return explicit;
 
-    final skipCfgAbove = _firstDouble(
-      data,
-      const ['skip_cfg_above_sigma', 'skipCfgAboveSigma'],
-    );
-    if (skipCfgAbove != null) return skipCfgAbove > 0;
+    const skipCfgKeys = ['skip_cfg_above_sigma', 'skipCfgAboveSigma'];
+    for (final key in skipCfgKeys) {
+      if (!data.containsKey(key)) continue;
+      final value = data[key];
+      if (value == null) return false;
+      final skipCfgAbove = _toDouble(value);
+      if (skipCfgAbove != null) return skipCfgAbove > 0;
+    }
 
     return null;
   }
@@ -1068,149 +1078,47 @@ class NaiImageMetadata with _$NaiImageMetadata {
     return null;
   }
 
-  static String? _inferModelFromSource(
-    String? source, {
-    required String prompt,
-    required String negativePrompt,
-  }) {
-    if (source == null || source.isEmpty) {
+  static String? _modelIdFromSource(String? source) {
+    final value = source?.trim();
+    if (value == null || value.isEmpty) {
       return null;
     }
 
-    final normalizedSource = source.toLowerCase();
-    if (normalizedSource.contains('v4.5')) {
-      if (_looksLikeCuratedModel(
-        prompt,
-        negativePrompt,
-        ImageModels.animeDiffusionV45Curated,
-      )) {
+    final normalized = value.toLowerCase();
+
+    // Official PNG Source fingerprints are exact model identifiers. Do not
+    // fall back to prompt/UC inference when the Source text is ambiguous.
+    if (normalized.contains('v4.5')) {
+      if (normalized.contains('4bde2a90') || normalized.contains('v4.5 full')) {
+        return ImageModels.animeDiffusionV45Full;
+      }
+      if (normalized.contains('v4.5 curated')) {
         return ImageModels.animeDiffusionV45Curated;
       }
-      return ImageModels.animeDiffusionV45Full;
+      return null;
     }
 
-    if (normalizedSource.contains('v4')) {
-      if (_looksLikeCuratedModel(
-        prompt,
-        negativePrompt,
-        ImageModels.animeDiffusionV4Curated,
-      )) {
+    if (normalized.contains('v4')) {
+      if (normalized.contains('v4 full')) {
+        return ImageModels.animeDiffusionV4Full;
+      }
+      if (normalized.contains('v4 curated')) {
         return ImageModels.animeDiffusionV4Curated;
       }
-      return ImageModels.animeDiffusionV4Full;
+      return null;
     }
 
-    if (normalizedSource.contains('furry') && normalizedSource.contains('v3')) {
+    if (normalized.contains('furry') && normalized.contains('v3')) {
       return ImageModels.furryDiffusionV3;
     }
-
-    if (normalizedSource.contains('v3')) {
+    if (normalized.contains('v3')) {
       return ImageModels.animeDiffusionV3;
+    }
+    if (normalized.contains('furry')) {
+      return ImageModels.furryDiffusion;
     }
 
     return null;
-  }
-
-  static bool _looksLikeCuratedModel(
-    String prompt,
-    String negativePrompt,
-    String curatedModel,
-  ) {
-    for (final qualityTags in QualityTags.getQualityTagVariants(curatedModel)) {
-      if (_containsOrderedPromptFragment(prompt, qualityTags)) {
-        return true;
-      }
-    }
-
-    for (final preset in const [0, 1, 2]) {
-      if (UcPresets.stripPresetByInt(negativePrompt, curatedModel, preset) !=
-          negativePrompt) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  static int? _inferUcPreset(String negativePrompt, String? model) {
-    if (negativePrompt.isEmpty || model == null || model.isEmpty) {
-      return null;
-    }
-
-    final candidates = <MapEntry<int, int>>[];
-    for (final preset in const [2, 0, 1]) {
-      final stripped =
-          UcPresets.stripPresetByInt(negativePrompt, model, preset);
-      if (stripped == negativePrompt) {
-        continue;
-      }
-      final presetTagCount = UcPresets.getPresetContentByInt(model, preset)
-          .split(',')
-          .map((tag) => tag.trim())
-          .where((tag) => tag.isNotEmpty)
-          .length;
-      candidates.add(MapEntry(preset, presetTagCount));
-    }
-
-    if (candidates.isEmpty) {
-      return null;
-    }
-
-    candidates.sort((a, b) => b.value.compareTo(a.value));
-    return candidates.first.key;
-  }
-
-  static bool? _inferQualityToggle(String prompt, String? model) {
-    if (prompt.isEmpty || model == null || model.isEmpty) {
-      return null;
-    }
-
-    final qualityTagVariants = QualityTags.getQualityTagVariants(model);
-    if (qualityTagVariants.isEmpty) {
-      return null;
-    }
-
-    return qualityTagVariants.any(
-      (qualityTags) => _containsOrderedPromptFragment(prompt, qualityTags),
-    );
-  }
-
-  static bool _containsOrderedPromptFragment(String prompt, String? fragment) {
-    if (fragment == null || fragment.isEmpty) {
-      return false;
-    }
-
-    final promptTags = prompt
-        .split(',')
-        .map((tag) => tag.trim().toLowerCase())
-        .where((tag) => tag.isNotEmpty)
-        .toList();
-    final fragmentTags = fragment
-        .split(',')
-        .map((tag) => tag.trim().toLowerCase())
-        .where((tag) => tag.isNotEmpty)
-        .toList();
-
-    if (fragmentTags.isEmpty || promptTags.length < fragmentTags.length) {
-      return false;
-    }
-
-    for (var start = 0;
-        start <= promptTags.length - fragmentTags.length;
-        start++) {
-      var matches = true;
-      for (var offset = 0; offset < fragmentTags.length; offset++) {
-        if (promptTags[start + offset] != fragmentTags[offset]) {
-          matches = false;
-          break;
-        }
-      }
-      if (matches) {
-        return true;
-      }
-    }
-
-    return false;
   }
 
   // 常见的固定前缀词

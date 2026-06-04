@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Service
+ServiceTypes=Krita/PythonPlugin
+X-KDE-Library=nai_launcher_bridge
+X-Python-2-Compatible=false
+Name=NAI Launcher Bridge
+Comment=Send Krita canvas images to NAI Launcher and receive generated results

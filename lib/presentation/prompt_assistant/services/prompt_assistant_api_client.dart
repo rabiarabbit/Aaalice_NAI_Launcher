@@ -9,9 +9,13 @@ import 'provider_adapters/openai_responses_adapter.dart';
 import 'provider_adapters/prompt_assistant_adapter.dart';
 
 class PromptAssistantApiClient {
-  PromptAssistantApiClient({required Dio dio}) : _dio = dio;
+  PromptAssistantApiClient({
+    required Dio dio,
+    this.imageUploadMaxBytes = promptAssistantImageUploadMaxBytes,
+  }) : _dio = dio;
 
   final Dio _dio;
+  final int imageUploadMaxBytes;
   final Map<String, CancelToken> _cancelTokens = {};
 
   void cancelCurrentRequest({String? sessionId}) {
@@ -51,9 +55,13 @@ class PromptAssistantApiClient {
         'PromptAssistant',
       );
 
-      final content = await _adapterFor(request.provider).complete(
+      final uploadRequest = await optimizePromptAssistantRequestImagesForUpload(
+        request,
+        maxBytes: imageUploadMaxBytes,
+      );
+      final content = await _adapterFor(uploadRequest.provider).complete(
         dio: _dio,
-        request: request,
+        request: uploadRequest,
         cancelToken: cancelToken,
       );
       final trimmed = content.trim();

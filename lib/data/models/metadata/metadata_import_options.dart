@@ -203,7 +203,7 @@ class MetadataImportOptions with _$MetadataImportOptions {
       count++;
     }
     if (importSampler && metadata.sampler != null) count++;
-    if (importModel && metadata.model != null) count++;
+    if (importModel && metadata.effectiveModel != null) count++;
     if (importSmea && (metadata.smea == true || metadata.smeaDyn == true)) {
       count++;
     }

@@ -338,8 +338,27 @@ class GalleryFilterService {
       List<File> filtered;
 
       if (criteria.searchQuery.isNotEmpty) {
-        // 有搜索关键词：使用数据库搜索
-        filtered = await _searchInDatabase(allFiles, criteria, cancelToken);
+        if (_hasDelimitedSearchQuery(criteria.searchQuery)) {
+          // 逗号分隔搜索使用后台 AND 过滤，避免 FTS 多词搜索的 OR 语义。
+          filtered = allFiles;
+          if (_hasDatabasePreSearchFilters(criteria)) {
+            filtered = await _searchInDatabase(
+              allFiles,
+              criteria.copyWith(searchQuery: ''),
+              cancelToken,
+            );
+          }
+          filtered = await _filterByDelimitedSearchQuery(
+            filtered,
+            criteria.searchQuery,
+            cancelToken,
+          );
+        } else {
+          // 有普通搜索关键词：使用数据库搜索
+          filtered = await _searchInDatabase(allFiles, criteria, cancelToken);
+        }
+        filtered =
+            await _applyPostSearchFilters(filtered, criteria, cancelToken);
       } else {
         // 本地过滤
         filtered = await _applyLocalFilters(allFiles, criteria, cancelToken);
@@ -473,6 +492,65 @@ class GalleryFilterService {
     return filtered;
   }
 
+  /// 应用数据库文本搜索之后仍需叠加的本地过滤。
+  Future<List<File>> _applyPostSearchFilters(
+    List<File> files,
+    FilterCriteria criteria,
+    CancelToken cancelToken,
+  ) async {
+    var filtered = files;
+
+    if (criteria.selectedTags.isNotEmpty) {
+      filtered =
+          await _filterByTags(filtered, criteria.selectedTags, cancelToken);
+    }
+
+    if (cancelToken.isCancelled) return [];
+
+    if (criteria.categoryFolderPath != null) {
+      filtered = await _filterByCategory(
+        filtered,
+        criteria.categoryFolderPath!,
+        cancelToken,
+      );
+    }
+
+    return filtered;
+  }
+
+  /// 按逗号分隔的搜索片段做 AND 包含匹配。
+  Future<List<File>> _filterByDelimitedSearchQuery(
+    List<File> files,
+    String searchQuery,
+    CancelToken cancelToken,
+  ) async {
+    final segments = _parseDelimitedSearchSegments(searchQuery);
+    if (segments.isEmpty || files.isEmpty) return files;
+
+    try {
+      final imageIds = await _dataSource.searchByDelimitedTextSegments(
+        segments,
+        limit: max(1, files.length),
+      );
+
+      if (cancelToken.isCancelled) return [];
+
+      final images = await _dataSource.getImagesByIds(imageIds);
+      final validPaths = images.map((image) => image.filePath).toSet();
+
+      return files.where((file) {
+        if (cancelToken.isCancelled) return false;
+        return validPaths.contains(file.path);
+      }).toList();
+    } catch (e) {
+      AppLogger.w(
+        'Failed to filter by delimited search query: $e',
+        'GalleryFilterService',
+      );
+      return files;
+    }
+  }
+
   /// 按标签过滤
   Future<List<File>> _filterByTags(
     List<File> files,
@@ -480,6 +558,12 @@ class GalleryFilterService {
     CancelToken cancelToken,
   ) async {
     try {
+      final requiredTags = tags
+          .map(_normalizeTagForMatch)
+          .where((tag) => tag.isNotEmpty)
+          .toSet();
+      if (requiredTags.isEmpty) return files;
+
       // 获取文件路径到图片 ID 的映射
       final pathToIdMap = await _dataSource.getImageIdsByPaths(
         files.map((f) => f.path).toList(),
@@ -488,6 +572,7 @@ class GalleryFilterService {
       // 获取所有图片的标签
       final imageIds = pathToIdMap.values.whereType<int>().toList();
       final tagsMap = await _dataSource.getTagsByImageIds(imageIds);
+      final metadataMap = await _dataSource.getMetadataByImageIds(imageIds);
 
       return files.where((file) {
         if (cancelToken.isCancelled) return false;
@@ -495,13 +580,66 @@ class GalleryFilterService {
         final imageId = pathToIdMap[file.path];
         if (imageId == null) return false;
 
-        final fileTags = tagsMap[imageId] ?? [];
-        return tags.every((tag) => fileTags.contains(tag));
+        final fileTags = (tagsMap[imageId] ?? [])
+            .map(_normalizeTagForMatch)
+            .where((tag) => tag.isNotEmpty)
+            .toSet();
+        final metadataText =
+            _normalizeTagForMatch(metadataMap[imageId]?.fullPromptText ?? '');
+
+        return requiredTags.every(
+          (tag) =>
+              fileTags.contains(tag) ||
+              _normalizedTextContainsTag(metadataText, tag),
+        );
       }).toList();
     } catch (e) {
       AppLogger.w('Failed to filter by tags: $e', 'GalleryFilterService');
       return files;
     }
+  }
+
+  String _normalizeTagForMatch(String value) {
+    return _normalizeSearchText(value)
+        .replaceAll(RegExp(r'[:]+'), ' ')
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
+  }
+
+  bool _hasDelimitedSearchQuery(String value) {
+    return value.contains(',') || value.contains('，');
+  }
+
+  bool _hasDatabasePreSearchFilters(FilterCriteria criteria) {
+    return criteria.dateStart != null ||
+        criteria.dateEnd != null ||
+        criteria.showFavoritesOnly ||
+        criteria.hasAdvancedFilters;
+  }
+
+  List<String> _parseDelimitedSearchSegments(String value) {
+    return value
+        .split(RegExp(r'[,，]+'))
+        .map(_normalizeSearchText)
+        .where((segment) => segment.isNotEmpty)
+        .toSet()
+        .toList(growable: false);
+  }
+
+  String _normalizeSearchText(String value) {
+    return value
+        .toLowerCase()
+        .replaceAll(RegExp(r'-?(?:\d+\.?\d*|\.\d+)::'), ' ')
+        .replaceAll(RegExp(r'[_/\\|,，;；\n\r\t]+'), ' ')
+        .replaceAll(RegExp(r'[\{\}\[\]\(\)]'), ' ')
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
+  }
+
+  bool _normalizedTextContainsTag(String normalizedText, String normalizedTag) {
+    if (normalizedText.isEmpty || normalizedTag.isEmpty) return false;
+
+    return ' $normalizedText '.contains(' $normalizedTag ');
   }
 
   /// 按日期范围过滤

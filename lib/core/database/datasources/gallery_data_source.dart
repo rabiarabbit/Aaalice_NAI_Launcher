@@ -2285,6 +2285,133 @@ class GalleryDataSource extends EnhancedBaseDataSource {
     );
   }
 
+  Future<List<int>> searchByDelimitedTextSegments(
+    List<String> segments, {
+    int limit = 100,
+  }) async {
+    final searchSegments = segments
+        .map(_normalizeDelimitedSearchSegment)
+        .where((segment) => segment.isNotEmpty)
+        .toSet()
+        .toList(growable: false);
+    if (searchSegments.isEmpty) return [];
+
+    final cacheKey = _QueryCacheKey('searchByDelimitedTextSegments', {
+      'segments': searchSegments.join(','),
+      'limit': limit,
+    });
+
+    final cached = _queryCache.get(cacheKey);
+    if (cached != null) {
+      return cached.cast<int>();
+    }
+
+    return _trackQuery(
+      'searchByDelimitedTextSegments',
+      () async {
+        try {
+          const searchableTextExpression = '''
+            LOWER(
+              COALESCE(i.file_name, '') || ' ' ||
+              COALESCE(i.file_path, '') || ' ' ||
+              COALESCE(m.full_prompt_text, '') || ' ' ||
+              COALESCE(m.prompt, '') || ' ' ||
+              COALESCE(m.negative_prompt, '') || ' ' ||
+              COALESCE(m.model, '') || ' ' ||
+              COALESCE(m.sampler, '') || ' ' ||
+              COALESCE(m.software, '') || ' ' ||
+              COALESCE(m.source, '') || ' ' ||
+              COALESCE(m.version, '')
+            )
+          ''';
+
+          final segmentConditions = <String>[];
+          final args = <String>[];
+
+          for (final segment in searchSegments) {
+            final variants = _buildDelimitedSearchVariants(segment);
+            final variantConditions = <String>[];
+
+            for (final variant in variants) {
+              final pattern = '%${_escapeLikePattern(variant)}%';
+              variantConditions.add(
+                "$searchableTextExpression LIKE ? ESCAPE '\\'",
+              );
+              args.add(pattern);
+            }
+
+            segmentConditions.add('(${variantConditions.join(' OR ')})');
+          }
+
+          final whereClause = segmentConditions.join(' AND ');
+
+          final results = await execute(
+            'searchByDelimitedTextSegments',
+            (db) async {
+              final dbResults = await db.rawQuery(
+                '''
+                SELECT i.id
+                FROM $_imagesTable i
+                LEFT JOIN $_metadataTable m ON m.image_id = i.id
+                WHERE i.is_deleted = 0 AND $whereClause
+                ORDER BY i.modified_at DESC
+                LIMIT ?
+                ''',
+                [...args, limit],
+              );
+
+              return dbResults
+                  .map((row) => (row['id'] as num).toInt())
+                  .toList();
+            },
+            timeout: const Duration(seconds: 10),
+            maxRetries: 3,
+          );
+
+          _queryCache.put(cacheKey, results);
+          return results;
+        } catch (e, stack) {
+          AppLogger.e(
+            'Failed to search by delimited text segments: ${searchSegments.join(",")}',
+            e,
+            stack,
+            'GalleryDS',
+          );
+          return [];
+        }
+      },
+      details: 'segments="${searchSegments.join(",")}"',
+    );
+  }
+
+  String _normalizeDelimitedSearchSegment(String value) {
+    return value
+        .toLowerCase()
+        .trim()
+        .replaceAll(RegExp(r'-?(?:\d+\.?\d*|\.\d+)::'), ' ')
+        .replaceAll(RegExp(r'[/\\|,，;；\n\r\t]+'), ' ')
+        .replaceAll(RegExp(r'[\{\}\[\]\(\)]'), ' ')
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
+  }
+
+  Set<String> _buildDelimitedSearchVariants(String segment) {
+    final normalized = _normalizeDelimitedSearchSegment(segment);
+    final variants = <String>{};
+
+    final original = segment.toLowerCase().trim();
+    if (original.isNotEmpty) {
+      variants.add(original);
+    }
+    if (normalized.isNotEmpty) {
+      variants.add(normalized);
+      variants.add(normalized.replaceAll(' ', '_'));
+      variants.add(normalized.replaceAll('_', ' '));
+    }
+
+    return variants.where((variant) => variant.isNotEmpty).toSet();
+  }
+
   /// 高级搜索 - 支持多条件组合查询
   Future<List<int>> advancedSearch({
     String? textQuery,

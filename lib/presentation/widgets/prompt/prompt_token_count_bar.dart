@@ -1,6 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/services/prompt_token_counter_service.dart';
+
+class PromptTokenCountAsyncBar extends StatelessWidget {
+  const PromptTokenCountAsyncBar({
+    super.key,
+    required this.usage,
+  });
+
+  final AsyncValue<PromptTokenUsage?> usage;
+
+  @override
+  Widget build(BuildContext context) {
+    return usage.when(
+      skipLoadingOnReload: true,
+      skipLoadingOnRefresh: true,
+      data: (usage) => usage == null
+          ? const SizedBox.shrink()
+          : PromptTokenCountBar(usage: usage),
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+    );
+  }
+}
 
 class PromptTokenCountBar extends StatelessWidget {
   const PromptTokenCountBar({

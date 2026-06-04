@@ -403,6 +403,8 @@ class _MetadataContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final displayModel = metadata.effectiveModel ?? metadata.source;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -430,10 +432,10 @@ class _MetadataContent extends StatelessWidget {
           title: context.l10n.gallery_generationParams,
           icon: Icons.tune,
           children: [
-            if (metadata.model != null)
+            if (displayModel?.isNotEmpty == true)
               _InfoRow(
                 label: context.l10n.gallery_metaModel,
-                value: metadata.model!,
+                value: displayModel!,
               ),
             if (metadata.seed != null)
               _InfoRow(

@@ -5,17 +5,22 @@ import 'package:flutter/services.dart';
 import '../core/editor_state.dart';
 import '../core/input_handler.dart';
 import 'layer_painter.dart';
+import 'stroke_preview_painter.dart';
 
 /// 编辑器画布组件
 /// 处理绑制、手势和键盘交互
 class EditorCanvas extends StatefulWidget {
   final EditorState state;
   final bool suppressSelectionOverlay;
+  final bool showTransparentCanvasBackground;
+  final bool Function(Offset localPosition)? shouldSuppressPointerInput;
 
   const EditorCanvas({
     super.key,
     required this.state,
     this.suppressSelectionOverlay = false,
+    this.showTransparentCanvasBackground = false,
+    this.shouldSuppressPointerInput,
   });
 
   @override
@@ -32,6 +37,7 @@ class _EditorCanvasState extends State<EditorCanvas>
 
   /// 焦点节点
   final FocusNode _focusNode = FocusNode();
+  final Set<int> _suppressedPointers = <int>{};
 
   @override
   void initState() {
@@ -71,9 +77,10 @@ class _EditorCanvasState extends State<EditorCanvas>
       child: Listener(
         onPointerSignal: _inputHandler.handlePointerSignal,
         onPointerHover: _inputHandler.handlePointerHover,
-        onPointerDown: _inputHandler.handlePointerDown,
-        onPointerUp: _inputHandler.handlePointerUp,
-        onPointerMove: _inputHandler.handlePointerMove,
+        onPointerDown: _handlePointerDown,
+        onPointerUp: _handlePointerUp,
+        onPointerCancel: _handlePointerCancel,
+        onPointerMove: _handlePointerMove,
         child: GestureDetector(
           behavior: HitTestBehavior.translucent,
           dragStartBehavior: DragStartBehavior.down,
@@ -115,7 +122,23 @@ class _EditorCanvasState extends State<EditorCanvas>
                           // 图层绘制 - 不使用 RepaintBoundary 以避免缓存问题
                           Positioned.fill(
                             child: CustomPaint(
-                              painter: LayerPainter(state: widget.state),
+                              painter: LayerPainter(
+                                state: widget.state,
+                                showTransparentCanvasBackground:
+                                    widget.showTransparentCanvasBackground,
+                              ),
+                            ),
+                          ),
+
+                          // 当前笔画预览 - 仅实时预览，不写入图层数据
+                          Positioned.fill(
+                            child: RepaintBoundary(
+                              child: CustomPaint(
+                                painter: StrokePreviewPainter(
+                                  state: widget.state,
+                                ),
+                                willChange: true,
+                              ),
                             ),
                           ),
 
@@ -159,6 +182,44 @@ class _EditorCanvasState extends State<EditorCanvas>
         ),
       ),
     );
+  }
+
+  void _handlePointerDown(PointerDownEvent event) {
+    if ((event.buttons & kPrimaryButton) != 0 &&
+        _shouldSuppressPointer(event)) {
+      _suppressedPointers.add(event.pointer);
+      widget.state.cancelStroke();
+      return;
+    }
+
+    _inputHandler.handlePointerDown(event);
+  }
+
+  void _handlePointerMove(PointerMoveEvent event) {
+    if (_suppressedPointers.contains(event.pointer)) {
+      return;
+    }
+
+    _inputHandler.handlePointerMove(event);
+  }
+
+  void _handlePointerUp(PointerUpEvent event) {
+    if (_suppressedPointers.remove(event.pointer)) {
+      return;
+    }
+
+    _inputHandler.handlePointerUp(event);
+  }
+
+  void _handlePointerCancel(PointerCancelEvent event) {
+    if (_suppressedPointers.remove(event.pointer)) {
+      return;
+    }
+  }
+
+  bool _shouldSuppressPointer(PointerDownEvent event) {
+    return widget.shouldSuppressPointerInput?.call(event.localPosition) ??
+        false;
   }
 
   /// 构建拾色器预览覆盖层列表

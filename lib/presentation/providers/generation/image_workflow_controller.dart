@@ -925,12 +925,28 @@ class ImageWorkflowController extends Notifier<ImageWorkflowState> {
   }
 
   void applyInpaintEditorResult({
+    Uint8List? sourceImage,
+    int? sourceWidth,
+    int? sourceHeight,
     required Uint8List? maskImage,
     required bool focusedInpaintEnabled,
     required Rect? focusedSelectionRect,
     required double minimumContextMegaPixels,
+    bool forceDisableFocusedInpaint = false,
   }) {
-    if (_params.sourceImage == null) {
+    final hasOutpaintSource = sourceImage != null;
+    if (hasOutpaintSource) {
+      if (sourceWidth == null || sourceHeight == null) {
+        throw ArgumentError('Outpaint source dimensions are required');
+      }
+      if (!NaiResolutionAdapter.isCompatible(sourceWidth, sourceHeight)) {
+        throw ArgumentError(
+          'Outpaint source dimensions must be 64-compatible',
+        );
+      }
+    }
+
+    if (_params.sourceImage == null && !hasOutpaintSource) {
       return;
     }
 
@@ -939,16 +955,25 @@ class ImageWorkflowController extends Notifier<ImageWorkflowState> {
       _restoreBaseParams();
     }
 
+    if (hasOutpaintSource) {
+      _paramsNotifier.setSourceImage(sourceImage);
+    }
+
     _ensureBaseSnapshot();
 
-    final effectiveFocusedInpaintEnabled =
-        focusedInpaintEnabled && focusedSelectionRect != null;
+    final effectiveFocusedSelectionRect =
+        forceDisableFocusedInpaint ? null : focusedSelectionRect;
+    final effectiveFocusedInpaintEnabled = !forceDisableFocusedInpaint &&
+        focusedInpaintEnabled &&
+        effectiveFocusedSelectionRect != null;
     state = state.copyWith(
       mode: ImageWorkflowMode.inpaint,
+      sourceWidth: hasOutpaintSource ? sourceWidth : null,
+      sourceHeight: hasOutpaintSource ? sourceHeight : null,
       isPanelExpanded: true,
       focusedInpaintEnabled: effectiveFocusedInpaintEnabled,
       minimumContextMegaPixels: minimumContextMegaPixels.clamp(0.0, 192.0),
-      focusedSelectionRect: focusedSelectionRect,
+      focusedSelectionRect: effectiveFocusedSelectionRect,
       clearFocusedSelectionRect: !effectiveFocusedInpaintEnabled,
     );
 

@@ -167,6 +167,11 @@ abstract class LocalGalleryService {
   ///
   /// 返回对应的图片记录列表，如果某些路径不存在则跳过
   Future<List<LocalImageRecord>> getRecordsByPaths(List<String> paths);
+
+  /// 获取当前过滤结果中的所有图片路径。
+  ///
+  /// 未应用过滤时返回全部图片；应用搜索/筛选后返回筛选结果。
+  Future<List<String>> getFilteredImagePaths();
 }
 
 /// 画廊服务实现
@@ -180,6 +185,8 @@ class LocalGalleryServiceImpl implements LocalGalleryService {
   List<File> _allFiles = [];
   List<File> _filteredFiles = [];
   FilterCriteria _currentFilter = const FilterCriteria();
+  int _filterGeneration = 0;
+  String? _activeFilterOperationId;
   int _pageSize = 50;
 
   LocalGalleryServiceImpl({
@@ -543,6 +550,13 @@ class LocalGalleryServiceImpl implements LocalGalleryService {
     return _loadRecords(batch);
   }
 
+  @override
+  Future<List<String>> getFilteredImagePaths() async {
+    _ensureInitialized();
+
+    return _effectiveFiles.map((file) => file.path).toList(growable: false);
+  }
+
   /// 加载图片记录列表
   Future<List<LocalImageRecord>> _loadRecords(List<File> files) async {
     if (files.isEmpty) return [];
@@ -803,22 +817,49 @@ class LocalGalleryServiceImpl implements LocalGalleryService {
   Future<void> applyFilter(FilterCriteria criteria) async {
     _ensureInitialized();
 
+    final generation = ++_filterGeneration;
+    final previousOperationId = _activeFilterOperationId;
+    if (previousOperationId != null) {
+      _filterService.cancelFilter(previousOperationId);
+      _activeFilterOperationId = null;
+    }
+
     _currentFilter = criteria;
 
     if (!criteria.hasFilters) {
-      _filteredFiles = _allFiles;
+      if (generation == _filterGeneration) {
+        _filteredFiles = _allFiles;
+      }
       return;
     }
 
+    final operationId = 'local_gallery_filter_$generation';
+    _activeFilterOperationId = operationId;
+
     try {
-      final result = await _filterService.applyFilters(_allFiles, criteria);
+      final result = await _filterService.applyFilters(
+        _allFiles,
+        criteria,
+        operationId: operationId,
+      );
+      if (generation != _filterGeneration || _currentFilter != criteria) {
+        return;
+      }
       _filteredFiles = result.files;
+    } on FilterCancelledException {
+      if (generation == _filterGeneration) {
+        rethrow;
+      }
     } catch (e) {
       throw GalleryFilterException(
         filterCriteria: criteria.toString(),
         message: 'Failed to apply filter',
         cause: e,
       );
+    } finally {
+      if (_activeFilterOperationId == operationId) {
+        _activeFilterOperationId = null;
+      }
     }
   }
 
@@ -1258,6 +1299,9 @@ class ErrorGalleryService implements LocalGalleryService {
   @override
   Future<List<LocalImageRecord>> getRecordsByPaths(List<String> paths) =>
       _throwError();
+
+  @override
+  Future<List<String>> getFilteredImagePaths() => _throwError();
 }
 
 /// 占位服务实现
@@ -1334,4 +1378,7 @@ class _PlaceholderGalleryService implements LocalGalleryService {
   @override
   Future<List<LocalImageRecord>> getRecordsByPaths(List<String> paths) =>
       _throwNotInitialized();
+
+  @override
+  Future<List<String>> getFilteredImagePaths() => _throwNotInitialized();
 }

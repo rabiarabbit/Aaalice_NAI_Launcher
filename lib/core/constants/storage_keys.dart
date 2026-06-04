@@ -89,6 +89,7 @@ class StorageKeys {
   static const String ucPresetCustomId = 'uc_preset_custom_id';
   static const String ucPresetCustomIds = 'uc_preset_custom_ids'; // 自定义条目ID列表
   static const String randomPromptMode = 'random_prompt_mode';
+  static const String randomGenerationMode = 'random_generation_mode';
   static const String imagesPerRequest = 'images_per_request';
   static const String enableAutocomplete = 'enable_autocomplete';
   static const String autoFormatPrompt = 'auto_format_prompt';
@@ -262,6 +263,9 @@ class StorageKeys {
       'comfyui_seedvr2_vae_tile_size';
   static const String comfyuiSeedvr2Tiled = 'comfyui_seedvr2_tiled';
   static const String comfyuiSeedvr2TileSize = 'comfyui_seedvr2_tile_size';
+
+  // Krita Bridge 设置
+  static const String kritaBridgeEnabled = 'krita_bridge_enabled';
 
   // 工作流设置
   static const String workflowEnhanceMagnitude = 'workflow_enhance_magnitude';

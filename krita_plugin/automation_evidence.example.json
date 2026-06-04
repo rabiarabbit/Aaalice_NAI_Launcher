@@ -1,0 +1,89 @@
+{
+  "auto_discovery_connect": {
+    "note": "Discovery parser rejects missing or stale secrets, and the fallback WebSocket client refuses non-loopback hosts. This is supporting evidence only; real Krita auto-connect validation is still required.",
+    "commands": [
+      "python3 -m unittest krita_plugin.tests.test_discovery_protocol",
+      "python3 -m unittest krita_plugin.tests.test_fallback_websocket"
+    ]
+  },
+  "auth_failure_safe": {
+    "note": "Bridge client and Docker UI tests keep auth failures disconnected and avoid echoing sensitive Launcher error text. This is supporting evidence only; real wrong-secret GUI validation is still required.",
+    "commands": [
+      "python3 -m unittest krita_plugin.tests.test_bridge_client",
+      "python3 -m unittest krita_plugin.tests.test_ui_state"
+    ]
+  },
+  "inpaint_e2e": {
+    "note": "Launcher service tests verify Krita inpaint previews and final results are masked before writeback so pixels outside the repaint mask stay transparent for Krita layers, while history uses the source/mask composite. Canvas helper tests verify PNG layer writeback converts RGBA bytes to Krita BGRA. This is supporting evidence only; real Krita inpaint validation is still required.",
+    "commands": [
+      "cmd.exe /c \"C:\\dev\\flutter\\bin\\flutter.bat test test\\presentation\\providers\\krita\\krita_bridge_service_test.dart test\\core\\utils\\inpaint_mask_utils_test.dart\"",
+      "python3 -m unittest krita_plugin.tests.test_canvas_io"
+    ]
+  },
+  "focused_inpaint_e2e": {
+    "note": "Docker UI and canvas helper tests verify Focused Inpaint uses the active Krita selection as the repaint mask and inner repaint area, derives the outer context frame from Minimum Context, keeps the temporary concentric preview layer synchronized as the selection or Minimum Context changes, removes bridge-owned preview layers before exporting a clean source canvas, restores the live focus frame after export, still sends the focused inpaint request if restoring that live frame reports a preview-layer add failure, clears that double frame when Focused Inpaint is disabled, and matches the Launcher focused-crop golden case. This is supporting evidence only; real Krita focused-inpaint validation is still required.",
+    "commands": [
+      "python3 -m unittest krita_plugin.tests.test_ui_state",
+      "python3 -m unittest krita_plugin.tests.test_canvas_io"
+    ]
+  },
+  "no_selection_behavior": {
+    "note": "Docker UI tests verify normal Inpaint and Focused Inpaint both use the current Krita selection as the repaint mask, and Focused Inpaint refuses to send without any active selection. Focused Inpaint uses selection bounds for the inner frame, so non-rectangular selections remain usable as masks. This is supporting evidence only; real Krita selection validation is still required.",
+    "commands": [
+      "python3 -m unittest krita_plugin.tests.test_ui_state"
+    ]
+  },
+  "large_canvas_rejected": {
+    "note": "Launcher protocol and Krita canvas helper tests reject V1 canvases outside the supported 64..4096 pixel edge range. This is supporting evidence only; real Krita large-canvas validation is still required.",
+    "commands": [
+      "cmd.exe /c \"C:\\dev\\flutter\\bin\\flutter.bat test test\\core\\krita\\krita_bridge_protocol_test.dart\"",
+      "python3 -m unittest krita_plugin.tests.test_canvas_io"
+    ]
+  },
+  "disconnect_generation_safe": {
+    "note": "Launcher service and Docker UI tests cancel active bridge requests and clear preview state on disconnect. This is supporting evidence only; real disconnect during generation validation is still required.",
+    "commands": [
+      "cmd.exe /c \"C:\\dev\\flutter\\bin\\flutter.bat test test\\presentation\\providers\\krita\\krita_bridge_service_test.dart\"",
+      "python3 -m unittest krita_plugin.tests.test_ui_state"
+    ]
+  },
+  "preview_throttle": {
+    "note": "Docker UI and canvas helper tests verify the first preview frame is written immediately, later frames respect the throttle interval, preview updates show a frame count, missing preview images surface a waiting-for-preview status, preview write failures keep a visible localized error instead of being overwritten by generic progress text, repeated identical preview-layer failures are not reported every frame, the next preview frame retries immediately after a failed write instead of being throttled, Krita waits after replacing an existing preview layer, and Krita addChildNode failures are reported instead of pretending the preview layer was added. This is supporting evidence only; real Krita preview performance validation is still required.",
+    "commands": [
+      "python3 -m unittest krita_plugin.tests.test_ui_state"
+    ]
+  },
+  "result_layer_aligned": {
+    "note": "Canvas helper tests verify same-size results prefer a new layer, RGBA PNG bytes are converted to Krita BGRA before setPixelData, Krita addChildNode failures are detected, and writeback falls back to opening a new document when layer writeback fails. Docker UI tests verify final and pushed images first enter the result area, single-click preview writes NAI Preview, double-click inserts the result as a new layer, write failures are localized, and document fallback is reported explicitly. This is supporting evidence only; real Krita layer alignment validation is still required.",
+    "commands": [
+      "python3 -m unittest krita_plugin.tests.test_canvas_io",
+      "python3 -m unittest krita_plugin.tests.test_ui_state"
+    ]
+  },
+  "launcher_history_recorded": {
+    "note": "Launcher bridge service tests verify final bridge images are registered through the existing history/save path with params metadata. This is supporting evidence only; real Launcher history validation is still required.",
+    "commands": [
+      "cmd.exe /c \"C:\\dev\\flutter\\bin\\flutter.bat test test\\presentation\\providers\\krita\\krita_bridge_service_test.dart\""
+    ]
+  },
+  "novelai_token_launcher_only": {
+    "note": "Dart bridge payload tests, plugin package scan, and Diagnostics tests avoid exposing NovelAI tokens, account data, endpoint text, or discovery secret values. This is supporting evidence only; real Krita GUI validation is still required.",
+    "commands": [
+      "cmd.exe /c \"C:\\dev\\flutter\\bin\\flutter.bat test test\\presentation\\providers\\krita\\krita_bridge_service_test.dart\"",
+      "python3 -m unittest krita_plugin.tests.test_package_plugin",
+      "python3 -m unittest krita_plugin.tests.test_diagnostics"
+    ]
+  },
+  "bridge_rejects_unauthenticated": {
+    "note": "Launcher WebSocket server tests reject unauthenticated local messages. This is supporting evidence only; real wrong-secret GUI validation is still required.",
+    "commands": [
+      "cmd.exe /c \"C:\\dev\\flutter\\bin\\flutter.bat test test\\core\\krita\\krita_bridge_server_test.dart\""
+    ]
+  },
+  "gallery_send_e2e": {
+    "note": "Launcher notifier and gallery destination tests verify authenticated push_image sends and the Krita destination is available in the existing gallery send dialog. This is supporting evidence only; real Krita receive validation is still required.",
+    "commands": [
+      "cmd.exe /c \"C:\\dev\\flutter\\bin\\flutter.bat test test\\presentation\\providers\\krita\\krita_bridge_notifier_test.dart test\\presentation\\widgets\\gallery\\image_send_destination_dialog_test.dart\""
+    ]
+  }
+}

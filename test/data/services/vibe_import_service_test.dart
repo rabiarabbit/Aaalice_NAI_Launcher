@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image/image.dart' as img;
 import 'package:nai_launcher/data/models/vibe/vibe_library_entry.dart';
@@ -11,6 +12,7 @@ import 'package:nai_launcher/data/services/vibe_import_service.dart';
 
 class _FakeVibeLibraryImportRepository implements VibeLibraryImportRepository {
   final List<VibeLibraryEntry> savedEntries = <VibeLibraryEntry>[];
+  List<VibeReference> savedBundleVibes = const [];
   int getAllEntriesCalls = 0;
   int findEntryByNameCalls = 0;
 
@@ -37,9 +39,103 @@ class _FakeVibeLibraryImportRepository implements VibeLibraryImportRepository {
     savedEntries.add(entry);
     return entry;
   }
+
+  @override
+  Future<VibeLibraryEntry> saveBundleEntry(
+    List<VibeReference> vibes, {
+    required String name,
+    String? categoryId,
+    List<String>? tags,
+    VibeLibraryEntry? replaceEntry,
+  }) async {
+    savedBundleVibes = vibes;
+    final entry = VibeLibraryEntry.fromVibeReference(
+      name: name,
+      vibeData: vibes.first,
+      categoryId: categoryId,
+      tags: tags,
+    ).copyWith(
+      bundledVibeNames: vibes.map((vibe) => vibe.displayName).toList(),
+      bundledVibeEncodings: vibes.map((vibe) => vibe.vibeEncoding).toList(),
+      bundledVibeStrengths: vibes.map((vibe) => vibe.strength).toList(),
+      bundledVibeInfoExtracted:
+          vibes.map((vibe) => vibe.infoExtracted).toList(),
+    );
+    savedEntries.add(entry);
+    return entry;
+  }
 }
 
 void main() {
+  group('VibeImportService.importFromFile', () {
+    test('整体导入 bundle 时用完整子 Vibe 列表保存原图数据', () async {
+      final repository = _FakeVibeLibraryImportRepository();
+      final service = VibeImportService(repository: repository);
+      final firstImage = Uint8List.fromList([1, 2, 3, 4]);
+      final secondImage = Uint8List.fromList([5, 6, 7, 8]);
+      final bundleBytes = Uint8List.fromList(
+        utf8.encode(
+          jsonEncode({
+            'identifier': 'novelai-vibe-transfer-bundle',
+            'version': 1,
+            'vibes': [
+              {
+                'name': 'first',
+                'encodings': {
+                  'nai-diffusion-4-full': {
+                    'vibe': {'encoding': 'encoding-first'},
+                  },
+                },
+                'image': base64Encode(firstImage),
+                'importInfo': {
+                  'strength': 0.35,
+                  'information_extracted': 0.7,
+                },
+              },
+              {
+                'name': 'second',
+                'encodings': {
+                  'nai-diffusion-4-full': {
+                    'vibe': {'encoding': 'encoding-second'},
+                  },
+                },
+                'image': base64Encode(secondImage),
+                'importInfo': {
+                  'strength': -0.25,
+                  'information_extracted': 0.5,
+                },
+              },
+            ],
+          }),
+        ),
+      );
+
+      final result = await service.importFromFile(
+        files: [
+          PlatformFile(
+            name: 'bundle.naiv4vibebundle',
+            size: bundleBytes.length,
+            bytes: bundleBytes,
+          ),
+        ],
+        onBundleOption: (bundleName, vibes) async {
+          return BundleImportOption.keepAsBundle(
+            configuredReferences: vibes,
+          );
+        },
+      );
+
+      expect(result.successCount, 1);
+      expect(repository.savedBundleVibes, hasLength(2));
+      expect(repository.savedBundleVibes[0].rawImageData, firstImage);
+      expect(repository.savedBundleVibes[1].rawImageData, secondImage);
+      expect(repository.savedBundleVibes[0].strength, 0.35);
+      expect(repository.savedBundleVibes[1].strength, -0.25);
+      expect(repository.savedBundleVibes[0].infoExtracted, 0.7);
+      expect(repository.savedBundleVibes[1].infoExtracted, 0.5);
+    });
+  });
+
   group('VibeImportService.importFromImage', () {
     test('should import jpg images as raw-image vibes instead of failing',
         () async {

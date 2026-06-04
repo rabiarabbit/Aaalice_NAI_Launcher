@@ -44,8 +44,7 @@ class _GlobalSettingsDialogState extends ConsumerState<GlobalSettingsDialog> {
   void _loadConfig() {
     final preset = ref.read(randomPresetNotifierProvider).selectedPreset;
     final algorithmConfig = preset?.algorithmConfig ?? const AlgorithmConfig();
-    _config =
-        algorithmConfig.characterCountConfig ?? CharacterCountConfig.naiDefault;
+    _config = algorithmConfig.effectiveCharacterCountConfig;
 
     // 默认折叠所有类别
     for (final category in _config.categories) {

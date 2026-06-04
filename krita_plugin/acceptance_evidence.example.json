@@ -1,0 +1,78 @@
+{
+  "plugin_manager_visible": {
+    "passed": null,
+    "note": "Confirm NAI Launcher Bridge appears in Krita's Python Plugin Manager."
+  },
+  "docker_visible": {
+    "passed": null,
+    "note": "Confirm Settings > Dockers > NAI Launcher Bridge is visible."
+  },
+  "launcher_settings_toggle": {
+    "passed": null,
+    "note": "Enable and disable Krita Bridge from Launcher settings and confirm bridge status/discovery file changes."
+  },
+  "auto_discovery_connect": {
+    "passed": null,
+    "note": "Confirm the docker connects by reading the Launcher discovery file without copying a token or port manually."
+  },
+  "auth_failure_safe": {
+    "passed": null,
+    "note": "Edit the discovery secret to a wrong value and confirm the dock shows an auth error without crashing."
+  },
+  "img2img_e2e": {
+    "passed": null,
+    "note": "Send a 1024x1024 Krita canvas through img2img and confirm a returned layer."
+  },
+  "inpaint_e2e": {
+    "passed": null,
+    "note": "Use the current Krita selection as the repaint mask, run Inpaint, and confirm only the masked area is written while unmasked pixels keep the original color."
+  },
+  "focused_inpaint_e2e": {
+    "passed": null,
+    "note": "Enable Focused Inpaint, use the current Krita selection as the inner repaint area and repaint mask, adjust Minimum Context, change the selection, and confirm the temporary inner/outer concentric rectangles update live, are not baked into the generated source image, and match the generated crop behavior."
+  },
+  "krita_cancel_e2e": {
+    "passed": null,
+    "note": "Start a Krita bridge generation, cancel it from the docker, and confirm preview/progress state is cleared."
+  },
+  "no_selection_behavior": {
+    "passed": null,
+    "note": "Confirm img2img uses the whole canvas and inpaint reports a clear message without a valid mask."
+  },
+  "large_canvas_rejected": {
+    "passed": null,
+    "note": "Confirm a canvas above V1 bounds is rejected or requires explicit focused-inpaint confirmation."
+  },
+  "disconnect_generation_safe": {
+    "passed": null,
+    "note": "Disconnect during generation and confirm no partial preview is written as final."
+  },
+  "preview_throttle": {
+    "passed": null,
+    "note": "Confirm preview frames update the NAI Preview layer during generation and the docker status shows preview-frame updates or an explicit waiting-for-preview message."
+  },
+  "result_layer_aligned": {
+    "passed": null,
+    "note": "Confirm the final image first appears in the Docker result area, single-click previews it, double-click adds it as a new layer, layer dimensions and alignment match the source canvas, colors are not channel-swapped, and inpaint writeback keeps alpha transparent outside the repaint mask."
+  },
+  "launcher_history_recorded": {
+    "passed": null,
+    "note": "Confirm Launcher history records the generated final image and key params."
+  },
+  "novelai_token_launcher_only": {
+    "passed": null,
+    "note": "Confirm no NovelAI token or account data appears in Krita messages, diagnostics, or logs."
+  },
+  "bridge_rejects_unauthenticated": {
+    "passed": null,
+    "note": "Confirm an unauthenticated local WebSocket client is rejected."
+  },
+  "gallery_send_e2e": {
+    "passed": null,
+    "note": "Send a generated/gallery image to Krita and confirm it arrives through the authenticated connection."
+  },
+  "disabled_bridge_existing_flows": {
+    "passed": null,
+    "note": "Disable the bridge and confirm existing generation, gallery, and Vibe flows still work."
+  }
+}

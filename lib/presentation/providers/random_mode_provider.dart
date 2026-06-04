@@ -1,9 +1,36 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../core/utils/app_logger.dart';
 import '../../data/models/prompt/random_prompt_result.dart';
+import '../../core/storage/local_storage_service.dart';
 
 part 'random_mode_provider.g.dart';
+
+const _defaultRandomGenerationMode = RandomGenerationMode.naiOfficial;
+
+/// 将持久化字符串还原为随机生成模式。
+///
+/// 未知值回退到官网模式，避免旧版本或损坏配置阻断启动。
+RandomGenerationMode randomGenerationModeFromStorage(String value) {
+  return switch (value) {
+    'nai_official' => RandomGenerationMode.naiOfficial,
+    'custom' => RandomGenerationMode.custom,
+    'hybrid' => RandomGenerationMode.hybrid,
+    _ => _defaultRandomGenerationMode,
+  };
+}
+
+/// 随机生成模式持久化值。
+extension RandomGenerationModeStorageX on RandomGenerationMode {
+  String toStorageValue() {
+    return switch (this) {
+      RandomGenerationMode.naiOfficial => 'nai_official',
+      RandomGenerationMode.custom => 'custom',
+      RandomGenerationMode.hybrid => 'hybrid',
+    };
+  }
+}
 
 /// 随机生成模式 Provider
 ///
@@ -12,35 +39,47 @@ part 'random_mode_provider.g.dart';
 class RandomModeNotifier extends _$RandomModeNotifier {
   @override
   RandomGenerationMode build() {
-    // 默认使用官网模式
-    return RandomGenerationMode.naiOfficial;
+    final storage = ref.read(localStorageServiceProvider);
+    return randomGenerationModeFromStorage(storage.getRandomGenerationMode());
   }
 
   /// 设置生成模式
-  void setMode(RandomGenerationMode mode) {
+  Future<void> setMode(RandomGenerationMode mode) async {
+    final previousMode = state;
     state = mode;
+    try {
+      await ref
+          .read(localStorageServiceProvider)
+          .setRandomGenerationMode(mode.toStorageValue());
+    } catch (e, stack) {
+      state = previousMode;
+      AppLogger.e('Failed to persist random generation mode', e, stack);
+    }
   }
 
   /// 切换到官网模式
-  void useNaiOfficial() {
-    state = RandomGenerationMode.naiOfficial;
+  Future<void> useNaiOfficial() {
+    return setMode(RandomGenerationMode.naiOfficial);
   }
 
   /// 切换到自定义模式
-  void useCustom() {
-    state = RandomGenerationMode.custom;
+  Future<void> useCustom() {
+    return setMode(RandomGenerationMode.custom);
   }
 
   /// 切换到混合模式
-  void useHybrid() {
-    state = RandomGenerationMode.hybrid;
+  Future<void> useHybrid() {
+    return setMode(RandomGenerationMode.hybrid);
   }
 
   /// 切换模式
-  void toggle() {
-    state = state == RandomGenerationMode.naiOfficial
-        ? RandomGenerationMode.custom
-        : RandomGenerationMode.naiOfficial;
+  Future<void> toggle() {
+    final nextMode = switch (state) {
+      RandomGenerationMode.naiOfficial => RandomGenerationMode.custom,
+      RandomGenerationMode.custom => RandomGenerationMode.hybrid,
+      RandomGenerationMode.hybrid => RandomGenerationMode.naiOfficial,
+    };
+    return setMode(nextMode);
   }
 }
 
@@ -55,6 +94,12 @@ bool isNaiOfficialMode(Ref ref) {
 @riverpod
 bool isCustomMode(Ref ref) {
   return ref.watch(randomModeNotifierProvider) == RandomGenerationMode.custom;
+}
+
+/// 便捷 Provider：是否为混合模式
+@riverpod
+bool isHybridMode(Ref ref) {
+  return ref.watch(randomModeNotifierProvider) == RandomGenerationMode.hybrid;
 }
 
 /// 模式显示信息

@@ -39,6 +39,12 @@ class ToolManager extends ChangeNotifier {
   /// 使用 ValueNotifier 避免触发全局重建
   final ValueNotifier<String?> toolNotifier = ValueNotifier(null);
 
+  int _batchDepth = 0;
+  bool _pendingToolNotification = false;
+  String? _pendingToolId;
+
+  bool get _isBatching => _batchDepth > 0;
+
   /// 构造函数
   ToolManager() : _tools = _createTools() {
     // 初始化时选中第一个工具
@@ -77,7 +83,7 @@ class ToolManager extends ChangeNotifier {
       _restoreToolSettings(tool);
 
       // 只通知工具切换，不触发画布重绘
-      toolNotifier.value = tool.id;
+      _setToolNotifierValue(tool.id);
     }
   }
 
@@ -141,7 +147,7 @@ class ToolManager extends ChangeNotifier {
       _currentTool = _previousTool;
       _previousTool = temp;
       // 只通知工具切换，不触发画布重绘
-      toolNotifier.value = _currentTool?.id;
+      _setToolNotifierValue(_currentTool?.id);
     }
   }
 
@@ -156,7 +162,7 @@ class ToolManager extends ChangeNotifier {
     final colorPicker = getToolById('color_picker');
     if (colorPicker != null) {
       _currentTool = colorPicker;
-      toolNotifier.value = colorPicker.id;
+      _setToolNotifierValue(colorPicker.id);
     }
   }
 
@@ -169,9 +175,47 @@ class ToolManager extends ChangeNotifier {
     // 切回之前的工具
     if (_toolBeforeTemporaryColorPicker != null) {
       _currentTool = _toolBeforeTemporaryColorPicker;
-      toolNotifier.value = _currentTool?.id;
+      _setToolNotifierValue(_currentTool?.id);
       _toolBeforeTemporaryColorPicker = null;
     }
+  }
+
+  void beginBatch() {
+    _batchDepth++;
+  }
+
+  void endBatch() {
+    if (_batchDepth == 0) {
+      return;
+    }
+
+    _batchDepth--;
+    if (_batchDepth > 0 || !_pendingToolNotification) {
+      return;
+    }
+
+    _pendingToolNotification = false;
+    toolNotifier.value = _pendingToolId;
+    _pendingToolId = null;
+  }
+
+  T runBatch<T>(T Function() body) {
+    beginBatch();
+    try {
+      return body();
+    } finally {
+      endBatch();
+    }
+  }
+
+  void _setToolNotifierValue(String? toolId) {
+    if (_isBatching) {
+      _pendingToolNotification = true;
+      _pendingToolId = toolId;
+      return;
+    }
+
+    toolNotifier.value = toolId;
   }
 
   /// 通过ID获取工具

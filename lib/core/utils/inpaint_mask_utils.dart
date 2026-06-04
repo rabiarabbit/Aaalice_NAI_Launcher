@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:isolate';
 import 'dart:typed_data';
 import 'package:image/image.dart' as img;
 
@@ -204,6 +205,109 @@ class InpaintMaskUtils {
     return _encodeBinaryMask(deltaMask, original.width, original.height);
   }
 
+  /// 将 inpaint 返回图按蒙版合成回原图。
+  ///
+  /// NovelAI inpaint 返回的是整张图；Krita 写回时只应替换蒙版区域，
+  /// 否则未选区域的轻微色偏也会覆盖原图。
+  static Uint8List compositeGeneratedImage({
+    required Uint8List sourceImage,
+    required Uint8List maskImage,
+    required Uint8List generatedImage,
+  }) {
+    img.Image? source;
+    img.Image? mask;
+    img.Image? generated;
+    try {
+      source = img.decodeImage(sourceImage);
+      mask = img.decodeImage(normalizeMaskBytes(maskImage));
+      generated = img.decodeImage(generatedImage);
+    } catch (_) {
+      return generatedImage;
+    }
+
+    if (source == null || mask == null || generated == null) {
+      return generatedImage;
+    }
+    if (source.width != mask.width || source.height != mask.height) {
+      return generatedImage;
+    }
+
+    final generatedCanvas =
+        generated.width == source.width && generated.height == source.height
+            ? generated
+            : img.copyResize(
+                generated,
+                width: source.width,
+                height: source.height,
+                interpolation: img.Interpolation.cubic,
+              );
+
+    final composed = img.Image.from(source, noAnimation: true);
+    img.compositeImage(
+      composed,
+      generatedCanvas,
+      dstX: 0,
+      dstY: 0,
+      dstW: source.width,
+      dstH: source.height,
+      mask: mask,
+      blend: img.BlendMode.direct,
+    );
+
+    return Uint8List.fromList(img.encodePng(composed));
+  }
+
+  /// 从 inpaint 返回图中提取透明补丁层。
+  ///
+  /// Krita 写回时使用透明补丁层叠在原图上，蒙版外 alpha=0，
+  /// 可以避免整张不透明图层覆盖原图造成色彩漂移。
+  static Uint8List extractGeneratedPatch({
+    required Uint8List maskImage,
+    required Uint8List generatedImage,
+  }) {
+    img.Image? mask;
+    img.Image? generated;
+    try {
+      mask = img.decodeImage(normalizeMaskBytes(maskImage));
+      generated = img.decodeImage(generatedImage);
+    } catch (_) {
+      return generatedImage;
+    }
+
+    if (mask == null || generated == null) {
+      return generatedImage;
+    }
+
+    final generatedCanvas =
+        generated.width == mask.width && generated.height == mask.height
+            ? generated
+            : img.copyResize(
+                generated,
+                width: mask.width,
+                height: mask.height,
+                interpolation: img.Interpolation.cubic,
+              );
+
+    final patch = img.Image(
+      width: mask.width,
+      height: mask.height,
+      numChannels: 4,
+    );
+    img.fill(patch, color: img.ColorRgba8(0, 0, 0, 0));
+    img.compositeImage(
+      patch,
+      generatedCanvas,
+      dstX: 0,
+      dstY: 0,
+      dstW: mask.width,
+      dstH: mask.height,
+      mask: mask,
+      blend: img.BlendMode.direct,
+    );
+
+    return Uint8List.fromList(img.encodePng(patch));
+  }
+
   /// 将蒙版处理为更适合 NovelAI Inpaint 的版本：
   /// 默认仅做二值化；按需启用闭运算或扩边，避免平白放大蒙版边界。
   static Uint8List prepareInpaintMaskBytes(
@@ -301,6 +405,15 @@ class InpaintMaskUtils {
     }
 
     return Uint8List.fromList(img.encodePng(overlay));
+  }
+
+  static Future<Uint8List> maskToEditorOverlayAsync(
+    Uint8List bytes, {
+    int overlayAlpha = 140,
+  }) {
+    return Isolate.run(
+      () => maskToEditorOverlay(bytes, overlayAlpha: overlayAlpha),
+    );
   }
 
   static bool _isMaskedPixel(img.Pixel pixel) {

@@ -528,7 +528,7 @@ class _MetadataImportDialogState extends State<MetadataImportDialog> {
       _GenerationImportOption(
         label: l10n.generation_model,
         value: _options.importModel,
-        hasData: metadata.model != null,
+        hasData: metadata.effectiveModel != null,
         onChanged: (v) =>
             setState(() => _options = _options.copyWith(importModel: v)),
       ),
@@ -558,7 +558,8 @@ class _MetadataImportDialogState extends State<MetadataImportDialog> {
         value: _options.importNoiseSchedule,
         hasData: metadata.noiseSchedule != null,
         onChanged: (v) => setState(
-            () => _options = _options.copyWith(importNoiseSchedule: v)),
+          () => _options = _options.copyWith(importNoiseSchedule: v),
+        ),
       ),
       _GenerationImportOption(
         label: _labelBeforeColon(l10n.generation_cfgRescale('')),
@@ -572,7 +573,8 @@ class _MetadataImportDialogState extends State<MetadataImportDialog> {
         value: _options.importQualityToggle,
         hasData: metadata.qualityToggle != null,
         onChanged: (v) => setState(
-            () => _options = _options.copyWith(importQualityToggle: v)),
+          () => _options = _options.copyWith(importQualityToggle: v),
+        ),
       ),
       _GenerationImportOption(
         label: l10n.ucPreset_label,

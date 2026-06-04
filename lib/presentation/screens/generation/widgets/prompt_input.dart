@@ -407,14 +407,6 @@ class _PromptInputWidgetState extends ConsumerState<PromptInputWidget> {
   }
 
   Widget _buildFullLayout(ThemeData theme) {
-    final tokenUsage = ref.watch(
-      promptTokenUsageProvider(
-        _isNegativeMode
-            ? PromptTokenCountTarget.negative
-            : PromptTokenCountTarget.positive,
-      ),
-    );
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -429,15 +421,11 @@ class _PromptInputWidgetState extends ConsumerState<PromptInputWidget> {
               ? _buildTextNegativeInput(theme)
               : _buildTextPromptInput(theme),
         ),
-        Padding(
-          padding: const EdgeInsets.only(top: 6),
-          child: tokenUsage.when(
-            data: (usage) => usage == null
-                ? const SizedBox.shrink()
-                : PromptTokenCountBar(usage: usage),
-            loading: () => const SizedBox.shrink(),
-            error: (_, __) => const SizedBox.shrink(),
-          ),
+        _PromptTokenCountFooter(
+          target: _isNegativeMode
+              ? PromptTokenCountTarget.negative
+              : PromptTokenCountTarget.positive,
+          topPadding: 6,
         ),
       ],
     );
@@ -795,8 +783,6 @@ class _PromptInputWidgetState extends ConsumerState<PromptInputWidget> {
   Widget _buildCompactLayout(ThemeData theme) {
     final enableHighlight = ref.watch(highlightEmphasisSettingsProvider);
     final enableAutocomplete = ref.watch(autocompleteSettingsProvider);
-    final tokenUsage =
-        ref.watch(promptTokenUsageProvider(PromptTokenCountTarget.positive));
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -861,17 +847,32 @@ class _PromptInputWidgetState extends ConsumerState<PromptInputWidget> {
             },
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.only(top: 4),
-          child: tokenUsage.when(
-            data: (usage) => usage == null
-                ? const SizedBox.shrink()
-                : PromptTokenCountBar(usage: usage),
-            loading: () => const SizedBox.shrink(),
-            error: (_, __) => const SizedBox.shrink(),
-          ),
+        const _PromptTokenCountFooter(
+          target: PromptTokenCountTarget.positive,
+          topPadding: 4,
         ),
       ],
+    );
+  }
+}
+
+class _PromptTokenCountFooter extends ConsumerWidget {
+  const _PromptTokenCountFooter({
+    required this.target,
+    required this.topPadding,
+  });
+
+  final PromptTokenCountTarget target;
+  final double topPadding;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final tokenUsage = ref.watch(promptTokenUsageProvider(target));
+    return Padding(
+      padding: EdgeInsets.only(top: topPadding),
+      child: RepaintBoundary(
+        child: PromptTokenCountAsyncBar(usage: tokenUsage),
+      ),
     );
   }
 }

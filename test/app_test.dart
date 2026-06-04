@@ -7,12 +7,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:image/image.dart' as img;
 import 'package:mocktail/mocktail.dart';
 import 'package:nai_launcher/app.dart';
 import 'package:nai_launcher/core/comfyui/builtin_workflows.dart';
 import 'package:nai_launcher/core/comfyui/comfyui_url_utils.dart';
 import 'package:nai_launcher/core/comfyui/workflow_node_validator.dart';
 import 'package:nai_launcher/core/comfyui/workflow_template_manager.dart';
+import 'package:nai_launcher/core/constants/api_constants.dart';
 import 'package:nai_launcher/core/constants/storage_keys.dart';
 import 'package:nai_launcher/core/shortcuts/default_shortcuts.dart';
 import 'package:nai_launcher/core/shortcuts/shortcut_config.dart';
@@ -36,6 +38,7 @@ import 'package:nai_launcher/presentation/providers/shortcuts_provider.dart';
 import 'package:nai_launcher/presentation/providers/tag_library_page_provider.dart';
 import 'package:nai_launcher/presentation/prompt_assistant/models/prompt_assistant_models.dart';
 import 'package:nai_launcher/presentation/prompt_assistant/providers/prompt_assistant_history_provider.dart';
+import 'package:nai_launcher/presentation/prompt_assistant/services/provider_adapters/prompt_assistant_adapter.dart';
 import 'package:nai_launcher/presentation/prompt_assistant/services/prompt_assistant_api_client.dart';
 import 'package:nai_launcher/presentation/prompt_assistant/services/prompt_assistant_service.dart';
 import 'package:nai_launcher/presentation/screens/statistics/widgets/dashboard/aspect_ratio_card.dart';
@@ -44,6 +47,7 @@ import 'package:nai_launcher/presentation/screens/vibe_library/widgets/vibe_expo
 import 'package:nai_launcher/presentation/screens/vibe_library/widgets/vibe_export_dialog_advanced.dart';
 import 'package:nai_launcher/presentation/utils/dropped_file_reader.dart';
 import 'package:nai_launcher/presentation/widgets/gallery/local_gallery_toolbar.dart';
+import 'package:nai_launcher/presentation/widgets/metadata/metadata_import_dialog.dart';
 import 'package:nai_launcher/presentation/widgets/shortcuts/shortcut_aware_widget.dart';
 
 class _MockDio extends Mock implements Dio {}
@@ -94,6 +98,7 @@ void main() {
     testWidgets('AppBootstrapEffects 监听 provider 变化时不重建子树', (tester) async {
       final anlasWatcherProvider = StateProvider<int>((ref) => 0);
       final backgroundRefreshProvider = StateProvider<int>((ref) => 0);
+      final kritaBridgeProvider = StateProvider<int>((ref) => 0);
       var buildCount = 0;
 
       await tester.pumpWidget(
@@ -102,6 +107,7 @@ void main() {
             home: AppBootstrapEffects(
               anlasWatcher: anlasWatcherProvider,
               backgroundRefresh: backgroundRefreshProvider,
+              kritaBridge: kritaBridgeProvider,
               child: Builder(
                 builder: (context) {
                   buildCount++;
@@ -119,11 +125,14 @@ void main() {
 
       expect(container.exists(anlasWatcherProvider), isTrue);
       expect(container.exists(backgroundRefreshProvider), isTrue);
+      expect(container.exists(kritaBridgeProvider), isTrue);
       expect(buildCount, 1);
 
       container.read(anlasWatcherProvider.notifier).state = 1;
       await tester.pump();
       container.read(backgroundRefreshProvider.notifier).state = 1;
+      await tester.pump();
+      container.read(kritaBridgeProvider.notifier).state = 1;
       await tester.pump();
 
       expect(buildCount, 1);
@@ -194,10 +203,10 @@ void main() {
               _FakeTagLibraryPageNotifier.new,
             ),
           ],
-          child: MaterialApp(
+          child: const MaterialApp(
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
-            home: const Scaffold(
+            home: Scaffold(
               body: TagLibraryToolbar(),
             ),
           ),
@@ -265,6 +274,38 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('选择外部 PNG 图片...'), findsOneWidget);
+    });
+
+    testWidgets('元数据导入模型选项应和其他参数一样只显示字段名', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(1000, 900));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(
+        const ProviderScope(
+          child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: Locale('zh'),
+            home: Scaffold(
+              body: MetadataImportDialog(
+                metadata: NaiImageMetadata(
+                  source: 'NovelAI Diffusion V4.5 4BDE2A90',
+                  seed: 1,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('模型'), findsOneWidget);
+      expect(find.textContaining('NAI Diffusion V4.5'), findsNothing);
+      expect(
+        find.textContaining(ImageModels.animeDiffusionV45Full),
+        findsNothing,
+      );
     });
   });
 
@@ -756,7 +797,7 @@ void main() {
     });
 
     test('pollinations is available as a normal provider preset', () {
-      final preset = ProviderPreset.pollinations;
+      const preset = ProviderPreset.pollinations;
 
       expect(preset.defaultName, 'pollinations.ai');
       expect(preset.defaultProtocol, ProviderProtocol.openaiChatCompletions);
@@ -824,8 +865,10 @@ void main() {
 
       final decoded = PromptAssistantConfigState.decode(jsonEncode(oldJson));
 
-      expect(decoded.providers.any((provider) => provider.id == 'pollinations'),
-          isFalse);
+      expect(
+        decoded.providers.any((provider) => provider.id == 'pollinations'),
+        isFalse,
+      );
       for (final taskType in AssistantTaskType.values) {
         expect(decoded.routing.providerIdFor(taskType), isEmpty);
         expect(decoded.routing.modelFor(taskType), isEmpty);
@@ -1421,6 +1464,109 @@ void main() {
         'gemini result',
       );
     });
+
+    test('compresses oversized image parts before LLM upload', () async {
+      const maxBytes = 20 * 1024;
+      final originalBytes = _buildNoisyPngBytes(width: 512, height: 384);
+      final originalImage = img.decodeImage(originalBytes)!;
+
+      expect(originalBytes.length, greaterThan(maxBytes));
+
+      final optimized = await optimizePromptAssistantImagePartForUpload(
+        PromptAssistantImagePart(
+          bytes: originalBytes,
+          mimeType: 'image/png',
+        ),
+        maxBytes: maxBytes,
+      );
+      final optimizedImage = img.decodeImage(optimized.bytes)!;
+
+      expect(optimized.bytes.length, lessThanOrEqualTo(maxBytes));
+      expect(optimized.mimeType, 'image/jpeg');
+      expect(optimizedImage.width, lessThan(originalImage.width));
+      expect(optimizedImage.height, lessThan(originalImage.height));
+      expect(
+        optimizedImage.width / optimizedImage.height,
+        closeTo(originalImage.width / originalImage.height, 0.02),
+      );
+    });
+
+    test('compresses legacy streamChat image payload before posting', () async {
+      const maxBytes = 20 * 1024;
+      final dio = _MockDio();
+      final client = PromptAssistantApiClient(
+        dio: dio,
+        imageUploadMaxBytes: maxBytes,
+      );
+      final originalBytes = _buildNoisyPngBytes(width: 512, height: 384);
+
+      when(
+        () => dio.post<dynamic>(
+          any(),
+          data: any(named: 'data'),
+          options: any(named: 'options'),
+          cancelToken: any(named: 'cancelToken'),
+        ),
+      ).thenAnswer((invocation) async {
+        final payload =
+            Map<String, dynamic>.from(invocation.namedArguments[#data] as Map);
+        final messages = payload['messages'] as List;
+        final userMessage = messages.last as Map;
+        final content = userMessage['content'] as List;
+        final imagePart = content.last as Map;
+        final imageUrl = imagePart['image_url'] as Map;
+        final parsed = parseDataUriImage(imageUrl['url'] as String)!;
+
+        expect(parsed.bytes.length, lessThanOrEqualTo(maxBytes));
+        expect(parsed.mimeType, 'image/jpeg');
+
+        return Response<dynamic>(
+          data: const {
+            'choices': [
+              {
+                'message': {'content': 'compressed'},
+              },
+            ],
+          },
+          requestOptions: RequestOptions(path: '/v1/chat/completions'),
+          statusCode: 200,
+        );
+      });
+
+      final chunks = await client
+          .streamChat(
+            sessionId: 'test',
+            provider: const ProviderConfig(
+              id: 'openai_custom',
+              name: 'OpenAI Compatible',
+              type: ProviderType.openaiCompatible,
+              baseUrl: 'https://example.invalid/v1',
+            ),
+            model: 'model-a',
+            messages: [
+              {
+                'role': 'user',
+                'content': [
+                  {'type': 'text', 'text': 'describe'},
+                  {
+                    'type': 'image_url',
+                    'image_url': {
+                      'url':
+                          'data:image/png;base64,${base64Encode(originalBytes)}',
+                    },
+                  },
+                ],
+              },
+            ],
+            apiKey: 'key',
+          )
+          .toList();
+
+      expect(
+        chunks.where((chunk) => !chunk.done).map((chunk) => chunk.delta).join(),
+        'compressed',
+      );
+    });
   });
 
   group('Prompt assistant fixed tag scope', () {
@@ -1566,4 +1712,23 @@ VibeLibraryEntry _buildVibeEntry({
     sourceTypeIndex: VibeSourceType.naiv4vibe.index,
     createdAt: DateTime(2026, 5, 2),
   );
+}
+
+Uint8List _buildNoisyPngBytes({
+  required int width,
+  required int height,
+}) {
+  final image = img.Image(width: width, height: height);
+  for (var y = 0; y < height; y++) {
+    for (var x = 0; x < width; x++) {
+      image.setPixelRgb(
+        x,
+        y,
+        (x * 37 + y * 17) & 0xff,
+        (x * 13 + y * 47) & 0xff,
+        (x * 53 + y * 29) & 0xff,
+      );
+    }
+  }
+  return Uint8List.fromList(img.encodePng(image));
 }

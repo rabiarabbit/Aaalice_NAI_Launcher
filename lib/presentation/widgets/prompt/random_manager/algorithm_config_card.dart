@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../providers/random_preset_provider.dart';
 import '../../../../data/models/prompt/algorithm_config.dart';
+import '../../../../data/models/prompt/character_count_config.dart';
 import '../../../../data/models/prompt/random_preset.dart';
 import '../../common/elevated_card.dart';
 import 'random_manager_widgets.dart';
@@ -157,8 +158,14 @@ class _AlgorithmConfigCardState extends ConsumerState<AlgorithmConfigCard> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    final weights = config.characterCountWeights;
-    final maxWeight = weights.fold<int>(0, (max, w) => w[1] > max ? w[1] : max);
+    final characterConfig = config.effectiveCharacterCountConfig;
+    final countCategories = characterConfig.categories
+        .where((category) => !category.isMultiPersonContainer)
+        .toList();
+    final maxWeight = countCategories.fold<int>(
+      0,
+      (max, category) => category.weight > max ? category.weight : max,
+    );
 
     final barColors = [
       colorScheme.primary,
@@ -167,9 +174,11 @@ class _AlgorithmConfigCardState extends ConsumerState<AlgorithmConfigCard> {
       Colors.orange.shade400,
     ];
 
-    final female = config.genderWeights['female'] ?? 60;
-    final male = config.genderWeights['male'] ?? 30;
-    final other = config.genderWeights['other'] ?? 10;
+    final soloOptions =
+        characterConfig.findCategoryById('solo')?.tagOptions ?? const [];
+    final female = _slotWeight(soloOptions, 'girl', fallback: 60);
+    final male = _slotWeight(soloOptions, 'boy', fallback: 30);
+    final other = _slotWeight(soloOptions, 'other', fallback: 10);
     final total = female + male + other;
 
     return Column(
@@ -210,11 +219,15 @@ class _AlgorithmConfigCardState extends ConsumerState<AlgorithmConfigCard> {
                 ],
               ),
               const SizedBox(height: 10),
-              ...weights.asMap().entries.map((entry) {
+              ...countCategories.asMap().entries.map((entry) {
                 final index = entry.key;
-                final count = entry.value[0];
-                final weight = entry.value[1];
-                final label = count == 0 ? '无人物' : '$count人';
+                final category = entry.value;
+                final weight = category.weight;
+                final label = category.count == 0
+                    ? '无人物'
+                    : category.count < 0
+                        ? category.label
+                        : '${category.count}人';
                 final widthRatio = maxWeight > 0 ? weight / maxWeight : 0.0;
                 final color = barColors[index % barColors.length];
 
@@ -258,7 +271,7 @@ class _AlgorithmConfigCardState extends ConsumerState<AlgorithmConfigCard> {
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    '性别分布',
+                    '单人性别选项',
                     style: theme.textTheme.labelSmall?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: colorScheme.onSurfaceVariant,
@@ -343,6 +356,11 @@ class _AlgorithmConfigCardState extends ConsumerState<AlgorithmConfigCard> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isReadOnly = widget.isPresetDefault || preset.isDefault;
+    final characterConfig = config.effectiveCharacterCountConfig;
+    final countCategories = characterConfig.categories
+        .where((category) => !category.isMultiPersonContainer)
+        .toList();
+    final soloCategory = characterConfig.findCategoryById('solo');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -368,17 +386,23 @@ class _AlgorithmConfigCardState extends ConsumerState<AlgorithmConfigCard> {
           color: colorScheme.primary,
         ),
         const SizedBox(height: 12),
-        ...config.characterCountWeights.map((w) {
-          final count = w[0];
-          final weight = w[1];
-          final label = count == 0 ? '无人物' : '$count 人';
+        ...countCategories.map((category) {
+          final label = category.count == 0
+              ? '无人物'
+              : category.count < 0
+                  ? category.label
+                  : '${category.count} 人';
           return _WeightSlider(
             label: label,
-            value: weight,
+            value: category.weight,
             color: colorScheme.primary,
             enabled: !isReadOnly,
             onChanged: (newWeight) {
-              _updateCharacterCountWeight(preset, count, newWeight);
+              _updateCharacterCountCategoryWeight(
+                preset,
+                category.id,
+                newWeight,
+              );
             },
           );
         }),
@@ -390,33 +414,28 @@ class _AlgorithmConfigCardState extends ConsumerState<AlgorithmConfigCard> {
           color: colorScheme.secondary,
         ),
         const SizedBox(height: 12),
-        _WeightSlider(
-          label: '女性',
-          value: config.genderWeights['female'] ?? 60,
-          color: Colors.pink.shade400,
-          enabled: !isReadOnly,
-          onChanged: (newWeight) {
-            _updateGenderWeight(preset, 'female', newWeight);
-          },
-        ),
-        _WeightSlider(
-          label: '男性',
-          value: config.genderWeights['male'] ?? 30,
-          color: Colors.blue.shade400,
-          enabled: !isReadOnly,
-          onChanged: (newWeight) {
-            _updateGenderWeight(preset, 'male', newWeight);
-          },
-        ),
-        _WeightSlider(
-          label: '其他',
-          value: config.genderWeights['other'] ?? 10,
-          color: Colors.purple.shade400,
-          enabled: !isReadOnly,
-          onChanged: (newWeight) {
-            _updateGenderWeight(preset, 'other', newWeight);
-          },
-        ),
+        if (soloCategory != null)
+          ...soloCategory.tagOptions.map((option) {
+            final color = option.mainPromptTags.contains('boy')
+                ? Colors.blue.shade400
+                : option.mainPromptTags.contains('other')
+                    ? Colors.purple.shade400
+                    : Colors.pink.shade400;
+            return _WeightSlider(
+              label: option.label,
+              value: option.weight,
+              color: color,
+              enabled: !isReadOnly,
+              onChanged: (newWeight) {
+                _updateCharacterTagOptionWeight(
+                  preset,
+                  soloCategory.id,
+                  option.id,
+                  newWeight,
+                );
+              },
+            );
+          }),
         const SizedBox(height: 20),
         // 全局设置
         SectionHeader(
@@ -484,29 +503,61 @@ class _AlgorithmConfigCardState extends ConsumerState<AlgorithmConfigCard> {
     );
   }
 
-  void _updateCharacterCountWeight(
+  int _slotWeight(
+    List<CharacterTagOption> options,
+    String slot, {
+    required int fallback,
+  }) {
+    for (final option in options) {
+      if (option.slotTags.any((tag) => tag.characterTag == slot)) {
+        return option.weight;
+      }
+    }
+    return fallback;
+  }
+
+  void _updateCharacterCountCategoryWeight(
     RandomPreset preset,
-    int count,
+    String categoryId,
     int newWeight,
   ) {
     final config = preset.algorithmConfig;
-    final newWeights = config.characterCountWeights.map((w) {
-      if (w[0] == count) {
-        return [count, newWeight];
+    final characterConfig = config.effectiveCharacterCountConfig;
+    final categories = characterConfig.categories.map((category) {
+      if (category.id == categoryId) {
+        return category.copyWith(weight: newWeight);
       }
-      return w;
+      return category;
     }).toList();
 
-    final newConfig = config.copyWith(characterCountWeights: newWeights);
+    final newConfig = config.copyWith(
+      characterCountConfig: characterConfig.copyWith(categories: categories),
+    );
     _updateConfig(preset, newConfig);
   }
 
-  void _updateGenderWeight(RandomPreset preset, String gender, int newWeight) {
+  void _updateCharacterTagOptionWeight(
+    RandomPreset preset,
+    String categoryId,
+    String optionId,
+    int newWeight,
+  ) {
     final config = preset.algorithmConfig;
-    final newWeights = Map<String, int>.from(config.genderWeights);
-    newWeights[gender] = newWeight;
+    final characterConfig = config.effectiveCharacterCountConfig;
+    final categories = characterConfig.categories.map((category) {
+      if (category.id != categoryId) return category;
+      final options = category.tagOptions.map((option) {
+        if (option.id == optionId) {
+          return option.copyWith(weight: newWeight.clamp(1, 100));
+        }
+        return option;
+      }).toList();
+      return category.copyWith(tagOptions: options);
+    }).toList();
 
-    final newConfig = config.copyWith(genderWeights: newWeights);
+    final newConfig = config.copyWith(
+      characterCountConfig: characterConfig.copyWith(categories: categories),
+    );
     _updateConfig(preset, newConfig);
   }
 

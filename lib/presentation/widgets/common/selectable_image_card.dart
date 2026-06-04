@@ -80,6 +80,9 @@ class SelectableImageCard extends ConsumerStatefulWidget {
   /// 发送到增强回调
   final VoidCallback? onEnhance;
 
+  /// 发送到 Krita 回调
+  final VoidCallback? onSendToKrita;
+
   /// 在文件夹中打开的回调（需要先保存图片）
   final VoidCallback? onOpenInExplorer;
 
@@ -142,6 +145,7 @@ class SelectableImageCard extends ConsumerStatefulWidget {
     this.onGenerateVariations,
     this.onDirectorTools,
     this.onEnhance,
+    this.onSendToKrita,
     this.onOpenInExplorer,
     this.sourceFilePath,
     this.onSaveToLibrary,
@@ -1090,6 +1094,12 @@ class _SelectableImageCardState extends ConsumerState<SelectableImageCard>
                 tooltip: context.l10n.image_upscale,
                 onTap: widget.onUpscale,
               ),
+            if (widget.onSendToKrita != null)
+              _HoverActionButton(
+                icon: Icons.brush_outlined,
+                tooltip: '发送到 Krita',
+                onTap: widget.onSendToKrita,
+              ),
             if (widget.onSaveToLibrary != null)
               _HoverActionButton(
                 icon: Icons.bookmark_add_rounded,
@@ -1270,7 +1280,8 @@ class _SelectableImageCardState extends ConsumerState<SelectableImageCard>
           widget.onGenerateVariations != null ||
           widget.onDirectorTools != null ||
           widget.onEnhance != null ||
-          widget.onUpscale != null) ...[
+          widget.onUpscale != null ||
+          widget.onSendToKrita != null) ...[
         const ProMenuItem.divider(),
         if (widget.onEditImage != null)
           ProMenuItem(
@@ -1313,6 +1324,13 @@ class _SelectableImageCardState extends ConsumerState<SelectableImageCard>
             label: context.l10n.image_upscale,
             icon: Icons.zoom_out_map_rounded,
             onTap: widget.onUpscale!,
+          ),
+        if (widget.onSendToKrita != null)
+          ProMenuItem(
+            id: 'send_to_krita',
+            label: '发送到 Krita',
+            icon: Icons.brush_outlined,
+            onTap: widget.onSendToKrita!,
           ),
       ],
     ];

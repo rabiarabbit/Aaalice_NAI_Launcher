@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -31,6 +33,45 @@ class CanvasController extends ChangeNotifier {
   bool _isMirroredHorizontally = false;
   bool get isMirroredHorizontally => _isMirroredHorizontally;
 
+  int _batchDepth = 0;
+  bool _pendingNotification = false;
+
+  bool get _isBatching => _batchDepth > 0;
+
+  void beginBatch() {
+    _batchDepth++;
+  }
+
+  void endBatch() {
+    if (_batchDepth == 0) {
+      return;
+    }
+
+    _batchDepth--;
+    if (_batchDepth == 0 && _pendingNotification) {
+      _pendingNotification = false;
+      notifyListeners();
+    }
+  }
+
+  T runBatch<T>(T Function() body) {
+    beginBatch();
+    try {
+      return body();
+    } finally {
+      endBatch();
+    }
+  }
+
+  void _notifyChanged() {
+    if (_isBatching) {
+      _pendingNotification = true;
+      return;
+    }
+
+    notifyListeners();
+  }
+
   /// 设置缩放
   void setScale(double scale, {Offset? focalPoint}) {
     final newScale = scale.clamp(minScale, maxScale);
@@ -44,7 +85,7 @@ class CanvasController extends ChangeNotifier {
       } else {
         _scale = newScale;
       }
-      notifyListeners();
+      _notifyChanged();
     }
   }
 
@@ -62,14 +103,14 @@ class CanvasController extends ChangeNotifier {
   void setOffset(Offset offset) {
     if (_offset != offset) {
       _offset = offset;
-      notifyListeners();
+      _notifyChanged();
     }
   }
 
   /// 平移
   void pan(Offset delta) {
     _offset += delta;
-    notifyListeners();
+    _notifyChanged();
   }
 
   /// 设置视口尺寸
@@ -100,14 +141,14 @@ class CanvasController extends ChangeNotifier {
       (_viewportSize.height - scaledHeight) / 2,
     );
 
-    notifyListeners();
+    _notifyChanged();
   }
 
   /// 重置视图
   void reset() {
     _scale = 1.0;
     _offset = Offset.zero;
-    notifyListeners();
+    _notifyChanged();
   }
 
   /// 重置到100%
@@ -122,7 +163,7 @@ class CanvasController extends ChangeNotifier {
     } else {
       _offset = Offset.zero;
     }
-    notifyListeners();
+    _notifyChanged();
   }
 
   /// 适应视口高度
@@ -143,7 +184,7 @@ class CanvasController extends ChangeNotifier {
       (_viewportSize.height - scaledHeight) / 2,
     );
 
-    notifyListeners();
+    _notifyChanged();
   }
 
   /// 适应视口宽度
@@ -164,31 +205,31 @@ class CanvasController extends ChangeNotifier {
       (_viewportSize.height - scaledHeight) / 2,
     );
 
-    notifyListeners();
+    _notifyChanged();
   }
 
   /// 向左旋转（默认15度）
   void rotateLeft({double degrees = 15.0}) {
     _rotation -= degrees * math.pi / 180.0;
-    notifyListeners();
+    _notifyChanged();
   }
 
   /// 向右旋转（默认15度）
   void rotateRight({double degrees = 15.0}) {
     _rotation += degrees * math.pi / 180.0;
-    notifyListeners();
+    _notifyChanged();
   }
 
   /// 重置旋转
   void resetRotation() {
     _rotation = 0.0;
-    notifyListeners();
+    _notifyChanged();
   }
 
   /// 切换水平镜像
   void toggleMirrorHorizontal() {
     _isMirroredHorizontally = !_isMirroredHorizontally;
-    notifyListeners();
+    _notifyChanged();
   }
 
   /// 重置视图（包括旋转和镜像）
@@ -335,7 +376,9 @@ class CanvasController extends ChangeNotifier {
 
     // 将视口左上角和右下角转换为画布坐标
     final topLeft = screenToCanvas(Offset.zero);
-    final bottomRight = screenToCanvas(Offset(_viewportSize.width, _viewportSize.height));
+    final bottomRight = screenToCanvas(
+      Offset(_viewportSize.width, _viewportSize.height),
+    );
 
     return Rect.fromPoints(topLeft, bottomRight);
   }

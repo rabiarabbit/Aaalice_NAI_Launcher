@@ -573,6 +573,53 @@ class VibeLibraryNotifier extends _$VibeLibraryNotifier {
     }
   }
 
+  /// 显式保存 bundle 中某个子 Vibe 的参数。
+  Future<VibeLibraryEntry?> saveBundleChildParams(
+    String id, {
+    required int childIndex,
+    required double strength,
+    required double infoExtracted,
+    VibeReference? persistedVibeData,
+  }) async {
+    try {
+      final saved = await _storage.saveBundleChildParams(
+        id,
+        childIndex: childIndex,
+        strength: strength,
+        infoExtracted: infoExtracted,
+        persistedVibeData: persistedVibeData,
+      );
+      if (saved == null) {
+        return null;
+      }
+
+      final entries = [...state.entries];
+      final index = entries.indexWhere((e) => e.id == id);
+      final displayEntry = saved.toDisplayEntry();
+      if (index >= 0) {
+        entries[index] = displayEntry;
+      } else {
+        entries.add(displayEntry);
+      }
+      state = state.copyWith(entries: entries);
+      await _applyFilters();
+      AppLogger.d(
+        'Bundle child params saved: ${saved.displayName}[$childIndex]',
+        'VibeLibrary',
+      );
+      return saved;
+    } catch (e, stackTrace) {
+      AppLogger.e(
+        'Failed to save bundle child params',
+        e,
+        stackTrace,
+        'VibeLibrary',
+      );
+      state = state.copyWith(error: e.toString());
+      return null;
+    }
+  }
+
   /// 保存 Bundle 条目
   Future<VibeLibraryEntry?> saveBundleEntry(
     List<VibeReference> vibes, {

@@ -71,7 +71,12 @@ class OnlineGallerySelectionNotifier extends _$OnlineGallerySelectionNotifier {
   void clearSelection() => _update(state.copyWith(selectedIds: {}));
 
   void enterAndSelect(String id) {
-    _update(state.copyWith(isActive: true, selectedIds: {...state.selectedIds, id}));
+    _update(
+      state.copyWith(
+        isActive: true,
+        selectedIds: {...state.selectedIds, id},
+      ),
+    );
   }
 
   void _update(SelectionModeState newState) => state = newState;
@@ -110,14 +115,37 @@ class LocalGallerySelectionNotifier extends _$LocalGallerySelectionNotifier {
     _update(state.copyWith(selectedIds: {...state.selectedIds, ...ids}));
   }
 
-  void clearSelection() => _update(state.copyWith(selectedIds: {}, lastSelectedId: null));
+  void replaceSelection(List<String> ids) {
+    _update(
+      state.copyWith(
+        selectedIds: ids.toSet(),
+        lastSelectedId: ids.isEmpty ? null : ids.last,
+      ),
+    );
+  }
+
+  void deselectAll(List<String> ids) {
+    if (ids.isEmpty) return;
+
+    _update(
+      state.copyWith(
+        selectedIds: state.selectedIds.difference(ids.toSet()),
+        lastSelectedId: null,
+      ),
+    );
+  }
+
+  void clearSelection() =>
+      _update(state.copyWith(selectedIds: {}, lastSelectedId: null));
 
   void enterAndSelect(String id) {
-    _update(state.copyWith(
-      isActive: true,
-      selectedIds: {...state.selectedIds, id},
-      lastSelectedId: id,
-    ),);
+    _update(
+      state.copyWith(
+        isActive: true,
+        selectedIds: {...state.selectedIds, id},
+        lastSelectedId: id,
+      ),
+    );
   }
 
   /// 范围选择（Shift+点击）
@@ -138,10 +166,12 @@ class LocalGallerySelectionNotifier extends _$LocalGallerySelectionNotifier {
     final end = anchorIndex < currentIndex ? currentIndex : anchorIndex;
     final rangeIds = allIds.sublist(start, end + 1);
 
-    _update(state.copyWith(
-      selectedIds: {...state.selectedIds, ...rangeIds},
-      lastSelectedId: currentId,
-    ),);
+    _update(
+      state.copyWith(
+        selectedIds: {...state.selectedIds, ...rangeIds},
+        lastSelectedId: currentId,
+      ),
+    );
   }
 
   void _update(SelectionModeState newState) => state = newState;

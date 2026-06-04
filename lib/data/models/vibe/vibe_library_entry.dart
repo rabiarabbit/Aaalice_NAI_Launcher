@@ -83,6 +83,12 @@ class VibeLibraryEntry with _$VibeLibraryEntry {
 
     /// bundle 内部 vibe 编码数据列表（用于重新保存 bundle 文件）
     @HiveField(20) List<String>? bundledVibeEncodings,
+
+    /// bundle 内部 vibe strength 参数缓存（与 bundledVibeNames 同索引）
+    @HiveField(21) List<double>? bundledVibeStrengths,
+
+    /// bundle 内部 vibe information extracted 参数缓存（与 bundledVibeNames 同索引）
+    @HiveField(22) List<double>? bundledVibeInfoExtracted,
   }) = _VibeLibraryEntry;
 
   /// 从 VibeReference 创建库条目
@@ -129,6 +135,8 @@ class VibeLibraryEntry with _$VibeLibraryEntry {
     String? filePath,
     bool isFavorite = false,
     VibeSourceType sourceType = VibeSourceType.rawImage,
+    double strength = 0.6,
+    double infoExtracted = 0.7,
   }) {
     final now = DateTime.now();
     final normalizedSourceType =
@@ -149,6 +157,8 @@ class VibeLibraryEntry with _$VibeLibraryEntry {
       thumbnail: thumbnail,
       filePath: filePath,
       sourceTypeIndex: normalizedSourceType.index,
+      strength: VibeReference.sanitizeStrength(strength),
+      infoExtracted: VibeReference.sanitizeInfoExtracted(infoExtracted),
     );
   }
 
@@ -174,6 +184,8 @@ class VibeLibraryEntry with _$VibeLibraryEntry {
       thumbnail: null,
       bundledVibePreviews: null,
       bundledVibeEncodings: null,
+      bundledVibeStrengths: null,
+      bundledVibeInfoExtracted: null,
     );
   }
 
@@ -223,6 +235,9 @@ class VibeLibraryEntry with _$VibeLibraryEntry {
     String? bundleId,
     List<String>? bundledVibeNames,
     List<Uint8List>? bundledVibePreviews,
+    List<String>? bundledVibeEncodings,
+    List<double>? bundledVibeStrengths,
+    List<double>? bundledVibeInfoExtracted,
     bool? isFavorite,
   }) {
     return copyWith(
@@ -241,6 +256,10 @@ class VibeLibraryEntry with _$VibeLibraryEntry {
       bundleId: bundleId ?? this.bundleId,
       bundledVibeNames: bundledVibeNames ?? this.bundledVibeNames,
       bundledVibePreviews: bundledVibePreviews ?? this.bundledVibePreviews,
+      bundledVibeEncodings: bundledVibeEncodings ?? this.bundledVibeEncodings,
+      bundledVibeStrengths: bundledVibeStrengths ?? this.bundledVibeStrengths,
+      bundledVibeInfoExtracted:
+          bundledVibeInfoExtracted ?? this.bundledVibeInfoExtracted,
       isFavorite: isFavorite ?? this.isFavorite,
     );
   }

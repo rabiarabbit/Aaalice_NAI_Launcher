@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nai_launcher/core/services/prompt_token_counter_service.dart';
 import 'package:nai_launcher/presentation/widgets/prompt/prompt_token_count_bar.dart';
 
@@ -95,6 +96,29 @@ void main() {
         tooltip.message,
         equals('提示词 100\n固定词 28\n网页端校准 1'),
       );
+    });
+
+    testWidgets('keeps previous token usage while reloading', (tester) async {
+      final reloadingUsage =
+          const AsyncLoading<PromptTokenUsage?>().copyWithPrevious(
+        const AsyncData<PromptTokenUsage?>(
+          PromptTokenUsage(
+            usedTokens: 128,
+            limit: 512,
+          ),
+        ),
+        isRefresh: false,
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: PromptTokenCountAsyncBar(usage: reloadingUsage),
+          ),
+        ),
+      );
+
+      expect(find.text('128 / 512'), findsOneWidget);
     });
   });
 }

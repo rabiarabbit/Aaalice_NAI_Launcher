@@ -177,7 +177,9 @@ class PresetSelectorBar extends ConsumerWidget {
 
   /// 显示创建预设对话框
   Future<void> _showCreatePresetDialog(
-      BuildContext context, WidgetRef ref,) async {
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
     final result = await NewPresetDialog.show(context);
     if (result == null) return;
 
@@ -365,7 +367,7 @@ class _PresetDropdownState extends State<_PresetDropdown> {
                 ),
               );
             }),
-            // 分隔线 + 新建预设选项（开发中）
+            // 分隔线 + 新建预设选项
             DropdownMenuItem<String>(
               value: '__create_new__',
               child: Row(
@@ -388,7 +390,7 @@ class _PresetDropdownState extends State<_PresetDropdown> {
           ],
           onChanged: (id) {
             if (id == '__create_new__') {
-              AppToast.warning(context, '开发中');
+              widget.onCreateNew();
             } else if (id != null) {
               final preset = widget.presets.firstWhere((p) => p.id == id);
               widget.onSelected(preset);

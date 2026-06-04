@@ -4,8 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/utils/localization_extension.dart';
 import '../../../../data/models/gallery/nai_image_metadata.dart';
 import '../../../../data/models/prompt/prompt_config.dart';
-import '../../../../presentation/providers/prompt_config_provider.dart'
-    show promptConfigNotifierProvider;
+import '../../../../data/services/random_prompt_legacy_adapter.dart';
+import '../../../../presentation/providers/random_preset_provider.dart'
+    show randomPresetNotifierProvider;
 import 'app_toast.dart';
 
 /// 保存为预设对话框
@@ -193,7 +194,7 @@ class _SaveAsPresetDialogState extends ConsumerState<SaveAsPresetDialog> {
 
     try {
       // 获取 notifier
-      final notifier = ref.read(promptConfigNotifierProvider.notifier);
+      final notifier = ref.read(randomPresetNotifierProvider.notifier);
 
       // 构建配置列表
       final configs = _buildConfigs(widget.metadata);
@@ -204,11 +205,13 @@ class _SaveAsPresetDialogState extends ConsumerState<SaveAsPresetDialog> {
         return;
       }
 
-      // 创建预设
-      final preset = RandomPromptPreset.create(
+      // 创建预设并转换到随机配置页使用的 canonical RandomPreset 管线。
+      final legacyPreset = RandomPromptPreset.create(
         name: name,
         configs: configs,
       );
+      final preset = RandomPromptLegacyAdapter.fromPreset(legacyPreset)
+          .copyWith(description: 'Saved from image metadata');
 
       // 保存预设
       await notifier.addPreset(preset);

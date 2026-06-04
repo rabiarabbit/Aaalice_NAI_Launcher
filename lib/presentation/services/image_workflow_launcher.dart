@@ -3,15 +3,17 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/constants/api_constants.dart';
 import '../../core/utils/app_logger.dart';
 import '../../core/utils/inpaint_mask_utils.dart';
 import '../../core/utils/localization_extension.dart';
 import '../../data/models/gallery/nai_image_metadata.dart';
+import '../../data/models/metadata/metadata_import_options.dart';
 import '../../data/services/image_metadata_service.dart';
 import '../providers/generation/image_workflow_controller.dart';
 import '../providers/image_generation_provider.dart';
+import '../providers/krita/krita_bridge_notifier.dart';
 import '../screens/director_tools/director_tools_screen.dart';
+import '../utils/metadata_import_applier.dart';
 import '../utils/prompt_preset_import_utils.dart';
 import '../widgets/common/app_toast.dart';
 import '../widgets/image_editor/image_editor_screen.dart';
@@ -74,6 +76,10 @@ class ImageWorkflowLauncher {
           'hasMaskChanges=${result.hasMaskChanges}, '
           'modifiedBytes=${result.modifiedImage?.length ?? 0}, '
           'maskBytes=${result.maskImage?.length ?? 0}, '
+          'hasOutpaintChanges=${result.hasOutpaintChanges}, '
+          'outpaintSourceBytes=${result.outpaintSourceImage?.length ?? 0}, '
+          'outpaintSourceWidth=${result.outpaintSourceWidth}, '
+          'outpaintSourceHeight=${result.outpaintSourceHeight}, '
           'focusRect=${result.focusAreaRect}, '
           'minContext=${result.minimumContextMegaPixels.toStringAsFixed(2)}, '
           'focusedEnabled=${result.focusedInpaintEnabled}',
@@ -94,10 +100,17 @@ class ImageWorkflowLauncher {
         ? result.maskImage
         : null;
     workflowNotifier.applyInpaintEditorResult(
+      sourceImage:
+          result.hasOutpaintChanges ? result.outpaintSourceImage : null,
+      sourceWidth:
+          result.hasOutpaintChanges ? result.outpaintSourceWidth : null,
+      sourceHeight:
+          result.hasOutpaintChanges ? result.outpaintSourceHeight : null,
       maskImage: effectiveMask,
       focusedInpaintEnabled: result.focusedInpaintEnabled,
       focusedSelectionRect: result.focusAreaRect,
       minimumContextMegaPixels: result.minimumContextMegaPixels,
+      forceDisableFocusedInpaint: result.hasOutpaintChanges,
     );
     if (effectiveMask != null) {
       AppToast.success(context, context.l10n.img2img_inpaintMaskReady);
@@ -190,6 +203,10 @@ class ImageWorkflowLauncher {
     }
 
     if (!context.mounted) return;
+    if (ref.read(kritaBridgeNotifierProvider).isBridgeGenerating) {
+      AppToast.warning(context, 'Krita Bridge 正在生成，请等待当前任务结束');
+      return;
+    }
     AppToast.info(context, context.l10n.img2img_variationsStarted);
 
     final currentParams = ref.read(generationParamsNotifierProvider);
@@ -202,58 +219,34 @@ class ImageWorkflowLauncher {
     GenerationParamsNotifier notifier, {
     required String fallbackModel,
   }) {
-    if (metadata.prompt.isNotEmpty) {
-      notifier.updatePrompt(metadata.prompt);
-    }
-    final importModel = metadata.model ?? fallbackModel;
-    final importNegativePrompt = metadata.ucPreset != null
-        ? UcPresets.stripPresetByInt(
-            metadata.negativePrompt,
-            importModel,
-            metadata.ucPreset!,
-          )
-        : metadata.negativePrompt;
-    if (metadata.negativePrompt.isNotEmpty || metadata.ucPreset != null) {
-      notifier.updateNegativePrompt(importNegativePrompt);
-    }
-    if (metadata.model != null && metadata.model!.isNotEmpty) {
-      notifier.updateModel(metadata.model!);
-    }
-    if (metadata.sampler != null && metadata.sampler!.isNotEmpty) {
-      notifier.updateSampler(metadata.sampler!);
-    }
-    if (metadata.steps != null) {
-      notifier.updateSteps(metadata.steps!);
-    }
-    if (metadata.scale != null) {
-      notifier.updateScale(metadata.scale!);
-    }
-    if (metadata.width != null && metadata.height != null) {
-      notifier.updateSize(metadata.width!, metadata.height!);
-    }
-    if (metadata.noiseSchedule != null && metadata.noiseSchedule!.isNotEmpty) {
-      notifier.updateNoiseSchedule(metadata.noiseSchedule!);
-    }
-    if (metadata.cfgRescale != null) {
-      notifier.updateCfgRescale(metadata.cfgRescale!);
-    }
-    if (metadata.ucPreset != null) {
-      notifier.updateUcPreset(metadata.ucPreset!);
-      applyImportedUcPreset(ref.read, metadata.ucPreset!);
-    }
-    if (metadata.qualityToggle != null) {
-      notifier.updateQualityToggle(metadata.qualityToggle!);
-      applyImportedQualityToggle(ref.read, metadata.qualityToggle!);
-    }
-    if (metadata.smea != null) {
-      notifier.updateSmea(metadata.smea!);
-    }
-    if (metadata.smeaDyn != null) {
-      notifier.updateSmeaDyn(metadata.smeaDyn!);
-    }
-    if (metadata.varietyPlus != null) {
-      notifier.updateVarietyPlus(metadata.varietyPlus!);
-    }
+    MetadataImportApplier.applyPromptAndGenerationParams(
+      metadata: metadata,
+      options: MetadataImportOptions.all(),
+      currentModel: fallbackModel,
+      target: MetadataImportTarget(
+        updatePrompt: notifier.updatePrompt,
+        updateNegativePrompt: notifier.updateNegativePrompt,
+        updateSeed: notifier.updateSeed,
+        updateSteps: notifier.updateSteps,
+        updateScale: notifier.updateScale,
+        updateSize: notifier.updateSize,
+        updateSampler: notifier.updateSampler,
+        updateModel: notifier.updateModel,
+        updateSmea: notifier.updateSmea,
+        updateSmeaDyn: notifier.updateSmeaDyn,
+        updateVarietyPlus: notifier.updateVarietyPlus,
+        updateNoiseSchedule: notifier.updateNoiseSchedule,
+        updateCfgRescale: notifier.updateCfgRescale,
+        updateQualityToggle: (value) {
+          notifier.updateQualityToggle(value);
+          applyImportedQualityToggle(ref.read, value);
+        },
+        updateUcPreset: (value) {
+          notifier.updateUcPreset(value);
+          applyImportedUcPreset(ref.read, value);
+        },
+      ),
+    );
 
     notifier.randomizeSeed();
     notifier.updateStrength(metadata.strength ?? 0.45);
