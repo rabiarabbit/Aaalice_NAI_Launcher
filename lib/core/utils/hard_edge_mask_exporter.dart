@@ -14,6 +14,7 @@ class HardEdgeMaskExportInput {
     required this.strokes,
     required this.baseMasks,
     required this.additionalRects,
+    this.orderedOperations = const [],
   });
 
   final int width;
@@ -21,6 +22,7 @@ class HardEdgeMaskExportInput {
   final List<HardEdgeMaskStroke> strokes;
   final List<HardEdgeMaskBaseImage> baseMasks;
   final List<Rect> additionalRects;
+  final List<HardEdgeMaskOperation> orderedOperations;
 }
 
 class HardEdgeMaskStroke {
@@ -47,6 +49,34 @@ class HardEdgeMaskBaseImage {
   final int offsetY;
 }
 
+abstract class HardEdgeMaskOperation {
+  const HardEdgeMaskOperation();
+}
+
+class HardEdgeMaskBaseImageOperation extends HardEdgeMaskOperation {
+  const HardEdgeMaskBaseImageOperation({
+    required this.baseMask,
+  });
+
+  final HardEdgeMaskBaseImage baseMask;
+}
+
+class HardEdgeMaskStrokeOperation extends HardEdgeMaskOperation {
+  const HardEdgeMaskStrokeOperation({
+    required this.stroke,
+  });
+
+  final HardEdgeMaskStroke stroke;
+}
+
+class HardEdgeMaskRectOperation extends HardEdgeMaskOperation {
+  const HardEdgeMaskRectOperation({
+    required this.rect,
+  });
+
+  final Rect rect;
+}
+
 class HardEdgeMaskExporter {
   const HardEdgeMaskExporter._();
 
@@ -66,19 +96,46 @@ class HardEdgeMaskExporter {
     );
     img.fill(mask, color: img.ColorRgba8(0, 0, 0, 255));
 
-    for (final baseMask in input.baseMasks) {
-      _pasteBaseMask(mask, baseMask);
+    if (input.orderedOperations.isNotEmpty) {
+      for (final operation in input.orderedOperations) {
+        _applyOperation(mask, operation);
+      }
+    } else {
+      for (final baseMask in input.baseMasks) {
+        _pasteBaseMask(mask, baseMask);
+      }
+      for (final stroke in input.strokes) {
+        _drawStroke(mask, stroke);
+      }
     }
+
     for (final rect in input.additionalRects) {
       _fillRect(mask, rect);
-    }
-    for (final stroke in input.strokes) {
-      _drawStroke(mask, stroke);
     }
 
     return InpaintMaskUtils.normalizeMaskBytes(
       Uint8List.fromList(img.encodePng(mask)),
     );
+  }
+
+  static void _applyOperation(
+    img.Image mask,
+    HardEdgeMaskOperation operation,
+  ) {
+    if (operation is HardEdgeMaskBaseImageOperation) {
+      _pasteBaseMask(mask, operation.baseMask);
+      return;
+    }
+    if (operation is HardEdgeMaskStrokeOperation) {
+      _drawStroke(mask, operation.stroke);
+      return;
+    }
+    if (operation is HardEdgeMaskRectOperation) {
+      _fillRect(mask, operation.rect);
+      return;
+    }
+
+    throw ArgumentError('Unsupported hard-edge mask operation: $operation');
   }
 
   static void _pasteBaseMask(
@@ -139,15 +196,49 @@ class HardEdgeMaskExporter {
       return;
     }
 
-    for (var i = 0; i < stroke.points.length - 1; i++) {
+    final masked = !stroke.isEraser;
+    if (stroke.points.length == 2) {
       _drawSegment(
         mask,
-        stroke.points[i],
-        stroke.points[i + 1],
+        stroke.points.first,
+        stroke.points.last,
         stroke.size,
-        masked: !stroke.isEraser,
+        masked: masked,
       );
+      return;
     }
+
+    _drawSmoothPath(mask, stroke.points, stroke.size, masked: masked);
+  }
+
+  static void _drawSmoothPath(
+    img.Image mask,
+    List<Offset> points,
+    double size, {
+    required bool masked,
+  }) {
+    var current = points.first;
+
+    for (var i = 1; i < points.length - 1; i++) {
+      final control = points[i];
+      final next = points[i + 1];
+      final end = Offset(
+        (control.dx + next.dx) / 2,
+        (control.dy + next.dy) / 2,
+      );
+
+      _drawQuadraticSegment(
+        mask,
+        current,
+        control,
+        end,
+        size,
+        masked: masked,
+      );
+      current = end;
+    }
+
+    _drawSegment(mask, current, points.last, size, masked: masked);
   }
 
   static void _drawSegment(
@@ -174,6 +265,46 @@ class HardEdgeMaskExporter {
         masked: masked,
       );
     }
+  }
+
+  static void _drawQuadraticSegment(
+    img.Image mask,
+    Offset start,
+    Offset control,
+    Offset end,
+    double size, {
+    required bool masked,
+  }) {
+    final estimatedLength =
+        (control - start).distance + (end - control).distance;
+    final steps = math.max(estimatedLength.ceil(), 1);
+
+    for (var step = 0; step <= steps; step++) {
+      final t = step / steps;
+      _drawDisc(
+        mask,
+        _quadraticPoint(start, control, end, t),
+        size,
+        masked: masked,
+      );
+    }
+  }
+
+  static Offset _quadraticPoint(
+    Offset start,
+    Offset control,
+    Offset end,
+    double t,
+  ) {
+    final inverseT = 1 - t;
+    return Offset(
+      inverseT * inverseT * start.dx +
+          2 * inverseT * t * control.dx +
+          t * t * end.dx,
+      inverseT * inverseT * start.dy +
+          2 * inverseT * t * control.dy +
+          t * t * end.dy,
+    );
   }
 
   static void _drawDisc(
