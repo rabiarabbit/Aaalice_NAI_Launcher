@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'dart:ui' show Offset, Rect, Size;
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image/image.dart' as img;
@@ -599,6 +600,79 @@ void main() {
       expect(resized.appliedExpansionEdges.right, equals(64));
       expect(resized.appliedExpansionEdges.bottom, equals(32));
       expect(resized.appliedCropEdges.isEmpty, isTrue);
+    });
+  });
+
+  group('OutpaintVirtualFrame', () {
+    test('expands left then returns to the original source frame', () {
+      final frame = OutpaintVirtualFrame.fromSource(
+        sourceWidth: 128,
+        sourceHeight: 128,
+      );
+
+      final expanded = frame.applyDelta(
+        const OutpaintFrameDelta(left: 33),
+        horizontalSnapTarget: OutpaintHorizontalSnapTarget.left,
+      );
+      expect(expanded.frame.canvasSize, equals(const Size(192, 128)));
+      expect(expanded.frame.sourceDrawOffset, equals(const Offset(64, 0)));
+      expect(expanded.contentShift, equals(const Offset(64, 0)));
+      expect(
+        expanded.outpaintMaskRects,
+        equals([const Rect.fromLTWH(0, 0, 64, 128)]),
+      );
+
+      final restored = expanded.frame.applyDelta(
+        const OutpaintFrameDelta(left: -33),
+        horizontalSnapTarget: OutpaintHorizontalSnapTarget.left,
+      );
+      expect(restored.frame.canvasSize, equals(const Size(128, 128)));
+      expect(restored.frame.sourceDrawOffset, Offset.zero);
+      expect(restored.contentShift, equals(const Offset(-64, 0)));
+      expect(restored.frame.hasOutpaintChanges, isFalse);
+    });
+
+    test('applies a corner expansion as one coherent virtual frame', () {
+      final frame = OutpaintVirtualFrame.fromSource(
+        sourceWidth: 128,
+        sourceHeight: 96,
+      );
+
+      final result = frame.applyDelta(
+        const OutpaintFrameDelta(left: 33, top: 33),
+        horizontalSnapTarget: OutpaintHorizontalSnapTarget.left,
+        verticalSnapTarget: OutpaintVerticalSnapTarget.top,
+      );
+
+      expect(result.frame.canvasSize, equals(const Size(192, 160)));
+      expect(result.frame.sourceDrawOffset, equals(const Offset(64, 64)));
+      expect(result.contentShift, equals(const Offset(64, 64)));
+      expect(
+        result.outpaintMaskRects,
+        equals([
+          const Rect.fromLTWH(0, 0, 192, 64),
+          const Rect.fromLTWH(0, 64, 64, 96),
+        ]),
+      );
+    });
+
+    test('crops the current frame without mutating original source dimensions',
+        () {
+      final frame = OutpaintVirtualFrame.fromSource(
+        sourceWidth: 128,
+        sourceHeight: 128,
+      );
+
+      final result = frame.applyDelta(
+        const OutpaintFrameDelta(right: -33),
+      );
+
+      expect(result.frame.sourceWidth, equals(128));
+      expect(result.frame.sourceHeight, equals(128));
+      expect(result.frame.canvasSize, equals(const Size(64, 128)));
+      expect(result.frame.sourceDrawOffset, Offset.zero);
+      expect(result.contentShift, Offset.zero);
+      expect(result.frame.hasOutpaintChanges, isTrue);
     });
   });
 }
