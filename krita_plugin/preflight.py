@@ -51,14 +51,14 @@ def main() -> int:
     )
     parser.add_argument(
         "--package-output",
-        type=Path,
-        default=PLUGIN_ZIP,
+        default=str(PLUGIN_ZIP),
         help=(
             "Path for the generated plugin zip. Defaults to "
             "dist/nai_launcher_bridge_krita_plugin.zip."
         ),
     )
     args = parser.parse_args()
+    package_output_path = Path(args.package_output)
 
     if not args.skip_tests:
         _run(
@@ -79,10 +79,10 @@ def main() -> int:
             sys.executable,
             "krita_plugin/package_plugin.py",
             "--output",
-            str(args.package_output),
+            args.package_output,
         ],
     )
-    _print_zip_hash(args.package_output)
+    _print_zip_hash(package_output_path)
 
     if not args.skip_isolated_install:
         _run_isolated_profile_check()
