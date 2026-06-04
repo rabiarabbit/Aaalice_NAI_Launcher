@@ -231,7 +231,7 @@ class Layer {
     }
 
     return HardEdgeMaskBaseImage(
-      bytes: bytes,
+      bytes: Uint8List.fromList(bytes),
       offsetX: _baseImageOffset.dx.round(),
       offsetY: _baseImageOffset.dy.round(),
     );

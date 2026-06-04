@@ -217,6 +217,9 @@ void main() {
     expect(baseMask!.offsetX, equals(0));
     expect(baseMask.offsetY, equals(0));
     expect(layer.baseImageOffset, Offset.zero);
+    final originalFirstByte = layer.baseImageBytes!.first;
+    baseMask.bytes[0] = originalFirstByte == 0 ? 1 : 0;
+    expect(layer.baseImageBytes!.first, equals(originalFirstByte));
 
     final strokes = layer.toHardEdgeMaskStrokes();
     expect(strokes, hasLength(1));
