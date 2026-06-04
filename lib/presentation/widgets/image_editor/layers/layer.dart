@@ -285,9 +285,8 @@ class Layer {
       _baseImage?.dispose();
       _baseImage = frame.image;
       _baseImageBytes = bytes;
-      _needsComposite = true;
-      _needsThumbnailUpdate = true;
-      _bounds = null; // 清除边界缓存，下次渲染时重新计算
+      _baseImageOffset = Offset.zero;
+      _invalidateRasterState();
     } catch (e) {
       AppLogger.w('Failed to decode base image: $e', 'ImageEditor');
       rethrow;
@@ -300,9 +299,8 @@ class Layer {
   void setBaseImageFromImage(ui.Image image) {
     _baseImage?.dispose();
     _baseImage = image;
-    _needsComposite = true;
-    _needsThumbnailUpdate = true;
-    _bounds = null; // 清除边界缓存
+    _baseImageOffset = Offset.zero;
+    _invalidateRasterState();
   }
 
   /// 同步设置基础图像（包含已解码图像和原始字节）
@@ -313,9 +311,8 @@ class Layer {
     _baseImage?.dispose();
     _baseImage = image;
     _baseImageBytes = bytes;
-    _needsComposite = true;
-    _needsThumbnailUpdate = true;
-    _bounds = null;
+    _baseImageOffset = Offset.zero;
+    _invalidateRasterState();
   }
 
   /// 清除基础图像
@@ -323,9 +320,58 @@ class Layer {
     _baseImage?.dispose();
     _baseImage = null;
     _baseImageBytes = null;
+    _baseImageOffset = Offset.zero;
+    _invalidateRasterState();
+  }
+
+  void setBaseImageOffset(Offset offset) {
+    _baseImageOffset = offset;
+    _invalidateRasterState();
+  }
+
+  void translateContent(Offset delta) {
+    if (delta == Offset.zero) {
+      return;
+    }
+
+    _baseImageOffset += delta;
+    final translatedStrokes = _strokes.map((stroke) {
+      return stroke.copyWith(
+        points: stroke.points.map((point) => point + delta).toList(),
+      );
+    }).toList(growable: false);
+
+    _strokes
+      ..clear()
+      ..addAll(translatedStrokes);
+    _strokeGeneration++;
+    _invalidateRasterState();
+  }
+
+  void _invalidateRasterState() {
+    _rasterizedStrokeCount = 0;
+    _needsRasterize = true;
     _needsComposite = true;
     _needsThumbnailUpdate = true;
-    _bounds = null; // 清除边界缓存
+    _bounds = null;
+
+    if (!_isRasterizing) {
+      _rasterizedImage?.dispose();
+      _rasterizedImage = null;
+    }
+    if (!_isCompositing) {
+      _compositedCache?.dispose();
+      _compositedCache = null;
+    }
+  }
+
+  void _drawBaseImage(Canvas canvas, Paint paint) {
+    final baseImage = _baseImage;
+    if (baseImage == null) {
+      return;
+    }
+
+    canvas.drawImage(baseImage, _baseImageOffset, paint);
   }
 
   /// 添加笔画
@@ -446,15 +492,13 @@ class Layer {
     } else if (hasAnyEraser && _baseImage != null) {
       // eraser + baseImage: 必须在 saveLayer 中先绘制 base 再绘制全部笔画，
       // 这样 BlendMode.clear 才能正确擦除 base 的像素。
-      canvas.drawImage(_baseImage!, Offset.zero, Paint());
+      _drawBaseImage(canvas, Paint());
       for (final stroke in _strokes) {
         _drawStroke(canvas, stroke);
       }
     } else {
       // 绘制基础图像
-      if (_baseImage != null) {
-        canvas.drawImage(_baseImage!, Offset.zero, Paint());
-      }
+      _drawBaseImage(canvas, Paint());
 
       // 使用光栅化缓存绘制已处理的笔画
       if (_rasterizedImage != null && _rasterizedStrokeCount > 0) {
@@ -513,46 +557,45 @@ class Layer {
 
   /// 计算图层边界
   Rect _calculateBounds(Size canvasSize) {
-    // 如果没有内容，边界为空
-    if (!hasContent) {
-      return Rect.zero;
+    Rect? bounds;
+    final baseImage = _baseImage;
+    if (baseImage != null) {
+      bounds = Rect.fromLTWH(
+        _baseImageOffset.dx,
+        _baseImageOffset.dy,
+        baseImage.width.toDouble(),
+        baseImage.height.toDouble(),
+      );
     }
-
-    // 如果有基础图像，使用画布尺寸作为边界
-    if (_baseImage != null) {
-      return Rect.fromLTWH(0, 0, canvasSize.width, canvasSize.height);
-    }
-
-    // 否则根据笔画计算边界
-    if (_strokes.isEmpty) {
-      return Rect.zero;
-    }
-
-    double minX = double.infinity;
-    double minY = double.infinity;
-    double maxX = double.negativeInfinity;
-    double maxY = double.negativeInfinity;
 
     for (final stroke in _strokes) {
+      if (stroke.points.isEmpty) {
+        continue;
+      }
+
+      double minX = double.infinity;
+      double minY = double.infinity;
+      double maxX = double.negativeInfinity;
+      double maxY = double.negativeInfinity;
       for (final point in stroke.points) {
         if (point.dx < minX) minX = point.dx;
         if (point.dy < minY) minY = point.dy;
         if (point.dx > maxX) maxX = point.dx;
         if (point.dy > maxY) maxY = point.dy;
       }
+
+      final radius = stroke.size / 2;
+      final strokeBounds = Rect.fromLTRB(
+        minX - radius,
+        minY - radius,
+        maxX + radius,
+        maxY + radius,
+      );
+      bounds =
+          bounds == null ? strokeBounds : bounds.expandToInclude(strokeBounds);
     }
 
-    // 添加笔画半径的边距
-    final maxRadius = _strokes
-        .map((s) => s.size / 2)
-        .fold<double>(0.0, (max, radius) => radius > max ? radius : max);
-
-    return Rect.fromLTRB(
-      minX - maxRadius,
-      minY - maxRadius,
-      maxX + maxRadius,
-      maxY + maxRadius,
-    );
+    return bounds ?? Rect.zero;
   }
 
   /// 绘制单个笔画
@@ -729,15 +772,13 @@ class Layer {
           ),
           Paint(),
         );
-        canvas.drawImage(_baseImage!, Offset.zero, Paint());
+        _drawBaseImage(canvas, Paint());
         for (final stroke in _strokes) {
           _drawStroke(canvas, stroke);
         }
         canvas.restore();
       } else {
-        if (_baseImage != null) {
-          canvas.drawImage(_baseImage!, Offset.zero, Paint());
-        }
+        _drawBaseImage(canvas, Paint());
         if (_rasterizedImage != null) {
           canvas.drawImage(_rasterizedImage!, Offset.zero, Paint());
         }
@@ -870,7 +911,9 @@ class Layer {
 
     // 如果有基础图像字节，重新解码
     if (cloned._baseImageBytes != null) {
+      final baseImageOffset = cloned._baseImageOffset;
       await cloned.setBaseImage(cloned._baseImageBytes!);
+      cloned.setBaseImageOffset(baseImageOffset);
     }
 
     return cloned;
@@ -890,15 +933,17 @@ class Layer {
       case CanvasResizeMode.pad:
         // 裁剪和填充模式：保持笔画原位置，渲染时自动裁剪
         // 不需要变换笔画坐标
-        _needsRasterize = true;
-        _needsComposite = true;
-        _needsThumbnailUpdate = true;
+        _invalidateRasterState();
         break;
 
       case CanvasResizeMode.stretch:
         // 拉伸模式：缩放所有笔画坐标
         final scaleX = newSize.width / oldSize.width;
         final scaleY = newSize.height / oldSize.height;
+        _baseImageOffset = Offset(
+          _baseImageOffset.dx * scaleX,
+          _baseImageOffset.dy * scaleY,
+        );
 
         final transformedStrokes = <StrokeData>[];
         for (final stroke in _strokes) {
@@ -917,16 +962,7 @@ class Layer {
         _strokes.clear();
         _strokes.addAll(transformedStrokes);
         _strokeGeneration++;
-        _rasterizedStrokeCount = 0;
-        _needsRasterize = true;
-        _needsComposite = true;
-        _needsThumbnailUpdate = true;
-
-        // 清除缓存，强制重新生成
-        _rasterizedImage?.dispose();
-        _rasterizedImage = null;
-        _compositedCache?.dispose();
-        _compositedCache = null;
+        _invalidateRasterState();
         break;
     }
   }

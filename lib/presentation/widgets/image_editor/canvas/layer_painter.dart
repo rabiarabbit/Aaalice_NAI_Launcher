@@ -208,6 +208,83 @@ class LayerPainter extends CustomPainter {
   }
 }
 
+class VirtualOutpaintMaskPainter extends CustomPainter {
+  final EditorState state;
+  final List<Rect> maskRects;
+
+  VirtualOutpaintMaskPainter({
+    required this.state,
+    required this.maskRects,
+  }) : super(repaint: state.renderNotifier);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (maskRects.isEmpty) {
+      return;
+    }
+
+    final canvasSize = state.canvasSize;
+    final controller = state.canvasController;
+
+    canvas.save();
+    canvas.translate(controller.offset.dx, controller.offset.dy);
+
+    final centerX = canvasSize.width * controller.scale / 2;
+    final centerY = canvasSize.height * controller.scale / 2;
+
+    if (controller.rotation != 0 || controller.isMirroredHorizontally) {
+      canvas.translate(centerX, centerY);
+
+      if (controller.rotation != 0) {
+        canvas.rotate(controller.rotation);
+      }
+
+      if (controller.isMirroredHorizontally) {
+        canvas.scale(-1.0, 1.0);
+      }
+
+      canvas.translate(-centerX, -centerY);
+    }
+
+    canvas.scale(controller.scale);
+    canvas.clipRect(Rect.fromLTWH(0, 0, canvasSize.width, canvasSize.height));
+
+    final fill = Paint()..color = const Color(0x5560AAFF);
+    final outline = Paint()
+      ..color = const Color(0xFF60AAFF)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0 / controller.scale.clamp(0.01, double.infinity);
+
+    for (final rect in maskRects) {
+      canvas.drawRect(rect, fill);
+      canvas.drawRect(rect, outline);
+    }
+
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant VirtualOutpaintMaskPainter oldDelegate) {
+    return state != oldDelegate.state ||
+        !_rectListsEqual(maskRects, oldDelegate.maskRects);
+  }
+
+  static bool _rectListsEqual(List<Rect> a, List<Rect> b) {
+    if (identical(a, b)) {
+      return true;
+    }
+    if (a.length != b.length) {
+      return false;
+    }
+    for (var i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) {
+        return false;
+      }
+    }
+    return true;
+  }
+}
+
 /// 选区绘制器
 /// 绘制选区蚂蚁线动画
 class SelectionPainter extends CustomPainter {
