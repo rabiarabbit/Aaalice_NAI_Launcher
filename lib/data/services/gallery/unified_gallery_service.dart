@@ -167,6 +167,11 @@ abstract class LocalGalleryService {
   ///
   /// 返回对应的图片记录列表，如果某些路径不存在则跳过
   Future<List<LocalImageRecord>> getRecordsByPaths(List<String> paths);
+
+  /// 获取当前过滤结果中的所有图片路径。
+  ///
+  /// 未应用过滤时返回全部图片；应用搜索/筛选后返回筛选结果。
+  Future<List<String>> getFilteredImagePaths();
 }
 
 /// 画廊服务实现
@@ -541,6 +546,13 @@ class LocalGalleryServiceImpl implements LocalGalleryService {
     final batch = _effectiveFiles.sublist(start, end);
 
     return _loadRecords(batch);
+  }
+
+  @override
+  Future<List<String>> getFilteredImagePaths() async {
+    _ensureInitialized();
+
+    return _effectiveFiles.map((file) => file.path).toList(growable: false);
   }
 
   /// 加载图片记录列表
@@ -1258,6 +1270,9 @@ class ErrorGalleryService implements LocalGalleryService {
   @override
   Future<List<LocalImageRecord>> getRecordsByPaths(List<String> paths) =>
       _throwError();
+
+  @override
+  Future<List<String>> getFilteredImagePaths() => _throwError();
 }
 
 /// 占位服务实现
@@ -1334,4 +1349,7 @@ class _PlaceholderGalleryService implements LocalGalleryService {
   @override
   Future<List<LocalImageRecord>> getRecordsByPaths(List<String> paths) =>
       _throwNotInitialized();
+
+  @override
+  Future<List<String>> getFilteredImagePaths() => _throwNotInitialized();
 }

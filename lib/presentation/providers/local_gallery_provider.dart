@@ -872,6 +872,21 @@ class LocalGalleryNotifier extends _$LocalGalleryNotifier {
     }
   }
 
+  Future<List<String>> getFilteredImagePaths() async {
+    try {
+      final service = await getService();
+      return await service.getFilteredImagePaths();
+    } catch (e) {
+      AppLogger.e(
+        'Get filtered image paths failed',
+        e,
+        null,
+        'LocalGalleryNotifier',
+      );
+      return [];
+    }
+  }
+
   // ============================================================
   // 索引管理
   // ============================================================

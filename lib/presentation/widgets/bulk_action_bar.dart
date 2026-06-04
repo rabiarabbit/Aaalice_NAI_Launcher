@@ -12,11 +12,17 @@ class BulkActionBar extends StatelessWidget {
   /// 是否已全选
   final bool isAllSelected;
 
+  /// 是否已选中全部可用项目（例如全部搜索结果）
+  final bool isAllAvailableSelected;
+
   /// 退出多选模式回调
   final VoidCallback? onExit;
 
   /// 全选/取消全选回调
   final VoidCallback? onSelectAll;
+
+  /// 选择/取消全部可用项目回调
+  final VoidCallback? onSelectAllAvailable;
 
   /// 操作按钮列表
   final List<BulkActionItem> actions;
@@ -27,15 +33,29 @@ class BulkActionBar extends StatelessWidget {
   /// 项目单位名称（如"项"、"Vibe"、"图片"）
   final String itemName;
 
+  /// 当前范围选择标签
+  final String selectAllLabel;
+  final String deselectAllLabel;
+
+  /// 全部可用项目选择标签
+  final String selectAllAvailableLabel;
+  final String deselectAllAvailableLabel;
+
   const BulkActionBar({
     super.key,
     required this.selectedCount,
     required this.isAllSelected,
+    this.isAllAvailableSelected = false,
     this.onExit,
     this.onSelectAll,
+    this.onSelectAllAvailable,
     this.actions = const [],
     this.isVibeLibrary = false,
     this.itemName = '项',
+    this.selectAllLabel = '全选',
+    this.deselectAllLabel = '取消全选',
+    this.selectAllAvailableLabel = '选择全部',
+    this.deselectAllAvailableLabel = '取消全部',
   });
 
   @override
@@ -91,10 +111,23 @@ class BulkActionBar extends StatelessWidget {
               // 全选/取消全选按钮
               _ActionButton(
                 icon: isAllSelected ? Icons.deselect : Icons.select_all,
-                label: isAllSelected ? '取消全选' : '全选',
+                label: isAllSelected ? deselectAllLabel : selectAllLabel,
                 onPressed: onSelectAll,
                 compact: true,
               ),
+              if (onSelectAllAvailable != null) ...[
+                const SizedBox(width: 8),
+                _ActionButton(
+                  icon: isAllAvailableSelected
+                      ? Icons.deselect
+                      : Icons.library_add_check_outlined,
+                  label: isAllAvailableSelected
+                      ? deselectAllAvailableLabel
+                      : selectAllAvailableLabel,
+                  onPressed: onSelectAllAvailable,
+                  compact: true,
+                ),
+              ],
 
               const Spacer(),
 
