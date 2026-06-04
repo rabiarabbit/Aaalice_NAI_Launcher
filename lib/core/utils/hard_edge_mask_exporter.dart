@@ -80,6 +80,8 @@ class HardEdgeMaskRectOperation extends HardEdgeMaskOperation {
 class HardEdgeMaskExporter {
   const HardEdgeMaskExporter._();
 
+  static const int _transparentAlphaThreshold = 8;
+
   static Future<Uint8List> exportAsync(HardEdgeMaskExportInput input) {
     return Isolate.run(() => export(input));
   }
@@ -142,6 +144,11 @@ class HardEdgeMaskExporter {
     img.Image mask,
     HardEdgeMaskBaseImage baseMask,
   ) {
+    final source = img.decodeImage(baseMask.bytes);
+    if (source == null) {
+      return;
+    }
+
     final normalizedBytes = InpaintMaskUtils.normalizeMaskBytes(baseMask.bytes);
     final base = img.decodeImage(normalizedBytes);
     if (base == null) {
@@ -160,10 +167,13 @@ class HardEdgeMaskExporter {
           continue;
         }
 
-        final pixel = base.getPixel(x, y);
-        if (pixel.r.toInt() > 0) {
-          _setMaskPixel(mask, targetX, targetY, masked: true);
+        final sourcePixel = source.getPixel(x, y);
+        if (sourcePixel.a.toInt() <= _transparentAlphaThreshold) {
+          continue;
         }
+
+        final pixel = base.getPixel(x, y);
+        _setMaskPixel(mask, targetX, targetY, masked: pixel.r.toInt() > 0);
       }
     }
   }

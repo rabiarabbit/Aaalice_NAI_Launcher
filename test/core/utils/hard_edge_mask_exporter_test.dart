@@ -282,6 +282,50 @@ void main() {
     expect(_redAt(exportedMask, 11, 11), equals(_redAt(expectedMask, 11, 11)));
   });
 
+  test(
+    'ImageExporterNew CPU export preserves base mask black and transparency',
+    () async {
+      final layerManager = LayerManager();
+      addTearDown(layerManager.dispose);
+
+      final strokeLayer = layerManager.addLayer();
+      strokeLayer.addStroke(
+        StrokeData(
+          points: const [Offset(0, 0.5), Offset(2.5, 0.5)],
+          size: 2,
+          color: const Color(0xFFFFFFFF),
+          opacity: 1,
+          hardness: 1,
+        ),
+      );
+
+      final importedMaskLayer = layerManager.addLayer();
+      await importedMaskLayer.setBaseImage(_blackWhiteTransparentPng());
+
+      final cpuExported = await ImageExporterNew.exportMaskFromLayers(
+        layerManager,
+        const Size(4, 2),
+        forceHardEdges: true,
+        preferCpuHardEdgeExport: true,
+      );
+      final canvasExported = await ImageExporterNew.exportMaskFromLayers(
+        layerManager,
+        const Size(4, 2),
+        forceHardEdges: true,
+        preferCpuHardEdgeExport: false,
+      );
+
+      final cpuMask = img.decodeImage(cpuExported)!;
+      final canvasMask = img.decodeImage(canvasExported)!;
+      expect(_redAt(canvasMask, 0, 0), equals(0));
+      expect(_redAt(canvasMask, 1, 0), equals(255));
+      expect(_redAt(canvasMask, 2, 0), equals(255));
+      expect(_redAt(cpuMask, 0, 0), equals(_redAt(canvasMask, 0, 0)));
+      expect(_redAt(cpuMask, 1, 0), equals(_redAt(canvasMask, 1, 0)));
+      expect(_redAt(cpuMask, 2, 0), equals(_redAt(canvasMask, 2, 0)));
+    },
+  );
+
   test('ImageExporterNew Canvas fallback honors base mask layer offsets',
       () async {
     final layerManager = LayerManager();
@@ -326,6 +370,14 @@ void main() {
 Uint8List _singleWhitePixelPng() {
   final base = img.Image(width: 1, height: 1, numChannels: 4);
   base.setPixelRgba(0, 0, 255, 255, 255, 255);
+  return Uint8List.fromList(img.encodePng(base));
+}
+
+Uint8List _blackWhiteTransparentPng() {
+  final base = img.Image(width: 3, height: 1, numChannels: 4);
+  base.setPixelRgba(0, 0, 0, 0, 0, 255);
+  base.setPixelRgba(1, 0, 255, 255, 255, 255);
+  base.setPixelRgba(2, 0, 0, 0, 0, 0);
   return Uint8List.fromList(img.encodePng(base));
 }
 
