@@ -435,6 +435,10 @@ class _LocalGalleryToolbarState extends ConsumerState<LocalGalleryToolbar> {
                   ),
                 ],
               ),
+              if (state.filterCriteria.selectedTags.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                _buildSelectedTagChips(theme, state),
+              ],
             ],
           ),
         ),
@@ -457,7 +461,7 @@ class _LocalGalleryToolbarState extends ConsumerState<LocalGalleryToolbar> {
         focusNode: _searchFocusNode,
         style: theme.textTheme.bodyMedium,
         decoration: InputDecoration(
-          hintText: '搜索文件名或 Prompt...',
+          hintText: '搜索文件名/Prompt，逗号分隔交集搜索...',
           hintStyle: TextStyle(
             color: theme.colorScheme.onSurfaceVariant.withOpacity(0.5),
             fontSize: 13,
@@ -519,11 +523,51 @@ class _LocalGalleryToolbarState extends ConsumerState<LocalGalleryToolbar> {
       focusNode: _searchFocusNode,
       asyncStrategy: _searchStrategyFuture!,
       onSuggestionSelected: (value) {
-        // 选择补全建议后立即触发搜索
+        // 选择补全建议后仍然作为搜索框文本处理，不转为标签 chip。
         _debounceTimer?.cancel();
         ref.read(localGalleryNotifierProvider.notifier).setSearchQuery(value);
       },
       child: searchField,
+    );
+  }
+
+  Widget _buildSelectedTagChips(ThemeData theme, LocalGalleryState state) {
+    final tags = state.filterCriteria.selectedTags;
+
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Wrap(
+        spacing: 6,
+        runSpacing: 6,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(right: 2),
+            child: Text(
+              '标签交集',
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.colorScheme.primary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          for (final tag in tags)
+            InputChip(
+              avatar: const Icon(Icons.tag, size: 14),
+              label: Text(tag),
+              onDeleted: () {
+                ref
+                    .read(localGalleryNotifierProvider.notifier)
+                    .removeSelectedTag(tag);
+              },
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              visualDensity: VisualDensity.compact,
+              side: BorderSide(
+                color: theme.colorScheme.primary.withValues(alpha: 0.35),
+              ),
+            ),
+        ],
+      ),
     );
   }
 

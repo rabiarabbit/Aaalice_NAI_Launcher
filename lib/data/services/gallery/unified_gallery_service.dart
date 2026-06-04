@@ -185,6 +185,8 @@ class LocalGalleryServiceImpl implements LocalGalleryService {
   List<File> _allFiles = [];
   List<File> _filteredFiles = [];
   FilterCriteria _currentFilter = const FilterCriteria();
+  int _filterGeneration = 0;
+  String? _activeFilterOperationId;
   int _pageSize = 50;
 
   LocalGalleryServiceImpl({
@@ -815,22 +817,49 @@ class LocalGalleryServiceImpl implements LocalGalleryService {
   Future<void> applyFilter(FilterCriteria criteria) async {
     _ensureInitialized();
 
+    final generation = ++_filterGeneration;
+    final previousOperationId = _activeFilterOperationId;
+    if (previousOperationId != null) {
+      _filterService.cancelFilter(previousOperationId);
+      _activeFilterOperationId = null;
+    }
+
     _currentFilter = criteria;
 
     if (!criteria.hasFilters) {
-      _filteredFiles = _allFiles;
+      if (generation == _filterGeneration) {
+        _filteredFiles = _allFiles;
+      }
       return;
     }
 
+    final operationId = 'local_gallery_filter_$generation';
+    _activeFilterOperationId = operationId;
+
     try {
-      final result = await _filterService.applyFilters(_allFiles, criteria);
+      final result = await _filterService.applyFilters(
+        _allFiles,
+        criteria,
+        operationId: operationId,
+      );
+      if (generation != _filterGeneration || _currentFilter != criteria) {
+        return;
+      }
       _filteredFiles = result.files;
+    } on FilterCancelledException {
+      if (generation == _filterGeneration) {
+        rethrow;
+      }
     } catch (e) {
       throw GalleryFilterException(
         filterCriteria: criteria.toString(),
         message: 'Failed to apply filter',
         cause: e,
       );
+    } finally {
+      if (_activeFilterOperationId == operationId) {
+        _activeFilterOperationId = null;
+      }
     }
   }
 

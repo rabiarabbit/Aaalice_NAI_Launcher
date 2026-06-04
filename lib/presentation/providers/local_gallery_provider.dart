@@ -109,6 +109,7 @@ class LocalGalleryState with _$LocalGalleryState {
 class LocalGalleryNotifier extends _$LocalGalleryNotifier {
   LocalGalleryState? _cachedState;
   LocalGalleryService? _service;
+  int _filterRequestSerial = 0;
 
   @override
   LocalGalleryState build() {
@@ -131,6 +132,7 @@ class LocalGalleryNotifier extends _$LocalGalleryNotifier {
   void _resetState() {
     _cachedState = null;
     _service = null;
+    _filterRequestSerial++;
     _setState(const LocalGalleryState());
   }
 
@@ -538,6 +540,69 @@ class LocalGalleryNotifier extends _$LocalGalleryNotifier {
     await _applyFilters();
   }
 
+  Future<void> setSelectedTags(List<String> tags) async {
+    final normalizedTags = _normalizeSelectedTags(tags);
+    final criteria = state.filterCriteria;
+    if (_sameStringList(criteria.selectedTags, normalizedTags)) return;
+
+    _setState(
+      state.copyWith(
+        filterCriteria: criteria.copyWith(selectedTags: normalizedTags),
+        currentPage: 0,
+      ),
+    );
+
+    await _applyFilters();
+  }
+
+  Future<void> addSelectedTags(
+    List<String> tags, {
+    bool clearSearchQuery = false,
+  }) async {
+    final criteria = state.filterCriteria;
+    final nextTags = _normalizeSelectedTags([
+      ...criteria.selectedTags,
+      ...tags,
+    ]);
+
+    if (_sameStringList(criteria.selectedTags, nextTags) &&
+        (!clearSearchQuery || criteria.searchQuery.isEmpty)) {
+      return;
+    }
+
+    _setState(
+      state.copyWith(
+        filterCriteria: criteria.copyWith(
+          searchQuery: clearSearchQuery ? '' : criteria.searchQuery,
+          selectedTags: nextTags,
+        ),
+        currentPage: 0,
+      ),
+    );
+
+    await _applyFilters();
+  }
+
+  Future<void> removeSelectedTag(String tag) async {
+    final normalizedTag = _normalizeTagKey(tag);
+    if (normalizedTag.isEmpty) return;
+
+    final criteria = state.filterCriteria;
+    final nextTags = criteria.selectedTags
+        .where((item) => _normalizeTagKey(item) != normalizedTag)
+        .toList(growable: false);
+    if (_sameStringList(criteria.selectedTags, nextTags)) return;
+
+    _setState(
+      state.copyWith(
+        filterCriteria: criteria.copyWith(selectedTags: nextTags),
+        currentPage: 0,
+      ),
+    );
+
+    await _applyFilters();
+  }
+
   Future<void> setDateRange(DateTime? start, DateTime? end) async {
     final criteria = state.filterCriteria;
     if (criteria.dateStart == start && criteria.dateEnd == end) return;
@@ -742,6 +807,7 @@ class LocalGalleryNotifier extends _$LocalGalleryNotifier {
     try {
       final service = await getService();
       final criteria = state.filterCriteria;
+      final requestSerial = ++_filterRequestSerial;
 
       // 【调试】记录过滤条件详情
       AppLogger.d(
@@ -756,6 +822,15 @@ class LocalGalleryNotifier extends _$LocalGalleryNotifier {
       );
 
       await service.applyFilter(criteria);
+
+      if (requestSerial != _filterRequestSerial ||
+          state.filterCriteria != criteria) {
+        AppLogger.d(
+          'Ignoring stale filter result: search="${criteria.searchQuery}", tags=${criteria.selectedTags}',
+          'LocalGalleryNotifier',
+        );
+        return;
+      }
 
       // 【调试】记录过滤结果
       AppLogger.d(
@@ -1039,6 +1114,44 @@ class LocalGalleryNotifier extends _$LocalGalleryNotifier {
   /// 清除错误状态
   void clearError() {
     _setState(state.copyWith(error: null));
+  }
+
+  List<String> _normalizeSelectedTags(List<String> tags) {
+    final result = <String>[];
+    final seen = <String>{};
+
+    for (final tag in tags) {
+      final trimmed = tag.trim();
+      final key = _normalizeTagKey(trimmed);
+      if (key.isEmpty || seen.contains(key)) continue;
+
+      seen.add(key);
+      result.add(trimmed);
+    }
+
+    return List.unmodifiable(result);
+  }
+
+  String _normalizeTagKey(String tag) {
+    return tag
+        .toLowerCase()
+        .replaceAll('_', ' ')
+        .replaceAll(
+          RegExp(r'\s+'),
+          ' ',
+        )
+        .trim();
+  }
+
+  bool _sameStringList(List<String> a, List<String> b) {
+    if (identical(a, b)) return true;
+    if (a.length != b.length) return false;
+
+    for (var i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+
+    return true;
   }
 }
 
