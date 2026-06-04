@@ -637,6 +637,13 @@ void main() {
         sourceWidth: 128,
         sourceHeight: 96,
       );
+      final expectedGeometry = InpaintOutpaintUtils.resolveFrameGeometry(
+        sourceWidth: frame.width,
+        sourceHeight: frame.height,
+        delta: const OutpaintFrameDelta(left: 33, top: 33),
+        horizontalSnapTarget: OutpaintHorizontalSnapTarget.left,
+        verticalSnapTarget: OutpaintVerticalSnapTarget.top,
+      );
 
       final result = frame.applyDelta(
         const OutpaintFrameDelta(left: 33, top: 33),
@@ -644,14 +651,29 @@ void main() {
         verticalSnapTarget: OutpaintVerticalSnapTarget.top,
       );
 
-      expect(result.frame.canvasSize, equals(const Size(192, 160)));
-      expect(result.frame.sourceDrawOffset, equals(const Offset(64, 64)));
-      expect(result.contentShift, equals(const Offset(64, 64)));
+      expect(result.geometry.width, expectedGeometry.width);
+      expect(result.geometry.height, expectedGeometry.height);
+      expect(
+        result.geometry.appliedFrameLeft,
+        expectedGeometry.appliedFrameLeft,
+      );
+      expect(result.geometry.appliedFrameTop, expectedGeometry.appliedFrameTop);
+      expect(
+        result.geometry.appliedFrameRight,
+        expectedGeometry.appliedFrameRight,
+      );
+      expect(
+        result.geometry.appliedFrameBottom,
+        expectedGeometry.appliedFrameBottom,
+      );
+      expect(result.frame.canvasSize, equals(const Size(192, 128)));
+      expect(result.frame.sourceDrawOffset, equals(const Offset(64, 32)));
+      expect(result.contentShift, equals(const Offset(64, 32)));
       expect(
         result.outpaintMaskRects,
         equals([
-          const Rect.fromLTWH(0, 0, 192, 64),
-          const Rect.fromLTWH(0, 64, 64, 96),
+          const Rect.fromLTWH(0, 0, 192, 32),
+          const Rect.fromLTWH(0, 32, 64, 96),
         ]),
       );
     });

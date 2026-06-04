@@ -350,57 +350,13 @@ class OutpaintVirtualFrame {
     OutpaintVerticalSnapTarget verticalSnapTarget =
         OutpaintVerticalSnapTarget.bottom,
   }) {
-    final requestedFrameLeft = -delta.left;
-    final requestedFrameTop = -delta.top;
-    final requestedFrameRight = width + delta.right;
-    final requestedFrameBottom = height + delta.bottom;
-    final requestedWidth = requestedFrameRight - requestedFrameLeft;
-    final requestedHeight = requestedFrameBottom - requestedFrameTop;
-
-    final appliedFrameLeft = -_resolveVirtualEdgeDelta(delta.left, snapTo64);
-    final appliedFrameTop = -_resolveVirtualEdgeDelta(delta.top, snapTo64);
-    final appliedFrameRight =
-        width + _resolveVirtualEdgeDelta(delta.right, snapTo64);
-    final appliedFrameBottom =
-        height + _resolveVirtualEdgeDelta(delta.bottom, snapTo64);
-    final nextWidth = appliedFrameRight - appliedFrameLeft;
-    final nextHeight = appliedFrameBottom - appliedFrameTop;
-
-    InpaintOutpaintUtils._validateExpandedDimensions(nextWidth, nextHeight);
-
-    final appliedExpansionEdges = OutpaintEdges(
-      left: appliedFrameLeft < 0 ? -appliedFrameLeft : 0,
-      top: appliedFrameTop < 0 ? -appliedFrameTop : 0,
-      right: appliedFrameRight > width ? appliedFrameRight - width : 0,
-      bottom: appliedFrameBottom > height ? appliedFrameBottom - height : 0,
-    );
-    final appliedCropEdges = OutpaintEdges(
-      left: appliedFrameLeft > 0 ? appliedFrameLeft : 0,
-      top: appliedFrameTop > 0 ? appliedFrameTop : 0,
-      right: appliedFrameRight < width ? width - appliedFrameRight : 0,
-      bottom: appliedFrameBottom < height ? height - appliedFrameBottom : 0,
-    );
-
-    final geometry = OutpaintFrameResolvedGeometry(
+    final geometry = InpaintOutpaintUtils.resolveFrameGeometry(
       sourceWidth: width,
       sourceHeight: height,
-      requestedWidth: requestedWidth,
-      requestedHeight: requestedHeight,
-      width: nextWidth,
-      height: nextHeight,
-      requestedFrameLeft: requestedFrameLeft,
-      requestedFrameTop: requestedFrameTop,
-      requestedFrameRight: requestedFrameRight,
-      requestedFrameBottom: requestedFrameBottom,
-      appliedFrameLeft: appliedFrameLeft,
-      appliedFrameTop: appliedFrameTop,
-      appliedFrameRight: appliedFrameRight,
-      appliedFrameBottom: appliedFrameBottom,
-      requestedDelta: delta,
-      requestedExpansionEdges: delta.expansionEdges,
-      requestedCropEdges: delta.cropEdges,
-      appliedExpansionEdges: appliedExpansionEdges,
-      appliedCropEdges: appliedCropEdges,
+      delta: delta,
+      snapTo64: snapTo64,
+      horizontalSnapTarget: horizontalSnapTarget,
+      verticalSnapTarget: verticalSnapTarget,
     );
 
     final nextFrameLeft = frameLeft + geometry.appliedFrameLeft;
@@ -422,23 +378,6 @@ class OutpaintVirtualFrame {
         (frameTop - nextFrameTop).toDouble(),
       ),
     );
-  }
-
-  static int _resolveVirtualEdgeDelta(int delta, bool snapTo64) {
-    if (!snapTo64 || delta == 0) {
-      return delta;
-    }
-
-    final magnitude = delta.abs();
-    final lower = (magnitude ~/ InpaintOutpaintUtils._snapSize) *
-        InpaintOutpaintUtils._snapSize;
-    final upper =
-        lower == magnitude ? lower : lower + InpaintOutpaintUtils._snapSize;
-    final lowerDistance = magnitude - lower;
-    final upperDistance = upper - magnitude;
-    final snappedMagnitude = upperDistance < lowerDistance ? upper : lower;
-
-    return delta.isNegative ? -snappedMagnitude : snappedMagnitude;
   }
 }
 
