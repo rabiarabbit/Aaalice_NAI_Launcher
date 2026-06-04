@@ -1,5 +1,5 @@
 // 独立的 NAI 元数据提取脚本 (纯 Dart，不依赖 Flutter)
-// 用法: dart run tool/extract_metadata.dart <image_path>
+// 用法: dart run tool/metadata/extract_metadata.dart <image_path>
 
 import 'dart:convert';
 import 'dart:io';
@@ -11,7 +11,7 @@ const String _magic = 'stealth_pngcomp';
 
 void main(List<String> args) async {
   if (args.isEmpty) {
-    print('用法: dart run tool/extract_metadata.dart <image_path>');
+    print('用法: dart run tool/metadata/extract_metadata.dart <image_path>');
     exit(1);
   }
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env dart
 // 诊断工具：检查固定词和词库的同步状态
-// 用法: dart tools/diagnose_sync.dart
+// 用法: dart run tool/diagnostics/diagnose_sync.dart
 
 import 'dart:convert';
 import 'dart:io';

@@ -7,16 +7,16 @@ import 'package:archive/archive.dart';
 /// 支持解析 PNG、.naiv4vibe、.naiv4vibebundle 文件
 ///
 /// 使用方法:
-///   dart run vibe_analyzer.dart <文件路径>
+///   dart run tool/vibe/vibe_analyzer.dart <文件路径>
 ///
 /// 示例:
-///   dart run vibe_analyzer.dart "E:\\Download\\test.png"
-///   dart run vibe_analyzer.dart "E:\\Download\\test.naiv4vibe"
-///   dart run vibe_analyzer.dart "E:\\Download\\test.naiv4vibebundle"
+///   dart run tool/vibe/vibe_analyzer.dart "E:\\Download\\test.png"
+///   dart run tool/vibe/vibe_analyzer.dart "E:\\Download\\test.naiv4vibe"
+///   dart run tool/vibe/vibe_analyzer.dart "E:\\Download\\test.naiv4vibebundle"
 
 void main(List<String> args) async {
   if (args.isEmpty) {
-    print('Usage: dart run vibe_analyzer.dart <file_path>');
+    print('Usage: dart run tool/vibe/vibe_analyzer.dart <file_path>');
     print('');
     print('Supported formats:');
     print('  - PNG files with NAI vibe metadata');
