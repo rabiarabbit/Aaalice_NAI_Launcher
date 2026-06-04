@@ -30,14 +30,21 @@ class LayerManager extends ChangeNotifier {
 
   // ===== 批量操作支持 =====
 
+  /// 批量操作嵌套深度
+  int _batchDepth = 0;
+
   /// 是否处于批量操作模式
-  bool _isBatchMode = false;
+  bool get _isBatchMode => _batchDepth > 0;
 
   /// 批量操作期间是否有结构变化（图层增删、排序）
   bool _pendingStructureChange = false;
 
   /// 批量操作期间是否有内容变化（笔画添加）
   bool _pendingContentChange = false;
+
+  bool _pendingActiveLayerNotification = false;
+  String? _pendingActiveLayerId;
+  final Map<String, bool> _pendingLayerActiveValues = {};
 
   // ===== 快照缓存管理器 =====
 
@@ -55,17 +62,14 @@ class LayerManager extends ChangeNotifier {
   /// 内部设置活动图层ID（同时更新 activeLayerNotifier 和 isActiveNotifier）
   void _setActiveLayerIdInternal(String? layerId) {
     // 旧活动图层：通知变为非活动
-    final oldLayer = getLayerById(_activeLayerId ?? '');
-    oldLayer?.isActiveNotifier.value = false;
+    final oldLayerId = _activeLayerId;
+    _setLayerActiveNotifierValue(oldLayerId, false);
 
     _activeLayerId = layerId;
-    activeLayerNotifier.value = layerId;
+    _setActiveLayerNotifierValue(layerId);
 
     // 新活动图层：通知变为活动
-    if (layerId != null) {
-      final newLayer = getLayerById(layerId);
-      newLayer?.isActiveNotifier.value = true;
-    }
+    _setLayerActiveNotifierValue(layerId, true);
   }
 
   /// 仅通知UI更新（不触发画布重绘）
@@ -111,8 +115,7 @@ class LayerManager extends ChangeNotifier {
     }
 
     _setActiveLayerIdInternal(layer.id);
-    invalidateSnapshot();
-    notifyListeners();
+    _markStructureChanged();
     return layer;
   }
 
@@ -134,8 +137,7 @@ class LayerManager extends ChangeNotifier {
       _setActiveLayerIdInternal(layer.id);
     }
 
-    invalidateSnapshot();
-    notifyListeners();
+    _markStructureChanged();
     return layer;
   }
 
@@ -168,8 +170,7 @@ class LayerManager extends ChangeNotifier {
     }
 
     _setActiveLayerIdInternal(layer.id);
-    invalidateSnapshot();
-    notifyListeners();
+    _markStructureChanged();
     return layer;
   }
 
@@ -178,8 +179,7 @@ class LayerManager extends ChangeNotifier {
     if (layer == null) return false;
 
     await layer.setBaseImage(imageBytes);
-    invalidateSnapshot();
-    notifyListeners();
+    _markContentChanged();
     return true;
   }
 
@@ -195,8 +195,7 @@ class LayerManager extends ChangeNotifier {
 
     _layers.add(layer);
     _setActiveLayerIdInternal(layer.id);
-    invalidateSnapshot();
-    notifyListeners();
+    _markStructureChanged();
     return layer;
   }
 
@@ -219,8 +218,7 @@ class LayerManager extends ChangeNotifier {
       }
     }
 
-    invalidateSnapshot();
-    notifyListeners();
+    _markStructureChanged();
     return true;
   }
 
@@ -234,8 +232,7 @@ class LayerManager extends ChangeNotifier {
     _layers.insert(index + 1, cloned);
     _setActiveLayerIdInternal(cloned.id);
 
-    invalidateSnapshot();
-    notifyListeners();
+    _markStructureChanged();
     return cloned;
   }
 
@@ -256,7 +253,7 @@ class LayerManager extends ChangeNotifier {
       // 内部删除上层（不触发通知）
       _removeLayerInternal(topLayerId);
       _setActiveLayerIdInternal(bottomLayerId);
-      _pendingStructureChange = true;
+      _markStructureChanged();
     } finally {
       endBatch();
     }
@@ -313,8 +310,8 @@ class LayerManager extends ChangeNotifier {
       // 添加合并后的图层
       _layers.add(merged);
       _setActiveLayerIdInternal(merged.id);
-      _pendingStructureChange = true;
-      _pendingContentChange = true;
+      _markStructureChanged();
+      _markContentChanged();
     } finally {
       endBatch();
     }
@@ -349,8 +346,8 @@ class LayerManager extends ChangeNotifier {
       // 添加展平后的图层
       _layers.add(flattened);
       _setActiveLayerIdInternal(flattened.id);
-      _pendingStructureChange = true;
-      _pendingContentChange = true;
+      _markStructureChanged();
+      _markContentChanged();
     } finally {
       endBatch();
     }
@@ -366,8 +363,7 @@ class LayerManager extends ChangeNotifier {
 
     final layer = _layers.removeAt(oldIndex);
     _layers.insert(newIndex, layer);
-    invalidateSnapshot();
-    notifyListeners();
+    _markStructureChanged();
   }
 
   /// 上移图层
@@ -395,16 +391,15 @@ class LayerManager extends ChangeNotifier {
     if (_activeLayerId == layerId) return; // 避免重复设置
 
     // 旧活动图层：通知变为非活动（O(1) rebuild）
-    final oldLayer = getLayerById(_activeLayerId ?? '');
-    oldLayer?.isActiveNotifier.value = false;
+    _setLayerActiveNotifierValue(_activeLayerId, false);
 
     // 新活动图层：通知变为活动（O(1) rebuild）
     final newLayer = getLayerById(layerId);
     if (newLayer != null) {
-      newLayer.isActiveNotifier.value = true;
       _activeLayerId = layerId;
       // 保持兼容：更新全局通知器（其他需要监听活动图层的组件）
-      activeLayerNotifier.value = layerId;
+      _setLayerActiveNotifierValue(layerId, true);
+      _setActiveLayerNotifierValue(layerId);
     }
   }
 
@@ -422,8 +417,7 @@ class LayerManager extends ChangeNotifier {
     final layer = getLayerById(layerId);
     if (layer != null) {
       layer.visible = !layer.visible;
-      invalidateSnapshot();
-      notifyListeners();
+      _markContentChanged();
     }
   }
 
@@ -442,8 +436,7 @@ class LayerManager extends ChangeNotifier {
     if (layer != null) {
       layer.opacity = opacity.clamp(0.0, 1.0);
       layer.markNeedsUpdate();
-      invalidateSnapshot();
-      notifyListeners();
+      _markContentChanged();
     }
   }
 
@@ -452,8 +445,7 @@ class LayerManager extends ChangeNotifier {
     final layer = getLayerById(layerId);
     if (layer != null) {
       layer.blendMode = mode;
-      invalidateSnapshot();
-      notifyListeners();
+      _markContentChanged();
     }
   }
 
@@ -471,8 +463,7 @@ class LayerManager extends ChangeNotifier {
     final layer = getLayerById(layerId);
     if (layer != null && !layer.locked) {
       layer.addStroke(stroke);
-      invalidateSnapshot();
-      notifyListeners();
+      _markContentChanged();
     }
   }
 
@@ -481,8 +472,7 @@ class LayerManager extends ChangeNotifier {
     final layer = activeLayer;
     if (layer != null && !layer.locked) {
       layer.addStroke(stroke);
-      invalidateSnapshot();
-      notifyListeners();
+      _markContentChanged();
     }
   }
 
@@ -493,8 +483,7 @@ class LayerManager extends ChangeNotifier {
       final stroke = layer.removeLastStroke();
       // 仅在实际删除笔画时通知（避免无效重绘）
       if (stroke != null) {
-        invalidateSnapshot();
-        notifyListeners();
+        _markContentChanged();
       }
       return stroke;
     }
@@ -506,8 +495,7 @@ class LayerManager extends ChangeNotifier {
     final layer = getLayerById(layerId);
     if (layer != null && !layer.locked) {
       layer.clearStrokes();
-      invalidateSnapshot();
-      notifyListeners();
+      _markContentChanged();
     }
   }
 
@@ -525,8 +513,7 @@ class LayerManager extends ChangeNotifier {
     }
     _layers.clear();
     _setActiveLayerIdInternal(null);
-    invalidateSnapshot();
-    notifyListeners();
+    _markStructureChanged();
   }
 
   /// 变换所有图层内容以适应新画布尺寸
@@ -543,12 +530,10 @@ class LayerManager extends ChangeNotifier {
       for (final layer in _layers) {
         layer.transformContent(oldSize, newSize, mode);
       }
-      _pendingContentChange = true;
+      _markContentChanged();
     } finally {
       endBatch();
     }
-
-    invalidateSnapshot();
   }
 
   /// 更新所有缩略图
@@ -614,22 +599,114 @@ class LayerManager extends ChangeNotifier {
   /// 开始批量操作（合并图层、展平等）
   /// 在批量操作期间，不会触发中间通知
   void beginBatch() {
-    _isBatchMode = true;
-    _pendingStructureChange = false;
-    _pendingContentChange = false;
+    _batchDepth++;
   }
 
   /// 结束批量操作，发送单次通知
   void endBatch() {
-    _isBatchMode = false;
+    if (_batchDepth == 0) {
+      return;
+    }
+
+    _batchDepth--;
+    if (_batchDepth > 0) {
+      return;
+    }
+
     if (_pendingStructureChange || _pendingContentChange) {
       if (_pendingContentChange) {
         invalidateSnapshot();
       }
+      _flushPendingActiveLayerNotifications();
       notifyListeners();
+    } else {
+      _flushPendingActiveLayerNotifications();
     }
     _pendingStructureChange = false;
     _pendingContentChange = false;
+  }
+
+  /// 在同步批量操作中合并多次结构/内容通知。
+  T runBatch<T>(T Function() body) {
+    beginBatch();
+    try {
+      return body();
+    } finally {
+      endBatch();
+    }
+  }
+
+  /// 在异步批量操作中合并多次结构/内容通知。
+  Future<T> runBatchAsync<T>(Future<T> Function() body) async {
+    beginBatch();
+    try {
+      return await body();
+    } finally {
+      endBatch();
+    }
+  }
+
+  void _markStructureChanged() {
+    if (_isBatchMode) {
+      _pendingStructureChange = true;
+      _pendingContentChange = true;
+      return;
+    }
+
+    invalidateSnapshot();
+    notifyListeners();
+  }
+
+  void _markContentChanged() {
+    if (_isBatchMode) {
+      _pendingContentChange = true;
+      return;
+    }
+
+    invalidateSnapshot();
+    notifyListeners();
+  }
+
+  void _setActiveLayerNotifierValue(String? layerId) {
+    if (_isBatchMode) {
+      _pendingActiveLayerNotification = true;
+      _pendingActiveLayerId = layerId;
+      return;
+    }
+
+    activeLayerNotifier.value = layerId;
+  }
+
+  void _setLayerActiveNotifierValue(String? layerId, bool value) {
+    if (layerId == null) {
+      return;
+    }
+
+    if (_isBatchMode) {
+      _pendingLayerActiveValues[layerId] = value;
+      return;
+    }
+
+    final layer = getLayerById(layerId);
+    layer?.isActiveNotifier.value = value;
+  }
+
+  void _flushPendingActiveLayerNotifications() {
+    if (!_pendingActiveLayerNotification && _pendingLayerActiveValues.isEmpty) {
+      return;
+    }
+
+    for (final entry in _pendingLayerActiveValues.entries) {
+      final layer = getLayerById(entry.key);
+      layer?.isActiveNotifier.value = entry.value;
+    }
+    _pendingLayerActiveValues.clear();
+
+    if (_pendingActiveLayerNotification) {
+      activeLayerNotifier.value = _pendingActiveLayerId;
+      _pendingActiveLayerNotification = false;
+      _pendingActiveLayerId = null;
+    }
   }
 
   /// 批量添加笔画（不触发中间通知）
@@ -643,12 +720,7 @@ class LayerManager extends ChangeNotifier {
       layer.addStrokeInternal(stroke);
     }
 
-    if (_isBatchMode) {
-      _pendingContentChange = true;
-    } else {
-      invalidateSnapshot();
-      notifyListeners();
-    }
+    _markContentChanged();
   }
 
   // ===== 快照缓存方法（代理到 CanvasSnapshotManager）=====

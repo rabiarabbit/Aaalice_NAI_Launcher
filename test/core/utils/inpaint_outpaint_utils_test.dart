@@ -5,6 +5,127 @@ import 'package:image/image.dart' as img;
 import 'package:nai_launcher/core/utils/inpaint_outpaint_utils.dart';
 
 void main() {
+  group('InpaintOutpaintUtils.resolveExpansionGeometry', () {
+    test('resolves requested, snapped, applied, and source offset geometry',
+        () {
+      final geometry = InpaintOutpaintUtils.resolveExpansionGeometry(
+        sourceWidth: 1024,
+        sourceHeight: 1216,
+        edges: const OutpaintEdges(
+          left: 200,
+          top: 200,
+          right: 200,
+          bottom: 200,
+        ),
+        horizontalSnapTarget: OutpaintHorizontalSnapTarget.left,
+        verticalSnapTarget: OutpaintVerticalSnapTarget.top,
+      );
+
+      expect(geometry.sourceWidth, equals(1024));
+      expect(geometry.sourceHeight, equals(1216));
+      expect(geometry.requestedWidth, equals(1424));
+      expect(geometry.requestedHeight, equals(1616));
+      expect(geometry.width, equals(1472));
+      expect(geometry.height, equals(1664));
+      expect(geometry.sourceOffsetX, equals(248));
+      expect(geometry.sourceOffsetY, equals(248));
+      expect(geometry.requestedEdges.left, equals(200));
+      expect(geometry.requestedEdges.top, equals(200));
+      expect(geometry.requestedEdges.right, equals(200));
+      expect(geometry.requestedEdges.bottom, equals(200));
+      expect(geometry.appliedEdges.left, equals(248));
+      expect(geometry.appliedEdges.top, equals(248));
+      expect(geometry.appliedEdges.right, equals(200));
+      expect(geometry.appliedEdges.bottom, equals(200));
+    });
+
+    test('preserves requested geometry when snapping is disabled', () {
+      final geometry = InpaintOutpaintUtils.resolveExpansionGeometry(
+        sourceWidth: 128,
+        sourceHeight: 96,
+        edges: const OutpaintEdges(left: 17, top: 23, right: 31, bottom: 41),
+        snapTo64: false,
+      );
+
+      expect(geometry.requestedWidth, equals(176));
+      expect(geometry.requestedHeight, equals(160));
+      expect(geometry.width, equals(176));
+      expect(geometry.height, equals(160));
+      expect(geometry.sourceOffsetX, equals(17));
+      expect(geometry.sourceOffsetY, equals(23));
+      expect(geometry.appliedEdges.left, equals(17));
+      expect(geometry.appliedEdges.top, equals(23));
+      expect(geometry.appliedEdges.right, equals(31));
+      expect(geometry.appliedEdges.bottom, equals(41));
+    });
+
+    test('rejects negative outpaint edges with expand-compatible message', () {
+      expect(
+        () => InpaintOutpaintUtils.resolveExpansionGeometry(
+          sourceWidth: 128,
+          sourceHeight: 96,
+          edges: const OutpaintEdges(top: -1),
+        ),
+        throwsA(
+          isA<ArgumentError>().having(
+            (error) => error.message,
+            'message',
+            'Outpaint edges must be non-negative',
+          ),
+        ),
+      );
+    });
+
+    test('rejects snapped dimensions above the 4096 limit', () {
+      expect(
+        () => InpaintOutpaintUtils.resolveExpansionGeometry(
+          sourceWidth: 4096,
+          sourceHeight: 4096,
+          edges: const OutpaintEdges(right: 1),
+        ),
+        throwsA(
+          isA<ArgumentError>().having(
+            (error) => error.message,
+            'message',
+            'Expanded image dimensions exceed 4096',
+          ),
+        ),
+      );
+    });
+
+    test('matches expand result metadata', () {
+      final sourceImage = _sourcePng(128, 96);
+      const edges = OutpaintEdges(left: 24, top: 10, right: 13, bottom: 9);
+      final geometry = InpaintOutpaintUtils.resolveExpansionGeometry(
+        sourceWidth: 128,
+        sourceHeight: 96,
+        edges: edges,
+        horizontalSnapTarget: OutpaintHorizontalSnapTarget.left,
+        verticalSnapTarget: OutpaintVerticalSnapTarget.top,
+      );
+
+      final result = InpaintOutpaintUtils.expand(
+        sourceImage: sourceImage,
+        edges: edges,
+        horizontalSnapTarget: OutpaintHorizontalSnapTarget.left,
+        verticalSnapTarget: OutpaintVerticalSnapTarget.top,
+      );
+
+      expect(result.width, geometry.width);
+      expect(result.height, geometry.height);
+      expect(result.sourceOffsetX, geometry.sourceOffsetX);
+      expect(result.sourceOffsetY, geometry.sourceOffsetY);
+      expect(result.requestedEdges.left, geometry.requestedEdges.left);
+      expect(result.requestedEdges.top, geometry.requestedEdges.top);
+      expect(result.requestedEdges.right, geometry.requestedEdges.right);
+      expect(result.requestedEdges.bottom, geometry.requestedEdges.bottom);
+      expect(result.appliedEdges.left, geometry.appliedEdges.left);
+      expect(result.appliedEdges.top, geometry.appliedEdges.top);
+      expect(result.appliedEdges.right, geometry.appliedEdges.right);
+      expect(result.appliedEdges.bottom, geometry.appliedEdges.bottom);
+    });
+  });
+
   group('InpaintOutpaintUtils.expand', () {
     test('expands source without snapping and masks only outpaint edges', () {
       final sourceImage = _sourcePng(4, 4);
@@ -220,6 +341,23 @@ void main() {
       );
     });
 
+    test('rejects negative edges before decoding invalid source bytes', () {
+      expect(
+        () => InpaintOutpaintUtils.expand(
+          sourceImage: Uint8List.fromList([1, 2, 3, 4]),
+          edges: const OutpaintEdges(left: -1),
+          snapTo64: false,
+        ),
+        throwsA(
+          isA<ArgumentError>().having(
+            (error) => error.message,
+            'message',
+            'Outpaint edges must be non-negative',
+          ),
+        ),
+      );
+    });
+
     test('rejects existing mask with mismatched dimensions', () {
       final sourceImage = _sourcePng(4, 4);
       final existingMask = _sourcePng(5, 4);
@@ -236,6 +374,25 @@ void main() {
             (error) => error.message,
             'message',
             'Existing mask dimensions must match source image dimensions',
+          ),
+        ),
+      );
+    });
+
+    test('rejects invalid existing mask before max dimension validation', () {
+      final sourceImage = _sourcePng(4096, 1);
+
+      expect(
+        () => InpaintOutpaintUtils.expand(
+          sourceImage: sourceImage,
+          existingMask: Uint8List.fromList([1, 2, 3, 4]),
+          edges: const OutpaintEdges(right: 1),
+        ),
+        throwsA(
+          isA<FormatException>().having(
+            (error) => error.message,
+            'message',
+            'Unable to decode existing mask',
           ),
         ),
       );
@@ -325,10 +482,87 @@ void main() {
       }
     });
   });
+
+  group('InpaintOutpaintUtils.resizeFrame', () {
+    test('crops an inward right edge resize to the previous 64 multiple', () {
+      final sourceImage = _horizontalGradientPng(128, 128);
+
+      final result = InpaintOutpaintUtils.resizeFrame(
+        sourceImage: sourceImage,
+        delta: const OutpaintFrameDelta(right: -32),
+      );
+
+      expect(result.width, equals(64));
+      expect(result.height, equals(128));
+      expect(result.appliedExpansionEdges.isEmpty, isTrue);
+      expect(result.appliedCropEdges.left, equals(0));
+      expect(result.appliedCropEdges.right, equals(64));
+
+      final croppedSource = img.decodeImage(result.sourceImage)!;
+      expect(croppedSource.width, equals(64));
+      expect(croppedSource.getPixel(0, 0).r.toInt(), equals(0));
+      expect(croppedSource.getPixel(63, 0).r.toInt(), equals(63));
+
+      final croppedMask = img.decodeImage(result.maskImage)!;
+      expect(croppedMask.width, equals(64));
+      expect(croppedMask.getPixel(0, 0).r.toInt(), equals(0));
+      expect(croppedMask.getPixel(63, 127).r.toInt(), equals(0));
+    });
+
+    test('crops an inward left edge resize from the source origin', () {
+      final sourceImage = _horizontalGradientPng(128, 128);
+
+      final result = InpaintOutpaintUtils.resizeFrame(
+        sourceImage: sourceImage,
+        delta: const OutpaintFrameDelta(left: -32),
+        horizontalSnapTarget: OutpaintHorizontalSnapTarget.left,
+      );
+
+      expect(result.width, equals(64));
+      expect(result.height, equals(128));
+      expect(result.appliedCropEdges.left, equals(64));
+      expect(result.appliedCropEdges.right, equals(0));
+
+      final croppedSource = img.decodeImage(result.sourceImage)!;
+      expect(croppedSource.getPixel(0, 0).r.toInt(), equals(64));
+      expect(croppedSource.getPixel(63, 0).r.toInt(), equals(127));
+    });
+
+    test('outward resize matches expand output dimensions and mask', () {
+      final sourceImage = _sourcePng(128, 96);
+
+      final expanded = InpaintOutpaintUtils.expand(
+        sourceImage: sourceImage,
+        edges: const OutpaintEdges(right: 32),
+      );
+      final resized = InpaintOutpaintUtils.resizeFrame(
+        sourceImage: sourceImage,
+        delta: const OutpaintFrameDelta(right: 32),
+      );
+
+      expect(resized.width, equals(expanded.width));
+      expect(resized.height, equals(expanded.height));
+      expect(resized.sourceImage, equals(expanded.sourceImage));
+      expect(resized.maskImage, equals(expanded.maskImage));
+      expect(resized.appliedExpansionEdges.right, equals(64));
+      expect(resized.appliedExpansionEdges.bottom, equals(32));
+      expect(resized.appliedCropEdges.isEmpty, isTrue);
+    });
+  });
 }
 
 Uint8List _sourcePng(int width, int height) {
   final image = img.Image(width: width, height: height);
   img.fill(image, color: img.ColorRgba8(24, 48, 72, 255));
+  return Uint8List.fromList(img.encodePng(image));
+}
+
+Uint8List _horizontalGradientPng(int width, int height) {
+  final image = img.Image(width: width, height: height);
+  for (var y = 0; y < height; y++) {
+    for (var x = 0; x < width; x++) {
+      image.setPixelRgba(x, y, x, 48, 72, 255);
+    }
+  }
   return Uint8List.fromList(img.encodePng(image));
 }

@@ -115,6 +115,18 @@ class ImageEditorScreen extends StatefulWidget {
   /// 标题
   final String title;
 
+  @visibleForTesting
+  final bool initialOutpaintCommitPending;
+
+  @visibleForTesting
+  final bool initialShowLayerPanel;
+
+  @visibleForTesting
+  final bool debugFailOutpaintSourceReplacement;
+
+  @visibleForTesting
+  final bool debugFailOutpaintAfterFocusedDisable;
+
   const ImageEditorScreen({
     super.key,
     this.initialImage,
@@ -126,6 +138,10 @@ class ImageEditorScreen extends StatefulWidget {
     this.showMaskExport = true,
     this.mode = ImageEditorMode.edit,
     this.title = '画板',
+    this.initialOutpaintCommitPending = false,
+    this.initialShowLayerPanel = true,
+    this.debugFailOutpaintSourceReplacement = false,
+    this.debugFailOutpaintAfterFocusedDisable = false,
   });
 
   /// 显示编辑器
@@ -180,6 +196,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
   bool _isMaskFillMode = false;
   bool _isInitialized = false;
   bool _showLayerPanel = true;
+  bool _isOutpaintCommitPending = false;
   String? _sourceLayerId;
   Uint8List? _outpaintSourceImage;
   int? _outpaintSourceWidth;
@@ -188,6 +205,99 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
   bool _hasOutpaintChanges = false;
 
   bool get _isInpaintMode => widget.mode == ImageEditorMode.inpaint;
+  bool get _canExportAndClose => !_isOutpaintCommitPending;
+
+  @visibleForTesting
+  Size get debugCanvasSize => _state.canvasSize;
+
+  @visibleForTesting
+  bool get debugFocusedInpaintEnabled => _focusedInpaintEnabled;
+
+  @visibleForTesting
+  bool get debugHasOutpaintChanges => _hasOutpaintChanges;
+
+  @visibleForTesting
+  bool get debugOutpaintCommitPending => _isOutpaintCommitPending;
+
+  @visibleForTesting
+  int? get debugOutpaintSourceWidth => _outpaintSourceWidth;
+
+  @visibleForTesting
+  int? get debugOutpaintSourceHeight => _outpaintSourceHeight;
+
+  @visibleForTesting
+  String? get debugCurrentToolId => _state.currentTool?.id;
+
+  @visibleForTesting
+  String? get debugActiveLayerId => _state.layerManager.activeLayerId;
+
+  @visibleForTesting
+  String? get debugActiveLayerName => _state.layerManager.activeLayer?.name;
+
+  @visibleForTesting
+  int get debugActiveLayerStrokeCount {
+    return _state.layerManager.activeLayer?.strokes.length ?? 0;
+  }
+
+  @visibleForTesting
+  bool get debugIsDrawing => _state.isDrawing;
+
+  @visibleForTesting
+  int get debugCurrentStrokePointCount => _state.currentStrokePoints.length;
+
+  @visibleForTesting
+  bool get debugHasMaskContent => _hasMaskContent();
+
+  @visibleForTesting
+  Offset debugCanvasToScreen(Offset point) {
+    return _state.canvasController.canvasToScreen(
+      point,
+      canvasSize: _state.canvasSize,
+    );
+  }
+
+  @visibleForTesting
+  Rect? get debugFocusedRect => _focusedSelectionState.committedRect;
+
+  @visibleForTesting
+  Rect? get debugSelectionBounds => _state.selectionPath?.getBounds();
+
+  @visibleForTesting
+  Rect? get debugPreviewBounds => _state.previewPath?.getBounds();
+
+  @visibleForTesting
+  List<String> get debugLayerNames =>
+      _state.layerManager.layers.map((layer) => layer.name).toList();
+
+  @visibleForTesting
+  Future<void> debugApplyOutpaintEdges(
+    OutpaintEdges edges, {
+    OutpaintHorizontalSnapTarget horizontalSnapTarget =
+        OutpaintHorizontalSnapTarget.right,
+    OutpaintVerticalSnapTarget verticalSnapTarget =
+        OutpaintVerticalSnapTarget.bottom,
+  }) {
+    return _applyOutpaintEdges(
+      edges,
+      horizontalSnapTarget: horizontalSnapTarget,
+      verticalSnapTarget: verticalSnapTarget,
+    );
+  }
+
+  @visibleForTesting
+  void debugSetToolById(String toolId) {
+    _state.setToolById(toolId);
+  }
+
+  @visibleForTesting
+  void debugSetSelectionRect(Rect rect) {
+    _state.setSelection(Path()..addRect(rect), saveHistory: false);
+  }
+
+  @visibleForTesting
+  void debugSetPreviewRect(Rect rect) {
+    _state.setPreviewPath(Path()..addRect(rect));
+  }
 
   @override
   void initState() {
@@ -204,6 +314,8 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
         widget.initialMinimumContextMegaPixels.clamp(0.0, 192.0);
     _focusedInpaintEnabled =
         widget.initialFocusedInpaintEnabled || widget.existingFocusRect != null;
+    _isOutpaintCommitPending = widget.initialOutpaintCommitPending;
+    _showLayerPanel = widget.initialShowLayerPanel;
     _initializeCanvas();
   }
 
@@ -449,7 +561,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
           // 导出按钮
           IconButton(
             icon: const Icon(Icons.check),
-            onPressed: _exportAndClose,
+            onPressed: _canExportAndClose ? _exportAndClose : null,
             tooltip: '完成',
           ),
         ],
@@ -580,7 +692,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
             child: FilledButton.icon(
               icon: const Icon(Icons.check, size: 18),
               label: const Text('完成'),
-              onPressed: _exportAndClose,
+              onPressed: _canExportAndClose ? _exportAndClose : null,
               style: FilledButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
               ),
@@ -1655,10 +1767,12 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
               child: const Text('退出'),
             ),
             FilledButton(
-              onPressed: () async {
-                Navigator.pop(context, false);
-                await _exportAndClose();
-              },
+              onPressed: _canExportAndClose
+                  ? () async {
+                      Navigator.pop(context, false);
+                      await _exportAndClose();
+                    }
+                  : null,
               child: const Text('保存并退出'),
             ),
           ],
@@ -1676,6 +1790,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
   /// 导出并关闭
   Future<void> _exportAndClose() async {
     if (!mounted) return;
+    if (!_canExportAndClose) return;
 
     // 用于跟踪加载对话框是否已显示
     bool loadingDialogShown = false;
@@ -1945,7 +2060,21 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
     OutpaintVerticalSnapTarget verticalSnapTarget =
         OutpaintVerticalSnapTarget.bottom,
   }) async {
-    if (!_isInpaintMode) {
+    return _applyOutpaintFrameDelta(
+      OutpaintFrameDelta.fromExpansionEdges(edges),
+      horizontalSnapTarget: horizontalSnapTarget,
+      verticalSnapTarget: verticalSnapTarget,
+    );
+  }
+
+  Future<void> _applyOutpaintFrameDelta(
+    OutpaintFrameDelta delta, {
+    OutpaintHorizontalSnapTarget horizontalSnapTarget =
+        OutpaintHorizontalSnapTarget.right,
+    OutpaintVerticalSnapTarget verticalSnapTarget =
+        OutpaintVerticalSnapTarget.bottom,
+  }) async {
+    if (!_isInpaintMode || delta.isEmpty || _isOutpaintCommitPending) {
       return;
     }
 
@@ -1955,6 +2084,25 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
         AppToast.error(context, 'Unable to read current source image.');
       }
       return;
+    }
+
+    final pendingGeometry = InpaintOutpaintUtils.tryResolveFrameGeometry(
+      sourceWidth: _state.canvasSize.width.round(),
+      sourceHeight: _state.canvasSize.height.round(),
+      delta: delta,
+      horizontalSnapTarget: horizontalSnapTarget,
+      verticalSnapTarget: verticalSnapTarget,
+    );
+    if (pendingGeometry == null || !pendingGeometry.hasAppliedChange) {
+      return;
+    }
+
+    if (mounted) {
+      setState(() {
+        _isOutpaintCommitPending = true;
+      });
+    } else {
+      _isOutpaintCommitPending = true;
     }
 
     try {
@@ -1975,69 +2123,149 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
               forceHardEdges: true,
             )
           : null;
-      final result = await InpaintOutpaintUtils.expandAsync(
+      final result = await InpaintOutpaintUtils.resizeFrameAsync(
         sourceImage: sourceBytes,
         existingMask: existingMask,
-        edges: edges,
+        delta: delta,
         horizontalSnapTarget: horizontalSnapTarget,
         verticalSnapTarget: verticalSnapTarget,
         includeEditorOverlay: true,
       );
 
-      final expandedCanvasSize = Size(
+      final resizedCanvasSize = Size(
         result.width.toDouble(),
         result.height.toDouble(),
       );
-      final overlayBytes = result.editorOverlayImage ??
-          await InpaintMaskUtils.maskToEditorOverlayAsync(result.maskImage);
-      final maskLayer = await _addMaskLayerAboveSource(
-        overlayBytes,
-        name: '蒙版',
-      );
-      if (maskLayer == null) {
-        throw Exception('Unable to add outpaint mask layer.');
-      }
+      final hasResultMask = InpaintMaskUtils.hasMaskedPixels(result.maskImage);
+      final overlayBytes = hasResultMask
+          ? result.editorOverlayImage ??
+              await InpaintMaskUtils.maskToEditorOverlayAsync(result.maskImage)
+          : null;
 
       final previousOutpaintSourceImage = _outpaintSourceImage;
       final previousOutpaintSourceWidth = _outpaintSourceWidth;
       final previousOutpaintSourceHeight = _outpaintSourceHeight;
       final previousHasOutpaintChanges = _hasOutpaintChanges;
+      final previousCanvasSize = _state.canvasSize;
+      final previousFocusedCanvasSize = _focusedSelectionState.committedRect;
+      final previousFocusedInpaintEnabled = _focusedInpaintEnabled;
+      final previousControllerScale = _state.canvasController.scale;
+      final previousControllerOffset = _state.canvasController.offset;
+      final previousSourceBytes = sourceBytes;
+      final previousActiveLayerId = _state.layerManager.activeLayerId;
+      final previousToolId = _state.currentTool?.id;
+      final previousSelectionPath = _state.selectionPath == null
+          ? null
+          : Path.from(_state.selectionPath!);
+      final previousPreviewPath =
+          _state.previewPath == null ? null : Path.from(_state.previewPath!);
 
-      _outpaintSourceImage = result.sourceImage;
-      _outpaintSourceWidth = result.width;
-      _outpaintSourceHeight = result.height;
-      _hasOutpaintChanges = true;
-
-      void restorePreCommitState() {
-        _state.layerManager.removeLayer(maskLayer.id);
+      void restoreOutpaintTrackingFields() {
         _outpaintSourceImage = previousOutpaintSourceImage;
         _outpaintSourceWidth = previousOutpaintSourceWidth;
         _outpaintSourceHeight = previousOutpaintSourceHeight;
         _hasOutpaintChanges = previousHasOutpaintChanges;
       }
 
-      bool replaced;
+      void restoreScreenState() {
+        restoreOutpaintTrackingFields();
+        _state.setCanvasSize(previousCanvasSize);
+        _focusedSelectionState.canvasSize = previousCanvasSize;
+        _focusedSelectionState.load(previousFocusedCanvasSize);
+        _focusedInpaintEnabled = previousFocusedInpaintEnabled;
+        _state.setSelection(previousSelectionPath, saveHistory: false);
+        _state.setPreviewPath(previousPreviewPath);
+        if (previousToolId != null) {
+          _state.setToolById(previousToolId);
+        }
+        if (previousActiveLayerId != null &&
+            _state.layerManager.getLayerById(previousActiveLayerId) != null) {
+          _state.layerManager.setActiveLayer(previousActiveLayerId);
+        }
+        _state.canvasController.runBatch(() {
+          _state.canvasController.setScale(previousControllerScale);
+          _state.canvasController.setOffset(previousControllerOffset);
+        });
+      }
+
+      _state.canvasController.beginBatch();
       try {
-        replaced = await _state.layerManager.replaceLayerImage(
-          sourceLayerId,
-          result.sourceImage,
-        );
-      } catch (_) {
-        restorePreCommitState();
-        rethrow;
-      }
-      if (!replaced) {
-        restorePreCommitState();
-        throw Exception('Unable to replace current source image.');
-      }
+        await _state.runBatchAsync(() async {
+          await _state.layerManager.runBatchAsync(() async {
+            Layer? maskLayer;
+            var sourceReplaced = false;
 
-      _state.setCanvasSize(expandedCanvasSize);
-      _focusedSelectionState.canvasSize = expandedCanvasSize;
-      _removeAllMaskLayers(preservedLayerIds: {maskLayer.id});
+            Future<void> rollbackTransaction() async {
+              if (maskLayer != null) {
+                _state.layerManager.removeLayer(maskLayer.id);
+              }
+              if (sourceReplaced) {
+                await _state.layerManager.replaceLayerImage(
+                  sourceLayerId,
+                  previousSourceBytes,
+                );
+              }
+              restoreScreenState();
+            }
 
-      _disableFocusedInpaintForOutpaint();
-      _state.canvasController.fitToViewport(_state.canvasSize);
-      _state.requestUiUpdate();
+            try {
+              if (overlayBytes != null) {
+                maskLayer = await _addMaskLayerAboveSource(
+                  overlayBytes,
+                  name: '蒙版',
+                );
+                if (maskLayer == null) {
+                  throw Exception('Unable to add outpaint mask layer.');
+                }
+              }
+
+              if (widget.debugFailOutpaintSourceReplacement) {
+                throw StateError(
+                  'Simulated outpaint source replacement failure.',
+                );
+              }
+
+              final replaced = await _state.layerManager.replaceLayerImage(
+                sourceLayerId,
+                result.sourceImage,
+              );
+              if (!replaced) {
+                throw Exception('Unable to replace current source image.');
+              }
+              sourceReplaced = true;
+
+              _outpaintSourceImage = result.sourceImage;
+              _outpaintSourceWidth = result.width;
+              _outpaintSourceHeight = result.height;
+              _hasOutpaintChanges = true;
+
+              _state.setCanvasSize(resizedCanvasSize);
+              _focusedSelectionState.canvasSize = resizedCanvasSize;
+              _disableFocusedInpaintForOutpaint();
+              _state.canvasController.fitToViewport(_state.canvasSize);
+
+              if (widget.debugFailOutpaintAfterFocusedDisable) {
+                throw StateError(
+                  'Simulated outpaint failure after focused disable.',
+                );
+              }
+
+              if (maskLayer != null) {
+                _removeAllMaskLayers(preservedLayerIds: {maskLayer.id});
+              } else {
+                _removeAllMaskLayers();
+                _addEmptyMaskLayerAboveSource(name: '蒙版');
+              }
+              _state.requestUiUpdate();
+            } catch (_) {
+              await rollbackTransaction();
+              rethrow;
+            }
+          });
+        });
+      } finally {
+        _state.canvasController.endBatch();
+      }
 
       if (mounted) {
         setState(() {});
@@ -2045,6 +2273,14 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
     } catch (e) {
       if (mounted) {
         AppToast.error(context, 'Apply outpaint failed: $e');
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isOutpaintCommitPending = false;
+        });
+      } else {
+        _isOutpaintCommitPending = false;
       }
     }
   }
@@ -2092,14 +2328,17 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
     return Stack(
       children: [
         Positioned.fill(
-          child: EditorCanvas(
-            state: _state,
-            showTransparentCanvasBackground: _isInpaintMode,
-            suppressSelectionOverlay:
-                _focusedSelectionState.shouldSuppressSelectionOverlay(
-              focusedEnabled: _isInpaintMode && _focusedInpaintEnabled,
-              currentToolId: _state.currentTool?.id,
-              previewPath: _state.previewPath,
+          child: RepaintBoundary(
+            child: EditorCanvas(
+              state: _state,
+              showTransparentCanvasBackground: _isInpaintMode,
+              shouldSuppressPointerInput: _shouldSuppressCanvasPointerInput,
+              suppressSelectionOverlay:
+                  _focusedSelectionState.shouldSuppressSelectionOverlay(
+                focusedEnabled: _isInpaintMode && _focusedInpaintEnabled,
+                currentToolId: _state.currentTool?.id,
+                previewPath: _state.previewPath,
+              ),
             ),
           ),
         ),
@@ -2108,21 +2347,25 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
             child: OutpaintEdgeDragOverlay(
               canvasSize: _state.canvasSize,
               controller: _state.canvasController,
+              enabled: !_isOutpaintCommitPending,
               onCommitted: _applyOutpaintEdges,
+              onFrameResizeCommitted: _applyOutpaintFrameDelta,
             ),
           ),
         if (_isInpaintMode && focusAreaRect != null && contextCrop != null)
           Positioned.fill(
             child: IgnorePointer(
-              child: CustomPaint(
-                painter: _FocusedContextOverlayPainter(
-                  canvasController: _state.canvasController,
-                  focusAreaRect: focusAreaRect,
-                  contextCrop: contextCrop,
-                  repaint: Listenable.merge([
-                    _state.renderNotifier,
-                    _state.canvasController,
-                  ]),
+              child: RepaintBoundary(
+                child: CustomPaint(
+                  painter: _FocusedContextOverlayPainter(
+                    canvasController: _state.canvasController,
+                    focusAreaRect: focusAreaRect,
+                    contextCrop: contextCrop,
+                    repaint: Listenable.merge([
+                      _state.renderNotifier,
+                      _state.canvasController,
+                    ]),
+                  ),
                 ),
               ),
             ),
@@ -2147,6 +2390,27 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
             child: _buildFocusedSelectionCard(),
           ),
       ],
+    );
+  }
+
+  bool _shouldSuppressCanvasPointerInput(Offset localPosition) {
+    if (!_isInpaintMode ||
+        _focusedInpaintEnabled ||
+        _isMaskFillMode ||
+        _isOutpaintCommitPending) {
+      return false;
+    }
+
+    final viewportSize = _state.canvasController.viewportSize;
+    if (viewportSize == Size.zero) {
+      return false;
+    }
+
+    return OutpaintEdgeDragOverlay.isResizeInteractionPoint(
+      localPosition: localPosition,
+      viewportSize: viewportSize,
+      canvasSize: _state.canvasSize,
+      controller: _state.canvasController,
     );
   }
 

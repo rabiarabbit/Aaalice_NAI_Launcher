@@ -2,19 +2,41 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
-import '../../../../core/utils/app_logger.dart';
 import '../core/editor_state.dart';
-import '../tools/blur_tool.dart';
-import '../tools/brush_tool.dart';
-import '../tools/clone_stamp_tool.dart';
-import '../tools/eraser_tool.dart';
+
+class CheckerboardCacheKey {
+  const CheckerboardCacheKey({
+    required this.canvasSize,
+    required this.cellSize,
+    required this.color1,
+    required this.color2,
+  });
+
+  final Size canvasSize;
+  final double cellSize;
+  final Color color1;
+  final Color color2;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        other is CheckerboardCacheKey &&
+            other.canvasSize == canvasSize &&
+            other.cellSize == cellSize &&
+            other.color1 == color1 &&
+            other.color2 == color2;
+  }
+
+  @override
+  int get hashCode => Object.hash(canvasSize, cellSize, color1, color2);
+}
 
 /// 棋盘格缓存管理器
-/// 使用 ImageShader 预缓存棋盘格图案，避免每帧重复绘制
+/// 缓存棋盘格 Picture，避免每帧重复绘制单元格
 class _CheckerboardCache {
-  static ui.Image? _image;
-  static ui.ImageShader? _shader;
-  static bool _isInitializing = false;
+  static CheckerboardCacheKey? _key;
+  static ui.Picture? _picture;
+  static int _recordCount = 0;
 
   /// 棋盘格单元格大小
   static const double cellSize = 16.0;
@@ -23,73 +45,57 @@ class _CheckerboardCache {
   static final Color color1 = Colors.grey.shade300;
   static final Color color2 = Colors.grey.shade100;
 
-  /// 获取棋盘格 Shader
-  static ui.ImageShader? get shader {
-    if (_shader != null) return _shader;
-    if (!_isInitializing) {
-      _initializeAsync();
-    }
-    return null;
+  static CheckerboardCacheKey? get currentKey => _key;
+  static int get recordCount => _recordCount;
+
+  static void draw(Canvas canvas, CheckerboardCacheKey key) {
+    final picture = _pictureFor(key);
+    canvas.save();
+    canvas.clipRect(
+      Rect.fromLTWH(0, 0, key.canvasSize.width, key.canvasSize.height),
+    );
+    canvas.drawPicture(picture);
+    canvas.restore();
   }
 
-  /// 异步初始化棋盘格图像
-  static Future<void> _initializeAsync() async {
-    if (_isInitializing || _image != null) return;
-    _isInitializing = true;
-
-    try {
-      // 创建 2x2 单元格的图案（用于平铺）
-      const patternSize = cellSize * 2;
-      final recorder = ui.PictureRecorder();
-      final canvas = Canvas(recorder);
-
-      final paint1 = Paint()..color = color1;
-      final paint2 = Paint()..color = color2;
-
-      // 绘制 2x2 棋盘格图案
-      // [1][2]
-      // [2][1]
-      canvas.drawRect(
-        const Rect.fromLTWH(0, 0, cellSize, cellSize),
-        paint1,
-      );
-      canvas.drawRect(
-        const Rect.fromLTWH(cellSize, 0, cellSize, cellSize),
-        paint2,
-      );
-      canvas.drawRect(
-        const Rect.fromLTWH(0, cellSize, cellSize, cellSize),
-        paint2,
-      );
-      canvas.drawRect(
-        const Rect.fromLTWH(cellSize, cellSize, cellSize, cellSize),
-        paint1,
-      );
-
-      final picture = recorder.endRecording();
-      _image = await picture.toImage(patternSize.toInt(), patternSize.toInt());
-      picture.dispose();
-
-      // 创建平铺 Shader
-      _shader = ui.ImageShader(
-        _image!,
-        ui.TileMode.repeated,
-        ui.TileMode.repeated,
-        Matrix4.identity().storage,
-      );
-    } catch (e) {
-      AppLogger.w('Failed to initialize checkerboard cache: $e', 'ImageEditor');
-    } finally {
-      _isInitializing = false;
+  static ui.Picture _pictureFor(CheckerboardCacheKey key) {
+    if (_picture != null && _key == key) {
+      return _picture!;
     }
+
+    _picture?.dispose();
+    _key = key;
+    _picture = _recordPicture(key);
+    _recordCount++;
+    return _picture!;
+  }
+
+  static ui.Picture _recordPicture(CheckerboardCacheKey key) {
+    final recorder = ui.PictureRecorder();
+    final canvas = Canvas(recorder);
+    final paint1 = Paint()..color = key.color1;
+    final paint2 = Paint()..color = key.color2;
+
+    for (double y = 0; y < key.canvasSize.height; y += key.cellSize) {
+      for (double x = 0; x < key.canvasSize.width; x += key.cellSize) {
+        final isEven = ((x ~/ key.cellSize) + (y ~/ key.cellSize)) % 2 == 0;
+        canvas.drawRect(
+          Rect.fromLTWH(x, y, key.cellSize, key.cellSize),
+          isEven ? paint1 : paint2,
+        );
+      }
+    }
+
+    return recorder.endRecording();
   }
 
   /// 释放缓存（通常不需要调用，除非显式清理）
   // ignore: unused_element
   static void dispose() {
-    _shader = null;
-    _image?.dispose();
-    _image = null;
+    _picture?.dispose();
+    _picture = null;
+    _key = null;
+    _recordCount = 0;
   }
 }
 
@@ -106,6 +112,21 @@ class LayerPainter extends CustomPainter {
     required this.state,
     this.showTransparentCanvasBackground = false,
   }) : super(repaint: state.renderNotifier);
+
+  @visibleForTesting
+  static CheckerboardCacheKey? get debugCheckerboardCacheKey {
+    return _CheckerboardCache.currentKey;
+  }
+
+  @visibleForTesting
+  static int get debugCheckerboardRecordCount {
+    return _CheckerboardCache.recordCount;
+  }
+
+  @visibleForTesting
+  static void debugResetCheckerboardCache() {
+    _CheckerboardCache.dispose();
+  }
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -160,130 +181,21 @@ class LayerPainter extends CustomPainter {
     state.layerManager
         .renderAll(canvas, canvasSize, viewportBounds: viewportBounds);
 
-    // 绘制当前正在绘制的笔画
-    if (state.isDrawing && state.currentStrokePoints.isNotEmpty) {
-      _drawCurrentStroke(canvas);
-    }
-
     // 恢复状态
     canvas.restore();
   }
 
-  /// 绘制当前正在绘制的笔画
-  void _drawCurrentStroke(Canvas canvas) {
-    final points = state.currentStrokePoints;
-    if (points.isEmpty) return;
-
-    final tool = state.currentTool;
-    if (tool == null || !tool.isPaintTool) return;
-
-    double size = 20.0;
-    double opacity = 1.0;
-    double hardness = 0.8;
-    Color color = state.foregroundColor;
-    bool isEraser = false;
-
-    if (tool is BrushTool) {
-      size = tool.settings.size;
-      opacity = tool.settings.opacity;
-      hardness = tool.settings.hardness;
-    } else if (tool is EraserTool) {
-      size = tool.size;
-      hardness = tool.hardness;
-      isEraser = true;
-    } else if (tool is BlurTool) {
-      size = tool.size;
-      color = const Color(0xFF90CAF9);
-      opacity = 0.25;
-      hardness = 0.0;
-    } else if (tool is CloneStampTool) {
-      if (tool.canvasSnapshot != null && tool.sourceOffset != null) {
-        tool.drawRealtimePreview(canvas, points);
-        return;
-      }
-      size = tool.size;
-      opacity = 0.3;
-      hardness = 0.5;
-      color = Colors.cyanAccent;
-    }
-
-    final paint = Paint()
-      ..color = isEraser
-          ? Colors.grey.withValues(alpha: 0.5)
-          : color.withValues(alpha: opacity)
-      ..strokeWidth = size
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round
-      ..style = PaintingStyle.stroke;
-
-    if (hardness < 1.0) {
-      final sigma = size * (1.0 - hardness) * 0.5;
-      paint.maskFilter = MaskFilter.blur(BlurStyle.normal, sigma);
-    }
-
-    if (points.length == 1) {
-      canvas.drawCircle(
-        points.first,
-        size / 2,
-        paint..style = PaintingStyle.fill,
-      );
-    } else {
-      final path = _createSmoothPath(points);
-      canvas.drawPath(path, paint);
-    }
-  }
-
-  /// 创建平滑路径
-  Path _createSmoothPath(List<Offset> points) {
-    final path = Path();
-    if (points.isEmpty) return path;
-
-    path.moveTo(points.first.dx, points.first.dy);
-
-    if (points.length == 2) {
-      path.lineTo(points.last.dx, points.last.dy);
-    } else {
-      for (int i = 1; i < points.length - 1; i++) {
-        final p0 = points[i];
-        final p1 = points[i + 1];
-        final midX = (p0.dx + p1.dx) / 2;
-        final midY = (p0.dy + p1.dy) / 2;
-        path.quadraticBezierTo(p0.dx, p0.dy, midX, midY);
-      }
-      path.lineTo(points.last.dx, points.last.dy);
-    }
-
-    return path;
-  }
-
   /// 绘制棋盘格背景（表示透明区域）
-  /// 使用 ImageShader 缓存优化性能
+  /// 使用 Picture 缓存优化性能
   void _drawCheckerboard(Canvas canvas, Size size) {
-    final shader = _CheckerboardCache.shader;
+    final key = CheckerboardCacheKey(
+      canvasSize: size,
+      cellSize: _CheckerboardCache.cellSize,
+      color1: _CheckerboardCache.color1,
+      color2: _CheckerboardCache.color2,
+    );
 
-    if (shader != null) {
-      // 使用缓存的 Shader 绘制（高性能）
-      canvas.drawRect(
-        Rect.fromLTWH(0, 0, size.width, size.height),
-        Paint()..shader = shader,
-      );
-    } else {
-      // 回退方案：Shader 未准备好时使用传统方式
-      // 仅在首帧或初始化失败时触发
-      const cellSize = _CheckerboardCache.cellSize;
-      final paint1 = Paint()..color = _CheckerboardCache.color1;
-      final paint2 = Paint()..color = _CheckerboardCache.color2;
-
-      for (double y = 0; y < size.height; y += cellSize) {
-        for (double x = 0; x < size.width; x += cellSize) {
-          final isEven = ((x ~/ cellSize) + (y ~/ cellSize)) % 2 == 0;
-          canvas.drawRect(
-            Rect.fromLTWH(x, y, cellSize, cellSize),
-            isEven ? paint1 : paint2,
-          );
-        }
-      }
-    }
+    _CheckerboardCache.draw(canvas, key);
   }
 
   @override

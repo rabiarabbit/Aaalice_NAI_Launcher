@@ -259,9 +259,13 @@ test/presentation/widgets/gallery/*
 !test/presentation/widgets/gallery/image_send_destination_dialog_test.dart
 !test/presentation/widgets/image_editor/
 test/presentation/widgets/image_editor/*
+!test/presentation/widgets/image_editor/image_editor_screen_inpaint_brush_test.dart
+!test/presentation/widgets/image_editor/image_editor_screen_outpaint_commit_test.dart
 !test/presentation/widgets/image_editor/canvas/
 test/presentation/widgets/image_editor/canvas/*
+!test/presentation/widgets/image_editor/canvas/editor_render_scheduler_test.dart
 !test/presentation/widgets/image_editor/canvas/layer_painter_test.dart
+!test/presentation/widgets/image_editor/canvas/stroke_preview_painter_test.dart
 !test/presentation/widgets/image_editor/widgets/
 test/presentation/widgets/image_editor/widgets/*
 !test/presentation/widgets/image_editor/widgets/outpaint_edge_drag_overlay_test.dart
