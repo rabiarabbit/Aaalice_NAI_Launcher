@@ -1,5 +1,5 @@
 // NAI 元数据字段对比工具
-// 用法: dart run tool/compare_metadata.dart <官方图片路径>
+// 用法: dart run tool/metadata/compare_metadata.dart <官方图片路径>
 
 import 'dart:convert';
 import 'dart:io';
@@ -94,7 +94,7 @@ final Map<String, List<String>> officialFieldGroups = {
 
 void main(List<String> args) async {
   if (args.isEmpty) {
-    print('用法: dart run tool/compare_metadata.dart <官方图片路径>');
+    print('用法: dart run tool/metadata/compare_metadata.dart <官方图片路径>');
     exit(1);
   }
 

@@ -6,7 +6,7 @@ import 'package:nai_launcher/core/constants/storage_keys.dart';
 Future<void> main(List<String> args) async {
   if (args.length != 1 && args.length != 2) {
     stderr.writeln(
-      'Usage: dart run tool/set_krita_bridge_enabled.dart <hive-directory> [true|false]',
+      'Usage: dart run tool/krita/set_krita_bridge_enabled.dart <hive-directory> [true|false]',
     );
     exitCode = 64;
     return;

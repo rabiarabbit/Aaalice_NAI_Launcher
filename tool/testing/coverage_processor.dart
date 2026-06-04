@@ -94,7 +94,7 @@ void main(List<String> arguments) {
     } else if (arguments[i] == '--output' && i + 1 < arguments.length) {
       outputPath = arguments[i + 1];
     } else if (arguments[i] == '--help' || arguments[i] == '-h') {
-      print('Usage: dart run tool/coverage_processor.dart [options]');
+      print('Usage: dart run tool/testing/coverage_processor.dart [options]');
       print('');
       print('Options:');
       print('  --input <path>   Input lcov.info file (default: coverage/lcov.info)');
@@ -102,7 +102,7 @@ void main(List<String> arguments) {
       print('  --help, -h       Show this help message');
       print('');
       print('Example:');
-      print('  dart run tool/coverage_processor.dart --input coverage/lcov.info --output test_results/coverage.json');
+      print('  dart run tool/testing/coverage_processor.dart --input coverage/lcov.info --output test_results/coverage.json');
       return;
     }
   }

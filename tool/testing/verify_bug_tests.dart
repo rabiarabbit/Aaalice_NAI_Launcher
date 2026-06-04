@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'config/test_constants.dart';
+import '../config/test_constants.dart';
 
 void main() async {
   final file = File('test_results/summary.json');

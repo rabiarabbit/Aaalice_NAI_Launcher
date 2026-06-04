@@ -442,8 +442,7 @@ nai_launcher/
 │   └── main.dart               # 入口文件
 ├── scripts/                    # 构建脚本
 ├── test/                       # 测试代码
-├── tool/                       # 工具脚本
-├── tools/                      # 构建工具
+├── tool/                       # 开发工具脚本（数据库、元数据、Krita、Vibe、测试辅助、诊断）
 ├── windows/                    # Windows 平台配置
 ├── pubspec.yaml                # 依赖配置
 └── README.md                   # 项目说明

@@ -3,7 +3,7 @@
 // 将翻译和共现 CSV 数据打包为预构建的 SQLite 数据库
 //
 // 使用方法:
-//   dart tools/build_databases.dart
+//   dart run tool/database/build_databases.dart
 //
 // 输出:
 //   assets/databases/translation.db

@@ -23,7 +23,7 @@ echo [INFO] Starting database build...
 echo [INFO] This may take 1-2 minutes depending on your system.
 echo.
 
-E:\flutter\bin\dart.bat tools\build_databases.dart
+E:\flutter\bin\dart.bat run tool\database\build_databases.dart
 
 if %ERRORLEVEL% NEQ 0 (
     echo.

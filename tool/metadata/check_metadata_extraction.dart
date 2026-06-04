@@ -1,8 +1,8 @@
 #!/usr/bin/env dart
-// ignore_for_file: avoid_print, avoid_relative_lib_imports
+// ignore_for_file: avoid_print
 
-/// 本地画廊元数据提取测试脚本
-library test_metadata_extraction;
+/// 本地画廊元数据提取检查脚本
+library check_metadata_extraction;
 /// 
 /// 用途：验证本地画廊中 PNG 图片的元数据提取情况
 /// 功能：
@@ -12,7 +12,7 @@ library test_metadata_extraction;
 /// - 列出无元数据的图片文件名
 /// 
 /// 运行方式：
-/// dart tools/test_metadata_extraction.dart [--path <自定义路径>]
+/// dart run tool/metadata/check_metadata_extraction.dart [--path <自定义路径>]
 
 import 'dart:io';
 import 'dart:convert';
@@ -22,8 +22,8 @@ import 'package:hive/hive.dart';
 
 // 导入项目中的元数据解析器
 // 注意：此脚本需要在项目根目录下运行，以正确解析导入
-import '../lib/data/services/metadata/unified_metadata_parser.dart';
-import '../lib/core/constants/storage_keys.dart';
+import 'package:nai_launcher/core/constants/storage_keys.dart';
+import 'package:nai_launcher/data/services/metadata/unified_metadata_parser.dart';
 
 /// 测试统计结果
 class TestResult {
@@ -287,7 +287,7 @@ Future<void> saveDetailedReport(TestResult result, String outputPath) async {
 /// 打印使用说明
 void printUsage() {
   print('''
-用法: dart tools/test_metadata_extraction.dart [选项]
+用法: dart run tool/metadata/check_metadata_extraction.dart [选项]
 
 选项:
   --path <路径>     指定画廊目录路径（覆盖配置中的路径）
@@ -295,9 +295,9 @@ void printUsage() {
   --help            显示此帮助信息
 
 示例:
-  dart tools/test_metadata_extraction.dart
-  dart tools/test_metadata_extraction.dart --path D:\\MyImages
-  dart tools/test_metadata_extraction.dart --output report.json
+  dart run tool/metadata/check_metadata_extraction.dart
+  dart run tool/metadata/check_metadata_extraction.dart --path D:\\MyImages
+  dart run tool/metadata/check_metadata_extraction.dart --output report.json
 ''');
 }
 
