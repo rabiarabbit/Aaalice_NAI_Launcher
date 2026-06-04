@@ -701,11 +701,30 @@ class InpaintOutpaintUtils {
     if (!snapTo64) {
       return clamped;
     }
-    if (requestedSize < sourceSize) {
-      final floored = (clamped ~/ _snapSize) * _snapSize;
-      return floored.clamp(_snapSize, _maxDimension).toInt();
+    final lower = (clamped ~/ _snapSize) * _snapSize;
+    final upper = lower == clamped ? lower : lower + _snapSize;
+    if (lower == upper) {
+      return lower.clamp(_snapSize, _maxDimension).toInt();
     }
-    return clamped + _snapRemainder(clamped);
+
+    final lowerDistance = (clamped - lower).abs();
+    final upperDistance = (upper - clamped).abs();
+    if (lowerDistance < upperDistance) {
+      return lower.clamp(_snapSize, _maxDimension).toInt();
+    }
+    if (upperDistance < lowerDistance) {
+      return upper.clamp(_snapSize, _maxDimension).toInt();
+    }
+
+    final clampedSource = sourceSize.clamp(_snapSize, _maxDimension).toInt();
+    if (clampedSource % _snapSize == 0 &&
+        (clampedSource == lower || clampedSource == upper)) {
+      return clampedSource;
+    }
+
+    return requestedSize >= sourceSize
+        ? upper.clamp(_snapSize, _maxDimension).toInt()
+        : lower.clamp(_snapSize, _maxDimension).toInt();
   }
 
   static img.Image _createExpandedSource(

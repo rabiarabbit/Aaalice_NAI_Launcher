@@ -484,12 +484,64 @@ void main() {
   });
 
   group('InpaintOutpaintUtils.resizeFrame', () {
+    test('keeps small signed frame drags at the original 64 multiple', () {
+      final rightOut = InpaintOutpaintUtils.resolveFrameGeometry(
+        sourceWidth: 128,
+        sourceHeight: 128,
+        delta: const OutpaintFrameDelta(right: 31),
+      );
+      final rightIn = InpaintOutpaintUtils.resolveFrameGeometry(
+        sourceWidth: 128,
+        sourceHeight: 128,
+        delta: const OutpaintFrameDelta(right: -31),
+      );
+      final leftOut = InpaintOutpaintUtils.resolveFrameGeometry(
+        sourceWidth: 128,
+        sourceHeight: 128,
+        delta: const OutpaintFrameDelta(left: 31),
+        horizontalSnapTarget: OutpaintHorizontalSnapTarget.left,
+      );
+      final leftIn = InpaintOutpaintUtils.resolveFrameGeometry(
+        sourceWidth: 128,
+        sourceHeight: 128,
+        delta: const OutpaintFrameDelta(left: -31),
+        horizontalSnapTarget: OutpaintHorizontalSnapTarget.left,
+      );
+
+      for (final geometry in [rightOut, rightIn, leftOut, leftIn]) {
+        expect(geometry.width, equals(128));
+        expect(geometry.height, equals(128));
+        expect(geometry.appliedFrameLeft, equals(0));
+        expect(geometry.appliedFrameRight, equals(128));
+        expect(geometry.hasAppliedChange, isFalse);
+      }
+    });
+
+    test('snaps signed frame drags beyond half a cell to the next 64 multiple',
+        () {
+      final rightOut = InpaintOutpaintUtils.resolveFrameGeometry(
+        sourceWidth: 128,
+        sourceHeight: 128,
+        delta: const OutpaintFrameDelta(right: 33),
+      );
+      final rightIn = InpaintOutpaintUtils.resolveFrameGeometry(
+        sourceWidth: 128,
+        sourceHeight: 128,
+        delta: const OutpaintFrameDelta(right: -33),
+      );
+
+      expect(rightOut.width, equals(192));
+      expect(rightOut.appliedExpansionEdges.right, equals(64));
+      expect(rightIn.width, equals(64));
+      expect(rightIn.appliedCropEdges.right, equals(64));
+    });
+
     test('crops an inward right edge resize to the previous 64 multiple', () {
       final sourceImage = _horizontalGradientPng(128, 128);
 
       final result = InpaintOutpaintUtils.resizeFrame(
         sourceImage: sourceImage,
-        delta: const OutpaintFrameDelta(right: -32),
+        delta: const OutpaintFrameDelta(right: -33),
       );
 
       expect(result.width, equals(64));
@@ -514,7 +566,7 @@ void main() {
 
       final result = InpaintOutpaintUtils.resizeFrame(
         sourceImage: sourceImage,
-        delta: const OutpaintFrameDelta(left: -32),
+        delta: const OutpaintFrameDelta(left: -33),
         horizontalSnapTarget: OutpaintHorizontalSnapTarget.left,
       );
 
@@ -533,11 +585,11 @@ void main() {
 
       final expanded = InpaintOutpaintUtils.expand(
         sourceImage: sourceImage,
-        edges: const OutpaintEdges(right: 32),
+        edges: const OutpaintEdges(right: 33),
       );
       final resized = InpaintOutpaintUtils.resizeFrame(
         sourceImage: sourceImage,
-        delta: const OutpaintFrameDelta(right: 32),
+        delta: const OutpaintFrameDelta(right: 33),
       );
 
       expect(resized.width, equals(expanded.width));

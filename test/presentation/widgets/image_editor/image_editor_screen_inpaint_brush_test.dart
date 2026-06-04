@@ -113,6 +113,9 @@ void main() {
     expect(rightEdge, findsOneWidget);
     final edgeRect = tester.getRect(rightEdge);
     final start = edgeRect.center;
+    final inwardBy64 = (state.debugCanvasToScreen(const Offset(64, 64))
+            as Offset) -
+        (state.debugCanvasToScreen(const Offset(128, 64)) as Offset);
 
     final gesture = await tester.startGesture(
       start,
@@ -120,7 +123,7 @@ void main() {
       buttons: kPrimaryButton,
     );
     await tester.pump();
-    await gesture.moveBy(const Offset(-80, 0));
+    await gesture.moveBy(inwardBy64);
     await tester.pump();
 
     expect(state.debugIsDrawing, isFalse);
@@ -177,6 +180,9 @@ void main() {
     final rightEdge = canvasTopLeft +
         (state.debugCanvasToScreen(const Offset(128, 64)) as Offset);
     final start = rightEdge - const Offset(16, 0);
+    final inwardBy64 = (state.debugCanvasToScreen(const Offset(64, 64))
+            as Offset) -
+        (state.debugCanvasToScreen(const Offset(128, 64)) as Offset);
 
     final gesture = await tester.startGesture(
       start,
@@ -184,7 +190,7 @@ void main() {
       buttons: kPrimaryButton,
     );
     await tester.pump();
-    await gesture.moveBy(const Offset(-80, 0));
+    await gesture.moveBy(inwardBy64);
     await tester.pump();
 
     expect(state.debugIsDrawing, isFalse);
