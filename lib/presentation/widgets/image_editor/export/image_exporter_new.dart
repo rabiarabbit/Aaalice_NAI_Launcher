@@ -178,7 +178,7 @@ class ImageExporterNew {
     if (includeBaseImage && layer.baseImage != null) {
       canvas.drawImage(
         layer.baseImage!,
-        Offset.zero,
+        layer.baseImageOffset,
         Paint(),
       );
     }

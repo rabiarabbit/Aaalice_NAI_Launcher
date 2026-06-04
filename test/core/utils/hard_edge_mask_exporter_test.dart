@@ -282,6 +282,26 @@ void main() {
     expect(_redAt(exportedMask, 11, 11), equals(_redAt(expectedMask, 11, 11)));
   });
 
+  test('ImageExporterNew Canvas fallback honors base mask layer offsets',
+      () async {
+    final layerManager = LayerManager();
+    addTearDown(layerManager.dispose);
+    final layer = layerManager.addLayer();
+    await layer.setBaseImage(_singleWhitePixelPng());
+    layer.setBaseImageOffset(const Offset(3, 2));
+
+    final exported = await ImageExporterNew.exportMaskFromLayers(
+      layerManager,
+      const Size(8, 8),
+      forceHardEdges: true,
+      preferCpuHardEdgeExport: false,
+    );
+
+    final mask = img.decodeImage(exported)!;
+    expect(_redAt(mask, 0, 0), equals(0));
+    expect(_redAt(mask, 3, 2), equals(255));
+  });
+
   test('ImageExporterNew keeps Canvas fallback for selection paths', () async {
     final layerManager = LayerManager();
     addTearDown(layerManager.dispose);
