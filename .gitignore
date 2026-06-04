@@ -326,6 +326,6 @@ flutter/
 flutter_windows.zip
 dist/*.zip
 .claude_settings.json
-docs/plans
+/docs/
 .worktrees/
 .kimi/
