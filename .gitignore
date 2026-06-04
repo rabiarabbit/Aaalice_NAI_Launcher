@@ -224,6 +224,7 @@ test/core/*
 !test/core/utils/
 test/core/utils/*
 !test/core/utils/inpaint_outpaint_utils_test.dart
+!test/core/utils/hard_edge_mask_exporter_test.dart
 
 # 保留本功能新增的固定标签侧栏回归测试
 !test/presentation/
