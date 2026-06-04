@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/utils/app_logger.dart';
+import '../../../../core/utils/hard_edge_mask_exporter.dart';
 import '../core/history_manager.dart';
 
 /// 画布调整模式
@@ -152,6 +153,8 @@ class Layer {
   ui.Image? get baseImage => _baseImage;
   Uint8List? _baseImageBytes;
   Uint8List? get baseImageBytes => _baseImageBytes;
+  Offset _baseImageOffset = Offset.zero;
+  Offset get baseImageOffset => _baseImageOffset;
 
   /// 光栅化后的图像缓存（笔画合并后）
   ui.Image? _rasterizedImage;
@@ -220,6 +223,48 @@ class Layer {
 
   /// 待处理的笔画数量
   int get pendingStrokeCount => _strokes.length - _rasterizedStrokeCount;
+
+  HardEdgeMaskBaseImage? toHardEdgeBaseMask() {
+    final bytes = _baseImageBytes;
+    if (bytes == null) {
+      return null;
+    }
+
+    return HardEdgeMaskBaseImage(
+      bytes: bytes,
+      offsetX: _baseImageOffset.dx.round(),
+      offsetY: _baseImageOffset.dy.round(),
+    );
+  }
+
+  List<HardEdgeMaskStroke> toHardEdgeMaskStrokes() {
+    return _strokes.map((stroke) {
+      return HardEdgeMaskStroke(
+        points: List<Offset>.from(stroke.points),
+        size: stroke.size,
+        isEraser: stroke.isEraser,
+      );
+    }).toList();
+  }
+
+  List<HardEdgeMaskOperation> toHardEdgeMaskOperations({
+    bool includeBaseImage = true,
+  }) {
+    final operations = <HardEdgeMaskOperation>[];
+
+    if (includeBaseImage) {
+      final baseMask = toHardEdgeBaseMask();
+      if (baseMask != null) {
+        operations.add(HardEdgeMaskBaseImageOperation(baseMask: baseMask));
+      }
+    }
+
+    for (final stroke in toHardEdgeMaskStrokes()) {
+      operations.add(HardEdgeMaskStrokeOperation(stroke: stroke));
+    }
+
+    return operations;
+  }
 
   /// 是否应该延迟光栅化
   bool get shouldDeferRasterize {
@@ -677,7 +722,10 @@ class Layer {
         // eraser + baseImage: saveLayer 内先绘制 base 再绘制全部笔画
         canvas.saveLayer(
           Rect.fromLTWH(
-            0, 0, canvasSize.width.toDouble(), canvasSize.height.toDouble(),
+            0,
+            0,
+            canvasSize.width.toDouble(),
+            canvasSize.height.toDouble(),
           ),
           Paint(),
         );
@@ -808,6 +856,7 @@ class Layer {
     if (_baseImageBytes != null) {
       cloned._baseImageBytes = Uint8List.fromList(_baseImageBytes!);
     }
+    cloned._baseImageOffset = _baseImageOffset;
 
     for (final stroke in _strokes) {
       cloned.addStroke(stroke.copyWith());
@@ -900,6 +949,7 @@ class Layer {
     // 清理笔画数据
     _strokes.clear();
     _baseImageBytes = null;
+    _baseImageOffset = Offset.zero;
 
     // 重置计数器和标志
     _rasterizedStrokeCount = 0;

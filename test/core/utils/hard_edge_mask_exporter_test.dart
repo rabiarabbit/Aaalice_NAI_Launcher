@@ -4,8 +4,14 @@ import 'dart:ui';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image/image.dart' as img;
 import 'package:nai_launcher/core/utils/hard_edge_mask_exporter.dart';
+import 'package:nai_launcher/presentation/widgets/image_editor/core/history_manager.dart';
+import 'package:nai_launcher/presentation/widgets/image_editor/export/image_exporter_new.dart';
+import 'package:nai_launcher/presentation/widgets/image_editor/layers/layer.dart';
+import 'package:nai_launcher/presentation/widgets/image_editor/layers/layer_manager.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   test('exports additional mask rects as white hard-edge pixels', () async {
     final bytes = await HardEdgeMaskExporter.exportAsync(
       const HardEdgeMaskExportInput(
@@ -164,6 +170,134 @@ void main() {
     expect(mask.getPixel(9, 5).r, equals(255));
     expect(mask.getPixel(10, 2).r, equals(0));
   });
+
+  test('CPU exporter matches the expected hard-edge canvas semantics',
+      () async {
+    final bytes = await HardEdgeMaskExporter.exportAsync(
+      const HardEdgeMaskExportInput(
+        width: 12,
+        height: 12,
+        strokes: [
+          HardEdgeMaskStroke(
+            points: [Offset(2, 6), Offset(9, 6)],
+            size: 3,
+            isEraser: false,
+          ),
+        ],
+        baseMasks: [],
+        additionalRects: [Rect.fromLTWH(0, 0, 2, 2)],
+      ),
+    );
+
+    final mask = img.decodeImage(bytes)!;
+    expect(mask.getPixel(0, 0).r, equals(255));
+    expect(mask.getPixel(2, 6).r, equals(255));
+    expect(mask.getPixel(9, 6).r, equals(255));
+    expect(mask.getPixel(11, 11).r, equals(0));
+  });
+
+  test('Layer exports hard-edge mask DTOs in canvas order', () async {
+    final layer = Layer();
+    addTearDown(layer.dispose);
+
+    await layer.setBaseImage(_singleWhitePixelPng());
+    layer.addStroke(
+      StrokeData(
+        points: const [Offset(2, 2), Offset(5, 2)],
+        size: 3,
+        color: const Color(0xFFFFFFFF),
+        opacity: 1,
+        hardness: 1,
+        isEraser: true,
+      ),
+    );
+
+    final baseMask = layer.toHardEdgeBaseMask();
+    expect(baseMask, isNotNull);
+    expect(baseMask!.offsetX, equals(0));
+    expect(baseMask.offsetY, equals(0));
+    expect(layer.baseImageOffset, Offset.zero);
+
+    final strokes = layer.toHardEdgeMaskStrokes();
+    expect(strokes, hasLength(1));
+    expect(strokes.single.points, const [Offset(2, 2), Offset(5, 2)]);
+    expect(strokes.single.size, equals(3));
+    expect(strokes.single.isEraser, isTrue);
+
+    final operations = layer.toHardEdgeMaskOperations();
+    expect(operations, hasLength(2));
+    expect(operations.first, isA<HardEdgeMaskBaseImageOperation>());
+    expect(operations.last, isA<HardEdgeMaskStrokeOperation>());
+  });
+
+  test('ImageExporterNew routes hard-edge layer masks through CPU exporter',
+      () async {
+    final layerManager = LayerManager();
+    addTearDown(layerManager.dispose);
+    final layer = layerManager.addLayer();
+    layer.addStroke(
+      StrokeData(
+        points: const [Offset(2, 6), Offset(9, 6)],
+        size: 3,
+        color: const Color(0xFFFFFFFF),
+        opacity: 1,
+        hardness: 1,
+      ),
+    );
+
+    final exported = await ImageExporterNew.exportMaskFromLayers(
+      layerManager,
+      const Size(12, 12),
+      forceHardEdges: true,
+      additionalMaskRects: const [Rect.fromLTWH(0, 0, 2, 2)],
+      preferCpuHardEdgeExport: true,
+    );
+    final expected = await HardEdgeMaskExporter.exportAsync(
+      const HardEdgeMaskExportInput(
+        width: 12,
+        height: 12,
+        strokes: [],
+        baseMasks: [],
+        additionalRects: [Rect.fromLTWH(0, 0, 2, 2)],
+        orderedOperations: [
+          HardEdgeMaskStrokeOperation(
+            stroke: HardEdgeMaskStroke(
+              points: [Offset(2, 6), Offset(9, 6)],
+              size: 3,
+              isEraser: false,
+            ),
+          ),
+        ],
+      ),
+    );
+
+    final exportedMask = img.decodeImage(exported)!;
+    final expectedMask = img.decodeImage(expected)!;
+    expect(_redAt(exportedMask, 0, 0), equals(_redAt(expectedMask, 0, 0)));
+    expect(_redAt(exportedMask, 2, 6), equals(_redAt(expectedMask, 2, 6)));
+    expect(_redAt(exportedMask, 9, 6), equals(_redAt(expectedMask, 9, 6)));
+    expect(_redAt(exportedMask, 11, 11), equals(_redAt(expectedMask, 11, 11)));
+  });
+
+  test('ImageExporterNew keeps Canvas fallback for selection paths', () async {
+    final layerManager = LayerManager();
+    addTearDown(layerManager.dispose);
+    final selectionPath = Path()..addRect(const Rect.fromLTWH(10, 10, 1, 1));
+
+    final exported = await ImageExporterNew.exportMaskFromLayers(
+      layerManager,
+      const Size(12, 12),
+      selectionPath: selectionPath,
+      forceHardEdges: true,
+      additionalMaskRects: const [Rect.fromLTWH(0, 0, 2, 2)],
+      preferCpuHardEdgeExport: true,
+    );
+
+    final mask = img.decodeImage(exported)!;
+    expect(_redAt(mask, 0, 0), equals(255));
+    expect(_redAt(mask, 10, 10), equals(255));
+    expect(_redAt(mask, 11, 11), equals(0));
+  });
 }
 
 Uint8List _singleWhitePixelPng() {
@@ -171,3 +305,5 @@ Uint8List _singleWhitePixelPng() {
   base.setPixelRgba(0, 0, 255, 255, 255, 255);
   return Uint8List.fromList(img.encodePng(base));
 }
+
+int _redAt(img.Image image, int x, int y) => image.getPixel(x, y).r.toInt();
