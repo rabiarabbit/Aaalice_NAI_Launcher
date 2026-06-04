@@ -746,6 +746,44 @@ void main() {
       expect(virtualResult.width, equals(64));
       expect(virtualResult.height, equals(128));
     });
+
+    test('rejects malformed virtual frame dimensions before materializing', () {
+      final sourceImage = _sourcePng(128, 128);
+      final malformedFrames = [
+        const OutpaintVirtualFrame(
+          sourceWidth: 128,
+          sourceHeight: 128,
+          frameLeft: 32,
+          frameTop: 0,
+          frameRight: 32,
+          frameBottom: 128,
+        ),
+        const OutpaintVirtualFrame(
+          sourceWidth: 128,
+          sourceHeight: 128,
+          frameLeft: 0,
+          frameTop: 96,
+          frameRight: 128,
+          frameBottom: 64,
+        ),
+      ];
+
+      for (final frame in malformedFrames) {
+        expect(
+          () => InpaintOutpaintUtils.materializeVirtualFrame(
+            sourceImage: sourceImage,
+            frame: frame,
+          ),
+          throwsA(
+            isA<ArgumentError>().having(
+              (error) => error.message,
+              'message',
+              'Virtual frame dimensions must be positive',
+            ),
+          ),
+        );
+      }
+    });
   });
 }
 

@@ -515,21 +515,26 @@ class InpaintOutpaintUtils {
         'Virtual frame source dimensions do not match source image',
       );
     }
-    _validateExpandedDimensions(frame.width, frame.height);
+    final frameWidth = frame.width;
+    final frameHeight = frame.height;
+    if (frameWidth <= 0 || frameHeight <= 0) {
+      throw ArgumentError('Virtual frame dimensions must be positive');
+    }
+    _validateExpandedDimensions(frameWidth, frameHeight);
 
     final output = img.Image(
-      width: frame.width,
-      height: frame.height,
+      width: frameWidth,
+      height: frameHeight,
       numChannels: 4,
     );
     img.fill(output, color: img.ColorRgba8(0, 0, 0, 0));
 
-    for (var y = 0; y < frame.height; y++) {
+    for (var y = 0; y < frameHeight; y++) {
       final sourceY = y + frame.frameTop;
       if (sourceY < 0 || sourceY >= source.height) {
         continue;
       }
-      for (var x = 0; x < frame.width; x++) {
+      for (var x = 0; x < frameWidth; x++) {
         final sourceX = x + frame.frameLeft;
         if (sourceX < 0 || sourceX >= source.width) {
           continue;
@@ -548,8 +553,8 @@ class InpaintOutpaintUtils {
 
     return OutpaintVirtualMaterializeResult(
       sourceImage: Uint8List.fromList(img.encodePng(output)),
-      width: frame.width,
-      height: frame.height,
+      width: frameWidth,
+      height: frameHeight,
     );
   }
 
