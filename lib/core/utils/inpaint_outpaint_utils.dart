@@ -249,6 +249,18 @@ class OutpaintVirtualApplyResult {
   List<Rect> get outpaintMaskRects => frame.outpaintMaskRects;
 }
 
+class OutpaintVirtualMaterializeResult {
+  final Uint8List sourceImage;
+  final int width;
+  final int height;
+
+  const OutpaintVirtualMaterializeResult({
+    required this.sourceImage,
+    required this.width,
+    required this.height,
+  });
+}
+
 class OutpaintVirtualFrame {
   final int sourceWidth;
   final int sourceHeight;
@@ -472,6 +484,72 @@ class InpaintOutpaintUtils {
         includeEditorOverlay: includeEditorOverlay,
         editorOverlayAlpha: editorOverlayAlpha,
       ),
+    );
+  }
+
+  static Future<OutpaintVirtualMaterializeResult> materializeVirtualFrameAsync({
+    required Uint8List sourceImage,
+    required OutpaintVirtualFrame frame,
+  }) {
+    return Isolate.run(
+      () => materializeVirtualFrame(
+        sourceImage: sourceImage,
+        frame: frame,
+      ),
+    );
+  }
+
+  static OutpaintVirtualMaterializeResult materializeVirtualFrame({
+    required Uint8List sourceImage,
+    required OutpaintVirtualFrame frame,
+  }) {
+    final decodedSource = _decodeSourceImage(sourceImage);
+    if (decodedSource == null) {
+      throw const FormatException('Unable to decode source image');
+    }
+    final source =
+        decodedSource.convert(format: img.Format.uint8, numChannels: 4);
+    if (source.width != frame.sourceWidth ||
+        source.height != frame.sourceHeight) {
+      throw ArgumentError(
+        'Virtual frame source dimensions do not match source image',
+      );
+    }
+    _validateExpandedDimensions(frame.width, frame.height);
+
+    final output = img.Image(
+      width: frame.width,
+      height: frame.height,
+      numChannels: 4,
+    );
+    img.fill(output, color: img.ColorRgba8(0, 0, 0, 0));
+
+    for (var y = 0; y < frame.height; y++) {
+      final sourceY = y + frame.frameTop;
+      if (sourceY < 0 || sourceY >= source.height) {
+        continue;
+      }
+      for (var x = 0; x < frame.width; x++) {
+        final sourceX = x + frame.frameLeft;
+        if (sourceX < 0 || sourceX >= source.width) {
+          continue;
+        }
+        final pixel = source.getPixel(sourceX, sourceY);
+        output.setPixelRgba(
+          x,
+          y,
+          pixel.r,
+          pixel.g,
+          pixel.b,
+          pixel.a,
+        );
+      }
+    }
+
+    return OutpaintVirtualMaterializeResult(
+      sourceImage: Uint8List.fromList(img.encodePng(output)),
+      width: frame.width,
+      height: frame.height,
     );
   }
 

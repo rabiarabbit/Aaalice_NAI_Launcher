@@ -696,6 +696,56 @@ void main() {
       expect(result.contentShift, Offset.zero);
       expect(result.frame.hasOutpaintChanges, isTrue);
     });
+
+    test('materializes a virtual right expansion like resizeFrame', () async {
+      final sourceImage = _sourcePng(128, 96);
+      final frame = OutpaintVirtualFrame.fromSource(
+        sourceWidth: 128,
+        sourceHeight: 96,
+      );
+      final applied = frame.applyDelta(const OutpaintFrameDelta(right: 33));
+
+      final virtualResult =
+          await InpaintOutpaintUtils.materializeVirtualFrameAsync(
+        sourceImage: sourceImage,
+        frame: applied.frame,
+      );
+      final resizeResult = await InpaintOutpaintUtils.resizeFrameAsync(
+        sourceImage: sourceImage,
+        delta: const OutpaintFrameDelta(right: 33),
+      );
+
+      expect(virtualResult.sourceImage, equals(resizeResult.sourceImage));
+      expect(virtualResult.width, equals(resizeResult.width));
+      expect(virtualResult.height, equals(resizeResult.height));
+    });
+
+    test('materializes a virtual left crop like resizeFrame', () async {
+      final sourceImage = _horizontalGradientPng(128, 128);
+      final frame = OutpaintVirtualFrame.fromSource(
+        sourceWidth: 128,
+        sourceHeight: 128,
+      );
+      final applied = frame.applyDelta(
+        const OutpaintFrameDelta(left: -33),
+        horizontalSnapTarget: OutpaintHorizontalSnapTarget.left,
+      );
+
+      final virtualResult =
+          await InpaintOutpaintUtils.materializeVirtualFrameAsync(
+        sourceImage: sourceImage,
+        frame: applied.frame,
+      );
+      final resizeResult = await InpaintOutpaintUtils.resizeFrameAsync(
+        sourceImage: sourceImage,
+        delta: const OutpaintFrameDelta(left: -33),
+        horizontalSnapTarget: OutpaintHorizontalSnapTarget.left,
+      );
+
+      expect(virtualResult.sourceImage, equals(resizeResult.sourceImage));
+      expect(virtualResult.width, equals(64));
+      expect(virtualResult.height, equals(128));
+    });
   });
 }
 
