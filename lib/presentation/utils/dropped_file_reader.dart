@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:super_clipboard/super_clipboard.dart';
 
 import '../../core/utils/app_logger.dart';
+import '../../core/utils/file_name_sanitizer.dart';
 import '../../core/utils/vibe_file_parser.dart';
 
 class DroppedFileData {
@@ -513,9 +514,10 @@ class DroppedFileReader {
   }
 
   static String _sanitizeFileName(String fileName) {
-    final sanitized =
-        fileName.replaceAll(RegExp(r'[<>:"/\\|?*\x00-\x1F]'), '_').trim();
-    return sanitized.isEmpty ? 'dropped_image' : sanitized;
+    return FileNameSanitizer.sanitize(
+      fileName,
+      fallback: 'dropped_image',
+    );
   }
 
   static String _extensionOf(String fileName) {

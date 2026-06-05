@@ -701,6 +701,112 @@ void main() {
           sweetoneOnlyFile.path,
         ]);
       });
+
+      test('should apply comma search inside database prefiltered results',
+          () async {
+        final now = DateTime.now();
+        final favoriteMatch = File('/test/comma_prefilter_favorite.png');
+        final decoyA = File('/test/comma_prefilter_decoy_a.png');
+        final decoyB = File('/test/comma_prefilter_decoy_b.png');
+
+        final favoriteId = await dataSource.upsertImage(
+          filePath: favoriteMatch.path,
+          fileName: 'comma_prefilter_favorite.png',
+          fileSize: 1024,
+          createdAt: now.subtract(const Duration(days: 3)),
+          modifiedAt: now.subtract(const Duration(days: 3)),
+        );
+        final decoyAId = await dataSource.upsertImage(
+          filePath: decoyA.path,
+          fileName: 'comma_prefilter_decoy_a.png',
+          fileSize: 1024,
+          createdAt: now,
+          modifiedAt: now,
+        );
+        final decoyBId = await dataSource.upsertImage(
+          filePath: decoyB.path,
+          fileName: 'comma_prefilter_decoy_b.png',
+          fileSize: 1024,
+          createdAt: now.subtract(const Duration(hours: 1)),
+          modifiedAt: now.subtract(const Duration(hours: 1)),
+        );
+
+        await dataSource.batchUpsertMetadata([
+          MapEntry(
+            favoriteId,
+            const NaiImageMetadata(
+              prompt: 'artist:shycocoa, sweetonedollar, selected favorite',
+              negativePrompt: '',
+              seed: 10,
+            ),
+          ),
+          MapEntry(
+            decoyAId,
+            const NaiImageMetadata(
+              prompt: 'artist:shycocoa, sweetonedollar, newer decoy',
+              negativePrompt: '',
+              seed: 11,
+            ),
+          ),
+          MapEntry(
+            decoyBId,
+            const NaiImageMetadata(
+              prompt: 'artist:shycocoa, sweetonedollar, second newer decoy',
+              negativePrompt: '',
+              seed: 12,
+            ),
+          ),
+        ]);
+
+        await dataSource.toggleFavorite(favoriteId);
+
+        final filterService = GalleryFilterService(dataSource);
+        final result = await filterService.applyFilters(
+          [favoriteMatch, decoyA, decoyB],
+          const FilterCriteria(
+            searchQuery: 'sweetone,shycocoa',
+            showFavoritesOnly: true,
+          ),
+        );
+
+        expect(result.files.map((file) => file.path), [favoriteMatch.path]);
+      });
+    });
+
+    group('GalleryFilterService date filtering', () {
+      test('should filter date range across more than one legacy batch',
+          () async {
+        final tempDir = Directory.systemTemp.createTempSync(
+          'gallery_filter_date_',
+        );
+        addTearDown(() async {
+          if (await tempDir.exists()) {
+            await tempDir.delete(recursive: true);
+          }
+        });
+
+        final files = <File>[];
+        final outsideDate = DateTime(2026, 1, 9, 12);
+        final insideDate = DateTime(2026, 1, 10, 12);
+
+        for (var i = 0; i < 51; i++) {
+          final file = File('${tempDir.path}/image_$i.png');
+          await file.writeAsBytes([i]);
+          await file.setLastModified(i == 50 ? insideDate : outsideDate);
+          files.add(file);
+        }
+
+        final filterService = GalleryFilterService(dataSource);
+        final result = await filterService.applyFilters(
+          files,
+          FilterCriteria(
+            dateStart: DateTime(2026, 1, 10),
+            dateEnd: DateTime(2026, 1, 10),
+          ),
+        );
+
+        expect(result.files.map((file) => file.path), [files.last.path]);
+      });
     });
 
     // ============================================================

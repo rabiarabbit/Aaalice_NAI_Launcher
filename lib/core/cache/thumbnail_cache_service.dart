@@ -8,6 +8,7 @@ import 'package:path/path.dart' as p;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../utils/app_logger.dart';
+import '../utils/isolate_pool.dart';
 
 part 'thumbnail_cache_service.g.dart';
 
@@ -130,9 +131,8 @@ class ThumbnailCacheService {
 
   ThumbnailCacheService._internal();
 
-  /// 初始化锁，防止重复初始化
-  final _initLock = Object();
-  bool _isInitializing = false;
+  /// 初始化任务缓存，防止重复初始化和轮询等待。
+  Future<void>? _initFuture;
 
   /// 默认缩略图尺寸
   static const ThumbnailSize defaultSize = ThumbnailSize.small;
@@ -196,31 +196,19 @@ class ThumbnailCacheService {
   /// 初始化服务
   ///
   /// 线程安全，防止重复初始化
-  Future<void> init() async {
-    if (_initialized) return;
+  Future<void> init() {
+    if (_initialized) return Future.value();
+    return _initFuture ??= _runInit();
+  }
 
-    // 使用同步锁防止并发初始化
-    if (_isInitializing) {
-      // 等待初始化完成
-      while (_isInitializing) {
-        await Future.delayed(const Duration(milliseconds: 10));
-      }
-      return;
-    }
-
-    synchronized(_initLock, () {
-      _isInitializing = true;
-    });
-
+  Future<void> _runInit() async {
     try {
       // 清理任何残留状态
       _cleanupStaleState();
 
       _initialized = true;
     } finally {
-      synchronized(_initLock, () {
-        _isInitializing = false;
-      });
+      _initFuture = null;
     }
   }
 
@@ -355,7 +343,8 @@ class ThumbnailCacheService {
     // 【修复】防止为缩略图生成缩略图
     if (originalPath.contains('.thumb.') ||
         originalPath.contains(
-            '${Platform.pathSeparator}.thumbs${Platform.pathSeparator}')) {
+          '${Platform.pathSeparator}.thumbs${Platform.pathSeparator}',
+        )) {
       // AppLogger.w('Refusing to generate thumbnail for thumbnail: $originalPath', 'ThumbnailCache');
       return null;
     }
@@ -411,7 +400,7 @@ class ThumbnailCacheService {
         await thumbDir.create(recursive: true);
       }
 
-      final result = await compute(
+      final result = await ComputeGate().runCompute(
         _generateThumbnailBytesInIsolate,
         <String, Object?>{
           'originalPath': originalPath,
@@ -686,8 +675,10 @@ class ThumbnailCacheService {
   ///   - 'resetStats': bool - 是否重置统计信息（默认 true）
   ///   - 'preserveAccessTimes': bool - 是否保留访问时间记录（默认 false）
   /// 返回被删除的目录数量
-  Future<int> clearCache(String rootPath,
-      {Map<String, dynamic>? options}) async {
+  Future<int> clearCache(
+    String rootPath, {
+    Map<String, dynamic>? options,
+  }) async {
     try {
       final rootDir = Directory(rootPath);
       if (!await rootDir.exists()) {
@@ -784,7 +775,11 @@ class ThumbnailCacheService {
       return deletedCount;
     } catch (e, stack) {
       AppLogger.e(
-          'Failed to clear cache before date: $e', e, stack, 'ThumbnailCache');
+        'Failed to clear cache before date: $e',
+        e,
+        stack,
+        'ThumbnailCache',
+      );
       return 0;
     }
   }
@@ -834,7 +829,11 @@ class ThumbnailCacheService {
       return cleanedCount;
     } catch (e, stack) {
       AppLogger.e(
-          'Failed to cleanup nested thumbs: $e', e, stack, 'ThumbnailCache');
+        'Failed to cleanup nested thumbs: $e',
+        e,
+        stack,
+        'ThumbnailCache',
+      );
       return 0;
     }
   }
@@ -1122,7 +1121,11 @@ class ThumbnailCacheService {
       }
     } catch (e, stack) {
       AppLogger.e(
-          'Failed to get all thumbnails: $e', e, stack, 'ThumbnailCache');
+        'Failed to get all thumbnails: $e',
+        e,
+        stack,
+        'ThumbnailCache',
+      );
     }
 
     return thumbnails;
@@ -1148,7 +1151,8 @@ class ThumbnailCacheService {
         originalPath.contains('%2E%2E') ||
         normalizedPath.contains('..')) {
       throw ArgumentError(
-          'Invalid path: path traversal detected in "$originalPath"');
+        'Invalid path: path traversal detected in "$originalPath"',
+      );
     }
 
     // 额外验证：如果设置了根目录，确保路径在根目录内
@@ -1320,11 +1324,6 @@ class _ThumbnailStats {
       'hitRateValue': hitRate,
     };
   }
-}
-
-/// 简单的同步锁实现
-void synchronized(Object lock, void Function() action) {
-  action();
 }
 
 Map<String, Object?> _generateThumbnailBytesInIsolate(

@@ -1,40 +1,85 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:isolate';
+import 'dart:math' as math;
 
-/// 全局Isolate池，限制并发Isolate数量
+import 'package:flutter/foundation.dart' as foundation;
+
+/// 全局重型计算闸门，统一限制 compute/Isolate.run 并发数量。
 ///
-/// 防止Isolate滥用导致的内存压力和系统资源耗尽
-class IsolatePool {
-  static final IsolatePool _instance = IsolatePool._internal();
-  factory IsolatePool() => _instance;
-  IsolatePool._internal();
+/// 该类只负责全局背压；它不会复用常驻 isolate。
+class ComputeGate {
+  static final ComputeGate _instance = ComputeGate._internal(
+    maxConcurrentTasks: defaultMaxConcurrentTasks(),
+  );
 
-  final _Semaphore _semaphore = _Semaphore(3); // 最多3个并发Isolate
+  factory ComputeGate() => _instance;
 
-  /// 在Isolate池中运行任务
-  ///
-  /// [task] 要在Isolate中执行的异步任务
-  /// 返回任务结果
-  Future<T> run<T>(Future<T> Function() task) async {
+  ComputeGate._internal({required int maxConcurrentTasks})
+      : _semaphore = _Semaphore(math.max(1, maxConcurrentTasks));
+
+  @foundation.visibleForTesting
+  factory ComputeGate.forTesting({required int maxConcurrentTasks}) {
+    return ComputeGate._internal(maxConcurrentTasks: maxConcurrentTasks);
+  }
+
+  final _Semaphore _semaphore;
+
+  int get maxConcurrentTasks => _semaphore.maxCount;
+
+  static int defaultMaxConcurrentTasks({int? processorCount}) {
+    final processors =
+        math.max(1, processorCount ?? Platform.numberOfProcessors);
+    return math.min(3, math.max(1, processors - 1));
+  }
+
+  /// 在全局计算闸门内运行异步/同步任务。
+  Future<T> run<T>(FutureOr<T> Function() task) async {
     await _semaphore.acquire();
     try {
-      return await Isolate.run(() => task());
+      return await task();
     } finally {
       _semaphore.release();
     }
   }
 
-  /// 在Isolate池中运行同步任务
+  /// 在全局计算闸门内运行 Flutter compute。
+  Future<R> runCompute<M, R>(
+    foundation.ComputeCallback<M, R> callback,
+    M message, {
+    String? debugLabel,
+  }) {
+    return run(
+      () => foundation.compute(callback, message, debugLabel: debugLabel),
+    );
+  }
+
+  /// 在全局计算闸门内运行一次 Isolate.run。
   ///
-  /// [task] 要在Isolate中执行的同步任务
-  /// 返回任务结果
-  Future<T> runSync<T>(T Function() task) async {
-    await _semaphore.acquire();
-    try {
-      return await Isolate.run(() => task());
-    } finally {
-      _semaphore.release();
-    }
+  /// 这仍会为本次任务创建 isolate，不是常驻 worker 池。
+  Future<T> runIsolate<T>(FutureOr<T> Function() task) {
+    return run(() => Isolate.run(task));
+  }
+}
+
+/// 兼容旧调用名的包装器。
+///
+/// 旧名容易误导为“常驻 isolate 池”；实际行为只是通过 [ComputeGate]
+/// 限制每次 Isolate.run 的并发。
+@Deprecated('Use ComputeGate. IsolatePool does not reuse isolates.')
+class IsolatePool {
+  static final IsolatePool _instance = IsolatePool._internal();
+  factory IsolatePool() => _instance;
+  IsolatePool._internal();
+
+  final ComputeGate _gate = ComputeGate();
+
+  Future<T> run<T>(Future<T> Function() task) {
+    return _gate.runIsolate(task);
+  }
+
+  Future<T> runSync<T>(T Function() task) {
+    return _gate.runIsolate(task);
   }
 }
 

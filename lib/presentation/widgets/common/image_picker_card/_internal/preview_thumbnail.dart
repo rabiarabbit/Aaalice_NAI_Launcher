@@ -3,6 +3,8 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 
+import '../../decoded_memory_image.dart';
+
 /// 缩略图预览组件
 ///
 /// 支持从 Uint8List 或文件路径显示图像
@@ -34,6 +36,12 @@ class PreviewThumbnail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final pixelRatio = MediaQuery.devicePixelRatioOf(context);
+    final cacheSize = DecodedMemoryImage.resolveCacheDimension(
+      logicalSize: size,
+      constrainedSize: null,
+      pixelRatio: pixelRatio,
+    );
 
     // 优先使用字节数据
     if (imageBytes != null && imageBytes!.isNotEmpty) {
@@ -43,6 +51,8 @@ class PreviewThumbnail extends StatelessWidget {
           imageBytes!,
           width: size,
           height: size,
+          cacheWidth: cacheSize,
+          cacheHeight: cacheSize,
           fit: BoxFit.cover,
           errorBuilder: (context, error, stackTrace) => _buildFallback(theme),
         ),
@@ -66,8 +76,11 @@ class PreviewThumbnail extends StatelessWidget {
                 File(imagePath!),
                 width: size,
                 height: size,
+                cacheWidth: cacheSize,
+                cacheHeight: cacheSize,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => _buildFallback(theme),
+                errorBuilder: (context, error, stackTrace) =>
+                    _buildFallback(theme),
               ),
             );
           }
@@ -111,7 +124,7 @@ class PreviewThumbnail extends StatelessWidget {
         height: size * 0.3,
         child: CircularProgressIndicator(
           strokeWidth: 2,
-          color: theme.colorScheme.onSurfaceVariant.withOpacity(0.5),
+          color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
         ),
       ),
     );

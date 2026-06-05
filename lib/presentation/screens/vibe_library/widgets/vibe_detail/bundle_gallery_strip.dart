@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 import '../../../../themes/design_tokens.dart';
+import '../../../../widgets/common/decoded_memory_image.dart';
 
 /// Bundle 画廊条
 ///
@@ -53,10 +54,10 @@ class BundleGalleryStrip extends StatelessWidget {
         child: Container(
           height: 100,
           decoration: BoxDecoration(
-            color: theme.colorScheme.surface.withOpacity(0.6),
+            color: theme.colorScheme.surface.withValues(alpha: 0.6),
             border: Border(
               top: BorderSide(
-                color: theme.colorScheme.outlineVariant.withOpacity(0.2),
+                color: theme.colorScheme.outlineVariant.withValues(alpha: 0.2),
               ),
             ),
           ),
@@ -69,7 +70,7 @@ class BundleGalleryStrip extends StatelessWidget {
               Container(
                 width: 1,
                 height: 64,
-                color: theme.colorScheme.outlineVariant.withOpacity(0.3),
+                color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
               ),
 
               // 横向子 vibe 列表
@@ -106,13 +107,14 @@ class BundleGalleryStrip extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: isSelected
-              ? theme.colorScheme.primaryContainer.withOpacity(0.5)
-              : theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+              ? theme.colorScheme.primaryContainer.withValues(alpha: 0.5)
+              : theme.colorScheme.surfaceContainerHighest
+                  .withValues(alpha: 0.3),
           borderRadius: DesignTokens.borderRadiusLg,
           border: Border.all(
             color: isSelected
                 ? theme.colorScheme.primary
-                : theme.colorScheme.outlineVariant.withOpacity(0.3),
+                : theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -146,10 +148,15 @@ class BundleGalleryStrip extends StatelessWidget {
   Widget _buildVibeItem(BuildContext context, int index) {
     final theme = Theme.of(context);
     final isSelected = selectedIndex == index;
-    final preview =
-        vibePreviews != null && index < vibePreviews!.length
-            ? vibePreviews![index]
-            : null;
+    final preview = vibePreviews != null && index < vibePreviews!.length
+        ? vibePreviews![index]
+        : null;
+    final itemExtent = isSelected ? 70.0 : 64.0;
+    final cacheSize = DecodedMemoryImage.resolveCacheDimension(
+      logicalSize: itemExtent,
+      constrainedSize: null,
+      pixelRatio: MediaQuery.devicePixelRatioOf(context),
+    );
 
     return GestureDetector(
       onTap: () => onSelected(index),
@@ -157,13 +164,13 @@ class BundleGalleryStrip extends StatelessWidget {
           ? () => onLongPressSetCover!(index)
           : null,
       child: Tooltip(
-        message: vibeNames[index] +
-            (onLongPressSetCover != null ? '\n长按设为封面' : ''),
+        message:
+            vibeNames[index] + (onLongPressSetCover != null ? '\n长按设为封面' : ''),
         child: AnimatedContainer(
           duration: DesignTokens.animationNormal,
           curve: DesignTokens.curveStandard,
-          width: isSelected ? 70 : 64,
-          height: isSelected ? 70 : 64,
+          width: itemExtent,
+          height: itemExtent,
           margin: EdgeInsets.symmetric(
             horizontal: DesignTokens.spacingXxs,
             vertical: isSelected ? 11 : 14,
@@ -171,15 +178,14 @@ class BundleGalleryStrip extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: DesignTokens.borderRadiusLg,
             border: Border.all(
-              color: isSelected
-                  ? theme.colorScheme.primary
-                  : Colors.transparent,
+              color:
+                  isSelected ? theme.colorScheme.primary : Colors.transparent,
               width: isSelected ? 2 : 1,
             ),
             boxShadow: isSelected
                 ? [
                     BoxShadow(
-                      color: theme.colorScheme.primary.withOpacity(0.4),
+                      color: theme.colorScheme.primary.withValues(alpha: 0.4),
                       blurRadius: 12,
                       spreadRadius: 1,
                     ),
@@ -192,6 +198,8 @@ class BundleGalleryStrip extends StatelessWidget {
                 ? Image.memory(
                     preview,
                     fit: BoxFit.cover,
+                    cacheWidth: cacheSize,
+                    cacheHeight: cacheSize,
                     errorBuilder: (_, __, ___) =>
                         _buildItemPlaceholder(theme, index),
                   )

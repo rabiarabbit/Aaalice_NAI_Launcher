@@ -79,7 +79,8 @@ class IsolateParseResult {
 /// - 性能统计
 class IsolateMetadataService {
   static IsolateMetadataService? _instance;
-  static IsolateMetadataService get instance => _instance ??= IsolateMetadataService._internal();
+  static IsolateMetadataService get instance =>
+      _instance ??= IsolateMetadataService._internal();
 
   IsolateMetadataService._internal();
 
@@ -248,32 +249,53 @@ class IsolateMetadataService {
       }
     } catch (e) {
       stopwatch.stop();
-      AppLogger.e('[IsolateMetadata] Edit parse ERROR', e, null, 'IsolateMetadataService');
+      AppLogger.e(
+        '[IsolateMetadata] Edit parse ERROR',
+        e,
+        null,
+        'IsolateMetadataService',
+      );
       return null;
     }
   }
 
   /// 取消所有进行中的任务
   void cancelAll() {
-    AppLogger.d('[IsolateMetadata] Cancelling all tasks', 'IsolateMetadataService');
+    AppLogger.d(
+      '[IsolateMetadata] Cancelling all tasks',
+      'IsolateMetadataService',
+    );
+    final queuedTasks = List<_ParseTask>.from(_taskQueue);
+    _taskQueue.clear();
+    _cancelledTasks += queuedTasks.length;
+
+    for (final task in queuedTasks) {
+      _completeTask(
+        task,
+        IsolateParseResult.error(
+          'Cancelled',
+          parseTime: Duration.zero,
+          wasCancelled: true,
+        ),
+      );
+    }
+
     for (final worker in _workers) {
       worker.cancelCurrent();
     }
-    _taskQueue.clear();
-    _cancelledTasks += _taskQueue.length;
   }
 
   /// 获取统计信息
   Map<String, dynamic> getStatistics() => {
-    'totalTasks': _totalTasks,
-    'successfulTasks': _successfulTasks,
-    'failedTasks': _failedTasks,
-    'cancelledTasks': _cancelledTasks,
-    'timeoutTasks': _timeoutTasks,
-    'successRate': _totalTasks > 0 ? _successfulTasks / _totalTasks : 0.0,
-    'activeWorkers': _workers.where((w) => w.isBusy).length,
-    'queuedTasks': _taskQueue.length,
-  };
+        'totalTasks': _totalTasks,
+        'successfulTasks': _successfulTasks,
+        'failedTasks': _failedTasks,
+        'cancelledTasks': _cancelledTasks,
+        'timeoutTasks': _timeoutTasks,
+        'successRate': _totalTasks > 0 ? _successfulTasks / _totalTasks : 0.0,
+        'activeWorkers': _workers.where((w) => w.isBusy).length,
+        'queuedTasks': _taskQueue.length,
+      };
 
   /// 重置统计
   void resetStatistics() {
@@ -286,7 +308,10 @@ class IsolateMetadataService {
 
   /// 销毁服务
   void dispose() {
-    AppLogger.i('[IsolateMetadata] Disposing service', 'IsolateMetadataService');
+    AppLogger.i(
+      '[IsolateMetadata] Disposing service',
+      'IsolateMetadataService',
+    );
     cancelAll();
     for (final worker in _workers) {
       worker.dispose();
@@ -329,6 +354,8 @@ class IsolateMetadataService {
         _failedTasks++;
       }
 
+      _completeTask(task, result);
+
       // 处理队列中的下一个任务
       _processQueue();
 
@@ -343,13 +370,16 @@ class IsolateMetadataService {
         'IsolateMetadataService',
       );
 
-      // 处理队列中的下一个任务
-      _processQueue();
-
-      return IsolateParseResult.error(
+      final result = IsolateParseResult.error(
         'Execution error: $e',
         parseTime: stopwatch.elapsed,
       );
+      _completeTask(task, result);
+
+      // 处理队列中的下一个任务
+      _processQueue();
+
+      return result;
     }
   }
 
@@ -365,20 +395,18 @@ class IsolateMetadataService {
       if (DateTime.now().difference(task.startTime) > task.config.timeout) {
         _taskQueue.remove(task);
         _timeoutTasks++;
-        return IsolateParseResult.error(
+        final result = IsolateParseResult.error(
           'Queue timeout after ${task.config.timeout.inSeconds}s',
           parseTime: stopwatch.elapsed,
           wasTimeout: true,
         );
+        _completeTask(task, result);
+        return result;
       }
     }
 
-    // 任务已经被执行，等待结果
-    // 注意：实际结果会通过 worker 返回，这里返回一个中间状态
-    return IsolateParseResult.error(
-      'Task in queue',
-      parseTime: stopwatch.elapsed,
-    );
+    // 任务已经被 worker 接手，等待真实解析结果。
+    return task.completer.future;
   }
 
   void _processQueue() {
@@ -386,13 +414,19 @@ class IsolateMetadataService {
 
     // 寻找空闲工作线程
     final worker = _workers.cast<_ParseWorker?>().firstWhere(
-      (w) => !(w?.isBusy ?? true),
-      orElse: () => null,
-    );
+          (w) => !(w?.isBusy ?? true),
+          orElse: () => null,
+        );
 
     if (worker != null) {
       final task = _taskQueue.removeAt(0);
       _executeTask(worker, task, Stopwatch()..start());
+    }
+  }
+
+  void _completeTask(_ParseTask task, IsolateParseResult result) {
+    if (!task.completer.isCompleted) {
+      task.completer.complete(result);
     }
   }
 }
@@ -405,12 +439,13 @@ class _ParseTask {
   final String filePath;
   final IsolateParseConfig config;
   final DateTime startTime;
+  final Completer<IsolateParseResult> completer;
 
   _ParseTask({
     required this.filePath,
     required this.config,
     required this.startTime,
-  });
+  }) : completer = Completer<IsolateParseResult>();
 }
 
 /// 解析工作线程

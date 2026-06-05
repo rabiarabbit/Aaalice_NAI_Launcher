@@ -1,3 +1,5 @@
+import 'tag_normalizer.dart';
+
 /// 括号条目，记录开括号时的位置和对应的闭括号位置
 class _BracketEntry {
   final int startPosition;
@@ -18,6 +20,8 @@ class _BracketEntry {
 /// 参考: https://github.com/Metachs/sdwebui-nai-api
 class SdToNaiConverter {
   SdToNaiConverter._();
+
+  static final RegExp _whitespaceCharPattern = RegExp(r'\s');
 
   /// SD圆括号默认权重倍数
   static const double _roundBracketMultiplier = 1.1;
@@ -118,7 +122,11 @@ class SdToNaiConverter {
   /// 对于第 2 类，只有在括号前已经存在同一段标签文本时才视为限定词；
   /// 这样仍然允许 `(masterpiece)` 这类独立括号被识别为 SD 权重。
   static bool _isTagNameBracket(
-      String text, int openIndex, int closeIndex, String content) {
+    String text,
+    int openIndex,
+    int closeIndex,
+    String content,
+  ) {
     // 检查前面是否是下划线
     final hasUnderscoreBefore = openIndex > 0 && text[openIndex - 1] == '_';
 
@@ -185,7 +193,11 @@ class SdToNaiConverter {
     }
 
     if (_isInlineQualifierBracket(
-        text, openIndex, content, hasNestedBrackets)) {
+      text,
+      openIndex,
+      content,
+      hasNestedBrackets,
+    )) {
       return true;
     }
 
@@ -229,7 +241,7 @@ class SdToNaiConverter {
 
   static int _findPreviousNonWhitespaceIndex(String text, int startExclusive) {
     for (var i = startExclusive - 1; i >= 0; i--) {
-      if (!RegExp(r'\s').hasMatch(text[i])) {
+      if (!_whitespaceCharPattern.hasMatch(text[i])) {
         return i;
       }
     }
@@ -239,7 +251,7 @@ class SdToNaiConverter {
   /// 检测文本是否已经包含NAI语法
   static bool hasNAISyntax(String text) {
     // NAI V4数值语法: weight::text:: (数字后跟双冒号，支持 1.5:: 或 .5:: 格式)
-    if (RegExp(r'-?(?:\d+\.?\d*|\.\d+)::').hasMatch(text)) return true;
+    if (TagNormalizer.weightPattern.hasMatch(text)) return true;
 
     // NAI花括号语法: 检测成对的花括号 {...}
     // 简单检查：有 { 后面跟着 }（允许嵌套）

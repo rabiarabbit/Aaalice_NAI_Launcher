@@ -9,6 +9,7 @@ import 'package:path/path.dart' as p;
 import '../../data/models/vibe/vibe_library_entry.dart';
 import '../../data/models/vibe/vibe_reference.dart';
 import 'app_logger.dart';
+import 'file_name_sanitizer.dart';
 import 'vibe_image_embedder.dart';
 
 class VibeEmbeddedPngExportPlan {
@@ -474,50 +475,32 @@ class VibeExportUtils {
 
   /// 生成文件名
   static String _generateFileName(String name) {
-    // 清理文件名中的非法字符
-    final sanitized = name.replaceAll(RegExp(r'[<>:"/\\|?*]'), '_').trim();
-
-    // 限制长度
-    var finalName = sanitized;
-    if (finalName.length > 50) {
-      finalName = finalName.substring(0, 50);
-    }
-
-    // 确保不为空
-    if (finalName.isEmpty) {
-      finalName = 'vibe';
-    }
+    final finalName = FileNameSanitizer.sanitize(
+      name,
+      fallback: 'vibe',
+      maxLength: 50,
+    );
 
     return '$finalName.naiv4vibe';
   }
 
   /// 生成 bundle 文件名
   static String _generateBundleFileName(String name) {
-    final sanitized = name.replaceAll(RegExp(r'[<>:"/\\|?*]'), '_').trim();
-
-    var finalName = sanitized;
-    if (finalName.length > 50) {
-      finalName = finalName.substring(0, 50);
-    }
-
-    if (finalName.isEmpty) {
-      finalName = 'vibe-bundle';
-    }
+    final finalName = FileNameSanitizer.sanitize(
+      name,
+      fallback: 'vibe-bundle',
+      maxLength: 50,
+    );
 
     return '$finalName.naiv4vibebundle';
   }
 
   static String _generateEmbeddedPngFileName(String name) {
-    final sanitized = name.replaceAll(RegExp(r'[<>:"/\\|?*]'), '_').trim();
-
-    var finalName = sanitized;
-    if (finalName.length > 50) {
-      finalName = finalName.substring(0, 50);
-    }
-
-    if (finalName.isEmpty) {
-      finalName = 'vibe';
-    }
+    final finalName = FileNameSanitizer.sanitize(
+      name,
+      fallback: 'vibe',
+      maxLength: 50,
+    );
 
     return '${finalName}_vibe.png';
   }

@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:logger/logger.dart';
+import 'package:nai_launcher/core/utils/app_logger.dart';
 
 /// 日志文件轮换和清理测试
 ///
@@ -231,6 +233,50 @@ void main() {
       expect(fileName, equals('app_20240620_142530.log'));
       expect(fileName.startsWith('app_'), isTrue);
       expect(fileName.endsWith('.log'), isTrue);
+    });
+  });
+
+  group('日志级别门禁', () {
+    tearDown(() {
+      AppLogger.debugSetMinimumLevelForTesting(null);
+    });
+
+    test('低于最低级别的惰性调试日志不会构建消息', () async {
+      await AppLogger.initialize(
+        isTestEnvironment: true,
+        enableFileLogging: false,
+      );
+      AppLogger.debugSetMinimumLevelForTesting(Level.warning);
+
+      var messageBuilt = false;
+      AppLogger.d(
+        () {
+          messageBuilt = true;
+          return 'expensive debug message';
+        },
+        'AppLoggerTest',
+      );
+
+      expect(messageBuilt, isFalse);
+    });
+
+    test('达到最低级别的惰性警告日志会构建消息', () async {
+      await AppLogger.initialize(
+        isTestEnvironment: true,
+        enableFileLogging: false,
+      );
+      AppLogger.debugSetMinimumLevelForTesting(Level.warning);
+
+      var messageBuilt = false;
+      AppLogger.w(
+        () {
+          messageBuilt = true;
+          return 'warning message';
+        },
+        'AppLoggerTest',
+      );
+
+      expect(messageBuilt, isTrue);
     });
   });
 }

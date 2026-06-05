@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
@@ -19,6 +20,13 @@ class AppLogger {
   static bool _initialized = false;
   static bool _isTestEnvironment = false;
   static bool _fileLoggingEnabled = false;
+  static Level? _minimumLevelOverride;
+
+  /// 文件日志轮转检查摊销阈值。
+  static const int _rotateCheckLogInterval = 500;
+  static const Duration _rotateCheckTimeInterval = Duration(seconds: 30);
+  static int _logsSinceRotateCheck = 0;
+  static DateTime? _lastRotateCheckAt;
 
   /// 日志文件最大数量
   static const int _maxLogFiles = 3;
@@ -79,11 +87,26 @@ class AppLogger {
     }
 
     return Logger(
-      filter: ProductionFilter(), // Release 模式下也能输出日志
+      filter: ProductionFilter(),
       printer: SimplePrinter(printTime: true),
-      level: Level.all,
+      level: _minimumLevel,
       output: outputs.length == 1 ? outputs.first : MultiOutput(outputs),
     );
+  }
+
+  static Level get _minimumLevel {
+    return _minimumLevelOverride ??
+        (kReleaseMode ? Level.warning : Level.trace);
+  }
+
+  static bool _shouldLog(Level level) => level >= _minimumLevel;
+
+  @visibleForTesting
+  static void debugSetMinimumLevelForTesting(Level? level) {
+    _minimumLevelOverride = level;
+    if (_logger != null) {
+      _logger = _buildLogger();
+    }
   }
 
   static Future<bool> _enableFileOutput() async {
@@ -136,6 +159,7 @@ class AppLogger {
       _fileLoggingEnabled = true;
       _fileLoggingEnabled = await _enableFileOutput();
       _logger = _buildLogger();
+      _resetRotateCheckState();
 
       if (_fileLoggingEnabled) {
         i('文件日志记录已开启', 'AppLogger');
@@ -153,6 +177,7 @@ class AppLogger {
     _fileOutput = null;
     _currentLogFile = null;
     _fileLoggingEnabled = false;
+    _resetRotateCheckState();
     _logger = _buildLogger();
 
     await oldFileOutput?.destroy();
@@ -300,6 +325,7 @@ class AppLogger {
         _logDirectory == null) {
       return;
     }
+    if (!_shouldCheckRotateNow()) return;
 
     try {
       final file = File(_currentLogFile!);
@@ -338,47 +364,81 @@ class AppLogger {
       _logger ??= Logger(
         filter: ProductionFilter(),
         printer: SimplePrinter(printTime: true),
-        level: Level.all,
+        level: _minimumLevel,
         output: ConsoleOutput(),
       );
     }
   }
 
+  static bool _shouldCheckRotateNow() {
+    final now = DateTime.now();
+    _logsSinceRotateCheck++;
+
+    final countDue = _logsSinceRotateCheck >= _rotateCheckLogInterval;
+    final timeDue = _lastRotateCheckAt == null ||
+        now.difference(_lastRotateCheckAt!) >= _rotateCheckTimeInterval;
+
+    if (!countDue && !timeDue) return false;
+
+    _logsSinceRotateCheck = 0;
+    _lastRotateCheckAt = now;
+    return true;
+  }
+
+  static void _resetRotateCheckState() {
+    _logsSinceRotateCheck = 0;
+    _lastRotateCheckAt = null;
+  }
+
+  static String _resolveMessage(Object message) {
+    if (message is String Function()) {
+      return message();
+    }
+    return message.toString();
+  }
+
+  static String _formatMessage(Object message, String? tag) {
+    final resolved = _resolveMessage(message);
+    final tagPrefix = tag != null ? '[$tag] ' : '';
+    return '$tagPrefix$resolved';
+  }
+
   /// 调试日志
-  static void d(String message, [String? tag]) {
+  static void d(Object message, [String? tag]) {
+    if (!_shouldLog(Level.debug)) return;
     _checkAndRotateLogFile();
     _ensureInitialized();
-    final tagPrefix = tag != null ? '[$tag] ' : '';
-    _logger!.d('$tagPrefix$message');
+    _logger!.d(_formatMessage(message, tag));
   }
 
   /// 信息日志
-  static void i(String message, [String? tag]) {
+  static void i(Object message, [String? tag]) {
+    if (!_shouldLog(Level.info)) return;
     _checkAndRotateLogFile();
     _ensureInitialized();
-    final tagPrefix = tag != null ? '[$tag] ' : '';
-    _logger!.i('$tagPrefix$message');
+    _logger!.i(_formatMessage(message, tag));
   }
 
   /// 警告日志
-  static void w(String message, [String? tag]) {
+  static void w(Object message, [String? tag]) {
+    if (!_shouldLog(Level.warning)) return;
     _checkAndRotateLogFile();
     _ensureInitialized();
-    final tagPrefix = tag != null ? '[$tag] ' : '';
-    _logger!.w('$tagPrefix$message');
+    _logger!.w(_formatMessage(message, tag));
   }
 
   /// 错误日志
   static void e(
-    String message, [
+    Object message, [
     dynamic error,
     StackTrace? stackTrace,
     String? tag,
   ]) {
+    if (!_shouldLog(Level.error)) return;
     _checkAndRotateLogFile();
     _ensureInitialized();
-    final tagPrefix = tag != null ? '[$tag] ' : '';
-    _logger!.e('$tagPrefix$message', error: error, stackTrace: stackTrace);
+    _logger!
+        .e(_formatMessage(message, tag), error: error, stackTrace: stackTrace);
     unawaited(flush());
   }
 

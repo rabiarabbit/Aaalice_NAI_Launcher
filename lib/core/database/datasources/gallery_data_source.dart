@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
@@ -7,6 +8,7 @@ import '../../../data/models/gallery/local_image_record.dart'
 import '../../../data/models/gallery/nai_image_metadata.dart';
 import '../../../data/services/image_metadata_service.dart';
 import '../../utils/app_logger.dart';
+import '../../utils/tag_normalizer.dart';
 import '../base_data_source.dart';
 import '../data_source.dart'
     show DataSourceHealth, DataSourceType, HealthStatus;
@@ -100,7 +102,8 @@ class GalleryImageRecord {
       ),
       lastScannedAt: map['last_scanned_at'] != null
           ? DateTime.fromMillisecondsSinceEpoch(
-              (map['last_scanned_at'] as num).toInt())
+              (map['last_scanned_at'] as num).toInt(),
+            )
           : null,
       dateYmd: (map['date_ymd'] as num?)?.toInt() ?? 0,
       resolutionKey: map['resolution_key'] as String?,
@@ -656,19 +659,29 @@ class GalleryDataSource extends EnhancedBaseDataSource {
 
       if (!hasColumn) {
         AppLogger.i(
-            '[Migration] Adding last_scanned_at column to $_imagesTable',
-            'GalleryDS');
+          '[Migration] Adding last_scanned_at column to $_imagesTable',
+          'GalleryDS',
+        );
         await db.execute(
-            'ALTER TABLE $_imagesTable ADD COLUMN last_scanned_at INTEGER');
-        AppLogger.i('[Migration] last_scanned_at column added successfully',
-            'GalleryDS');
+          'ALTER TABLE $_imagesTable ADD COLUMN last_scanned_at INTEGER',
+        );
+        AppLogger.i(
+          '[Migration] last_scanned_at column added successfully',
+          'GalleryDS',
+        );
       } else {
         AppLogger.d(
-            '[Migration] last_scanned_at column already exists', 'GalleryDS');
+          '[Migration] last_scanned_at column already exists',
+          'GalleryDS',
+        );
       }
     } catch (e, stack) {
-      AppLogger.e('[Migration] Failed to add last_scanned_at column', e, stack,
-          'GalleryDS');
+      AppLogger.e(
+        '[Migration] Failed to add last_scanned_at column',
+        e,
+        stack,
+        'GalleryDS',
+      );
       // 迁移失败不应该阻止应用启动
     }
   }
@@ -1049,7 +1062,9 @@ class GalleryDataSource extends EnhancedBaseDataSource {
       _markDataChanged();
 
       AppLogger.d(
-          'Updated file path for image $imageId: $newPath', 'GalleryDS');
+        'Updated file path for image $imageId: $newPath',
+        'GalleryDS',
+      );
     } catch (e, stack) {
       AppLogger.e(
         'Failed to update file path for image $imageId: $newPath',
@@ -1200,7 +1215,11 @@ class GalleryDataSource extends EnhancedBaseDataSource {
                   }
                 } catch (e, stack) {
                   AppLogger.e(
-                      'Failed to get images by IDs', e, stack, 'GalleryDS');
+                    'Failed to get images by IDs',
+                    e,
+                    stack,
+                    'GalleryDS',
+                  );
                 }
               },
               timeout: const Duration(seconds: 30),
@@ -1549,15 +1568,21 @@ class GalleryDataSource extends EnhancedBaseDataSource {
             _ => 'none',
           };
           counts[statusName] = count;
-          AppLogger.d('[GalleryDS] Status $statusIndex ($statusName): $count',
-              'GalleryDS');
+          AppLogger.d(
+            '[GalleryDS] Status $statusIndex ($statusName): $count',
+            'GalleryDS',
+          );
         }
 
         AppLogger.i('[GalleryDS] Final counts: $counts', 'GalleryDS');
         return counts;
       } catch (e, stack) {
         AppLogger.e(
-            'Failed to count images by metadata status', e, stack, 'GalleryDS');
+          'Failed to count images by metadata status',
+          e,
+          stack,
+          'GalleryDS',
+        );
         return {'success': 0, 'failed': 0, 'none': 0};
       }
     });
@@ -2126,7 +2151,11 @@ class GalleryDataSource extends EnhancedBaseDataSource {
           return results;
         } catch (e, stack) {
           AppLogger.e(
-              'Failed to search full text: $query', e, stack, 'GalleryDS');
+            'Failed to search full text: $query',
+            e,
+            stack,
+            'GalleryDS',
+          );
           return [];
         }
       },
@@ -2288,6 +2317,7 @@ class GalleryDataSource extends EnhancedBaseDataSource {
   Future<List<int>> searchByDelimitedTextSegments(
     List<String> segments, {
     int limit = 100,
+    List<String>? candidatePaths,
   }) async {
     final searchSegments = segments
         .map(_normalizeDelimitedSearchSegment)
@@ -2296,9 +2326,18 @@ class GalleryDataSource extends EnhancedBaseDataSource {
         .toList(growable: false);
     if (searchSegments.isEmpty) return [];
 
+    final candidatePathList = candidatePaths
+        ?.where((path) => path.isNotEmpty)
+        .toSet()
+        .toList(growable: false);
+    if (candidatePaths != null && candidatePathList!.isEmpty) return [];
+
     final cacheKey = _QueryCacheKey('searchByDelimitedTextSegments', {
       'segments': searchSegments.join(','),
       'limit': limit,
+      if (candidatePathList != null) 'candidateCount': candidatePathList.length,
+      if (candidatePathList != null)
+        'candidateHash': Object.hashAll(candidatePathList),
     });
 
     final cached = _queryCache.get(cacheKey);
@@ -2348,19 +2387,57 @@ class GalleryDataSource extends EnhancedBaseDataSource {
           final results = await execute(
             'searchByDelimitedTextSegments',
             (db) async {
-              final dbResults = await db.rawQuery(
-                '''
-                SELECT i.id
-                FROM $_imagesTable i
-                LEFT JOIN $_metadataTable m ON m.image_id = i.id
-                WHERE i.is_deleted = 0 AND $whereClause
-                ORDER BY i.modified_at DESC
-                LIMIT ?
-                ''',
-                [...args, limit],
-              );
+              final dbResults = <Map<String, Object?>>[];
+
+              if (candidatePathList == null) {
+                dbResults.addAll(
+                  await db.rawQuery(
+                    '''
+                    SELECT i.id, i.modified_at
+                    FROM $_imagesTable i
+                    LEFT JOIN $_metadataTable m ON m.image_id = i.id
+                    WHERE i.is_deleted = 0 AND $whereClause
+                    ORDER BY i.modified_at DESC
+                    LIMIT ?
+                    ''',
+                    [...args, limit],
+                  ),
+                );
+              } else {
+                const pathChunkSize = 800;
+                for (var i = 0;
+                    i < candidatePathList.length;
+                    i += pathChunkSize) {
+                  final end = min(i + pathChunkSize, candidatePathList.length);
+                  final pathChunk = candidatePathList.sublist(i, end);
+                  final pathPlaceholders =
+                      List.filled(pathChunk.length, '?').join(',');
+
+                  dbResults.addAll(
+                    await db.rawQuery(
+                      '''
+                      SELECT i.id, i.modified_at
+                      FROM $_imagesTable i
+                      LEFT JOIN $_metadataTable m ON m.image_id = i.id
+                      WHERE i.is_deleted = 0
+                        AND i.file_path IN ($pathPlaceholders)
+                        AND $whereClause
+                      ORDER BY i.modified_at DESC
+                      ''',
+                      [...pathChunk, ...args],
+                    ),
+                  );
+                }
+              }
+
+              dbResults.sort((a, b) {
+                final aModified = (a['modified_at'] as num?)?.toInt() ?? 0;
+                final bModified = (b['modified_at'] as num?)?.toInt() ?? 0;
+                return bModified.compareTo(aModified);
+              });
 
               return dbResults
+                  .take(limit)
                   .map((row) => (row['id'] as num).toInt())
                   .toList();
             },
@@ -2385,14 +2462,7 @@ class GalleryDataSource extends EnhancedBaseDataSource {
   }
 
   String _normalizeDelimitedSearchSegment(String value) {
-    return value
-        .toLowerCase()
-        .trim()
-        .replaceAll(RegExp(r'-?(?:\d+\.?\d*|\.\d+)::'), ' ')
-        .replaceAll(RegExp(r'[/\\|,，;；\n\r\t]+'), ' ')
-        .replaceAll(RegExp(r'[\{\}\[\]\(\)]'), ' ')
-        .replaceAll(RegExp(r'\s+'), ' ')
-        .trim();
+    return TagNormalizer.normalizeDelimitedSearchSegment(value);
   }
 
   Set<String> _buildDelimitedSearchVariants(String segment) {
@@ -2514,7 +2584,8 @@ class GalleryDataSource extends EnhancedBaseDataSource {
           if (metadataStatuses != null && metadataStatuses.isNotEmpty) {
             final statusIndices = metadataStatuses
                 .map(
-                    (s) => MetadataStatus.values.indexWhere((v) => v.name == s))
+                  (s) => MetadataStatus.values.indexWhere((v) => v.name == s),
+                )
                 .where((i) => i >= 0)
                 .toList();
             if (statusIndices.isNotEmpty) {

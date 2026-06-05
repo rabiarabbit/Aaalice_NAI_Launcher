@@ -64,7 +64,6 @@ class DecodedMemoryImage extends StatelessWidget {
     );
   }
 
-  @visibleForTesting
   static int? resolveCacheDimension({
     required double? logicalSize,
     required double? constrainedSize,
