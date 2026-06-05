@@ -96,9 +96,10 @@ class _EditableDoubleFieldState extends State<EditableDoubleField> {
         ],
         decoration: InputDecoration(
           isDense: true,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
           filled: true,
-          fillColor: theme.colorScheme.primaryContainer.withOpacity(0.5),
+          fillColor: theme.colorScheme.primaryContainer.withValues(alpha: 0.5),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
             borderSide: BorderSide.none,

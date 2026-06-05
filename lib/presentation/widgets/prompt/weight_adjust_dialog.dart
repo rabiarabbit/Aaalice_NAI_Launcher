@@ -105,7 +105,7 @@ class _WeightAdjustDialogState extends State<WeightAdjustDialog> {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.outline.withOpacity(0.3),
+                    color: theme.colorScheme.outline.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -197,7 +197,7 @@ class _WeightAdjustDialogState extends State<WeightAdjustDialog> {
                     onPressed: _decrementWeight,
                     icon: const Icon(Icons.remove),
                     style: IconButton.styleFrom(
-                      backgroundColor: Colors.blue.withOpacity(0.1),
+                      backgroundColor: Colors.blue.withValues(alpha: 0.1),
                       foregroundColor: Colors.blue,
                     ),
                   ),
@@ -222,7 +222,7 @@ class _WeightAdjustDialogState extends State<WeightAdjustDialog> {
                                 : _currentWeight < 1.0
                                     ? Colors.blue
                                     : theme.colorScheme.primary)
-                            .withOpacity(0.2),
+                            .withValues(alpha: 0.2),
                       ),
                       child: Slider(
                         value: _currentWeight,
@@ -241,7 +241,7 @@ class _WeightAdjustDialogState extends State<WeightAdjustDialog> {
                     onPressed: _incrementWeight,
                     icon: const Icon(Icons.add),
                     style: IconButton.styleFrom(
-                      backgroundColor: Colors.orange.withOpacity(0.1),
+                      backgroundColor: Colors.orange.withValues(alpha: 0.1),
                       foregroundColor: Colors.orange,
                     ),
                   ),
@@ -327,8 +327,8 @@ class _WeightAdjustDialogState extends State<WeightAdjustDialog> {
           ? (isReset
               ? theme.colorScheme.primaryContainer
               : weight > 1.0
-                  ? Colors.orange.withOpacity(0.2)
-                  : Colors.blue.withOpacity(0.2))
+                  ? Colors.orange.withValues(alpha: 0.2)
+                  : Colors.blue.withValues(alpha: 0.2))
           : null,
       labelStyle: TextStyle(
         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,

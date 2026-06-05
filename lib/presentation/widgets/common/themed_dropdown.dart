@@ -50,7 +50,7 @@ class ThemedDropdown<T> extends StatelessWidget {
     return InsetShadowContainer(
       borderRadius: borderRadius,
       child: DropdownButtonFormField<T>(
-        value: value,
+        initialValue: value,
         items: items,
         onChanged: onChanged,
         isExpanded: isExpanded,
@@ -178,7 +178,7 @@ class ThemedTextField extends StatelessWidget {
           // 浮动标签样式
           labelStyle: TextStyle(
             fontSize: 12,
-            color: theme.colorScheme.onSurface.withOpacity(0.6),
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
           ),
           floatingLabelStyle: TextStyle(
             fontSize: 12,

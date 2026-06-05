@@ -70,8 +70,8 @@ class _CategoryCardState extends ConsumerState<CategoryCard>
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  colorScheme.primary.withOpacity(0.6),
-                  colorScheme.secondary.withOpacity(0.4),
+                  colorScheme.primary.withValues(alpha: 0.6),
+                  colorScheme.secondary.withValues(alpha: 0.4),
                 ],
               )
             : null,
@@ -200,7 +200,7 @@ class _CategoryCardState extends ConsumerState<CategoryCard>
       children: [
         Divider(
           height: 1,
-          color: colorScheme.outlineVariant.withOpacity(0.3),
+          color: colorScheme.outlineVariant.withValues(alpha: 0.3),
         ),
         Padding(
           padding: const EdgeInsets.all(12),
@@ -405,14 +405,14 @@ class _TrashDropZoneState extends State<_TrashDropZone>
               border: Border.all(
                 color: _isHovering
                     ? colorScheme.error
-                    : colorScheme.outline.withOpacity(0.3),
+                    : colorScheme.outline.withValues(alpha: 0.3),
                 width: _isHovering ? 2 : 1,
                 strokeAlign: BorderSide.strokeAlignInside,
               ),
               boxShadow: _isHovering
                   ? [
                       BoxShadow(
-                        color: colorScheme.error.withOpacity(0.3),
+                        color: colorScheme.error.withValues(alpha: 0.3),
                         blurRadius: 12,
                         spreadRadius: 2,
                       ),

@@ -71,11 +71,12 @@ class BulkActionBar extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           decoration: BoxDecoration(
             color: isDark
-                ? theme.colorScheme.surface.withOpacity(0.9)
-                : theme.colorScheme.surface.withOpacity(0.95),
+                ? theme.colorScheme.surface.withValues(alpha: 0.9)
+                : theme.colorScheme.surface.withValues(alpha: 0.95),
             border: Border(
               bottom: BorderSide(
-                color: theme.dividerColor.withOpacity(isDark ? 0.15 : 0.2),
+                color:
+                    theme.dividerColor.withValues(alpha: isDark ? 0.15 : 0.2),
               ),
             ),
           ),
@@ -95,7 +96,8 @@ class BulkActionBar extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.primaryContainer.withOpacity(0.8),
+                  color:
+                      theme.colorScheme.primaryContainer.withValues(alpha: 0.8),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -141,7 +143,7 @@ class BulkActionBar extends StatelessWidget {
                       Container(
                         width: 1,
                         height: 28,
-                        color: theme.dividerColor.withOpacity(0.3),
+                        color: theme.dividerColor.withValues(alpha: 0.3),
                       ),
                       const SizedBox(width: 16),
                     ] else if (i > 0)
@@ -304,7 +306,7 @@ class _ActionButtonState extends State<_ActionButton> {
     final isEnabled = widget.onPressed != null;
     final effectiveColor = widget.color ?? theme.colorScheme.onSurface;
     final displayColor =
-        isEnabled ? effectiveColor : effectiveColor.withOpacity(0.4);
+        isEnabled ? effectiveColor : effectiveColor.withValues(alpha: 0.4);
 
     return MouseRegion(
       onEnter: isEnabled ? (_) => setState(() => _isHovered = true) : null,
@@ -324,13 +326,13 @@ class _ActionButtonState extends State<_ActionButton> {
             decoration: BoxDecoration(
               color: _isHovered
                   ? (widget.isDanger
-                      ? effectiveColor.withOpacity(isDark ? 0.2 : 0.12)
-                      : effectiveColor.withOpacity(isDark ? 0.15 : 0.08))
+                      ? effectiveColor.withValues(alpha: isDark ? 0.2 : 0.12)
+                      : effectiveColor.withValues(alpha: isDark ? 0.15 : 0.08))
                   : Colors.transparent,
               borderRadius: BorderRadius.circular(8),
               border: _isHovered
                   ? Border.all(
-                      color: effectiveColor.withOpacity(0.3),
+                      color: effectiveColor.withValues(alpha: 0.3),
                       width: 1,
                     )
                   : Border.all(

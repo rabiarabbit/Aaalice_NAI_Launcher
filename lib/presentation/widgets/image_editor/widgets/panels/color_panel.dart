@@ -64,8 +64,8 @@ class ColorPanel extends StatelessWidget {
                       children: _quickColors.map((color) {
                         return _QuickColorButton(
                           color: color,
-                          isSelected:
-                              state.foregroundColor.value == color.value,
+                          isSelected: state.foregroundColor.toARGB32() ==
+                              color.toARGB32(),
                           onTap: () => state.setForegroundColor(color),
                         );
                       }).toList(),
@@ -78,7 +78,7 @@ class ColorPanel extends StatelessWidget {
 
               // 颜色值显示
               Text(
-                '#${state.foregroundColor.value.toRadixString(16).substring(2).toUpperCase()}',
+                '#${state.foregroundColor.toARGB32().toRadixString(16).substring(2).toUpperCase()}',
                 style: theme.textTheme.bodySmall?.copyWith(
                   fontFamily: 'monospace',
                   color: theme.colorScheme.onSurfaceVariant,
@@ -195,7 +195,7 @@ class _ColorPreview extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
+                      color: Colors.black.withValues(alpha: 0.2),
                       blurRadius: 2,
                     ),
                   ],
@@ -265,7 +265,8 @@ class _ColorPickerDialogState extends State<_ColorPickerDialog> {
     super.initState();
     _hsvColor = HSVColor.fromColor(widget.initialColor);
     _hexController = TextEditingController(
-      text: widget.initialColor.value
+      text: widget.initialColor
+          .toARGB32()
           .toRadixString(16)
           .substring(2)
           .toUpperCase(),
@@ -321,7 +322,8 @@ class _ColorPickerDialogState extends State<_ColorPickerDialog> {
                                       Border.all(color: Colors.white, width: 2),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.3),
+                                      color:
+                                          Colors.black.withValues(alpha: 0.3),
                                       blurRadius: 2,
                                     ),
                                   ],
@@ -438,8 +440,12 @@ class _ColorPickerDialogState extends State<_ColorPickerDialog> {
   }
 
   void _updateHexController() {
-    _hexController.text =
-        _hsvColor.toColor().value.toRadixString(16).substring(2).toUpperCase();
+    _hexController.text = _hsvColor
+        .toColor()
+        .toARGB32()
+        .toRadixString(16)
+        .substring(2)
+        .toUpperCase();
   }
 
   void _parseHex(String value) {

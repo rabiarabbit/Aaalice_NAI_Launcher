@@ -143,7 +143,7 @@ class ImageDestinationDialog extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(8),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
+                        color: Colors.black.withValues(alpha: 0.2),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
@@ -253,15 +253,15 @@ class ImageDestinationDialog extends ConsumerWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Colors.amber.withOpacity(0.1),
-            Colors.orange.withOpacity(0.05),
+            Colors.amber.withValues(alpha: 0.1),
+            Colors.orange.withValues(alpha: 0.05),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Colors.amber.withOpacity(0.3),
+          color: Colors.amber.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -272,7 +272,7 @@ class ImageDestinationDialog extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: Colors.amber.withOpacity(0.1),
+              color: Colors.amber.withValues(alpha: 0.1),
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(12),
               ),
@@ -311,7 +311,7 @@ class ImageDestinationDialog extends ConsumerWidget {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: theme.colorScheme.outline.withOpacity(0.3),
+                        color: theme.colorScheme.outline.withValues(alpha: 0.3),
                       ),
                     ),
                     child: ClipRRect(
@@ -389,7 +389,7 @@ class ImageDestinationDialog extends ConsumerWidget {
                 _DestinationButton(
                   icon: Icons.save_outlined,
                   label: isBundle ? '保存 Vibe Bundle' : '保存到 Vibe 库',
-                  subtitle: isBundle 
+                  subtitle: isBundle
                       ? '将 ${detectedVibe?.displayName ?? ""} 等保存到库中'
                       : '将预编码 Vibe 数据保存到库中',
                   onTap: () => Navigator.of(context)
@@ -467,7 +467,7 @@ class _DestinationButton extends StatelessWidget {
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: isPrimary
                               ? theme.colorScheme.onPrimaryContainer
-                                  .withOpacity(0.7)
+                                  .withValues(alpha: 0.7)
                               : theme.colorScheme.onSurfaceVariant,
                         ),
                       ),
@@ -479,7 +479,8 @@ class _DestinationButton extends StatelessWidget {
                 Icons.chevron_right,
                 size: 20,
                 color: isPrimary
-                    ? theme.colorScheme.onPrimaryContainer.withOpacity(0.5)
+                    ? theme.colorScheme.onPrimaryContainer
+                        .withValues(alpha: 0.5)
                     : theme.colorScheme.outline,
               ),
             ],

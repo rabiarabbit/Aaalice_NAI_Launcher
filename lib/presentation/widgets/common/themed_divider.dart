@@ -56,8 +56,8 @@ class ThemedDivider extends StatelessWidget {
     // 使用新的 divider 属性
     final dividerColor = extension?.dividerColor ??
         (isDark
-            ? Colors.white.withOpacity(0.1)
-            : Colors.black.withOpacity(0.1));
+            ? Colors.white.withValues(alpha: 0.1)
+            : Colors.black.withValues(alpha: 0.1));
     final thickness = extension?.dividerThickness ?? 1.0;
 
     return _buildSimpleDivider(context, dividerColor, thickness);
@@ -104,15 +104,15 @@ class ThemedDivider extends StatelessWidget {
             bottom: vertical ? endIndent : 0,
           ),
           decoration: BoxDecoration(
-            color: glowColor.withOpacity(0.8),
+            color: glowColor.withValues(alpha: 0.8),
             boxShadow: [
               BoxShadow(
-                color: glowColor.withOpacity(0.4),
+                color: glowColor.withValues(alpha: 0.4),
                 blurRadius: 4,
                 spreadRadius: 0,
               ),
               BoxShadow(
-                color: glowColor.withOpacity(0.2),
+                color: glowColor.withValues(alpha: 0.2),
                 blurRadius: 8,
                 spreadRadius: 0,
               ),

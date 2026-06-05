@@ -236,7 +236,7 @@ class _CategoryTreeViewState extends State<CategoryTreeView> {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: theme.colorScheme.primary.withOpacity(0.5),
+              color: theme.colorScheme.primary.withValues(alpha: 0.5),
               width: 1.5,
             ),
           ),
@@ -343,7 +343,7 @@ class _CategoryTreeViewState extends State<CategoryTreeView> {
           duration: const Duration(milliseconds: 200),
           decoration: BoxDecoration(
             color: isAccepting
-                ? theme.colorScheme.primary.withOpacity(0.1)
+                ? theme.colorScheme.primary.withValues(alpha: 0.1)
                 : Colors.transparent,
             border: isAccepting
                 ? Border.all(
@@ -352,7 +352,7 @@ class _CategoryTreeViewState extends State<CategoryTreeView> {
                   )
                 : isRejected
                     ? Border.all(
-                        color: theme.colorScheme.error.withOpacity(0.5),
+                        color: theme.colorScheme.error.withValues(alpha: 0.5),
                         width: 1,
                       )
                     : null,
@@ -392,8 +392,8 @@ class _CategoryTreeViewState extends State<CategoryTreeView> {
             gradient: isAccepting
                 ? LinearGradient(
                     colors: [
-                      Colors.green.withOpacity(0.15),
-                      Colors.green.withOpacity(0.05),
+                      Colors.green.withValues(alpha: 0.15),
+                      Colors.green.withValues(alpha: 0.05),
                     ],
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
@@ -589,7 +589,7 @@ class _CategoryItemState extends State<_CategoryItem> {
                       child: Icon(
                         Icons.drag_indicator,
                         size: 14,
-                        color: theme.colorScheme.outline.withOpacity(0.5),
+                        color: theme.colorScheme.outline.withValues(alpha: 0.5),
                       ),
                     ),
 

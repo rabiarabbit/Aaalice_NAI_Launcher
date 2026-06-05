@@ -62,14 +62,14 @@ class EmphasisConfigPanel extends StatelessWidget {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                colorScheme.primary.withOpacity(0.2),
-                colorScheme.primary.withOpacity(0.1),
+                colorScheme.primary.withValues(alpha: 0.2),
+                colorScheme.primary.withValues(alpha: 0.1),
               ],
             ),
             borderRadius: BorderRadius.circular(10),
             boxShadow: [
               BoxShadow(
-                color: colorScheme.primary.withOpacity(0.1),
+                color: colorScheme.primary.withValues(alpha: 0.1),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -125,7 +125,7 @@ class EmphasisConfigPanel extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: colorScheme.secondaryContainer.withOpacity(0.5),
+                  color: colorScheme.secondaryContainer.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Icon(
@@ -149,8 +149,8 @@ class EmphasisConfigPanel extends StatelessWidget {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      colorScheme.primary.withOpacity(0.15),
-                      colorScheme.primary.withOpacity(0.08),
+                      colorScheme.primary.withValues(alpha: 0.15),
+                      colorScheme.primary.withValues(alpha: 0.08),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(8),
@@ -204,7 +204,7 @@ class EmphasisConfigPanel extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: colorScheme.tertiaryContainer.withOpacity(0.5),
+                  color: colorScheme.tertiaryContainer.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Icon(
@@ -228,8 +228,8 @@ class EmphasisConfigPanel extends StatelessWidget {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      colorScheme.tertiary.withOpacity(0.15),
-                      colorScheme.tertiary.withOpacity(0.08),
+                      colorScheme.tertiary.withValues(alpha: 0.15),
+                      colorScheme.tertiary.withValues(alpha: 0.08),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(8),
@@ -269,7 +269,7 @@ class EmphasisConfigPanel extends StatelessWidget {
                                   end: Alignment.bottomRight,
                                   colors: [
                                     colorScheme.primary,
-                                    colorScheme.primary.withOpacity(0.8),
+                                    colorScheme.primary.withValues(alpha: 0.8),
                                   ],
                                 )
                               : null,
@@ -280,13 +280,14 @@ class EmphasisConfigPanel extends StatelessWidget {
                           border: Border.all(
                             color: isSelected
                                 ? Colors.transparent
-                                : colorScheme.outline.withOpacity(0.2),
+                                : colorScheme.outline.withValues(alpha: 0.2),
                             width: 1,
                           ),
                           boxShadow: isSelected
                               ? [
                                   BoxShadow(
-                                    color: colorScheme.primary.withOpacity(0.3),
+                                    color: colorScheme.primary
+                                        .withValues(alpha: 0.3),
                                     blurRadius: 8,
                                     offset: const Offset(0, 2),
                                   ),
@@ -332,8 +333,8 @@ class EmphasisConfigPanel extends StatelessWidget {
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         colors: [
-          colorScheme.primary.withOpacity(0.4),
-          colorScheme.secondary.withOpacity(0.2),
+          colorScheme.primary.withValues(alpha: 0.4),
+          colorScheme.secondary.withValues(alpha: 0.2),
         ],
       ),
       gradientBorderWidth: 1,
@@ -347,7 +348,7 @@ class EmphasisConfigPanel extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: colorScheme.primaryContainer.withOpacity(0.5),
+                  color: colorScheme.primaryContainer.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Icon(
@@ -368,7 +369,7 @@ class EmphasisConfigPanel extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: colorScheme.secondaryContainer.withOpacity(0.5),
+                  color: colorScheme.secondaryContainer.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
@@ -390,11 +391,11 @@ class EmphasisConfigPanel extends StatelessWidget {
               color: colorScheme.surfaceContainerLowest,
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                color: colorScheme.outline.withOpacity(0.15),
+                color: colorScheme.outline.withValues(alpha: 0.15),
               ),
               boxShadow: [
                 BoxShadow(
-                  color: colorScheme.shadow.withOpacity(0.05),
+                  color: colorScheme.shadow.withValues(alpha: 0.05),
                   blurRadius: 4,
                   offset: const Offset(0, 2),
                 ),

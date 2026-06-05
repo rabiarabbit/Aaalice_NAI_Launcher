@@ -80,14 +80,14 @@ class _CharacterPositionCanvasState extends State<CharacterPositionCanvas> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                colorScheme.primary.withOpacity(0.2),
-                colorScheme.primary.withOpacity(0.1),
+                colorScheme.primary.withValues(alpha: 0.2),
+                colorScheme.primary.withValues(alpha: 0.1),
               ],
             ),
             borderRadius: BorderRadius.circular(10),
             boxShadow: [
               BoxShadow(
-                color: colorScheme.primary.withOpacity(0.1),
+                color: colorScheme.primary.withValues(alpha: 0.1),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -122,7 +122,7 @@ class _CharacterPositionCanvasState extends State<CharacterPositionCanvas> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           decoration: BoxDecoration(
-            color: colorScheme.primaryContainer.withOpacity(0.5),
+            color: colorScheme.primaryContainer.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Text(
@@ -149,8 +149,8 @@ class _CharacterPositionCanvasState extends State<CharacterPositionCanvas> {
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         colors: [
-          colorScheme.primary.withOpacity(0.3),
-          colorScheme.secondary.withOpacity(0.2),
+          colorScheme.primary.withValues(alpha: 0.3),
+          colorScheme.secondary.withValues(alpha: 0.2),
         ],
       ),
       gradientBorderWidth: 1,
@@ -192,7 +192,7 @@ class _CharacterPositionCanvasState extends State<CharacterPositionCanvas> {
                             Icon(
                               Icons.touch_app_rounded,
                               size: 40,
-                              color: colorScheme.outline.withOpacity(0.5),
+                              color: colorScheme.outline.withValues(alpha: 0.5),
                             ),
                             const SizedBox(height: 8),
                             Text(
@@ -223,7 +223,7 @@ class _CharacterPositionCanvasState extends State<CharacterPositionCanvas> {
       painter: _GridPainter(
         rows: rows,
         cols: cols,
-        color: Theme.of(context).colorScheme.outline.withOpacity(0.15),
+        color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.15),
       ),
     );
   }
@@ -263,7 +263,7 @@ class _CharacterPositionCanvasState extends State<CharacterPositionCanvas> {
               end: Alignment.bottomRight,
               colors: [
                 color,
-                color.withOpacity(0.7),
+                color.withValues(alpha: 0.7),
               ],
             ),
             shape: BoxShape.circle,
@@ -273,7 +273,9 @@ class _CharacterPositionCanvasState extends State<CharacterPositionCanvas> {
             ),
             boxShadow: [
               BoxShadow(
-                color: color.withOpacity(isSelected || isDragging ? 0.6 : 0.3),
+                color: color.withValues(
+                  alpha: isSelected || isDragging ? 0.6 : 0.3,
+                ),
                 blurRadius: isSelected || isDragging ? 12 : 6,
                 spreadRadius: isSelected || isDragging ? 2 : 0,
               ),
@@ -358,7 +360,7 @@ class _CharacterPositionCanvasState extends State<CharacterPositionCanvas> {
         itemCount: widget.positions.length,
         separatorBuilder: (_, __) => Divider(
           height: 1,
-          color: colorScheme.outline.withOpacity(0.1),
+          color: colorScheme.outline.withValues(alpha: 0.1),
         ),
         itemBuilder: (context, index) {
           final position = widget.positions[index];
@@ -367,7 +369,7 @@ class _CharacterPositionCanvasState extends State<CharacterPositionCanvas> {
 
           return Material(
             color: isSelected
-                ? colorScheme.primaryContainer.withOpacity(0.3)
+                ? colorScheme.primaryContainer.withValues(alpha: 0.3)
                 : Colors.transparent,
             child: InkWell(
               onTap: () => setState(() => _selectedIndex = index),
@@ -386,12 +388,12 @@ class _CharacterPositionCanvasState extends State<CharacterPositionCanvas> {
                         gradient: LinearGradient(
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
-                          colors: [color, color.withOpacity(0.7)],
+                          colors: [color, color.withValues(alpha: 0.7)],
                         ),
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: color.withOpacity(0.3),
+                            color: color.withValues(alpha: 0.3),
                             blurRadius: 6,
                           ),
                         ],
@@ -459,7 +461,7 @@ class _CharacterPositionCanvasState extends State<CharacterPositionCanvas> {
                       IconButton(
                         icon: Icon(
                           Icons.delete_outline_rounded,
-                          color: colorScheme.error.withOpacity(0.7),
+                          color: colorScheme.error.withValues(alpha: 0.7),
                         ),
                         onPressed: () => _removePosition(index),
                         tooltip: '删除',
@@ -496,7 +498,7 @@ class _CharacterPositionCanvasState extends State<CharacterPositionCanvas> {
                 ? LinearGradient(
                     colors: [
                       colorScheme.primary,
-                      colorScheme.primary.withOpacity(0.8),
+                      colorScheme.primary.withValues(alpha: 0.8),
                     ],
                   )
                 : null,
@@ -505,7 +507,7 @@ class _CharacterPositionCanvasState extends State<CharacterPositionCanvas> {
             border: Border.all(
               color: isSelected
                   ? Colors.transparent
-                  : colorScheme.outline.withOpacity(0.3),
+                  : colorScheme.outline.withValues(alpha: 0.3),
             ),
           ),
           child: Text(
@@ -536,7 +538,7 @@ class _CharacterPositionCanvasState extends State<CharacterPositionCanvas> {
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               decoration: BoxDecoration(
                 border: Border.all(
-                  color: colorScheme.primary.withOpacity(0.5),
+                  color: colorScheme.primary.withValues(alpha: 0.5),
                   width: 1.5,
                 ),
                 borderRadius: BorderRadius.circular(10),

@@ -163,12 +163,12 @@ class _SelectionBoxPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     // 填充
     final fillPaint = Paint()
-      ..color = color.withOpacity(0.1)
+      ..color = color.withValues(alpha: 0.1)
       ..style = PaintingStyle.fill;
 
     // 边框
     final strokePaint = Paint()
-      ..color = color.withOpacity(0.5)
+      ..color = color.withValues(alpha: 0.5)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.5;
 

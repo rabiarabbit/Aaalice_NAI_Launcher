@@ -30,7 +30,11 @@ class StatisticsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context, ThemeData theme, AppLocalizations l10n) {
+  Widget _buildHeader(
+    BuildContext context,
+    ThemeData theme,
+    AppLocalizations l10n,
+  ) {
     final colorScheme = theme.colorScheme;
     final extension = theme.extension<AppThemeExtension>();
     final borderColor = extension?.borderColor ?? colorScheme.outlineVariant;
@@ -41,7 +45,8 @@ class StatisticsScreen extends ConsumerWidget {
       decoration: BoxDecoration(
         color: colorScheme.surface,
         border: Border(
-          bottom: BorderSide(color: borderColor.withOpacity(0.2), width: 1),
+          bottom:
+              BorderSide(color: borderColor.withValues(alpha: 0.2), width: 1),
         ),
       ),
       child: Row(
@@ -50,7 +55,8 @@ class StatisticsScreen extends ConsumerWidget {
           const SizedBox(width: 12),
           Text(
             l10n.statistics_title,
-            style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+            style: theme.textTheme.titleLarge
+                ?.copyWith(fontWeight: FontWeight.w600),
           ),
           const Spacer(),
           const AnimatedRefreshButton(),
@@ -141,7 +147,8 @@ class StatisticsScreen extends ConsumerWidget {
           Text(l10n.statistics_error(error)),
           const SizedBox(height: 16),
           ElevatedButton(
-            onPressed: () => ref.read(statisticsNotifierProvider.notifier).refresh(),
+            onPressed: () =>
+                ref.read(statisticsNotifierProvider.notifier).refresh(),
             child: Text(l10n.statistics_retry),
           ),
         ],

@@ -185,7 +185,7 @@ class _TokenLoginCardState extends ConsumerState<TokenLoginCard> {
                           authState.httpStatusCode,
                         )!,
                         style: TextStyle(
-                          color: theme.colorScheme.error.withOpacity(0.8),
+                          color: theme.colorScheme.error.withValues(alpha: 0.8),
                           fontSize: 12,
                         ),
                       ),

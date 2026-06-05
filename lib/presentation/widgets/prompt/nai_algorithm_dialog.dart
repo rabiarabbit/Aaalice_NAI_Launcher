@@ -200,7 +200,8 @@ class NaiAlgorithmDialog extends StatelessWidget {
                         color: theme.colorScheme.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                          color: theme.colorScheme.outline.withOpacity(0.2),
+                          color:
+                              theme.colorScheme.outline.withValues(alpha: 0.2),
                         ),
                       ),
                       child: Column(
@@ -236,8 +237,8 @@ class NaiAlgorithmDialog extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color:
-                            theme.colorScheme.primaryContainer.withOpacity(0.3),
+                        color: theme.colorScheme.primaryContainer
+                            .withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Column(
@@ -354,7 +355,7 @@ class NaiAlgorithmDialog extends StatelessWidget {
                 child: Container(
                   height: 16,
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.7),
+                    color: color.withValues(alpha: 0.7),
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
@@ -422,7 +423,7 @@ class NaiAlgorithmDialog extends StatelessWidget {
               Text(
                 content,
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurface.withOpacity(0.7),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
               ),
             ],

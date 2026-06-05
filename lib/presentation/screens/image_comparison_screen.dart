@@ -40,7 +40,7 @@ class _ImageComparisonScreenState extends ConsumerState<ImageComparisonScreen> {
               Icon(
                 Icons.image_not_supported,
                 size: 64,
-                color: theme.colorScheme.onSurface.withOpacity(0.5),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
               ),
               const SizedBox(height: 16),
               Text(
@@ -78,7 +78,7 @@ class _ImageComparisonScreenState extends ConsumerState<ImageComparisonScreen> {
               Text(
                 l10n.comparison_maxImages,
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurface.withOpacity(0.7),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
               ),
             ],
@@ -108,7 +108,7 @@ class _ImageComparisonScreenState extends ConsumerState<ImageComparisonScreen> {
             right: 8,
             child: Container(
               decoration: BoxDecoration(
-                color: theme.colorScheme.surface.withOpacity(0.8),
+                color: theme.colorScheme.surface.withValues(alpha: 0.8),
                 shape: BoxShape.circle,
               ),
               child: IconButton(
@@ -132,7 +132,7 @@ class _ImageComparisonScreenState extends ConsumerState<ImageComparisonScreen> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.surface.withOpacity(0.8),
+                  color: theme.colorScheme.surface.withValues(alpha: 0.8),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -204,7 +204,7 @@ class _ImageComparisonScreenState extends ConsumerState<ImageComparisonScreen> {
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: theme.colorScheme.outline.withOpacity(0.3),
+          color: theme.colorScheme.outline.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -254,10 +254,10 @@ class _ImageComparisonScreenState extends ConsumerState<ImageComparisonScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: theme.colorScheme.surface.withOpacity(0.9),
+                color: theme.colorScheme.surface.withValues(alpha: 0.9),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: theme.colorScheme.outline.withOpacity(0.3),
+                  color: theme.colorScheme.outline.withValues(alpha: 0.3),
                   width: 1,
                 ),
               ),

@@ -113,7 +113,7 @@ class _HeatmapChartState extends State<HeatmapChart>
                                 fontSize: 10,
                                 fontWeight: FontWeight.w500,
                                 color: colorScheme.onSurfaceVariant
-                                    .withOpacity(0.8),
+                                    .withValues(alpha: 0.8),
                               ),
                               textAlign: TextAlign.right,
                             ),
@@ -173,7 +173,8 @@ class _HeatmapChartState extends State<HeatmapChart>
                                     borderRadius: BorderRadius.circular(8),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withOpacity(0.15),
+                                        color: Colors.black
+                                            .withValues(alpha: 0.15),
                                         blurRadius: 8,
                                         offset: const Offset(0, 4),
                                       ),
@@ -192,7 +193,7 @@ class _HeatmapChartState extends State<HeatmapChart>
                                               animatedValue,
                                             )
                                           : colorScheme.surfaceContainerHighest
-                                              .withOpacity(0.5),
+                                              .withValues(alpha: 0.5),
                                       borderRadius: BorderRadius.circular(
                                         isHovered || isToday ? 4 : 3,
                                       ),
@@ -201,9 +202,9 @@ class _HeatmapChartState extends State<HeatmapChart>
                                             ? colorScheme.primary
                                             : isHovered
                                                 ? colorScheme.primary
-                                                    .withOpacity(0.6)
+                                                    .withValues(alpha: 0.6)
                                                 : colorScheme.outlineVariant
-                                                    .withOpacity(0.3),
+                                                    .withValues(alpha: 0.3),
                                         width: isToday
                                             ? 2
                                             : (isHovered ? 1.5 : 0.5),
@@ -214,7 +215,7 @@ class _HeatmapChartState extends State<HeatmapChart>
                                                 color:
                                                     ChartColors.getHeatmapColor(
                                                   value,
-                                                ).withOpacity(0.4),
+                                                ).withValues(alpha: 0.4),
                                                 blurRadius: 6,
                                                 spreadRadius: 1,
                                               ),
@@ -223,7 +224,7 @@ class _HeatmapChartState extends State<HeatmapChart>
                                     ),
                                     transform: isHovered
                                         ? Matrix4.identity()
-                                            .scaled(1.15, 1.15, 1.0)
+                                            .scaledByDouble(1.15, 1.15, 1.0, 1)
                                         : null,
                                     transformAlignment: Alignment.center,
                                   ),
@@ -260,7 +261,7 @@ class _HeatmapChartState extends State<HeatmapChart>
         ...List.generate(5, (index) {
           final value = index / 4;
           final color = index == 0
-              ? colorScheme.surfaceContainerHighest.withOpacity(0.5)
+              ? colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)
               : ChartColors.getHeatmapColor(value);
           return Container(
             width: 14,
@@ -270,7 +271,13 @@ class _HeatmapChartState extends State<HeatmapChart>
               color: color,
               borderRadius: BorderRadius.circular(3),
               boxShadow: index > 0
-                  ? [BoxShadow(color: color.withOpacity(0.3), blurRadius: 4, offset: const Offset(0, 1))]
+                  ? [
+                      BoxShadow(
+                        color: color.withValues(alpha: 0.3),
+                        blurRadius: 4,
+                        offset: const Offset(0, 1),
+                      ),
+                    ]
                   : null,
             ),
           );
@@ -281,13 +288,17 @@ class _HeatmapChartState extends State<HeatmapChart>
     );
   }
 
-  Widget _buildLegendLabel(ThemeData theme, String text, ColorScheme colorScheme) {
+  Widget _buildLegendLabel(
+    ThemeData theme,
+    String text,
+    ColorScheme colorScheme,
+  ) {
     return Text(
       text,
       style: theme.textTheme.bodySmall?.copyWith(
         fontSize: 11,
         fontWeight: FontWeight.w500,
-        color: colorScheme.onSurfaceVariant.withOpacity(0.7),
+        color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
       ),
     );
   }

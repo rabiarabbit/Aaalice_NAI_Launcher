@@ -48,5 +48,5 @@ class SoftDividerModule extends BaseDividerModule {
   double get thickness => 1.0;
 
   @override
-  Color get dividerColor => _dividerColor.withOpacity(_opacity);
+  Color get dividerColor => _dividerColor.withValues(alpha: _opacity);
 }

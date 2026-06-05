@@ -137,7 +137,7 @@ class _TagLibraryPickerDialogState
         Expanded(
           flex: 1,
           child: DropdownButtonFormField<String?>(
-            value: selectedCategoryId,
+            initialValue: selectedCategoryId,
             decoration: InputDecoration(
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),

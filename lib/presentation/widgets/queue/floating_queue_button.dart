@@ -260,11 +260,11 @@ class _FloatingQueueButtonState extends ConsumerState<FloatingQueueButton>
   /// Tooltip 装饰
   BoxDecoration _tooltipDecoration(ThemeData theme) {
     return BoxDecoration(
-      color: theme.colorScheme.inverseSurface.withOpacity(0.92),
+      color: theme.colorScheme.inverseSurface.withValues(alpha: 0.92),
       borderRadius: BorderRadius.circular(12),
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withOpacity(0.2),
+          color: Colors.black.withValues(alpha: 0.2),
           blurRadius: 16,
           offset: const Offset(0, 4),
         ),
@@ -348,8 +348,8 @@ class _FloatingQueueButtonState extends ConsumerState<FloatingQueueButton>
         shape: BoxShape.circle,
         gradient: RadialGradient(
           colors: [
-            colors.primary.withOpacity(0.25 * intensity),
-            colors.primary.withOpacity(0.08 * intensity),
+            colors.primary.withValues(alpha: 0.25 * intensity),
+            colors.primary.withValues(alpha: 0.08 * intensity),
             Colors.transparent,
           ],
           stops: const [0.2, 0.5, 1.0],
@@ -370,7 +370,7 @@ class _FloatingQueueButtonState extends ConsumerState<FloatingQueueButton>
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(
-              color: colors.primary.withOpacity(0.6 * (1 - value)),
+              color: colors.primary.withValues(alpha: 0.6 * (1 - value)),
               width: 2.5 * (1 - value),
             ),
           ),
@@ -410,7 +410,7 @@ class _FloatingQueueButtonState extends ConsumerState<FloatingQueueButton>
       painter: _ProgressRingPainter(
         progress: progress,
         progressColor: colors.primary,
-        trackColor: colors.primary.withOpacity(0.15),
+        trackColor: colors.primary.withValues(alpha: 0.15),
         strokeWidth: _progressStrokeWidth,
         glowIntensity: intensity,
       ),
@@ -449,13 +449,13 @@ class _FloatingQueueButtonState extends ConsumerState<FloatingQueueButton>
         boxShadow: [
           // 主发光
           BoxShadow(
-            color: statusColors.primary.withOpacity(0.5 * glowIntensity),
+            color: statusColors.primary.withValues(alpha: 0.5 * glowIntensity),
             blurRadius: 18 * glowIntensity,
             spreadRadius: 1,
           ),
           // 底部阴影
           BoxShadow(
-            color: statusColors.secondary.withOpacity(0.35),
+            color: statusColors.secondary.withValues(alpha: 0.35),
             blurRadius: 14,
             offset: const Offset(0, 5),
           ),
@@ -490,8 +490,9 @@ class _FloatingQueueButtonState extends ConsumerState<FloatingQueueButton>
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Colors.white.withOpacity(_isHovering ? 0.5 : 0.35),
-                        Colors.white.withOpacity(0),
+                        Colors.white
+                            .withValues(alpha: _isHovering ? 0.5 : 0.35),
+                        Colors.white.withValues(alpha: 0),
                       ],
                     ),
                   ),
@@ -510,8 +511,8 @@ class _FloatingQueueButtonState extends ConsumerState<FloatingQueueButton>
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Colors.white.withOpacity(0),
-                        Colors.white.withOpacity(0.12),
+                        Colors.white.withValues(alpha: 0),
+                        Colors.white.withValues(alpha: 0.12),
                       ],
                     ),
                   ),
@@ -538,7 +539,7 @@ class _FloatingQueueButtonState extends ConsumerState<FloatingQueueButton>
       return Icon(
         Icons.warning_rounded,
         size: 26,
-        color: Colors.white.withOpacity(0.95),
+        color: Colors.white.withValues(alpha: 0.95),
       );
     }
 
@@ -550,7 +551,7 @@ class _FloatingQueueButtonState extends ConsumerState<FloatingQueueButton>
         showPauseIcon ? Icons.pause_rounded : Icons.play_arrow_rounded,
         key: ValueKey(showPauseIcon),
         size: 28,
-        color: Colors.white.withOpacity(0.95),
+        color: Colors.white.withValues(alpha: 0.95),
       ),
     );
   }
@@ -567,7 +568,7 @@ class _FloatingQueueButtonState extends ConsumerState<FloatingQueueButton>
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(
-              color: color.withOpacity(0.45 * value),
+              color: color.withValues(alpha: 0.45 * value),
               width: 1.5,
             ),
           ),
@@ -597,16 +598,16 @@ class _FloatingQueueButtonState extends ConsumerState<FloatingQueueButton>
         ),
         borderRadius: BorderRadius.circular(badgeSize / 2),
         border: Border.all(
-          color: Colors.white.withOpacity(0.6),
+          color: Colors.white.withValues(alpha: 0.6),
           width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: colors.primary.withOpacity(0.4),
+            color: colors.primary.withValues(alpha: 0.4),
             blurRadius: 5,
           ),
           BoxShadow(
-            color: Colors.black.withOpacity(0.25),
+            color: Colors.black.withValues(alpha: 0.25),
             blurRadius: 3,
             offset: const Offset(0, 1),
           ),
@@ -622,7 +623,7 @@ class _FloatingQueueButtonState extends ConsumerState<FloatingQueueButton>
             height: 1,
             shadows: [
               Shadow(
-                color: Colors.black.withOpacity(0.3),
+                color: Colors.black.withValues(alpha: 0.3),
                 blurRadius: 2,
               ),
             ],
@@ -948,7 +949,7 @@ class _ProgressRingPainter extends CustomPainter {
     if (progress > 0) {
       // 发光
       final glowPaint = Paint()
-        ..color = progressColor.withOpacity(0.35 * glowIntensity)
+        ..color = progressColor.withValues(alpha: 0.35 * glowIntensity)
         ..style = PaintingStyle.stroke
         ..strokeWidth = strokeWidth + 3
         ..strokeCap = StrokeCap.round
@@ -1008,7 +1009,7 @@ class _RotatingRingPainter extends CustomPainter {
     final trackPaint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 3.5
-      ..color = primaryColor.withOpacity(0.15 * intensity);
+      ..color = primaryColor.withValues(alpha: 0.15 * intensity);
 
     canvas.drawCircle(center, radius, trackPaint);
 
@@ -1025,9 +1026,9 @@ class _RotatingRingPainter extends CustomPainter {
         startAngle: 0,
         endAngle: arcLength,
         colors: [
-          primaryColor.withOpacity(0),
-          primaryColor.withOpacity(0.3 * intensity),
-          secondaryColor.withOpacity(0.5 * intensity),
+          primaryColor.withValues(alpha: 0),
+          primaryColor.withValues(alpha: 0.3 * intensity),
+          secondaryColor.withValues(alpha: 0.5 * intensity),
         ],
         stops: const [0.0, 0.5, 1.0],
       ).createShader(Rect.fromCircle(center: center, radius: radius));
@@ -1049,9 +1050,9 @@ class _RotatingRingPainter extends CustomPainter {
         startAngle: 0,
         endAngle: arcLength,
         colors: [
-          primaryColor.withOpacity(0),
-          primaryColor.withOpacity(0.6 * intensity),
-          secondaryColor.withOpacity(0.95 * intensity),
+          primaryColor.withValues(alpha: 0),
+          primaryColor.withValues(alpha: 0.6 * intensity),
+          secondaryColor.withValues(alpha: 0.95 * intensity),
         ],
         stops: const [0.0, 0.4, 1.0],
       ).createShader(Rect.fromCircle(center: center, radius: radius));
@@ -1069,12 +1070,12 @@ class _RotatingRingPainter extends CustomPainter {
     final headY = center.dy + radius * math.sin(arcLength);
 
     final headGlowPaint = Paint()
-      ..color = secondaryColor.withOpacity(0.6 * intensity)
+      ..color = secondaryColor.withValues(alpha: 0.6 * intensity)
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6);
     canvas.drawCircle(Offset(headX, headY), 4, headGlowPaint);
 
     final headPaint = Paint()
-      ..color = Colors.white.withOpacity(0.9 * intensity);
+      ..color = Colors.white.withValues(alpha: 0.9 * intensity);
     canvas.drawCircle(Offset(headX, headY), 2.5, headPaint);
   }
 

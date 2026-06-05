@@ -303,8 +303,10 @@ class _ThumbnailCropDialogState extends State<ThumbnailCropDialog> {
     // 图像居中偏移 + 基础居中位置 + 用户拖拽偏移
     // 公式: imageOffset + (displayed - crop) / 2 + _crop * (displayed - crop) / 2
     //      = imageOffset + (displayed - crop) / 2 * (1 + _crop)
-    final cropLeft = imageOffsetX + (displayedSize.width - cropSize.width) / 2 * (1 + _cropX);
-    final cropTop = imageOffsetY + (displayedSize.height - cropSize.height) / 2 * (1 + _cropY);
+    final cropLeft = imageOffsetX +
+        (displayedSize.width - cropSize.width) / 2 * (1 + _cropX);
+    final cropTop = imageOffsetY +
+        (displayedSize.height - cropSize.height) / 2 * (1 + _cropY);
 
     return Container(
       width: _displayWidth,
@@ -390,7 +392,7 @@ class _ThumbnailCropDialogState extends State<ThumbnailCropDialog> {
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.5),
+                            color: Colors.black.withValues(alpha: 0.5),
                             blurRadius: 4,
                           ),
                         ],
@@ -465,7 +467,7 @@ class _CropOverlayPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.black.withOpacity(0.5)
+      ..color = Colors.black.withValues(alpha: 0.5)
       ..style = PaintingStyle.fill;
 
     // 计算裁剪框位置（中心对齐）

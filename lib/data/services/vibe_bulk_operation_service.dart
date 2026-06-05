@@ -165,7 +165,9 @@ class VibeBulkOperationService {
         if (deleted) {
           successCount++;
           AppLogger.d(
-              'Deleted: $entryName ($successCount/${entryIds.length})', _tag);
+            'Deleted: $entryName ($successCount/${entryIds.length})',
+            _tag,
+          );
         } else {
           failedCount++;
           errors.add('Entry not found or delete failed: $entryName');
@@ -240,7 +242,9 @@ class VibeBulkOperationService {
         if (updatedEntry != null) {
           successCount++;
           AppLogger.d(
-              'Moved: $entryName ($successCount/${entryIds.length})', _tag);
+            'Moved: $entryName ($successCount/${entryIds.length})',
+            _tag,
+          );
         } else {
           failedCount++;
           errors.add('Entry not found: $entryName');
@@ -325,8 +329,9 @@ class VibeBulkOperationService {
         if (updatedEntry != null) {
           successCount++;
           AppLogger.d(
-              'Favorite toggled: $entryName ($successCount/${entryIds.length})',
-              _tag);
+            'Favorite toggled: $entryName ($successCount/${entryIds.length})',
+            _tag,
+          );
         } else {
           failedCount++;
           errors.add('Failed to toggle favorite: $entryName');
@@ -415,8 +420,9 @@ class VibeBulkOperationService {
         if (updatedEntry != null) {
           successCount++;
           AppLogger.d(
-              'Tags added: $entryName ($successCount/${entryIds.length})',
-              _tag);
+            'Tags added: $entryName ($successCount/${entryIds.length})',
+            _tag,
+          );
         } else {
           failedCount++;
           errors.add('Failed to add tags: $entryName');
@@ -506,8 +512,9 @@ class VibeBulkOperationService {
         if (updatedEntry != null) {
           successCount++;
           AppLogger.d(
-              'Tags removed: $entryName ($successCount/${entryIds.length})',
-              _tag);
+            'Tags removed: $entryName ($successCount/${entryIds.length})',
+            _tag,
+          );
         } else {
           failedCount++;
           errors.add('Failed to remove tags: $entryName');
@@ -634,7 +641,11 @@ class VibeBulkOperationService {
         );
       } else {
         AppLogger.e(
-            'Bulk export failed: no file was created', null, null, _tag);
+          'Bulk export failed: no file was created',
+          null,
+          null,
+          _tag,
+        );
         return VibeBulkOperationResult.fromResult(
           success: 0,
           failed: entries.length,

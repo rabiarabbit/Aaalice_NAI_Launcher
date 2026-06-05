@@ -35,7 +35,9 @@ class ParameterProcessingResult {
 
   /// 创建未处理的结果
   factory ParameterProcessingResult.unprocessed(
-      String prompt, String negativePrompt) {
+    String prompt,
+    String negativePrompt,
+  ) {
     return ParameterProcessingResult(
       prompt: prompt,
       negativePrompt: negativePrompt,

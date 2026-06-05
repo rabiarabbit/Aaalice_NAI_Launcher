@@ -31,7 +31,7 @@ class AnlasCostBadge extends ConsumerWidget {
     // 价格徽章颜色
     Color badgeColor;
     Color badgeTextColor;
-    
+
     if (isInsufficient) {
       badgeColor = theme.colorScheme.error;
       badgeTextColor = Colors.white;
@@ -44,7 +44,7 @@ class AnlasCostBadge extends ConsumerWidget {
       margin: const EdgeInsets.only(left: 8),
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        color: badgeColor.withOpacity(0.9),
+        color: badgeColor.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(

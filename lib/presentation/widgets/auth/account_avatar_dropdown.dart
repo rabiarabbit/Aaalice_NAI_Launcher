@@ -48,7 +48,7 @@ class AccountAvatarDropdown extends ConsumerWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
         side: BorderSide(
-          color: theme.colorScheme.outline.withOpacity(0.1),
+          color: theme.colorScheme.outline.withValues(alpha: 0.1),
         ),
       ),
       child: Padding(
@@ -85,7 +85,7 @@ class AccountAvatarDropdown extends ConsumerWidget {
             Container(
               decoration: BoxDecoration(
                 border: Border.all(
-                  color: theme.colorScheme.outline.withOpacity(0.2),
+                  color: theme.colorScheme.outline.withValues(alpha: 0.2),
                 ),
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -191,13 +191,13 @@ class _AccountListTile extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           color: isSelected
-              ? theme.colorScheme.primaryContainer.withOpacity(0.3)
+              ? theme.colorScheme.primaryContainer.withValues(alpha: 0.3)
               : null,
           border: isLast
               ? null
               : Border(
                   bottom: BorderSide(
-                    color: theme.colorScheme.outline.withOpacity(0.15),
+                    color: theme.colorScheme.outline.withValues(alpha: 0.15),
                   ),
                 ),
         ),
@@ -245,7 +245,8 @@ class _AccountListTile extends StatelessWidget {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: theme.colorScheme.primary.withOpacity(0.1),
+                            color: theme.colorScheme.primary
+                                .withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
@@ -278,7 +279,7 @@ class _AccountListTile extends StatelessWidget {
             else
               Icon(
                 Icons.chevron_right,
-                color: theme.colorScheme.onSurface.withOpacity(0.4),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
               ),
           ],
         ),

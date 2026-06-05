@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 /// 悬浮操作按钮组
-/// 
+///
 /// 用于图片卡片等场景，在悬浮时显示的操作按钮组。
 /// 特点：
 /// - 自动处理悬浮显示/隐藏动画
@@ -81,7 +81,7 @@ class FloatingActionButtons extends StatelessWidget {
 
     for (var i = 0; i < buttons.length; i++) {
       final button = buttons[i];
-      
+
       // 添加按钮
       result.add(
         _FloatingActionButtonItem(
@@ -160,7 +160,8 @@ class _FloatingActionButtonItem extends StatefulWidget {
   });
 
   @override
-  State<_FloatingActionButtonItem> createState() => _FloatingActionButtonItemState();
+  State<_FloatingActionButtonItem> createState() =>
+      _FloatingActionButtonItemState();
 }
 
 class _FloatingActionButtonItemState extends State<_FloatingActionButtonItem> {
@@ -168,8 +169,10 @@ class _FloatingActionButtonItemState extends State<_FloatingActionButtonItem> {
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = widget.backgroundColor ?? Colors.black.withOpacity(0.6);
-    final hoverBgColor = widget.hoverBackgroundColor ?? Colors.black.withOpacity(0.85);
+    final bgColor =
+        widget.backgroundColor ?? Colors.black.withValues(alpha: 0.6);
+    final hoverBgColor =
+        widget.hoverBackgroundColor ?? Colors.black.withValues(alpha: 0.85);
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovering = true),
@@ -191,7 +194,7 @@ class _FloatingActionButtonItemState extends State<_FloatingActionButtonItem> {
               boxShadow: _isHovering
                   ? [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.4),
+                        color: Colors.black.withValues(alpha: 0.4),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
@@ -221,7 +224,7 @@ enum FloatingActionButtonsPosition {
 }
 
 /// 带位置的悬浮按钮组包装器
-/// 
+///
 /// 用于需要在特定位置显示悬浮按钮的场景
 class PositionedFloatingActionButtons extends StatelessWidget {
   /// 是否显示

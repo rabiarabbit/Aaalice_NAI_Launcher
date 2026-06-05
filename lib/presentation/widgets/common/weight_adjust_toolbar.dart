@@ -465,7 +465,7 @@ class _WeightAdjustToolbarState extends State<_WeightAdjustToolbar> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: colorScheme.outline.withOpacity(0.2),
+                    color: colorScheme.outline.withValues(alpha: 0.2),
                   ),
                 ),
                 child: Row(
@@ -499,13 +499,15 @@ class _WeightAdjustToolbarState extends State<_WeightAdjustToolbar> {
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(4),
                               borderSide: BorderSide(
-                                color: colorScheme.outline.withOpacity(0.5),
+                                color:
+                                    colorScheme.outline.withValues(alpha: 0.5),
                               ),
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(4),
                               borderSide: BorderSide(
-                                color: colorScheme.outline.withOpacity(0.3),
+                                color:
+                                    colorScheme.outline.withValues(alpha: 0.3),
                               ),
                             ),
                             focusedBorder: OutlineInputBorder(
@@ -532,7 +534,7 @@ class _WeightAdjustToolbarState extends State<_WeightAdjustToolbar> {
                       width: 1,
                       height: 20,
                       margin: const EdgeInsets.symmetric(horizontal: 8),
-                      color: colorScheme.outline.withOpacity(0.3),
+                      color: colorScheme.outline.withValues(alpha: 0.3),
                     ),
                     _WeightButton(
                       icon: Icons.refresh,

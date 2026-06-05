@@ -208,7 +208,7 @@ class _TagTemplatePanelState extends ConsumerState<TagTemplatePanel> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: BoxDecoration(
-              color: theme.colorScheme.primary.withOpacity(0.1),
+              color: theme.colorScheme.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
@@ -229,7 +229,7 @@ class _TagTemplatePanelState extends ConsumerState<TagTemplatePanel> {
             iconSize: 20,
             tooltip: context.l10n.tag_templateCreate,
             style: IconButton.styleFrom(
-              backgroundColor: theme.colorScheme.primary.withOpacity(0.1),
+              backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
               foregroundColor: theme.colorScheme.primary,
             ),
           ),
@@ -250,14 +250,14 @@ class _TagTemplatePanelState extends ConsumerState<TagTemplatePanel> {
             Icon(
               Icons.bookmark_border,
               size: 48,
-              color: theme.colorScheme.primary.withOpacity(0.4),
+              color: theme.colorScheme.primary.withValues(alpha: 0.4),
             ),
             const SizedBox(height: 16),
             Text(
               context.l10n.tag_templatesEmpty,
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.6),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             ),
             const SizedBox(height: 8),
@@ -265,7 +265,7 @@ class _TagTemplatePanelState extends ConsumerState<TagTemplatePanel> {
               context.l10n.tag_templatesEmptyHint,
               textAlign: TextAlign.center,
               style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.4),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
               ),
             ),
           ],
@@ -308,9 +308,10 @@ class _TagTemplatePanelState extends ConsumerState<TagTemplatePanel> {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
-              color: theme.colorScheme.outline.withOpacity(0.3),
+              color: theme.colorScheme.outline.withValues(alpha: 0.3),
             ),
-            color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+            color: theme.colorScheme.surfaceContainerHighest
+                .withValues(alpha: 0.3),
           ),
           child: Row(
             children: [
@@ -318,7 +319,7 @@ class _TagTemplatePanelState extends ConsumerState<TagTemplatePanel> {
               Icon(
                 Icons.bookmark,
                 size: 16,
-                color: theme.colorScheme.primary.withOpacity(0.7),
+                color: theme.colorScheme.primary.withValues(alpha: 0.7),
               ),
               const SizedBox(width: 12),
 
@@ -342,7 +343,8 @@ class _TagTemplatePanelState extends ConsumerState<TagTemplatePanel> {
                       Text(
                         template.description!,
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurface.withOpacity(0.6),
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.6),
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -353,7 +355,8 @@ class _TagTemplatePanelState extends ConsumerState<TagTemplatePanel> {
                     Text(
                       context.l10n.tag_templateTagCount(template.tagCount),
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurface.withOpacity(0.5),
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.5),
                         fontSize: 11,
                       ),
                     ),
@@ -365,7 +368,7 @@ class _TagTemplatePanelState extends ConsumerState<TagTemplatePanel> {
               Icon(
                 Icons.add_circle_outline,
                 size: 18,
-                color: theme.colorScheme.primary.withOpacity(0.5),
+                color: theme.colorScheme.primary.withValues(alpha: 0.5),
               ),
               const SizedBox(width: 4),
 
@@ -373,7 +376,7 @@ class _TagTemplatePanelState extends ConsumerState<TagTemplatePanel> {
               Icon(
                 Icons.more_vert,
                 size: 18,
-                color: theme.colorScheme.onSurface.withOpacity(0.4),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
               ),
             ],
           ),
@@ -484,10 +487,10 @@ class _CreateTemplateDialogState extends State<_CreateTemplateDialog> {
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: theme.colorScheme.surfaceContainerHighest
-                      .withOpacity(0.3),
+                      .withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: theme.colorScheme.outline.withOpacity(0.3),
+                    color: theme.colorScheme.outline.withValues(alpha: 0.3),
                   ),
                 ),
                 child: Column(
@@ -496,7 +499,8 @@ class _CreateTemplateDialogState extends State<_CreateTemplateDialog> {
                     Text(
                       context.l10n.tag_templatePreview,
                       style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.colorScheme.onSurface.withOpacity(0.6),
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -524,7 +528,8 @@ class _CreateTemplateDialogState extends State<_CreateTemplateDialog> {
                           widget.initialTags.length - 10,
                         ),
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurface.withOpacity(0.5),
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.5),
                           fontSize: 11,
                         ),
                       ),

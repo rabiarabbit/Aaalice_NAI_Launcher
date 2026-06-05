@@ -84,11 +84,11 @@ class _MultiCharacterConfigPanelState
 
     // 渐变色组合
     final gradients = [
-      [Colors.grey, Colors.grey.withOpacity(0.7)],
-      [colorScheme.primary, colorScheme.primary.withOpacity(0.7)],
-      [colorScheme.secondary, colorScheme.secondary.withOpacity(0.7)],
-      [colorScheme.tertiary, colorScheme.tertiary.withOpacity(0.7)],
-      [Colors.purple, Colors.purple.withOpacity(0.7)],
+      [Colors.grey, Colors.grey.withValues(alpha: 0.7)],
+      [colorScheme.primary, colorScheme.primary.withValues(alpha: 0.7)],
+      [colorScheme.secondary, colorScheme.secondary.withValues(alpha: 0.7)],
+      [colorScheme.tertiary, colorScheme.tertiary.withValues(alpha: 0.7)],
+      [Colors.purple, Colors.purple.withValues(alpha: 0.7)],
     ];
 
     return ElevatedCard(
@@ -110,8 +110,8 @@ class _MultiCharacterConfigPanelState
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      colorScheme.primary.withOpacity(0.2),
-                      colorScheme.primary.withOpacity(0.1),
+                      colorScheme.primary.withValues(alpha: 0.2),
+                      colorScheme.primary.withValues(alpha: 0.1),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(8),
@@ -190,8 +190,8 @@ class _MultiCharacterConfigPanelState
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      colorScheme.secondary.withOpacity(0.2),
-                      colorScheme.secondary.withOpacity(0.1),
+                      colorScheme.secondary.withValues(alpha: 0.2),
+                      colorScheme.secondary.withValues(alpha: 0.1),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(8),
@@ -342,9 +342,9 @@ class _MultiCharacterConfigPanelState
     }
 
     final colors = {
-      'male': [Colors.blue, Colors.blue.withOpacity(0.7)],
-      'female': [Colors.pink, Colors.pink.withOpacity(0.7)],
-      'other': [Colors.purple, Colors.purple.withOpacity(0.7)],
+      'male': [Colors.blue, Colors.blue.withValues(alpha: 0.7)],
+      'female': [Colors.pink, Colors.pink.withValues(alpha: 0.7)],
+      'other': [Colors.purple, Colors.purple.withValues(alpha: 0.7)],
     };
 
     return ElevatedCard(
@@ -424,7 +424,7 @@ class _MultiCharacterConfigPanelState
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: color.withOpacity(0.4),
+                        color: color.withValues(alpha: 0.4),
                         blurRadius: 4,
                       ),
                     ],
@@ -463,8 +463,8 @@ class _MultiCharacterConfigPanelState
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  color.withOpacity(0.15),
-                  color.withOpacity(0.08),
+                  color.withValues(alpha: 0.15),
+                  color.withValues(alpha: 0.08),
                 ],
               ),
               borderRadius: BorderRadius.circular(6),

@@ -104,14 +104,14 @@ class _TimeConditionPanelState extends State<TimeConditionPanel> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                colorScheme.primary.withOpacity(0.2),
-                colorScheme.primary.withOpacity(0.1),
+                colorScheme.primary.withValues(alpha: 0.2),
+                colorScheme.primary.withValues(alpha: 0.1),
               ],
             ),
             borderRadius: BorderRadius.circular(10),
             boxShadow: [
               BoxShadow(
-                color: colorScheme.primary.withOpacity(0.1),
+                color: colorScheme.primary.withValues(alpha: 0.1),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -220,7 +220,7 @@ class _TimeConditionPanelState extends State<TimeConditionPanel> {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: colorScheme.secondaryContainer.withOpacity(0.5),
+                  color: colorScheme.secondaryContainer.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Icon(
@@ -265,7 +265,7 @@ class _TimeConditionPanelState extends State<TimeConditionPanel> {
                           color: colorScheme.surfaceContainerHighest,
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
-                            color: colorScheme.outline.withOpacity(0.2),
+                            color: colorScheme.outline.withValues(alpha: 0.2),
                           ),
                         ),
                         child: Column(
@@ -311,7 +311,7 @@ class _TimeConditionPanelState extends State<TimeConditionPanel> {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: colorScheme.tertiaryContainer.withOpacity(0.5),
+                  color: colorScheme.tertiaryContainer.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Icon(
@@ -384,13 +384,13 @@ class _TimeConditionPanelState extends State<TimeConditionPanel> {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    colorScheme.errorContainer.withOpacity(0.8),
-                    colorScheme.errorContainer.withOpacity(0.5),
+                    colorScheme.errorContainer.withValues(alpha: 0.8),
+                    colorScheme.errorContainer.withValues(alpha: 0.5),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
-                  color: colorScheme.error.withOpacity(0.3),
+                  color: colorScheme.error.withValues(alpha: 0.3),
                 ),
               ),
               child: Row(
@@ -435,7 +435,7 @@ class _TimeConditionPanelState extends State<TimeConditionPanel> {
         color: colorScheme.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: color.withOpacity(0.3),
+          color: color.withValues(alpha: 0.3),
         ),
       ),
       child: Column(
@@ -466,7 +466,7 @@ class _TimeConditionPanelState extends State<TimeConditionPanel> {
             children: [
               Expanded(
                 child: DropdownButtonFormField<int>(
-                  value: month,
+                  initialValue: month,
                   decoration: InputDecoration(
                     labelText: '月',
                     border: OutlineInputBorder(
@@ -484,7 +484,7 @@ class _TimeConditionPanelState extends State<TimeConditionPanel> {
               const SizedBox(width: 8),
               Expanded(
                 child: DropdownButtonFormField<int>(
-                  value: day,
+                  initialValue: day,
                   decoration: InputDecoration(
                     labelText: '日',
                     border: OutlineInputBorder(
@@ -526,7 +526,8 @@ class _TimeConditionPanelState extends State<TimeConditionPanel> {
                     Container(
                       padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
-                        color: colorScheme.primaryContainer.withOpacity(0.5),
+                        color:
+                            colorScheme.primaryContainer.withValues(alpha: 0.5),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Icon(
@@ -565,7 +566,7 @@ class _TimeConditionPanelState extends State<TimeConditionPanel> {
               ],
             ),
           ),
-          Divider(height: 1, color: colorScheme.outline.withOpacity(0.1)),
+          Divider(height: 1, color: colorScheme.outline.withValues(alpha: 0.1)),
           // 每年重复开关
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -609,7 +610,7 @@ class _TimeConditionPanelState extends State<TimeConditionPanel> {
               ],
             ),
           ),
-          Divider(height: 1, color: colorScheme.outline.withOpacity(0.1)),
+          Divider(height: 1, color: colorScheme.outline.withValues(alpha: 0.1)),
           // 启用开关
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -661,8 +662,8 @@ class _TimeConditionPanelState extends State<TimeConditionPanel> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                colorScheme.primary.withOpacity(0.6),
-                colorScheme.secondary.withOpacity(0.4),
+                colorScheme.primary.withValues(alpha: 0.6),
+                colorScheme.secondary.withValues(alpha: 0.4),
               ],
             )
           : null,
@@ -680,7 +681,7 @@ class _TimeConditionPanelState extends State<TimeConditionPanel> {
                       end: Alignment.bottomRight,
                       colors: [
                         colorScheme.primary,
-                        colorScheme.primary.withOpacity(0.8),
+                        colorScheme.primary.withValues(alpha: 0.8),
                       ],
                     )
                   : null,
@@ -689,7 +690,7 @@ class _TimeConditionPanelState extends State<TimeConditionPanel> {
               boxShadow: isActive
                   ? [
                       BoxShadow(
-                        color: colorScheme.primary.withOpacity(0.3),
+                        color: colorScheme.primary.withValues(alpha: 0.3),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -733,8 +734,8 @@ class _TimeConditionPanelState extends State<TimeConditionPanel> {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    colorScheme.primary.withOpacity(0.2),
-                    colorScheme.primary.withOpacity(0.1),
+                    colorScheme.primary.withValues(alpha: 0.2),
+                    colorScheme.primary.withValues(alpha: 0.1),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(20),

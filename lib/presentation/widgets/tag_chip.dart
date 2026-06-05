@@ -79,11 +79,11 @@ class _SimpleTagChipState extends ConsumerState<SimpleTagChip> {
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
             color: _isHovering
-                ? chipColor.withOpacity(0.3)
-                : chipColor.withOpacity(0.1),
+                ? chipColor.withValues(alpha: 0.3)
+                : chipColor.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(4),
             border: Border.all(
-              color: chipColor.withOpacity(_isHovering ? 0.8 : 0.3),
+              color: chipColor.withValues(alpha: _isHovering ? 0.8 : 0.3),
             ),
           ),
           child: Row(

@@ -87,17 +87,21 @@ class _ThumbnailItemState extends State<_ThumbnailItem> {
     final borderColor = widget.isSelected
         ? primary
         : _isHovered
-            ? primary.withOpacity(0.7)
-            : Colors.white.withOpacity(0.2);
+            ? primary.withValues(alpha: 0.7)
+            : Colors.white.withValues(alpha: 0.2);
 
     // 边框宽度
-    final borderWidth = widget.isSelected ? 2.5 : _isHovered ? 2.0 : 1.0;
+    final borderWidth = widget.isSelected
+        ? 2.5
+        : _isHovered
+            ? 2.0
+            : 1.0;
 
     // 阴影
     final shadow = widget.isSelected || _isHovered
         ? [
             BoxShadow(
-              color: primary.withOpacity(widget.isSelected ? 0.4 : 0.25),
+              color: primary.withValues(alpha: widget.isSelected ? 0.4 : 0.25),
               blurRadius: widget.isSelected ? 12 : 8,
               spreadRadius: widget.isSelected ? 2 : 1,
             ),
@@ -105,7 +109,11 @@ class _ThumbnailItemState extends State<_ThumbnailItem> {
         : null;
 
     // 透明度
-    final opacity = widget.isSelected ? 1.0 : _isHovered ? 0.85 : 0.5;
+    final opacity = widget.isSelected
+        ? 1.0
+        : _isHovered
+            ? 0.85
+            : 0.5;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),

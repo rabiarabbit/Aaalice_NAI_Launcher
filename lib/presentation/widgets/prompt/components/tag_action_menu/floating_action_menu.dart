@@ -47,11 +47,11 @@ class FloatingActionMenu extends StatelessWidget {
         color: theme.colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(TagChipSizes.menuBorderRadius),
         border: Border.all(
-          color: theme.colorScheme.outline.withOpacity(0.2),
+          color: theme.colorScheme.outline.withValues(alpha: 0.2),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -86,7 +86,7 @@ class FloatingActionMenu extends StatelessWidget {
       width: 1,
       height: 18,
       margin: const EdgeInsets.symmetric(horizontal: 4),
-      color: theme.colorScheme.outline.withOpacity(0.2),
+      color: theme.colorScheme.outline.withValues(alpha: 0.2),
     );
   }
 }
@@ -145,7 +145,7 @@ class _WeightControlSection extends StatelessWidget {
                       ? PromptTagColors.weightIncrease
                       : tag.weight < 1.0
                           ? PromptTagColors.weightDecrease
-                          : theme.colorScheme.onSurface.withOpacity(0.7),
+                          : theme.colorScheme.onSurface.withValues(alpha: 0.7),
                   fontFeatures: const [FontFeature.tabularFigures()],
                 ),
               ),
@@ -201,7 +201,7 @@ class _ActionButtonsSection extends StatelessWidget {
           tooltip: tag.enabled
               ? context.l10n.tooltip_disable
               : context.l10n.tooltip_enable,
-          color: theme.colorScheme.onSurface.withOpacity(0.7),
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
           onTap: () {
             onToggleEnabled?.call();
             HapticFeedback.lightImpact();
@@ -213,7 +213,7 @@ class _ActionButtonsSection extends StatelessWidget {
           _MenuIconButton(
             icon: Icons.edit_outlined,
             tooltip: context.l10n.tooltip_edit,
-            color: theme.colorScheme.onSurface.withOpacity(0.7),
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
             onTap: () {
               onEdit?.call();
               HapticFeedback.lightImpact();
@@ -225,7 +225,7 @@ class _ActionButtonsSection extends StatelessWidget {
           _MenuIconButton(
             icon: Icons.copy_outlined,
             tooltip: context.l10n.tooltip_copy,
-            color: theme.colorScheme.onSurface.withOpacity(0.7),
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
             onTap: () {
               onCopy?.call();
               HapticFeedback.lightImpact();
@@ -283,7 +283,7 @@ class _MenuIconButtonState extends State<_MenuIconButton> {
             height: TagChipSizes.menuButtonSize,
             decoration: BoxDecoration(
               color: _isHovered
-                  ? widget.color.withOpacity(0.15)
+                  ? widget.color.withValues(alpha: 0.15)
                   : Colors.transparent,
               borderRadius: BorderRadius.circular(4),
             ),
@@ -291,7 +291,9 @@ class _MenuIconButtonState extends State<_MenuIconButton> {
             child: Icon(
               widget.icon,
               size: TagChipSizes.menuIconSize,
-              color: _isHovered ? widget.color : widget.color.withOpacity(0.8),
+              color: _isHovered
+                  ? widget.color
+                  : widget.color.withValues(alpha: 0.8),
             ),
           ),
         ),

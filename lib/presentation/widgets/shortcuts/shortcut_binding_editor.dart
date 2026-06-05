@@ -33,8 +33,7 @@ class ShortcutBindingEditor extends ConsumerStatefulWidget {
       _ShortcutBindingEditorState();
 }
 
-class _ShortcutBindingEditorState
-    extends ConsumerState<ShortcutBindingEditor> {
+class _ShortcutBindingEditorState extends ConsumerState<ShortcutBindingEditor> {
   late TextEditingController _controller;
   bool _isRecording = false;
   String? _conflictId;
@@ -82,7 +81,7 @@ class _ShortcutBindingEditorState
               border: Border.all(
                 color: _isRecording
                     ? theme.colorScheme.primary
-                    : theme.colorScheme.outline.withOpacity(0.3),
+                    : theme.colorScheme.outline.withValues(alpha: 0.3),
               ),
             ),
             child: _isRecording
@@ -154,7 +153,7 @@ class _ShortcutBindingEditorState
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: _isRecording
-                  ? theme.colorScheme.primaryContainer.withOpacity(0.3)
+                  ? theme.colorScheme.primaryContainer.withValues(alpha: 0.3)
                   : theme.colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
@@ -162,7 +161,7 @@ class _ShortcutBindingEditorState
                     ? theme.colorScheme.primary
                     : _conflictId != null
                         ? theme.colorScheme.error
-                        : theme.colorScheme.outline.withOpacity(0.3),
+                        : theme.colorScheme.outline.withValues(alpha: 0.3),
                 width: _isRecording || _conflictId != null ? 2 : 1,
               ),
             ),
@@ -212,7 +211,8 @@ class _ShortcutBindingEditorState
                                   AppShortcutManager.getDisplayLabel(
                                     _controller.text,
                                   ),
-                                  style: theme.textTheme.headlineSmall?.copyWith(
+                                  style:
+                                      theme.textTheme.headlineSmall?.copyWith(
                                     fontFamily: 'monospace',
                                     fontWeight: FontWeight.bold,
                                     color: widget.binding.hasCustomShortcut

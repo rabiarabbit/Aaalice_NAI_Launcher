@@ -495,7 +495,10 @@ class UnifiedMetadataParser {
   /// - 重新编码: 500-800ms
   /// - 此方法: 5-15ms
   static Uint8List embedTextChunkOnly(
-      Uint8List originalPng, String keyword, String text) {
+    Uint8List originalPng,
+    String keyword,
+    String text,
+  ) {
     try {
       final chunks = _parsePngChunks(originalPng);
       final output = BytesBuilder();
@@ -549,7 +552,11 @@ class UnifiedMetadataParser {
       return output.toBytes();
     } catch (e, stack) {
       AppLogger.e(
-          '[UnifiedMetadataParser] Failed to embed text chunk', e, stack, _tag);
+        '[UnifiedMetadataParser] Failed to embed text chunk',
+        e,
+        stack,
+        _tag,
+      );
       // 失败时返回原始数据
       return originalPng;
     }
@@ -720,7 +727,10 @@ class UnifiedMetadataParser {
 
   /// 写入 tEXt chunk 到 builder
   static void _writeTextChunk(
-      BytesBuilder builder, String keyword, String text) {
+    BytesBuilder builder,
+    String keyword,
+    String text,
+  ) {
     final keywordBytes = latin1.encode(keyword);
     final textBytes = latin1.encode(text);
 
@@ -756,7 +766,9 @@ class UnifiedMetadataParser {
 
   /// 更新 PNG 的 tEXt chunk 中的 Comment 字段
   static Future<Uint8List> _updateTextChunk(
-      Uint8List bytes, String metadataJson) async {
+    Uint8List bytes,
+    String metadataJson,
+  ) async {
     try {
       final chunks = _parsePngChunks(bytes);
       final output = BytesBuilder();
@@ -804,7 +816,9 @@ class UnifiedMetadataParser {
       return output.toBytes();
     } catch (e) {
       AppLogger.w(
-          '[UnifiedMetadataParser] Failed to update tEXt chunk: $e', _tag);
+        '[UnifiedMetadataParser] Failed to update tEXt chunk: $e',
+        _tag,
+      );
       return bytes; // 失败时返回原始数据
     }
   }
@@ -1141,7 +1155,9 @@ class UnifiedMetadataParser {
 
   /// 嵌入 stealth 数据到 alpha 通道
   static Future<Uint8List> _embedStealthData(
-      Uint8List imageBytes, String metadataJson) async {
+    Uint8List imageBytes,
+    String metadataJson,
+  ) async {
     final image = img.decodePng(imageBytes);
     if (image == null) throw Exception('Failed to decode PNG image');
 
@@ -1241,7 +1257,10 @@ class UnifiedMetadataParser {
 
   /// 缓存解析结果
   static void _cacheResult(
-      String filePath, int fileSize, MetadataParseResult result) {
+    String filePath,
+    int fileSize,
+    MetadataParseResult result,
+  ) {
     final cacheKey =
         '$filePath:$fileSize:${result.metadata?.prompt.hashCode ?? 0}';
     _resultCache[cacheKey] = result;
@@ -1262,7 +1281,9 @@ class UnifiedMetadataParser {
 
   /// 更新统计信息
   static void _updateStatistics(
-      MetadataParseResult result, Duration parseTime) {
+    MetadataParseResult result,
+    Duration parseTime,
+  ) {
     _statistics.totalParseTime += parseTime;
     if (result.success) {
       _statistics.successfulParses++;
@@ -1323,12 +1344,16 @@ class UnifiedMetadataParser {
               _extractString(json, ['sampler', 'sampler_name', 'scheduler']);
           steps ??= _extractInt(json, ['steps', 'num_inference_steps', 'step']);
           cfgScale ??= _extractDouble(
-              json, ['cfg_scale', 'scale', 'guidance_scale', 'cfg']);
+            json,
+            ['cfg_scale', 'scale', 'guidance_scale', 'cfg'],
+          );
           seed ??= _extractInt(json, ['seed', 'noise_seed', 'random_seed']);
           width ??= _extractInt(json, ['width', 'w', 'image_width']);
           height ??= _extractInt(json, ['height', 'h', 'image_height']);
           model ??= _extractString(
-              json, ['model', 'model_name', 'checkpoint', 'model_hash']);
+            json,
+            ['model', 'model_name', 'checkpoint', 'model_hash'],
+          );
           software ??=
               _extractString(json, ['software', 'source', 'generator', 'app']);
         } catch (_) {
@@ -1555,8 +1580,9 @@ class NovelAiParser implements MetadataParser {
                 rawJson: text,
               );
               AppLogger.d(
-                  'NovelAiParser: Metadata created from nested Comment Map',
-                  'UnifiedMetadataParser');
+                'NovelAiParser: Metadata created from nested Comment Map',
+                'UnifiedMetadataParser',
+              );
               return result;
             } catch (e, stack) {
               AppLogger.e(
@@ -1570,8 +1596,10 @@ class NovelAiParser implements MetadataParser {
           }
         }
       } catch (e) {
-        AppLogger.d('NovelAiParser: Failed to parse field "$field": $e',
-            'UnifiedMetadataParser');
+        AppLogger.d(
+          'NovelAiParser: Failed to parse field "$field": $e',
+          'UnifiedMetadataParser',
+        );
         continue;
       }
     }

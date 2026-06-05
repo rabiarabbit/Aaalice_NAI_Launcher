@@ -246,7 +246,9 @@ class ReferencePanelNotifier extends _$ReferencePanelNotifier {
         );
         if (preparedVibe == null) {
           return SaveToLibraryResult(
-              savedCount: savedCount, reusedCount: reusedCount);
+            savedCount: savedCount,
+            reusedCount: reusedCount,
+          );
         }
 
         final vibeWithParams = preparedVibe.normalizedForLibraryStorage();

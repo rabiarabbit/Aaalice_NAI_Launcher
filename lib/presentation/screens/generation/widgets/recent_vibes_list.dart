@@ -37,13 +37,13 @@ class RecentVibesList extends ConsumerWidget {
                 Icon(
                   Icons.history,
                   size: 14,
-                  color: theme.colorScheme.onSurface.withOpacity(0.6),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
                 const SizedBox(width: 4),
                 Text(
                   '最近使用',
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurface.withOpacity(0.6),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                 ),
                 const SizedBox(width: 4),
@@ -54,7 +54,7 @@ class RecentVibesList extends ConsumerWidget {
                   child: Icon(
                     Icons.chevron_left,
                     size: 16,
-                    color: theme.colorScheme.onSurface.withOpacity(0.4),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
                   ),
                 ),
               ],

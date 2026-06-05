@@ -282,7 +282,8 @@ class _FixedTagEditDialogState extends ConsumerState<FixedTagEditDialog> {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.secondary.withOpacity(0.1),
+                        color:
+                            theme.colorScheme.secondary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
@@ -379,13 +380,15 @@ class _FixedTagEditDialogState extends ConsumerState<FixedTagEditDialog> {
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       color: _saveToLibrary
-                          ? theme.colorScheme.primaryContainer.withOpacity(0.3)
+                          ? theme.colorScheme.primaryContainer
+                              .withValues(alpha: 0.3)
                           : theme.colorScheme.surfaceContainerLow,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
                         color: _saveToLibrary
-                            ? theme.colorScheme.primary.withOpacity(0.4)
-                            : theme.colorScheme.outlineVariant.withOpacity(0.5),
+                            ? theme.colorScheme.primary.withValues(alpha: 0.4)
+                            : theme.colorScheme.outlineVariant
+                                .withValues(alpha: 0.5),
                       ),
                     ),
                     child: Column(
@@ -620,7 +623,7 @@ class _FixedTagEditDialogState extends ConsumerState<FixedTagEditDialog> {
         const SizedBox(width: 10),
         Expanded(
           child: DropdownButtonFormField<String?>(
-            value: _selectedCategoryId,
+            initialValue: _selectedCategoryId,
             decoration: InputDecoration(
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 10,
@@ -629,13 +632,13 @@ class _FixedTagEditDialogState extends ConsumerState<FixedTagEditDialog> {
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
                 borderSide: BorderSide(
-                  color: theme.colorScheme.outline.withOpacity(0.3),
+                  color: theme.colorScheme.outline.withValues(alpha: 0.3),
                 ),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
                 borderSide: BorderSide(
-                  color: theme.colorScheme.outline.withOpacity(0.3),
+                  color: theme.colorScheme.outline.withValues(alpha: 0.3),
                 ),
               ),
               isDense: true,

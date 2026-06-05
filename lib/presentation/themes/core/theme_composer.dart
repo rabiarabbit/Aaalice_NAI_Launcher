@@ -133,7 +133,7 @@ class ThemeComposer {
             ? const Color(0xFF2A2A2A)
             : const Color(0xFFFFFFFF),
         surfaceTintColor: Colors.transparent,
-        shadowColor: Colors.black.withOpacity(0.25),
+        shadowColor: Colors.black.withValues(alpha: 0.25),
         margin: EdgeInsets.zero,
       ),
 
@@ -142,7 +142,7 @@ class ThemeComposer {
         style: ElevatedButton.styleFrom(
           shape: shape.buttonShape as OutlinedBorder?,
           elevation: 2,
-          shadowColor: Colors.black.withOpacity(0.15),
+          shadowColor: Colors.black.withValues(alpha: 0.15),
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         ),
       ),
@@ -158,7 +158,7 @@ class ThemeComposer {
         style: OutlinedButton.styleFrom(
           shape: shape.buttonShape as OutlinedBorder?,
           side: BorderSide(
-            color: colorScheme.outline.withOpacity(0.3),
+            color: colorScheme.outline.withValues(alpha: 0.3),
             width: 1,
           ),
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
@@ -190,14 +190,14 @@ class ThemeComposer {
         focusedBorder: OutlineInputBorder(
           borderRadius: _extractBorderRadius(shape.inputShape),
           borderSide: BorderSide(
-            color: colorScheme.primary.withOpacity(0.6),
+            color: colorScheme.primary.withValues(alpha: 0.6),
             width: 1.5,
           ),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: _extractBorderRadius(shape.inputShape),
           borderSide: BorderSide(
-            color: colorScheme.error.withOpacity(0.6),
+            color: colorScheme.error.withValues(alpha: 0.6),
             width: 1.0,
           ),
         ),
@@ -228,7 +228,8 @@ class ThemeComposer {
           backgroundColor:
               WidgetStatePropertyAll(colorScheme.surfaceContainerHigh),
           elevation: const WidgetStatePropertyAll(0), // 使用自定义阴影
-          shadowColor: WidgetStatePropertyAll(Colors.black.withOpacity(0.15)),
+          shadowColor:
+              WidgetStatePropertyAll(Colors.black.withValues(alpha: 0.15)),
           surfaceTintColor: const WidgetStatePropertyAll(Colors.transparent),
         ),
       ),
@@ -239,7 +240,7 @@ class ThemeComposer {
         ),
         color: colorScheme.surfaceContainerHigh,
         elevation: 8,
-        shadowColor: Colors.black.withOpacity(0.15),
+        shadowColor: Colors.black.withValues(alpha: 0.15),
         surfaceTintColor: Colors.transparent,
       ),
 
@@ -253,7 +254,8 @@ class ThemeComposer {
           backgroundColor:
               WidgetStatePropertyAll(colorScheme.surfaceContainerHigh),
           elevation: const WidgetStatePropertyAll(8),
-          shadowColor: WidgetStatePropertyAll(Colors.black.withOpacity(0.15)),
+          shadowColor:
+              WidgetStatePropertyAll(Colors.black.withValues(alpha: 0.15)),
           surfaceTintColor: const WidgetStatePropertyAll(Colors.transparent),
         ),
       ),
@@ -275,7 +277,7 @@ class ThemeComposer {
         ),
         backgroundColor: colorScheme.surfaceContainerHigh,
         elevation: 16,
-        shadowColor: Colors.black.withOpacity(0.2),
+        shadowColor: Colors.black.withValues(alpha: 0.2),
         surfaceTintColor: Colors.transparent,
       ),
 
@@ -288,7 +290,7 @@ class ThemeComposer {
         ),
         backgroundColor: colorScheme.surfaceContainerHigh,
         elevation: 16,
-        shadowColor: Colors.black.withOpacity(0.2),
+        shadowColor: Colors.black.withValues(alpha: 0.2),
         surfaceTintColor: Colors.transparent,
       ),
 
@@ -312,7 +314,7 @@ class ThemeComposer {
           borderRadius: BorderRadius.circular(shape.smallRadius),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.15),
+              color: Colors.black.withValues(alpha: 0.15),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),

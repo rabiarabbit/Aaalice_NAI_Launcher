@@ -207,7 +207,7 @@ class _SelectionInfo extends StatelessWidget {
           padding: const EdgeInsets.all(6),
           decoration: BoxDecoration(
             color: hasSelection
-                ? colorScheme.primary.withOpacity(0.15)
+                ? colorScheme.primary.withValues(alpha: 0.15)
                 : colorScheme.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(6),
           ),
@@ -336,7 +336,7 @@ class _QuickActionButtonState extends State<_QuickActionButton> {
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: widget.highlighted || (_isHovered && isEnabled)
-                  ? colorScheme.primary.withOpacity(0.12)
+                  ? colorScheme.primary.withValues(alpha: 0.12)
                   : Colors.transparent,
               borderRadius: BorderRadius.circular(6),
             ),
@@ -347,7 +347,7 @@ class _QuickActionButtonState extends State<_QuickActionButton> {
                   ? (widget.highlighted
                       ? colorScheme.primary
                       : colorScheme.onSurfaceVariant)
-                  : colorScheme.onSurfaceVariant.withOpacity(0.4),
+                  : colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
             ),
           ),
         ),
@@ -381,7 +381,7 @@ class _BatchOperations extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.shadow.withOpacity(0.05),
+            color: colorScheme.shadow.withValues(alpha: 0.05),
             blurRadius: 4,
             offset: const Offset(0, 1),
           ),
@@ -440,7 +440,7 @@ class _BatchOperationButtonState extends State<_BatchOperationButton> {
   Widget build(BuildContext context) {
     final isEnabled = widget.onPressed != null;
     final effectiveColor =
-        isEnabled ? widget.color : widget.color.withOpacity(0.4);
+        isEnabled ? widget.color : widget.color.withValues(alpha: 0.4);
 
     return MouseRegion(
       cursor: isEnabled ? SystemMouseCursors.click : SystemMouseCursors.basic,
@@ -453,13 +453,13 @@ class _BatchOperationButtonState extends State<_BatchOperationButton> {
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           decoration: BoxDecoration(
             color: _isHovered && isEnabled
-                ? effectiveColor.withOpacity(0.15)
-                : effectiveColor.withOpacity(0.08),
+                ? effectiveColor.withValues(alpha: 0.15)
+                : effectiveColor.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(6),
             boxShadow: _isHovered && isEnabled
                 ? [
                     BoxShadow(
-                      color: effectiveColor.withOpacity(0.2),
+                      color: effectiveColor.withValues(alpha: 0.2),
                       blurRadius: 6,
                       offset: const Offset(0, 2),
                     ),

@@ -150,7 +150,8 @@ class CacheMonitorController extends StateNotifier<CacheMonitorState> {
 }
 
 /// 缓存监控 Provider
-final cacheMonitorProvider = StateNotifierProvider<CacheMonitorController, CacheMonitorState>(
+final cacheMonitorProvider =
+    StateNotifierProvider<CacheMonitorController, CacheMonitorState>(
   (ref) => CacheMonitorController(),
 );
 
@@ -309,7 +310,11 @@ class CacheMonitorWidget extends ConsumerWidget {
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.error_outline, color: colorScheme.error, size: 16),
+                    Icon(
+                      Icons.error_outline,
+                      color: colorScheme.error,
+                      size: 16,
+                    ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
@@ -427,7 +432,7 @@ class _CacheStatisticsPanel extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.orange.withOpacity(0.2),
+                  color: Colors.orange.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: const Text(
@@ -439,13 +444,20 @@ class _CacheStatisticsPanel extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              Icon(Icons.storage, color: Colors.orange.withOpacity(0.7), size: 20),
+              Icon(
+                Icons.storage,
+                color: Colors.orange.withValues(alpha: 0.7),
+                size: 20,
+              ),
               const SizedBox(width: 8),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('SQLite 数据库', style: TextStyle(fontWeight: FontWeight.w500)),
+                    const Text(
+                      'SQLite 数据库',
+                      style: TextStyle(fontWeight: FontWeight.w500),
+                    ),
                     Text(
                       '${statistics.l3DatabaseImageCount} 图片 | ${statistics.l3DatabaseMetadataCount} 元数据',
                       style: theme.textTheme.bodySmall?.copyWith(
@@ -512,7 +524,7 @@ class _CacheLevelCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.2),
+              color: color.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(
@@ -524,7 +536,7 @@ class _CacheLevelCard extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          Icon(icon, color: color.withOpacity(0.7), size: 20),
+          Icon(icon, color: color.withValues(alpha: 0.7), size: 20),
           const SizedBox(width: 8),
           Expanded(
             child: Column(
@@ -710,7 +722,7 @@ class _ActionButtons extends StatelessWidget {
       label: Text(label),
       style: OutlinedButton.styleFrom(
         foregroundColor: color,
-        side: BorderSide(color: color.withOpacity(0.5)),
+        side: BorderSide(color: color.withValues(alpha: 0.5)),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       ),
     );

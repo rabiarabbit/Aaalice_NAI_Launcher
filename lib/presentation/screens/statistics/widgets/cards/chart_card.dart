@@ -29,8 +29,8 @@ class SectionHeader extends StatelessWidget {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                colorScheme.primary.withOpacity(0.15),
-                colorScheme.primary.withOpacity(0.08),
+                colorScheme.primary.withValues(alpha: 0.15),
+                colorScheme.primary.withValues(alpha: 0.08),
               ],
             ),
             borderRadius: BorderRadius.circular(8),
@@ -99,7 +99,7 @@ class _ChartCardState extends State<ChartCard> {
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeOutCubic,
         transform: _isHovered
-            ? (Matrix4.identity()..translate(0.0, -2.0))
+            ? (Matrix4.identity()..translateByDouble(0.0, -2.0, 0, 1))
             : Matrix4.identity(),
         decoration: BoxDecoration(
           // 深度层叠风格：使用主题中明确定义的最亮容器色
@@ -109,14 +109,16 @@ class _ChartCardState extends State<ChartCard> {
           boxShadow: widget.elevated
               ? [
                   BoxShadow(
-                    color: Colors.black.withOpacity(
-                      _isHovered ? shadowIntensity * 1.5 : shadowIntensity,
+                    color: Colors.black.withValues(
+                      alpha:
+                          _isHovered ? shadowIntensity * 1.5 : shadowIntensity,
                     ),
                     blurRadius: _isHovered ? 16 : 12,
                     offset: Offset(0, _isHovered ? 6 : 4),
                   ),
                   BoxShadow(
-                    color: Colors.black.withOpacity(shadowIntensity * 0.5),
+                    color:
+                        Colors.black.withValues(alpha: shadowIntensity * 0.5),
                     blurRadius: 6,
                     offset: const Offset(0, 2),
                   ),
@@ -138,8 +140,8 @@ class _ChartCardState extends State<ChartCard> {
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: accentColor.withOpacity(
-                              isDark ? 0.15 : 0.1,
+                            color: accentColor.withValues(
+                              alpha: isDark ? 0.15 : 0.1,
                             ),
                             borderRadius: BorderRadius.circular(6),
                           ),
@@ -213,7 +215,8 @@ class StatRow extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: (valueColor ?? colorScheme.primary).withOpacity(0.08),
+              color:
+                  (valueColor ?? colorScheme.primary).withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
@@ -282,7 +285,7 @@ class ChartEmptyState extends StatelessWidget {
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: colorScheme.primary.withOpacity(0.1),
+                          color: colorScheme.primary.withValues(alpha: 0.1),
                           blurRadius: 20,
                           offset: const Offset(0, 8),
                         ),
@@ -291,7 +294,8 @@ class ChartEmptyState extends StatelessWidget {
                     child: Icon(
                       icon,
                       size: 48,
-                      color: colorScheme.onSurfaceVariant.withOpacity(0.6),
+                      color:
+                          colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
                     ),
                   ),
                 );

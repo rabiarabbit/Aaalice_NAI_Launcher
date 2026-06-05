@@ -233,12 +233,12 @@ class _ThemedSliderState extends State<ThemedSlider> {
     required ThemeData theme,
   }) {
     final borderRadius = BorderRadius.circular(trackHeight / 2);
-    final borderColor = theme.colorScheme.outline.withOpacity(0.15);
+    final borderColor = theme.colorScheme.outline.withValues(alpha: 0.15);
 
     // 内阴影颜色
     final shadowColor = isDark
-        ? Colors.black.withOpacity(shadowDepth * 1.5)
-        : Colors.black.withOpacity(shadowDepth);
+        ? Colors.black.withValues(alpha: shadowDepth * 1.5)
+        : Colors.black.withValues(alpha: shadowDepth);
 
     return Container(
       width: trackWidth,
@@ -289,7 +289,7 @@ class _ThemedSliderState extends State<ThemedSlider> {
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(shadowOpacity),
+            color: Colors.black.withValues(alpha: shadowOpacity),
             blurRadius: shadowBlur,
             offset: const Offset(0, 2),
           ),
@@ -310,7 +310,7 @@ class _ThemedSliderState extends State<ThemedSlider> {
         borderRadius: BorderRadius.circular(4),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -394,7 +394,7 @@ class ThemedSliderListTile extends StatelessWidget {
                                 .textTheme
                                 .bodyLarge!
                                 .color!
-                                .withOpacity(0.5),
+                                .withValues(alpha: 0.5),
                       ),
                   child: title,
                 ),

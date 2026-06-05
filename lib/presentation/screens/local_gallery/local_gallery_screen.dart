@@ -108,8 +108,12 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
         Future.delayed(const Duration(milliseconds: 500), () {
           if (mounted) {
             _autoRefresh().catchError((e, stack) {
-              AppLogger.e('Auto refresh on resume failed', e, stack,
-                  'LocalGalleryScreen');
+              AppLogger.e(
+                'Auto refresh on resume failed',
+                e,
+                stack,
+                'LocalGalleryScreen',
+              );
             });
           }
         });
@@ -233,7 +237,7 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
         color: theme.colorScheme.surfaceContainerLow,
         border: Border(
           right: BorderSide(
-            color: theme.colorScheme.outlineVariant.withOpacity(0.3),
+            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
             width: 1,
           ),
         ),
@@ -243,7 +247,7 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
           _buildCategoryPanelHeader(theme),
           Divider(
             height: 1,
-            color: theme.colorScheme.outlineVariant.withOpacity(0.3),
+            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
           ),
           Expanded(
             child: FutureBuilder<int>(
@@ -373,6 +377,7 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
       icon: Icons.delete_outline,
     );
     if (confirmed) {
+      if (!mounted) return;
       final protected = await AssetProtectionGuard.confirmDangerousAction(
         context: context,
         ref: ref,
@@ -443,8 +448,9 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
       final currentPath = router.routeInformationProvider.value.uri.path;
       if (currentPath != '/local-gallery') {
         AppLogger.d(
-            '[AutoRefresh] Skipped: not on local gallery page (current: $currentPath)',
-            'LocalGalleryScreen');
+          '[AutoRefresh] Skipped: not on local gallery page (current: $currentPath)',
+          'LocalGalleryScreen',
+        );
         return;
       }
 
@@ -454,8 +460,9 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
         final elapsed = now.difference(_lastRefreshTime!).inMilliseconds;
         if (elapsed < _minRefreshIntervalMs) {
           AppLogger.d(
-              '[AutoRefresh] Skipped: too frequent (${elapsed}ms < ${_minRefreshIntervalMs}ms)',
-              'LocalGalleryScreen');
+            '[AutoRefresh] Skipped: too frequent (${elapsed}ms < ${_minRefreshIntervalMs}ms)',
+            'LocalGalleryScreen',
+          );
           return;
         }
       }
@@ -464,7 +471,9 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
       final scanState = ref.read(galleryScanProgressProvider);
       if (scanState.isScanning) {
         AppLogger.d(
-            '[AutoRefresh] Skipped: scan in progress', 'LocalGalleryScreen');
+          '[AutoRefresh] Skipped: scan in progress',
+          'LocalGalleryScreen',
+        );
         return;
       }
 
@@ -745,6 +754,7 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
         ? await AssetProtectionGuard.resolveNonOverwritingPath(requestedPath)
         : requestedPath;
 
+    if (!mounted) return;
     AppToast.info(context, '正在打包 ${selectedImages.length} 张图片...');
 
     final imagePaths = selectedImages.map((img) => img.path).toList();
@@ -843,7 +853,9 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
     if (mounted) {
       if (movedCount > 0) {
         AppToast.info(
-            context, context.l10n.localGallery_movedImages(movedCount));
+          context,
+          context.l10n.localGallery_movedImages(movedCount),
+        );
         ref.read(localGallerySelectionNotifierProvider.notifier).exit();
         ref.read(localGalleryNotifierProvider.notifier).refresh();
         ref.read(galleryFolderNotifierProvider.notifier).refresh();
@@ -1201,7 +1213,8 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
       case 'copy_seed':
         if (metadata?.seed != null) {
           await Clipboard.setData(
-              ClipboardData(text: metadata!.seed.toString()));
+            ClipboardData(text: metadata!.seed.toString()),
+          );
           if (mounted) AppToast.success(context, 'Seed 已复制');
         }
       case 'open_folder':
@@ -1323,8 +1336,10 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
     _groupedGridViewKey.currentState?.scrollToGroup(targetGroup);
 
     if (context.mounted) {
-      AppToast.info(context,
-          '已跳转到 ${picked.year}-${picked.month.toString().padLeft(2, '0')}');
+      AppToast.info(
+        context,
+        '已跳转到 ${picked.year}-${picked.month.toString().padLeft(2, '0')}',
+      );
     }
   }
 }

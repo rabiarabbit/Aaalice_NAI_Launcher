@@ -59,7 +59,7 @@ class _EntryListItemState extends State<EntryListItem> {
 
     // 选择模式下的背景色
     final backgroundColor = widget.isSelected
-        ? theme.colorScheme.primaryContainer.withOpacity(0.3)
+        ? theme.colorScheme.primaryContainer.withValues(alpha: 0.3)
         : (_isHovering && !widget.isSelectionMode
             ? theme.colorScheme.surfaceContainerHighest
             : theme.colorScheme.surfaceContainerHigh);
@@ -94,7 +94,8 @@ class _EntryListItemState extends State<EntryListItem> {
           // 悬停时微微上移（非选择模式）
           transform: widget.isSelectionMode
               ? null
-              : (Matrix4.identity()..translate(0.0, _isHovering ? -2.0 : 0.0)),
+              : (Matrix4.identity()
+                ..translateByDouble(0.0, _isHovering ? -2.0 : 0.0, 0, 1)),
           decoration: BoxDecoration(
             // 背景色 - 选中时使用主色容器
             color: backgroundColor,
@@ -109,19 +110,19 @@ class _EntryListItemState extends State<EntryListItem> {
                 ? [
                     // 主阴影 - 带主题色
                     BoxShadow(
-                      color: theme.colorScheme.primary.withOpacity(0.15),
+                      color: theme.colorScheme.primary.withValues(alpha: 0.15),
                       blurRadius: 16,
                       offset: const Offset(0, 6),
                     ),
                     // 中层阴影
                     BoxShadow(
-                      color: theme.colorScheme.primary.withOpacity(0.08),
+                      color: theme.colorScheme.primary.withValues(alpha: 0.08),
                       blurRadius: 8,
                       offset: const Offset(0, 3),
                     ),
                     // 底层阴影
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.06),
+                      color: Colors.black.withValues(alpha: 0.06),
                       blurRadius: 4,
                       offset: const Offset(0, 2),
                     ),
@@ -129,12 +130,12 @@ class _EntryListItemState extends State<EntryListItem> {
                 : [
                     // 静态阴影
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.08),
+                      color: Colors.black.withValues(alpha: 0.08),
                       blurRadius: 8,
                       offset: const Offset(0, 3),
                     ),
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.04),
+                      color: Colors.black.withValues(alpha: 0.04),
                       blurRadius: 4,
                       offset: const Offset(0, 1),
                     ),
@@ -212,7 +213,7 @@ class _EntryListItemState extends State<EntryListItem> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
-            color: theme.colorScheme.primary.withOpacity(0.5),
+            color: theme.colorScheme.primary.withValues(alpha: 0.5),
             width: 2,
           ),
         ),
@@ -307,7 +308,7 @@ class _EntryListItemState extends State<EntryListItem> {
         child: Icon(
           Icons.image_outlined,
           size: 24,
-          color: theme.colorScheme.outline.withOpacity(0.5),
+          color: theme.colorScheme.outline.withValues(alpha: 0.5),
         ),
       ),
     );
@@ -554,7 +555,7 @@ class _TagChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        color: theme.colorScheme.secondaryContainer.withOpacity(0.5),
+        color: theme.colorScheme.secondaryContainer.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
@@ -591,17 +592,17 @@ class _SelectionCheckbox extends StatelessWidget {
         decoration: BoxDecoration(
           color: isSelected
               ? theme.colorScheme.primary
-              : theme.colorScheme.surface.withOpacity(0.9),
+              : theme.colorScheme.surface.withValues(alpha: 0.9),
           borderRadius: BorderRadius.circular(6),
           border: Border.all(
             color: isSelected
                 ? theme.colorScheme.primary
-                : theme.colorScheme.outline.withOpacity(0.5),
+                : theme.colorScheme.outline.withValues(alpha: 0.5),
             width: 2,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),

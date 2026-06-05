@@ -41,7 +41,7 @@ class ResizeHandle extends StatelessWidget {
               width: 2,
               height: 40,
               decoration: BoxDecoration(
-                color: theme.colorScheme.outline.withOpacity(0.2),
+                color: theme.colorScheme.outline.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(1),
               ),
             ),
@@ -86,7 +86,7 @@ class VerticalResizeHandle extends StatelessWidget {
               width: 40,
               height: 2,
               decoration: BoxDecoration(
-                color: theme.colorScheme.outline.withOpacity(0.2),
+                color: theme.colorScheme.outline.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(1),
               ),
             ),

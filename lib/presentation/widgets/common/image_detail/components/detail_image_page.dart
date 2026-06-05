@@ -9,6 +9,7 @@ import '../image_detail_data.dart';
 class DetailImagePage extends StatefulWidget {
   final ImageDetailData data;
   final String? heroTag;
+
   /// 外部传入的 TransformationController，用于快捷键控制缩放
   final TransformationController? transformationController;
 
@@ -78,8 +79,13 @@ class _DetailImagePageState extends State<DetailImagePage>
       final x = -position.dx * (_doubleTapScale - 1);
       final y = -position.dy * (_doubleTapScale - 1);
       endMatrix = Matrix4.identity()
-        ..translate(x, y)
-        ..scale(_doubleTapScale);
+        ..translateByDouble(x, y, 0, 1)
+        ..scaleByDouble(
+          _doubleTapScale,
+          _doubleTapScale,
+          _doubleTapScale,
+          1,
+        );
     }
 
     _animation = Matrix4Tween(
@@ -109,7 +115,7 @@ class _DetailImagePageState extends State<DetailImagePage>
               child: CircularProgressIndicator(
                 strokeWidth: 2,
                 valueColor: AlwaysStoppedAnimation<Color>(
-                  Colors.white.withOpacity(0.6),
+                  Colors.white.withValues(alpha: 0.6),
                 ),
               ),
             ),
@@ -117,7 +123,7 @@ class _DetailImagePageState extends State<DetailImagePage>
             Text(
               '加载中...',
               style: TextStyle(
-                color: Colors.white.withOpacity(0.6),
+                color: Colors.white.withValues(alpha: 0.6),
                 fontSize: 14,
               ),
             ),

@@ -43,10 +43,10 @@ class PositionGridSelector extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest.withOpacity(0.5),
+        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: colorScheme.outline.withOpacity(0.4),
+          color: colorScheme.outline.withValues(alpha: 0.4),
           width: 1,
         ),
       ),
@@ -128,20 +128,22 @@ class _GridCell extends StatelessWidget {
             height: size,
             decoration: BoxDecoration(
               color: isSelected
-                  ? colorScheme.primary.withOpacity(0.8 * effectiveOpacity)
+                  ? colorScheme.primary
+                      .withValues(alpha: 0.8 * effectiveOpacity)
                   : colorScheme.surfaceContainerHigh
-                      .withOpacity(0.8 * effectiveOpacity),
+                      .withValues(alpha: 0.8 * effectiveOpacity),
               borderRadius: BorderRadius.circular(4),
               border: Border.all(
                 color: isSelected
-                    ? colorScheme.primary.withOpacity(effectiveOpacity)
-                    : colorScheme.outline.withOpacity(0.5 * effectiveOpacity),
+                    ? colorScheme.primary.withValues(alpha: effectiveOpacity)
+                    : colorScheme.outline
+                        .withValues(alpha: 0.5 * effectiveOpacity),
                 width: isSelected ? 2 : 1,
               ),
               boxShadow: isSelected
                   ? [
                       BoxShadow(
-                        color: colorScheme.primary.withOpacity(0.3),
+                        color: colorScheme.primary.withValues(alpha: 0.3),
                         blurRadius: 4,
                         spreadRadius: 0,
                       ),
@@ -214,7 +216,7 @@ class LabeledPositionGridSelector extends StatelessWidget {
                   label,
                   textAlign: TextAlign.center,
                   style: theme.textTheme.labelSmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant.withOpacity(0.7),
+                    color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -244,8 +246,8 @@ class LabeledPositionGridSelector extends StatelessWidget {
                         child: Text(
                           '${row + 1}',
                           style: theme.textTheme.labelSmall?.copyWith(
-                            color:
-                                colorScheme.onSurfaceVariant.withOpacity(0.7),
+                            color: colorScheme.onSurfaceVariant
+                                .withValues(alpha: 0.7),
                             fontWeight: FontWeight.w500,
                           ),
                         ),

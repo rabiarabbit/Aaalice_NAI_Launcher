@@ -92,9 +92,9 @@ class PromptTagColors {
     required ThemeData theme,
   }) {
     if (!isEnabled) {
-      return theme.colorScheme.surfaceContainerHighest.withOpacity(0.2);
+      return theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.2);
     }
-    return baseColor.withOpacity(isSelected ? 0.25 : 0.12);
+    return baseColor.withValues(alpha: isSelected ? 0.25 : 0.12);
   }
 
   /// 生成边框色
@@ -106,11 +106,11 @@ class PromptTagColors {
     required ThemeData theme,
   }) {
     if (!isEnabled) {
-      return theme.colorScheme.outline.withOpacity(0.15);
+      return theme.colorScheme.outline.withValues(alpha: 0.15);
     }
-    if (isSelected) return baseColor.withOpacity(0.7);
-    if (isHovered) return baseColor.withOpacity(0.5);
-    return baseColor.withOpacity(0.25);
+    if (isSelected) return baseColor.withValues(alpha: 0.7);
+    if (isHovered) return baseColor.withValues(alpha: 0.5);
+    return baseColor.withValues(alpha: 0.25);
   }
 }
 
@@ -208,7 +208,7 @@ class CategoryGradient {
     final baseGradient = getGradientByCategory(category);
     return LinearGradient(
       colors: baseGradient.colors
-          .map((color) => color.withOpacity(opacity))
+          .map((color) => color.withValues(alpha: opacity))
           .toList(),
       begin: baseGradient.begin,
       end: baseGradient.end,
@@ -237,7 +237,9 @@ class CategoryGradient {
           // 降低颜色亮度以适应暗色模式（配合浅色文字）
           // 降低幅度设置为 0.5 以确保 WCAG AA 合规（4.5:1 对比度）
           final hsl = HSLColor.fromColor(color);
-          return hsl.withLightness((hsl.lightness - 0.5).clamp(0.02, 0.98)).toColor();
+          return hsl
+              .withLightness((hsl.lightness - 0.5).clamp(0.02, 0.98))
+              .toColor();
         }).toList(),
         begin: baseGradient.begin,
         end: baseGradient.end,
@@ -252,10 +254,8 @@ class CategoryGradient {
   static Color getContrastColor(int category) {
     final startColor = getGradientStartColor(category);
     // 计算亮度
-    final luminance = (0.299 * startColor.red +
-            0.587 * startColor.green +
-            0.114 * startColor.blue) /
-        255.0;
+    final luminance =
+        0.299 * startColor.r + 0.587 * startColor.g + 0.114 * startColor.b;
     // 返回黑色或白色以确保对比度 ≥ 4.5:1
     return luminance > 0.5 ? Colors.black : Colors.white;
   }
@@ -273,9 +273,9 @@ class CategoryGradient {
 
   /// 计算相对亮度（用于 WCAG 对比度计算）
   static double _calculateLuminance(Color color) {
-    final r = _channelToLuminance(color.red / 255.0);
-    final g = _channelToLuminance(color.green / 255.0);
-    final b = _channelToLuminance(color.blue / 255.0);
+    final r = _channelToLuminance(color.r);
+    final g = _channelToLuminance(color.g);
+    final b = _channelToLuminance(color.b);
     return 0.2126 * r + 0.7152 * g + 0.0722 * b;
   }
 
@@ -295,8 +295,8 @@ class WeightColorGradient {
   static List<Color> getIncreaseGradient(int bracketLayers) {
     final intensity = (bracketLayers / 10).clamp(0.0, 1.0);
     return [
-      PromptTagColors.weightIncrease.withOpacity(0.1 + intensity * 0.2),
-      PromptTagColors.weightIncrease.withOpacity(0.05 + intensity * 0.1),
+      PromptTagColors.weightIncrease.withValues(alpha: 0.1 + intensity * 0.2),
+      PromptTagColors.weightIncrease.withValues(alpha: 0.05 + intensity * 0.1),
     ];
   }
 
@@ -304,8 +304,8 @@ class WeightColorGradient {
   static List<Color> getDecreaseGradient(int bracketLayers) {
     final intensity = (bracketLayers.abs() / 10).clamp(0.0, 1.0);
     return [
-      PromptTagColors.weightDecrease.withOpacity(0.1 + intensity * 0.2),
-      PromptTagColors.weightDecrease.withOpacity(0.05 + intensity * 0.1),
+      PromptTagColors.weightDecrease.withValues(alpha: 0.1 + intensity * 0.2),
+      PromptTagColors.weightDecrease.withValues(alpha: 0.05 + intensity * 0.1),
     ];
   }
 }

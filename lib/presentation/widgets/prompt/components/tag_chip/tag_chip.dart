@@ -216,7 +216,7 @@ class _TagChipState extends ConsumerState<TagChip>
     // 2. 从翻译服务获取
     final translationService = ref.read(tagTranslationServiceProvider);
     final result = await translationService.translate(widget.tag.text);
-    
+
     if (mounted) {
       setState(() {
         _translation = result;
@@ -369,8 +369,8 @@ class _TagChipState extends ConsumerState<TagChip>
           fontWeight: FontWeight.w500,
           height: 1.2,
           color: isEnabled
-              ? theme.colorScheme.onSurface.withOpacity(0.9)
-              : theme.colorScheme.onSurface.withOpacity(0.35),
+              ? theme.colorScheme.onSurface.withValues(alpha: 0.9)
+              : theme.colorScheme.onSurface.withValues(alpha: 0.35),
           decoration: isEnabled ? null : TextDecoration.lineThrough,
         ),
       );
@@ -401,8 +401,8 @@ class _TagChipState extends ConsumerState<TagChip>
               height: 1.2,
               fontFamily: 'monospace',
               color: isEnabled
-                  ? effectiveColor.withOpacity(0.9)
-                  : theme.colorScheme.onSurface.withOpacity(0.35),
+                  ? effectiveColor.withValues(alpha: 0.9)
+                  : theme.colorScheme.onSurface.withValues(alpha: 0.35),
               decoration: isEnabled ? null : TextDecoration.lineThrough,
             ),
           ),
@@ -419,8 +419,8 @@ class _TagChipState extends ConsumerState<TagChip>
               fontWeight: FontWeight.w500,
               height: 1.2,
               color: isEnabled
-                  ? effectiveColor.withOpacity(0.6)
-                  : theme.colorScheme.onSurface.withOpacity(0.2),
+                  ? effectiveColor.withValues(alpha: 0.6)
+                  : theme.colorScheme.onSurface.withValues(alpha: 0.2),
               decoration: isEnabled ? null : TextDecoration.lineThrough,
             ),
           ),
@@ -437,8 +437,8 @@ class _TagChipState extends ConsumerState<TagChip>
               fontWeight: FontWeight.w500,
               height: 1.2,
               color: isEnabled
-                  ? theme.colorScheme.onSurface.withOpacity(0.9)
-                  : theme.colorScheme.onSurface.withOpacity(0.35),
+                  ? theme.colorScheme.onSurface.withValues(alpha: 0.9)
+                  : theme.colorScheme.onSurface.withValues(alpha: 0.35),
               decoration: isEnabled ? null : TextDecoration.lineThrough,
             ),
           ),
@@ -455,8 +455,8 @@ class _TagChipState extends ConsumerState<TagChip>
               fontWeight: FontWeight.w500,
               height: 1.2,
               color: isEnabled
-                  ? effectiveColor.withOpacity(0.6)
-                  : theme.colorScheme.onSurface.withOpacity(0.2),
+                  ? effectiveColor.withValues(alpha: 0.6)
+                  : theme.colorScheme.onSurface.withValues(alpha: 0.2),
               decoration: isEnabled ? null : TextDecoration.lineThrough,
             ),
           ),
@@ -479,8 +479,8 @@ class _TagChipState extends ConsumerState<TagChip>
                 fontWeight: FontWeight.w500,
                 height: 1.2,
                 color: isEnabled
-                    ? effectiveColor.withOpacity(0.6)
-                    : theme.colorScheme.onSurface.withOpacity(0.2),
+                    ? effectiveColor.withValues(alpha: 0.6)
+                    : theme.colorScheme.onSurface.withValues(alpha: 0.2),
                 decoration: isEnabled ? null : TextDecoration.lineThrough,
               ),
             ),
@@ -497,8 +497,8 @@ class _TagChipState extends ConsumerState<TagChip>
                 fontWeight: FontWeight.w500,
                 height: 1.2,
                 color: isEnabled
-                    ? effectiveColor.withOpacity(0.6)
-                    : theme.colorScheme.onSurface.withOpacity(0.2),
+                    ? effectiveColor.withValues(alpha: 0.6)
+                    : theme.colorScheme.onSurface.withValues(alpha: 0.2),
                 decoration: isEnabled ? null : TextDecoration.lineThrough,
               ),
             ),
@@ -516,8 +516,8 @@ class _TagChipState extends ConsumerState<TagChip>
               fontWeight: FontWeight.w500,
               height: 1.2,
               color: isEnabled
-                  ? theme.colorScheme.onSurface.withOpacity(0.9)
-                  : theme.colorScheme.onSurface.withOpacity(0.35),
+                  ? theme.colorScheme.onSurface.withValues(alpha: 0.9)
+                  : theme.colorScheme.onSurface.withValues(alpha: 0.35),
               decoration: isEnabled ? null : TextDecoration.lineThrough,
             ),
           ),
@@ -535,8 +535,8 @@ class _TagChipState extends ConsumerState<TagChip>
                 fontWeight: FontWeight.w500,
                 height: 1.2,
                 color: isEnabled
-                    ? effectiveColor.withOpacity(0.6)
-                    : theme.colorScheme.onSurface.withOpacity(0.2),
+                    ? effectiveColor.withValues(alpha: 0.6)
+                    : theme.colorScheme.onSurface.withValues(alpha: 0.2),
                 decoration: isEnabled ? null : TextDecoration.lineThrough,
               ),
             ),
@@ -553,8 +553,8 @@ class _TagChipState extends ConsumerState<TagChip>
                 fontWeight: FontWeight.w500,
                 height: 1.2,
                 color: isEnabled
-                    ? effectiveColor.withOpacity(0.6)
-                    : theme.colorScheme.onSurface.withOpacity(0.2),
+                    ? effectiveColor.withValues(alpha: 0.6)
+                    : theme.colorScheme.onSurface.withValues(alpha: 0.2),
                 decoration: isEnabled ? null : TextDecoration.lineThrough,
               ),
             ),
@@ -707,7 +707,7 @@ class _TagChipState extends ConsumerState<TagChip>
         ),
         boxShadow: [
           BoxShadow(
-            color: effectiveColor.withOpacity(shadowOpacity),
+            color: effectiveColor.withValues(alpha: shadowOpacity),
             blurRadius: shadowBlur,
             offset: shadowOffset,
           ),
@@ -761,7 +761,7 @@ class _TagChipState extends ConsumerState<TagChip>
       curve: Curves.easeInOut,
       foregroundDecoration: BoxDecoration(
         color: _isHovering && !TagChip.isMobile && !reducedMotion
-            ? Colors.white.withOpacity(0.08)
+            ? Colors.white.withValues(alpha: 0.08)
             : Colors.transparent,
         borderRadius: BorderRadius.circular(
           widget.compact
@@ -801,8 +801,8 @@ class _TagChipState extends ConsumerState<TagChip>
                   height: 1.2,
                   fontStyle: FontStyle.italic,
                   color: isEnabled
-                      ? theme.colorScheme.onSurface.withOpacity(0.4)
-                      : theme.colorScheme.onSurface.withOpacity(0.2),
+                      ? theme.colorScheme.onSurface.withValues(alpha: 0.4)
+                      : theme.colorScheme.onSurface.withValues(alpha: 0.2),
                 ),
               ),
             ),
@@ -820,8 +820,8 @@ class _TagChipState extends ConsumerState<TagChip>
           onTap: widget.onTap,
           onDoubleTap: _handleDoubleTap,
           onLongPress: _onLongPress,
-          splashColor: effectiveColor.withOpacity(0.2),
-          highlightColor: effectiveColor.withOpacity(0.1),
+          splashColor: effectiveColor.withValues(alpha: 0.2),
+          highlightColor: effectiveColor.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(
             widget.compact
                 ? TagChipSizes.compactBorderRadius
@@ -1059,7 +1059,8 @@ class _DeleteButtonState extends State<_DeleteButton>
                       padding: const EdgeInsets.all(2),
                       decoration: BoxDecoration(
                         color: _isHovering
-                            ? widget.theme.colorScheme.error.withOpacity(0.15)
+                            ? widget.theme.colorScheme.error
+                                .withValues(alpha: 0.15)
                             : Colors.transparent,
                         borderRadius: BorderRadius.circular(4),
                       ),
@@ -1069,7 +1070,7 @@ class _DeleteButtonState extends State<_DeleteButton>
                         color: _isHovering
                             ? widget.theme.colorScheme.error
                             : widget.theme.colorScheme.onSurface
-                                .withOpacity(0.4),
+                                .withValues(alpha: 0.4),
                       ),
                     ),
                   ),
@@ -1162,9 +1163,9 @@ class _FavoriteButtonState extends State<_FavoriteButton>
                     decoration: BoxDecoration(
                       color: _isHovering
                           ? (widget.isFavorite
-                              ? Colors.red.withOpacity(0.15)
+                              ? Colors.red.withValues(alpha: 0.15)
                               : widget.theme.colorScheme.primary
-                                  .withOpacity(0.15))
+                                  .withValues(alpha: 0.15))
                           : Colors.transparent,
                       borderRadius: BorderRadius.circular(4),
                     ),
@@ -1180,7 +1181,7 @@ class _FavoriteButtonState extends State<_FavoriteButton>
                           : (_isHovering
                               ? widget.theme.colorScheme.primary
                               : widget.theme.colorScheme.onSurface
-                                  .withOpacity(0.4)),
+                                  .withValues(alpha: 0.4)),
                     ),
                   ),
                 );
@@ -1319,7 +1320,7 @@ class _BatchSelectionCheckbox extends StatelessWidget {
           border: Border.all(
             color: isSelected
                 ? theme.colorScheme.primary
-                : theme.colorScheme.outline.withOpacity(0.5),
+                : theme.colorScheme.outline.withValues(alpha: 0.5),
             width: 1.5,
           ),
         ),

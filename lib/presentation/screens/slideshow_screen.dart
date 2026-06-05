@@ -152,7 +152,7 @@ class _SlideshowScreenState extends ConsumerState<SlideshowScreen> {
               Icon(
                 Icons.image_not_supported,
                 size: 64,
-                color: theme.colorScheme.onSurface.withOpacity(0.5),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
               ),
               const SizedBox(height: 16),
               Text(
@@ -217,7 +217,7 @@ class _SlideshowScreenState extends ConsumerState<SlideshowScreen> {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      Colors.black.withOpacity(0.7),
+                      Colors.black.withValues(alpha: 0.7),
                       Colors.transparent,
                     ],
                   ),
@@ -231,7 +231,7 @@ class _SlideshowScreenState extends ConsumerState<SlideshowScreen> {
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.surface.withOpacity(0.8),
+                        color: theme.colorScheme.surface.withValues(alpha: 0.8),
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Text(
@@ -271,7 +271,7 @@ class _SlideshowScreenState extends ConsumerState<SlideshowScreen> {
                     end: Alignment.bottomCenter,
                     colors: [
                       Colors.transparent,
-                      Colors.black.withOpacity(0.7),
+                      Colors.black.withValues(alpha: 0.7),
                     ],
                   ),
                 ),
@@ -328,7 +328,7 @@ class _SlideshowScreenState extends ConsumerState<SlideshowScreen> {
                       vertical: 8,
                     ),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.surface.withOpacity(0.8),
+                      color: theme.colorScheme.surface.withValues(alpha: 0.8),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(

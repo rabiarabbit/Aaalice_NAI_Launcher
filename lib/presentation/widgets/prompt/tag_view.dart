@@ -376,13 +376,13 @@ class _TagViewState extends ConsumerState<TagView>
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            theme.colorScheme.primary.withOpacity(0.15),
-            theme.colorScheme.primary.withOpacity(0.08),
+            theme.colorScheme.primary.withValues(alpha: 0.15),
+            theme.colorScheme.primary.withValues(alpha: 0.08),
           ],
         ),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: theme.colorScheme.primary.withOpacity(0.3),
+          color: theme.colorScheme.primary.withValues(alpha: 0.3),
         ),
       ),
       child: Row(
@@ -393,7 +393,7 @@ class _TagViewState extends ConsumerState<TagView>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: theme.colorScheme.primary.withOpacity(0.2),
+              color: theme.colorScheme.primary.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
@@ -433,7 +433,7 @@ class _TagViewState extends ConsumerState<TagView>
                 child: Icon(
                   Icons.close,
                   size: 18,
-                  color: theme.colorScheme.onSurface.withOpacity(0.6),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
               ),
             ),
@@ -462,7 +462,7 @@ class _TagViewState extends ConsumerState<TagView>
             border: Border.all(
               color: allSelected
                   ? theme.colorScheme.primary
-                  : theme.colorScheme.outline.withOpacity(0.5),
+                  : theme.colorScheme.outline.withValues(alpha: 0.5),
               width: 1.5,
             ),
           ),
@@ -475,7 +475,7 @@ class _TagViewState extends ConsumerState<TagView>
               : Icon(
                   Icons.check_box_outline_blank,
                   size: 18,
-                  color: theme.colorScheme.onSurface.withOpacity(0.6),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
         ),
       ),
@@ -491,7 +491,7 @@ class _TagViewState extends ConsumerState<TagView>
   }) {
     final color = isDestructive
         ? theme.colorScheme.error
-        : theme.colorScheme.onSurface.withOpacity(0.8);
+        : theme.colorScheme.onSurface.withValues(alpha: 0.8);
 
     return Material(
       color: Colors.transparent,
@@ -541,7 +541,7 @@ class _TagViewState extends ConsumerState<TagView>
                 widget.emptyHint ?? context.l10n.tag_emptyHint,
                 textAlign: TextAlign.center,
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurface.withOpacity(0.7),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                   fontSize: 14,
                 ),
               ),
@@ -552,7 +552,7 @@ class _TagViewState extends ConsumerState<TagView>
                 context.l10n.tag_emptyHintSub,
                 textAlign: TextAlign.center,
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurface.withOpacity(0.5),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                   fontSize: 12,
                   height: 1.4,
                 ),
@@ -588,7 +588,8 @@ class _TagViewState extends ConsumerState<TagView>
                       widget.emptyHint ?? context.l10n.tag_emptyHint,
                       textAlign: TextAlign.center,
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurface.withOpacity(0.7),
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.7),
                         fontSize: 14,
                         height: 1.5,
                       ),
@@ -601,7 +602,8 @@ class _TagViewState extends ConsumerState<TagView>
                       context.l10n.tag_emptyHintSub,
                       textAlign: TextAlign.center,
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurface.withOpacity(0.5),
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.5),
                         fontSize: 12,
                         height: 1.4,
                       ),
@@ -638,9 +640,9 @@ class _TagViewState extends ConsumerState<TagView>
                 center: Alignment.center,
                 radius: 0.8,
                 colors: [
-                  theme.colorScheme.primary.withOpacity(0.15),
-                  theme.colorScheme.primary.withOpacity(0.05),
-                  theme.colorScheme.primary.withOpacity(0.02),
+                  theme.colorScheme.primary.withValues(alpha: 0.15),
+                  theme.colorScheme.primary.withValues(alpha: 0.05),
+                  theme.colorScheme.primary.withValues(alpha: 0.02),
                 ],
                 stops: const [0.0, 0.6, 1.0],
               ),
@@ -659,7 +661,7 @@ class _TagViewState extends ConsumerState<TagView>
                       child: Icon(
                         Icons.label_outline_rounded,
                         size: 56,
-                        color: theme.colorScheme.primary.withOpacity(0.6),
+                        color: theme.colorScheme.primary.withValues(alpha: 0.6),
                       ),
                     ),
                   );
@@ -772,13 +774,14 @@ class _TagViewState extends ConsumerState<TagView>
                         end: Alignment.bottomCenter,
                         colors: [
                           theme.colorScheme.primary,
-                          theme.colorScheme.primary.withOpacity(0.5),
+                          theme.colorScheme.primary.withValues(alpha: 0.5),
                         ],
                       ),
                       borderRadius: BorderRadius.circular(2),
                       boxShadow: [
                         BoxShadow(
-                          color: theme.colorScheme.primary.withOpacity(0.5),
+                          color:
+                              theme.colorScheme.primary.withValues(alpha: 0.5),
                           blurRadius: 8,
                         ),
                       ],
@@ -848,8 +851,8 @@ class _TagViewState extends ConsumerState<TagView>
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                theme.colorScheme.error.withOpacity(0.1),
-                theme.colorScheme.error.withOpacity(0.2),
+                theme.colorScheme.error.withValues(alpha: 0.1),
+                theme.colorScheme.error.withValues(alpha: 0.2),
               ],
             ),
             borderRadius: BorderRadius.circular(10),
@@ -887,11 +890,11 @@ class _TagViewState extends ConsumerState<TagView>
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
                 border: Border.all(
-                  color: theme.colorScheme.primary.withOpacity(0.3),
+                  color: theme.colorScheme.primary.withValues(alpha: 0.3),
                   width: 1,
                 ),
                 borderRadius: BorderRadius.circular(6),
-                color: theme.colorScheme.primary.withOpacity(0.05),
+                color: theme.colorScheme.primary.withValues(alpha: 0.05),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -899,7 +902,7 @@ class _TagViewState extends ConsumerState<TagView>
                   Icon(
                     Icons.add,
                     size: 14,
-                    color: theme.colorScheme.primary.withOpacity(0.8),
+                    color: theme.colorScheme.primary.withValues(alpha: 0.8),
                   ),
                   const SizedBox(width: 4),
                   Text(
@@ -907,7 +910,7 @@ class _TagViewState extends ConsumerState<TagView>
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
-                      color: theme.colorScheme.primary.withOpacity(0.8),
+                      color: theme.colorScheme.primary.withValues(alpha: 0.8),
                     ),
                   ),
                 ],
@@ -924,7 +927,7 @@ class _TagViewState extends ConsumerState<TagView>
               style: TextStyle(
                 fontSize: 10,
                 height: 1.2,
-                color: theme.colorScheme.onSurface.withOpacity(0),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0),
               ),
             ),
           ),
@@ -942,10 +945,11 @@ class _TagViewState extends ConsumerState<TagView>
           constraints: const BoxConstraints(maxWidth: 220),
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
-            color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
+            color: theme.colorScheme.surfaceContainerHighest
+                .withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
-              color: theme.colorScheme.primary.withOpacity(0.4),
+              color: theme.colorScheme.primary.withValues(alpha: 0.4),
             ),
           ),
           child: Row(
@@ -969,7 +973,8 @@ class _TagViewState extends ConsumerState<TagView>
                       hintText: context.l10n.tag_inputHint,
                       hintStyle: TextStyle(
                         fontSize: 12,
-                        color: theme.colorScheme.onSurface.withOpacity(0.4),
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.4),
                       ),
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 10,
@@ -990,7 +995,7 @@ class _TagViewState extends ConsumerState<TagView>
               ),
               _buildMiniIconButton(
                 icon: Icons.close,
-                color: theme.colorScheme.onSurface.withOpacity(0.5),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                 onTap: _cancelAddTag,
               ),
             ],
@@ -1041,7 +1046,7 @@ class _TagViewState extends ConsumerState<TagView>
                 child: Container(
                   decoration: BoxDecoration(
                     color: theme.colorScheme.surfaceContainerHighest
-                        .withOpacity(0.3),
+                        .withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(
                       widget.compact
                           ? TagBorderRadius.small
@@ -1194,14 +1199,14 @@ class _TagCountBadgeState extends State<_TagCountBadge> {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                widget.theme.colorScheme.primary.withOpacity(0.2),
-                widget.theme.colorScheme.primary.withOpacity(0.1),
+                widget.theme.colorScheme.primary.withValues(alpha: 0.2),
+                widget.theme.colorScheme.primary.withValues(alpha: 0.1),
               ],
             ),
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
               color: widget.theme.colorScheme.primary
-                  .withOpacity(_isHovering ? 0.5 : 0.3),
+                  .withValues(alpha: _isHovering ? 0.5 : 0.3),
               width: 1,
             ),
           ),
@@ -1224,7 +1229,8 @@ class _TagCountBadgeState extends State<_TagCountBadge> {
                   style: TextStyle(
                     fontSize: 9,
                     fontWeight: FontWeight.w500,
-                    color: widget.theme.colorScheme.onSurface.withOpacity(0.6),
+                    color: widget.theme.colorScheme.onSurface
+                        .withValues(alpha: 0.6),
                     fontFeatures: const [FontFeature.tabularFigures()],
                   ),
                 ),
@@ -1282,19 +1288,20 @@ class _BreakdownMenu extends StatelessWidget {
                         end: Alignment.bottomRight,
                         colors: [
                           theme.colorScheme.surfaceContainerHighest
-                              .withOpacity(0.9),
+                              .withValues(alpha: 0.9),
                           theme.colorScheme.surfaceContainerHigh
-                              .withOpacity(0.85),
+                              .withValues(alpha: 0.85),
                         ],
                       ),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: theme.colorScheme.outline.withOpacity(0.2),
+                        color: theme.colorScheme.outline.withValues(alpha: 0.2),
                         width: 1,
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: theme.colorScheme.shadow.withOpacity(0.2),
+                          color:
+                              theme.colorScheme.shadow.withValues(alpha: 0.2),
                           blurRadius: 12,
                           offset: const Offset(0, 4),
                         ),
@@ -1338,7 +1345,7 @@ class _BreakdownMenu extends StatelessWidget {
                                       fontSize: 11,
                                       fontWeight: FontWeight.w500,
                                       color: theme.colorScheme.onSurface
-                                          .withOpacity(0.8),
+                                          .withValues(alpha: 0.8),
                                     ),
                                   ),
                                 ),
@@ -1373,7 +1380,7 @@ class _BreakdownMenu extends StatelessWidget {
                                           colors: [
                                             theme.colorScheme.primary,
                                             theme.colorScheme.primary
-                                                .withOpacity(0.7),
+                                                .withValues(alpha: 0.7),
                                           ],
                                         ),
                                         borderRadius: BorderRadius.circular(2),

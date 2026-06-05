@@ -52,19 +52,19 @@ class GlassDialog extends StatelessWidget {
           padding: padding ?? const EdgeInsets.all(DesignTokens.spacingMd),
           decoration: BoxDecoration(
             color: theme.colorScheme.surface
-                .withOpacity(DesignTokens.glassOpacity),
+                .withValues(alpha: DesignTokens.glassOpacity),
             borderRadius: fullScreen ? null : DesignTokens.borderRadiusLg,
             border: fullScreen
                 ? null
                 : Border.all(
                     color: theme.colorScheme.outline
-                        .withOpacity(DesignTokens.glassBorderOpacity),
+                        .withValues(alpha: DesignTokens.glassBorderOpacity),
                   ),
             boxShadow: fullScreen
                 ? null
                 : [
                     BoxShadow(
-                      color: theme.shadowColor.withOpacity(0.2),
+                      color: theme.shadowColor.withValues(alpha: 0.2),
                       blurRadius: DesignTokens.spacingLg,
                       offset: const Offset(0, 8),
                     ),

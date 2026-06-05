@@ -86,7 +86,6 @@ class ThemedButton extends StatelessWidget {
         );
         break;
       case AppInteractionStyle.material:
-      default:
         buttonWidget = _MaterialButton(
           onPressed: isLoading ? null : onPressed,
           style: style,
@@ -292,27 +291,32 @@ class _StyledButtonState extends State<_StyledButton> {
       switch (widget.style) {
         case ThemedButtonStyle.filled:
           return _ButtonColors(
-            background: enabled ? theme.colorScheme.primary : theme.disabledColor,
+            background:
+                enabled ? theme.colorScheme.primary : theme.disabledColor,
             foreground: theme.colorScheme.onPrimary,
             border: theme.colorScheme.primaryContainer,
           );
         case ThemedButtonStyle.outlined:
           return _ButtonColors(
             background: theme.colorScheme.surface,
-            foreground: enabled ? theme.colorScheme.primary : theme.disabledColor,
+            foreground:
+                enabled ? theme.colorScheme.primary : theme.disabledColor,
             border: enabled ? theme.colorScheme.primary : theme.disabledColor,
           );
         case ThemedButtonStyle.text:
           return _ButtonColors(
             background: Colors.transparent,
-            foreground: enabled ? theme.colorScheme.primary : theme.disabledColor,
+            foreground:
+                enabled ? theme.colorScheme.primary : theme.disabledColor,
             border: Colors.transparent,
           );
       }
     } else {
-      final baseColor = enabled ? theme.colorScheme.primary : theme.disabledColor;
-      final onBaseColor =
-          enabled ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface.withOpacity(0.38);
+      final baseColor =
+          enabled ? theme.colorScheme.primary : theme.disabledColor;
+      final onBaseColor = enabled
+          ? theme.colorScheme.onPrimary
+          : theme.colorScheme.onSurface.withValues(alpha: 0.38);
 
       switch (widget.style) {
         case ThemedButtonStyle.filled:
@@ -329,7 +333,9 @@ class _StyledButtonState extends State<_StyledButton> {
           );
         case ThemedButtonStyle.text:
           return _ButtonColors(
-            background: _isPressed ? baseColor.withOpacity(0.2) : Colors.transparent,
+            background: _isPressed
+                ? baseColor.withValues(alpha: 0.2)
+                : Colors.transparent,
             foreground: baseColor,
             border: null,
           );
@@ -357,7 +363,8 @@ class _StyledButtonState extends State<_StyledButton> {
                     ? []
                     : [
                         BoxShadow(
-                          color: Color.lerp(colors.background, Colors.black, 0.4)!,
+                          color:
+                              Color.lerp(colors.background, Colors.black, 0.4)!,
                           offset: Offset(0, depth),
                           blurRadius: 0,
                         ),
@@ -369,7 +376,9 @@ class _StyledButtonState extends State<_StyledButton> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         boxDecoration: BoxDecoration(
           color: colors.background,
-          border: colors.border != null ? Border.all(color: colors.border!, width: 2) : null,
+          border: colors.border != null
+              ? Border.all(color: colors.border!, width: 2)
+              : null,
           borderRadius: BorderRadius.circular(2),
         ),
       );
@@ -393,7 +402,11 @@ class _ButtonColors {
   final Color foreground;
   final Color? border;
 
-  _ButtonColors({required this.background, required this.foreground, this.border});
+  _ButtonColors({
+    required this.background,
+    required this.foreground,
+    this.border,
+  });
 }
 
 class _ButtonDecoration {

@@ -107,7 +107,8 @@ class _PromptConfigScreenState extends ConsumerState<PromptConfigScreen> {
                         ],
                         const SizedBox(height: 16),
                         Divider(
-                          color: colorScheme.outlineVariant.withOpacity(0.3),
+                          color:
+                              colorScheme.outlineVariant.withValues(alpha: 0.3),
                           height: 1,
                         ),
                         const SizedBox(height: 16),

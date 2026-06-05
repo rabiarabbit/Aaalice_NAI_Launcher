@@ -40,8 +40,7 @@ class CharacterPromptButton extends ConsumerWidget {
                   // 停靠模式下提示用户面板已显示在图像区域
                   AppToast.info(
                     context,
-                    AppLocalizations.of(context)!
-                        .characterEditor_dockedHint,
+                    AppLocalizations.of(context)!.characterEditor_dockedHint,
                   );
                 } else {
                   CharacterEditorDialog.show(context);
@@ -54,12 +53,12 @@ class CharacterPromptButton extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
                     color: hasCharacters
-                        ? colorScheme.primary.withOpacity(0.5)
-                        : colorScheme.outline.withOpacity(0.3),
+                        ? colorScheme.primary.withValues(alpha: 0.5)
+                        : colorScheme.outline.withValues(alpha: 0.3),
                     width: 1,
                   ),
                   color: hasCharacters
-                      ? colorScheme.primary.withOpacity(0.1)
+                      ? colorScheme.primary.withValues(alpha: 0.1)
                       : Colors.transparent,
                 ),
                 child: Row(
@@ -400,7 +399,7 @@ class _CharacterTooltipWrapper extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),

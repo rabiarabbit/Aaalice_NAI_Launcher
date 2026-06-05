@@ -28,11 +28,11 @@ class PostTooltip extends ConsumerWidget {
       showDuration: const Duration(seconds: 10),
       preferBelow: false,
       decoration: BoxDecoration(
-        color: Colors.grey.shade900.withOpacity(0.95),
+        color: Colors.grey.shade900.withValues(alpha: 0.95),
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withValues(alpha: 0.3),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -124,10 +124,8 @@ class PostTooltip extends ConsumerWidget {
           ),
         ),
       );
-      final artistTexts = post.artistTags
-          .take(3)
-          .map((t) => t.replaceAll('_', ' '))
-          .join(', ');
+      final artistTexts =
+          post.artistTags.take(3).map((t) => t.replaceAll('_', ' ')).join(', ');
       spans.add(
         TextSpan(
           text: artistTexts,
@@ -149,7 +147,8 @@ class PostTooltip extends ConsumerWidget {
           ),
         ),
       );
-      final charCount = post.characterTags.length > 5 ? 5 : post.characterTags.length;
+      final charCount =
+          post.characterTags.length > 5 ? 5 : post.characterTags.length;
       final charTexts = post.characterTags
           .take(charCount)
           .map((t) => t.replaceAll('_', ' '))
@@ -208,7 +207,8 @@ class PostTooltip extends ConsumerWidget {
           ),
         ),
       );
-      final tagCount = post.generalTags.length > 8 ? 8 : post.generalTags.length;
+      final tagCount =
+          post.generalTags.length > 8 ? 8 : post.generalTags.length;
       final tagTexts = post.generalTags
           .take(tagCount)
           .map((t) => t.replaceAll('_', ' '))

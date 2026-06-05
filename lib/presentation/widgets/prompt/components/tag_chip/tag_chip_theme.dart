@@ -82,7 +82,7 @@ class TagChipTheme {
     final shadowColor = baseColor ?? (isDark ? Colors.white : Colors.black);
     return [
       BoxShadow(
-        color: shadowColor.withOpacity(TagShadowConfig.normalOpacity),
+        color: shadowColor.withValues(alpha: TagShadowConfig.normalOpacity),
         blurRadius: TagShadowConfig.normalBlurRadius,
         offset: const Offset(
           TagShadowConfig.normalOffsetX,
@@ -103,7 +103,7 @@ class TagChipTheme {
     final shadowColor = baseColor ?? (isDark ? Colors.white : Colors.black);
     return [
       BoxShadow(
-        color: shadowColor.withOpacity(TagShadowConfig.hoverOpacity),
+        color: shadowColor.withValues(alpha: TagShadowConfig.hoverOpacity),
         blurRadius: TagShadowConfig.hoverBlurRadius,
         offset: const Offset(
           TagShadowConfig.hoverOffsetX,
@@ -123,7 +123,7 @@ class TagChipTheme {
   }) {
     return [
       BoxShadow(
-        color: baseColor.withOpacity(TagShadowConfig.selectedOpacity),
+        color: baseColor.withValues(alpha: TagShadowConfig.selectedOpacity),
         blurRadius: TagShadowConfig.selectedBlurRadius,
         offset: const Offset(
           TagShadowConfig.selectedOffsetX,
@@ -144,7 +144,7 @@ class TagChipTheme {
     final shadowColor = baseColor ?? (isDark ? Colors.white : Colors.black);
     return [
       BoxShadow(
-        color: shadowColor.withOpacity(TagShadowConfig.draggingOpacity),
+        color: shadowColor.withValues(alpha: TagShadowConfig.draggingOpacity),
         blurRadius: TagShadowConfig.draggingBlurRadius,
         offset: const Offset(
           TagShadowConfig.draggingOffsetX,
@@ -161,7 +161,7 @@ class TagChipTheme {
     final shadowColor = isDark ? Colors.white : Colors.black;
     return [
       BoxShadow(
-        color: shadowColor.withOpacity(TagShadowConfig.disabledOpacity),
+        color: shadowColor.withValues(alpha: TagShadowConfig.disabledOpacity),
         blurRadius: TagShadowConfig.disabledBlurRadius,
         offset: const Offset(
           TagShadowConfig.disabledOffsetX,
@@ -194,9 +194,7 @@ class TagChipTheme {
     final gradient = CategoryGradient.getGradientByCategory(category);
 
     // 获取背景色（使用渐变）
-    final backgroundGradient = isEnabled
-        ? gradient
-        : null;
+    final backgroundGradient = isEnabled ? gradient : null;
 
     // 获取边框色
     final borderColor = PromptTagColors.getBorderColor(
@@ -261,11 +259,11 @@ class TagChipTheme {
     // 玻璃态背景色（低透明度）
     final backgroundGradient = LinearGradient(
       colors: [
-        gradient.colors.first.withOpacity(
-          isEnabled ? TagGlassmorphism.minBackgroundOpacity : 0.3,
+        gradient.colors.first.withValues(
+          alpha: isEnabled ? TagGlassmorphism.minBackgroundOpacity : 0.3,
         ),
-        gradient.colors.last.withOpacity(
-          isEnabled ? TagGlassmorphism.maxBackgroundOpacity : 0.4,
+        gradient.colors.last.withValues(
+          alpha: isEnabled ? TagGlassmorphism.maxBackgroundOpacity : 0.4,
         ),
       ],
       begin: gradient.begin,
@@ -273,8 +271,8 @@ class TagChipTheme {
     );
 
     // 玻璃态边框
-    final borderColor = baseColor.withOpacity(
-      isEnabled ? TagGlassmorphism.borderOpacity : 0.1,
+    final borderColor = baseColor.withValues(
+      alpha: isEnabled ? TagGlassmorphism.borderOpacity : 0.1,
     );
 
     // 玻璃态阴影
@@ -357,7 +355,8 @@ class TagChipTheme {
   /// 获取标签间距
   static EdgeInsets getTagSpacing({bool compact = false}) {
     return EdgeInsets.symmetric(
-      horizontal: compact ? TagSpacing.compactHorizontal : TagSpacing.horizontal,
+      horizontal:
+          compact ? TagSpacing.compactHorizontal : TagSpacing.horizontal,
       vertical: compact ? TagSpacing.compactVertical : TagSpacing.vertical,
     );
   }
@@ -373,7 +372,7 @@ class TagChipTheme {
 
     // 暗色模式下使用白色，亮色模式下使用对比色
     if (isDark) {
-      return Colors.white.withOpacity(0.95);
+      return Colors.white.withValues(alpha: 0.95);
     }
 
     // 亮色模式下，使用渐变的对比色
@@ -388,7 +387,7 @@ class TagChipTheme {
     return getTextColor(
       category: category,
       theme: theme,
-    ).withOpacity(0.65);
+    ).withValues(alpha: 0.65);
   }
 
   /// 获取权重指示器颜色

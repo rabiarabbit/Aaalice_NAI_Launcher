@@ -179,7 +179,7 @@ class _TagChipEditModeState extends ConsumerState<TagChipEditMode>
               // Gradient background with reduced opacity
               gradient: LinearGradient(
                 colors: gradient.colors
-                    .map((color) => color.withOpacity(0.08))
+                    .map((color) => color.withValues(alpha: 0.08))
                     .toList(),
                 begin: gradient.begin,
                 end: gradient.end,
@@ -193,7 +193,7 @@ class _TagChipEditModeState extends ConsumerState<TagChipEditMode>
               boxShadow: _focusNode.hasFocus
                   ? [
                       BoxShadow(
-                        color: gradientColor.withOpacity(glowOpacity),
+                        color: gradientColor.withValues(alpha: glowOpacity),
                         blurRadius: 8 + (_glowAnimation.value * 4),
                         spreadRadius: _glowAnimation.value * 2,
                       ),
@@ -236,7 +236,7 @@ class _TagChipEditModeState extends ConsumerState<TagChipEditMode>
                       ),
                       borderSide: BorderSide(
                         color: widget.borderColor ??
-                            gradientColor.withOpacity(0.3),
+                            gradientColor.withValues(alpha: 0.3),
                         width: borderWidth,
                       ),
                     ),
@@ -248,7 +248,7 @@ class _TagChipEditModeState extends ConsumerState<TagChipEditMode>
                       ),
                       borderSide: BorderSide(
                         color: widget.borderColor ??
-                            gradientColor.withOpacity(0.3),
+                            gradientColor.withValues(alpha: 0.3),
                         width: borderWidth,
                       ),
                     ),

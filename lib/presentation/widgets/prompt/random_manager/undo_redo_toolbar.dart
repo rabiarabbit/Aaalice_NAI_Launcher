@@ -134,7 +134,7 @@ class _UndoRedoToolbarState extends State<UndoRedoToolbar> {
             width: 1,
             height: 20,
             margin: const EdgeInsets.symmetric(horizontal: 8),
-            color: colorScheme.outlineVariant.withOpacity(0.3),
+            color: colorScheme.outlineVariant.withValues(alpha: 0.3),
           ),
           // 重做按钮
           _UndoRedoButton(
@@ -200,9 +200,9 @@ class _UndoRedoButtonState extends State<_UndoRedoButton> {
             height: 36,
             decoration: BoxDecoration(
               color: _isPressed && widget.enabled
-                  ? colorScheme.primary.withOpacity(0.2)
+                  ? colorScheme.primary.withValues(alpha: 0.2)
                   : _isHovered && widget.enabled
-                      ? colorScheme.primary.withOpacity(0.1)
+                      ? colorScheme.primary.withValues(alpha: 0.1)
                       : Colors.transparent,
               borderRadius: BorderRadius.circular(8),
             ),
@@ -219,7 +219,7 @@ class _UndoRedoButtonState extends State<_UndoRedoButton> {
                         ? (_isHovered
                             ? colorScheme.primary
                             : colorScheme.onSurfaceVariant)
-                        : colorScheme.onSurfaceVariant.withOpacity(0.4),
+                        : colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
                   ),
                 ),
                 // 数量徽章
@@ -285,12 +285,12 @@ class HistoryDropdown<T> extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.shadow.withOpacity(0.1),
+            color: colorScheme.shadow.withValues(alpha: 0.1),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
           BoxShadow(
-            color: colorScheme.shadow.withOpacity(0.15),
+            color: colorScheme.shadow.withValues(alpha: 0.15),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
@@ -398,7 +398,7 @@ class _HistoryItemState extends State<_HistoryItem> {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
             color: _isHovered
-                ? colorScheme.primary.withOpacity(0.1)
+                ? colorScheme.primary.withValues(alpha: 0.1)
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
           ),

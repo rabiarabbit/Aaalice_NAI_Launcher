@@ -67,7 +67,7 @@ class ChartColors {
     double opacity = 0.15,
     bool isDarkMode = false,
   }) {
-    return color.withOpacity(isDarkMode ? opacity * 1.3 : opacity);
+    return color.withValues(alpha: isDarkMode ? opacity * 1.3 : opacity);
   }
 
   /// Get heatmap color based on value (0.0 to 1.0)
@@ -111,8 +111,8 @@ class ChartColors {
       begin: vertical ? Alignment.topCenter : Alignment.centerLeft,
       end: vertical ? Alignment.bottomCenter : Alignment.centerRight,
       colors: [
-        color.withOpacity(startOpacity),
-        color.withOpacity(endOpacity),
+        color.withValues(alpha: startOpacity),
+        color.withValues(alpha: endOpacity),
       ],
     );
   }

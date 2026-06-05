@@ -72,8 +72,13 @@ class _VibePreviewDropZoneState extends State<VibePreviewDropZone> {
     final centerY = size.height / 2;
 
     final matrix = Matrix4.identity()
-      ..translate(centerX - centerX * scale, centerY - centerY * scale)
-      ..scale(scale);
+      ..translateByDouble(
+        centerX - centerX * scale,
+        centerY - centerY * scale,
+        0,
+        1,
+      )
+      ..scaleByDouble(scale, scale, scale, 1);
 
     _transformationController.value = matrix;
   }
@@ -291,18 +296,21 @@ class _VibePreviewDropZoneState extends State<VibePreviewDropZone> {
         decoration: BoxDecoration(
           borderRadius: DesignTokens.borderRadiusXl,
           border: Border.all(
-            color: Colors.white.withOpacity(0.6),
+            color: Colors.white.withValues(alpha: 0.6),
             width: 2,
             strokeAlign: BorderSide.strokeAlignInside,
           ),
-          color: Colors.white.withOpacity(0.08),
+          color: Colors.white.withValues(alpha: 0.08),
         ),
         child: const Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.file_download_outlined,
-                  size: 48, color: Colors.white70,),
+              Icon(
+                Icons.file_download_outlined,
+                size: 48,
+                color: Colors.white70,
+              ),
               SizedBox(height: DesignTokens.spacingSm),
               Text(
                 '释放以设置预览图',
@@ -327,7 +335,7 @@ class _VibePreviewDropZoneState extends State<VibePreviewDropZone> {
     return Tooltip(
       message: tooltip,
       child: Material(
-        color: Colors.black.withOpacity(0.5),
+        color: Colors.black.withValues(alpha: 0.5),
         borderRadius: DesignTokens.borderRadiusLg,
         child: InkWell(
           onTap: onPressed,
@@ -348,7 +356,7 @@ class _VibePreviewDropZoneState extends State<VibePreviewDropZone> {
     return Tooltip(
       message: '关闭 (Esc)',
       child: Material(
-        color: Colors.black.withOpacity(0.5),
+        color: Colors.black.withValues(alpha: 0.5),
         shape: const CircleBorder(),
         child: InkWell(
           onTap: onPressed,

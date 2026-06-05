@@ -336,7 +336,7 @@ class _LayerTileState extends State<_LayerTile>
       index: widget.index,
       child: Material(
         color: widget.isActive
-            ? theme.colorScheme.primaryContainer.withOpacity(0.5)
+            ? theme.colorScheme.primaryContainer.withValues(alpha: 0.5)
             : Colors.transparent,
         child: InkWell(
           onTap: widget.onTap,
@@ -414,7 +414,7 @@ class _LayerTileState extends State<_LayerTile>
                               color: widget.layer.visible
                                   ? null
                                   : theme.colorScheme.onSurface
-                                      .withOpacity(0.5),
+                                      .withValues(alpha: 0.5),
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -687,7 +687,7 @@ class _LayerThumbnail extends StatelessWidget {
           height: size * 0.4,
           child: CircularProgressIndicator(
             strokeWidth: 2,
-            color: theme.colorScheme.primary.withOpacity(0.5),
+            color: theme.colorScheme.primary.withValues(alpha: 0.5),
           ),
         ),
       );

@@ -141,21 +141,29 @@ class _EntrySelectorDialogState extends ConsumerState<EntrySelectorDialog> {
               Expanded(
                 child: filteredEntries.isEmpty
                     ? _buildEmptyState(theme)
-                    : ListView.builder(
-                        itemCount: filteredEntries.length,
-                        itemBuilder: (context, index) {
-                          final entry = filteredEntries[index];
-                          return _EntryListTile(
-                            entry: entry,
-                            categoryName: _getCategoryName(entry.categoryId),
-                            isSelected: _selectedEntryId == entry.id,
-                            onTap: () {
-                              setState(() {
-                                _selectedEntryId = entry.id;
-                              });
-                            },
-                          );
+                    : RadioGroup<String>(
+                        groupValue: _selectedEntryId,
+                        onChanged: (value) {
+                          if (value != null) {
+                            setState(() => _selectedEntryId = value);
+                          }
                         },
+                        child: ListView.builder(
+                          itemCount: filteredEntries.length,
+                          itemBuilder: (context, index) {
+                            final entry = filteredEntries[index];
+                            return _EntryListTile(
+                              entry: entry,
+                              categoryName: _getCategoryName(entry.categoryId),
+                              isSelected: _selectedEntryId == entry.id,
+                              onTap: () {
+                                setState(() {
+                                  _selectedEntryId = entry.id;
+                                });
+                              },
+                            );
+                          },
+                        ),
                       ),
               ),
 
@@ -199,7 +207,7 @@ class _EntrySelectorDialogState extends ConsumerState<EntrySelectorDialog> {
           Icon(
             Icons.search_off_outlined,
             size: 48,
-            color: theme.colorScheme.outline.withOpacity(0.5),
+            color: theme.colorScheme.outline.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 12),
           Text(
@@ -249,8 +257,6 @@ class _EntryListTile extends StatelessWidget {
               // 选择指示器
               Radio<String>(
                 value: entry.id,
-                groupValue: isSelected ? entry.id : null,
-                onChanged: (_) => onTap(),
                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
 

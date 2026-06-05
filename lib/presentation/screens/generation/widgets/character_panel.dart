@@ -52,7 +52,7 @@ class _CharacterPanelState extends ConsumerState<CharacterPanel> {
                     size: 20,
                     color: hasCharacters
                         ? theme.colorScheme.primary
-                        : theme.colorScheme.onSurface.withOpacity(0.6),
+                        : theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
@@ -109,7 +109,7 @@ class _CharacterPanelState extends ConsumerState<CharacterPanel> {
                   Text(
                     context.l10n.character_hint,
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurface.withOpacity(0.6),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -236,7 +236,7 @@ class _CharacterItemState extends State<_CharacterItem> {
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         border: Border.all(
-          color: theme.colorScheme.outline.withOpacity(0.3),
+          color: theme.colorScheme.outline.withValues(alpha: 0.3),
         ),
         borderRadius: BorderRadius.circular(8),
       ),
@@ -246,7 +246,8 @@ class _CharacterItemState extends State<_CharacterItem> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+              color: theme.colorScheme.surfaceContainerHighest
+                  .withValues(alpha: 0.3),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(7),
                 topRight: Radius.circular(7),
@@ -345,7 +346,7 @@ class _CharacterItemState extends State<_CharacterItem> {
                             ),
                             filled: true,
                             fillColor: theme.colorScheme.surfaceContainerHighest
-                                .withOpacity(0.3),
+                                .withValues(alpha: 0.3),
                           ),
                           maxLines: 2,
                           minLines: 1,
@@ -439,7 +440,8 @@ class _CharacterItemState extends State<_CharacterItem> {
                         Text(
                           context.l10n.character_positionHint,
                           style: theme.textTheme.labelSmall?.copyWith(
-                            color: theme.colorScheme.onSurface.withOpacity(0.5),
+                            color: theme.colorScheme.onSurface
+                                .withValues(alpha: 0.5),
                           ),
                         ),
                       ],
@@ -497,7 +499,7 @@ class _PositionSlider extends StatelessWidget {
                 builder: (context) => Text(
                   context.l10n.character_auto,
                   style: theme.textTheme.labelSmall?.copyWith(
-                    color: theme.colorScheme.onSurface.withOpacity(0.5),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                   ),
                 ),
               ),

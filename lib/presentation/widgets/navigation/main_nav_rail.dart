@@ -195,7 +195,7 @@ class _GitHubIconState extends State<_GitHubIcon> {
                 duration: const Duration(milliseconds: 200),
                 decoration: BoxDecoration(
                   color: _isHovering
-                      ? color.withOpacity(0.15)
+                      ? color.withValues(alpha: 0.15)
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -203,7 +203,7 @@ class _GitHubIconState extends State<_GitHubIcon> {
                   child: CustomPaint(
                     size: const Size(24, 24),
                     painter: _GitHubLogoPainter(
-                      color: color.withOpacity(_isHovering ? 1.0 : 0.7),
+                      color: color.withValues(alpha: _isHovering ? 1.0 : 0.7),
                     ),
                   ),
                 ),
@@ -499,13 +499,14 @@ class _ExternalLinkIconState extends State<_ExternalLinkIcon> {
                 duration: const Duration(milliseconds: 200),
                 decoration: BoxDecoration(
                   color: _isHovering
-                      ? widget.color.withOpacity(0.15)
+                      ? widget.color.withValues(alpha: 0.15)
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
                   widget.icon,
-                  color: widget.color.withOpacity(_isHovering ? 1.0 : 0.7),
+                  color:
+                      widget.color.withValues(alpha: _isHovering ? 1.0 : 0.7),
                   size: 24,
                 ),
               ),
@@ -522,15 +523,12 @@ class _NavIcon extends StatefulWidget {
   final String label;
   final bool isSelected;
   final VoidCallback onTap;
-  final bool isDisabled;
 
   const _NavIcon({
     required this.icon,
     required this.label,
     required this.isSelected,
     required this.onTap,
-    // ignore: unused_element
-    this.isDisabled = false,
   });
 
   @override
@@ -546,17 +544,15 @@ class _NavIconState extends State<_NavIcon> {
     final theme = Theme.of(context);
     final color = widget.isSelected
         ? theme.colorScheme.primary
-        : (widget.isDisabled
-            ? theme.disabledColor
-            : theme.iconTheme.color?.withOpacity(0.7));
+        : theme.iconTheme.color?.withValues(alpha: 0.7);
 
     // 计算背景色：选中状态优先，其次是 Hover 状态
     Color backgroundColor = Colors.transparent;
     if (widget.isSelected) {
-      backgroundColor = theme.colorScheme.primary.withOpacity(0.1);
-    } else if (_isHovering && !widget.isDisabled) {
+      backgroundColor = theme.colorScheme.primary.withValues(alpha: 0.1);
+    } else if (_isHovering) {
       backgroundColor =
-          theme.colorScheme.surfaceContainerHighest.withOpacity(0.5);
+          theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5);
     }
 
     return Tooltip(
@@ -569,27 +565,11 @@ class _NavIconState extends State<_NavIcon> {
         child: Material(
           color: Colors.transparent,
           child: InkWell(
-            onTap: widget.isDisabled ? null : widget.onTap,
-            onHover: (val) {
-              if (!widget.isDisabled) {
-                setState(() => _isHovering = val);
-              }
-            },
-            onTapDown: (_) {
-              if (!widget.isDisabled) {
-                setState(() => _isPressed = true);
-              }
-            },
-            onTapUp: (_) {
-              if (!widget.isDisabled) {
-                setState(() => _isPressed = false);
-              }
-            },
-            onTapCancel: () {
-              if (!widget.isDisabled) {
-                setState(() => _isPressed = false);
-              }
-            },
+            onTap: widget.onTap,
+            onHover: (val) => setState(() => _isHovering = val),
+            onTapDown: (_) => setState(() => _isPressed = true),
+            onTapUp: (_) => setState(() => _isPressed = false),
+            onTapCancel: () => setState(() => _isPressed = false),
             borderRadius: BorderRadius.circular(8),
             child: AnimatedScale(
               scale: _isPressed ? 0.92 : (_isHovering ? 1.1 : 1.0),
@@ -602,7 +582,8 @@ class _NavIconState extends State<_NavIcon> {
                   borderRadius: BorderRadius.circular(8),
                   border: widget.isSelected
                       ? Border.all(
-                          color: theme.colorScheme.primary.withOpacity(0.5),
+                          color:
+                              theme.colorScheme.primary.withValues(alpha: 0.5),
                           width: 1,
                         )
                       : null,
@@ -678,7 +659,7 @@ class _AccountAvatarButtonState extends State<_AccountAvatarButton> {
                   )
                 : Container(
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.primary.withOpacity(0.2),
+                      color: theme.colorScheme.primary.withValues(alpha: 0.2),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -728,7 +709,7 @@ class _AccountAvatarButtonState extends State<_AccountAvatarButton> {
             child: Text(
               '${context.l10n.auth_currentAccount}: ${currentAccount.displayName}',
               style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.6),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             ),
           ),

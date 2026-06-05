@@ -73,16 +73,16 @@ class _RandomModeToggleState extends ConsumerState<RandomModeToggle>
             decoration: BoxDecoration(
               color: widget.enabled
                   ? (_isHovering
-                      ? theme.colorScheme.primary.withOpacity(0.25)
-                      : theme.colorScheme.primary.withOpacity(0.15))
+                      ? theme.colorScheme.primary.withValues(alpha: 0.25)
+                      : theme.colorScheme.primary.withValues(alpha: 0.15))
                   : (_isHovering
                       ? theme.colorScheme.surfaceContainerHighest
                       : Colors.transparent),
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
                 color: widget.enabled
-                    ? theme.colorScheme.primary.withOpacity(0.5)
-                    : theme.colorScheme.outline.withOpacity(0.3),
+                    ? theme.colorScheme.primary.withValues(alpha: 0.5)
+                    : theme.colorScheme.outline.withValues(alpha: 0.3),
                 width: widget.enabled ? 1.5 : 1,
               ),
             ),
@@ -99,7 +99,7 @@ class _RandomModeToggleState extends ConsumerState<RandomModeToggle>
                 size: 20,
                 color: widget.enabled
                     ? theme.colorScheme.primary
-                    : theme.colorScheme.onSurface.withOpacity(0.5),
+                    : theme.colorScheme.onSurface.withValues(alpha: 0.5),
               ),
             ),
           ),

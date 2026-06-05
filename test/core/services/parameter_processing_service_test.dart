@@ -45,10 +45,10 @@ void main() {
 
       test('should create with both tag libraries and fixed tags', () {
         final entries = [
-          TagLibraryEntry.create(name: 'test', content: 'content')
+          TagLibraryEntry.create(name: 'test', content: 'content'),
         ];
         final fixedTags = [
-          FixedTagEntry.create(name: 'fixed', content: 'fixed content')
+          FixedTagEntry.create(name: 'fixed', content: 'fixed content'),
         ];
 
         final service = ParameterProcessingService(
@@ -125,7 +125,9 @@ void main() {
       test('should resolve alias in negative prompt', () {
         final entries = [
           TagLibraryEntry.create(
-              name: 'badhands', content: 'bad hands, extra fingers'),
+            name: 'badhands',
+            content: 'bad hands, extra fingers',
+          ),
         ];
         final service = ParameterProcessingService(tagLibraryEntries: entries);
 
@@ -135,7 +137,9 @@ void main() {
         );
 
         expect(
-            result.negativePrompt, equals('bad hands, extra fingers, blurry'));
+          result.negativePrompt,
+          equals('bad hands, extra fingers, blurry'),
+        );
         expect(result.aliasesResolved, isTrue);
       });
 
@@ -157,7 +161,9 @@ void main() {
       test('should resolve aliases with case insensitive matching', () {
         final entries = [
           TagLibraryEntry.create(
-              name: 'Character', content: 'female character'),
+            name: 'Character',
+            content: 'female character',
+          ),
         ];
         final service = ParameterProcessingService(tagLibraryEntries: entries);
 
@@ -520,9 +526,11 @@ void main() {
         );
 
         expect(
-            result.prompt,
-            equals(
-                'best quality, 1girl, long hair, blue eyes, smiling, cinematic lighting'));
+          result.prompt,
+          equals(
+            'best quality, 1girl, long hair, blue eyes, smiling, cinematic lighting',
+          ),
+        );
         expect(result.negativePrompt, equals('low quality, <bad>'));
       });
     });
@@ -622,7 +630,9 @@ void main() {
 
         expect(service.isEntryNameValid('TestEntry'), isTrue);
         expect(
-            service.isEntryNameValid('testentry'), isTrue); // case insensitive
+          service.isEntryNameValid('testentry'),
+          isTrue,
+        ); // case insensitive
       });
 
       test('should return false for non-existing entry name', () {
@@ -698,7 +708,8 @@ void main() {
         expect(
           stats.toString(),
           equals(
-              'FixedTagsStatistics(total: 1, enabled: 1, prefix: 1, suffix: 0)'),
+            'FixedTagsStatistics(total: 1, enabled: 1, prefix: 1, suffix: 0)',
+          ),
         );
       });
     });

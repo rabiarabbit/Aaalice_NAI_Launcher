@@ -145,7 +145,7 @@ class _CanvasSizeDialogState extends State<CanvasSizeDialog> {
           children: [
             // 预设选择
             DropdownButtonFormField<CanvasSizePreset>(
-              value: _selectedPreset,
+              initialValue: _selectedPreset,
               decoration: const InputDecoration(
                 labelText: '预设尺寸',
                 isDense: true,
@@ -178,7 +178,7 @@ class _CanvasSizeDialogState extends State<CanvasSizeDialog> {
 
             // 内容处理模式选择
             DropdownButtonFormField<ContentHandlingMode>(
-              value: _selectedMode,
+              initialValue: _selectedMode,
               decoration: const InputDecoration(
                 labelText: '内容处理',
                 isDense: true,
@@ -558,7 +558,7 @@ class _SizeComparisonPainter extends CustomPainter {
     );
 
     final newPaint = Paint()
-      ..color = theme.colorScheme.primary.withOpacity(0.2)
+      ..color = theme.colorScheme.primary.withValues(alpha: 0.2)
       ..style = PaintingStyle.fill;
 
     canvas.drawRect(newRect, newPaint);
@@ -588,7 +588,7 @@ class _SizeComparisonPainter extends CustomPainter {
         final intersectedRect = originalRect.intersect(newRect);
         if (intersectedRect.width > 0 && intersectedRect.height > 0) {
           final cropPaint = Paint()
-            ..color = theme.colorScheme.error.withOpacity(0.3)
+            ..color = theme.colorScheme.error.withValues(alpha: 0.3)
             ..style = PaintingStyle.fill;
           canvas.drawRect(intersectedRect, cropPaint);
         }
@@ -611,7 +611,7 @@ class _SizeComparisonPainter extends CustomPainter {
 
   void _drawPattern(Canvas canvas, Rect outerRect, Rect innerRect) {
     final patternPaint = Paint()
-      ..color = theme.colorScheme.outlineVariant.withOpacity(0.5)
+      ..color = theme.colorScheme.outlineVariant.withValues(alpha: 0.5)
       ..strokeWidth = 1.0;
 
     // 绘制点状图案表示填充区域

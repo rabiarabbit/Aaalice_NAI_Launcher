@@ -123,7 +123,7 @@ class _AddTagGroupDialogState extends ConsumerState<AddTagGroupDialog>
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: colorScheme.shadow.withOpacity(0.1),
+              color: colorScheme.shadow.withValues(alpha: 0.1),
               blurRadius: 16,
               offset: const Offset(0, 8),
             ),
@@ -157,8 +157,8 @@ class _AddTagGroupDialogState extends ConsumerState<AddTagGroupDialog>
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            colorScheme.primaryContainer.withOpacity(0.3),
-            colorScheme.secondaryContainer.withOpacity(0.2),
+            colorScheme.primaryContainer.withValues(alpha: 0.3),
+            colorScheme.secondaryContainer.withValues(alpha: 0.2),
           ],
         ),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
@@ -168,7 +168,7 @@ class _AddTagGroupDialogState extends ConsumerState<AddTagGroupDialog>
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: colorScheme.primary.withOpacity(0.1),
+              color: colorScheme.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
@@ -678,7 +678,7 @@ class _EmojiPickerButtonState extends State<_EmojiPickerButton> {
             border: Border.all(
               color: _isHovered
                   ? colorScheme.primary
-                  : colorScheme.outline.withOpacity(0.3),
+                  : colorScheme.outline.withValues(alpha: 0.3),
               width: _isHovered ? 2 : 1,
             ),
           ),
@@ -806,8 +806,8 @@ class _DanbooruListTileState extends State<_DanbooruListTile> {
                   onPressed: widget.onOpenExternal,
                   tooltip: '在 Danbooru 中查看',
                   style: IconButton.styleFrom(
-                    backgroundColor:
-                        colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                    backgroundColor: colorScheme.surfaceContainerHighest
+                        .withValues(alpha: 0.5),
                   ),
                 ),
             ],

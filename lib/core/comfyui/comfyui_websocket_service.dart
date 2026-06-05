@@ -113,10 +113,12 @@ class ComfyUIWebSocketService {
           final execData = data['data'] as Map<String, dynamic>?;
           final promptId = execData?['prompt_id'] as String?;
           if (promptId != null && promptId == _trackingPromptId) {
-            _progressController.add(ComfyUIProgress(
-              promptId: promptId,
-              status: ComfyUITaskStatus.running,
-            ));
+            _progressController.add(
+              ComfyUIProgress(
+                promptId: promptId,
+                status: ComfyUITaskStatus.running,
+              ),
+            );
           }
           break;
 
@@ -126,16 +128,20 @@ class ComfyUIWebSocketService {
           final promptId = execData?['prompt_id'] as String?;
           if (promptId != null && promptId == _trackingPromptId) {
             if (nodeId == null) {
-              _progressController.add(ComfyUIProgress(
-                promptId: promptId,
-                status: ComfyUITaskStatus.completed,
-              ));
+              _progressController.add(
+                ComfyUIProgress(
+                  promptId: promptId,
+                  status: ComfyUITaskStatus.completed,
+                ),
+              );
             } else {
-              _progressController.add(ComfyUIProgress(
-                promptId: promptId,
-                status: ComfyUITaskStatus.running,
-                currentNodeId: nodeId,
-              ));
+              _progressController.add(
+                ComfyUIProgress(
+                  promptId: promptId,
+                  status: ComfyUITaskStatus.running,
+                  currentNodeId: nodeId,
+                ),
+              );
             }
           }
           break;
@@ -145,12 +151,14 @@ class ComfyUIWebSocketService {
           if (progData != null) {
             final promptId = progData['prompt_id'] as String?;
             if (promptId == _trackingPromptId || _trackingPromptId == null) {
-              _progressController.add(ComfyUIProgress(
-                promptId: promptId ?? '',
-                status: ComfyUITaskStatus.running,
-                currentStep: progData['value'] as int? ?? 0,
-                totalSteps: progData['max'] as int? ?? 0,
-              ));
+              _progressController.add(
+                ComfyUIProgress(
+                  promptId: promptId ?? '',
+                  status: ComfyUITaskStatus.running,
+                  currentStep: progData['value'] as int? ?? 0,
+                  totalSteps: progData['max'] as int? ?? 0,
+                ),
+              );
             }
           }
           break;
@@ -162,13 +170,15 @@ class ComfyUIWebSocketService {
           final errData = data['data'] as Map<String, dynamic>?;
           final promptId = errData?['prompt_id'] as String?;
           if (promptId != null && promptId == _trackingPromptId) {
-            _progressController.add(ComfyUIProgress(
-              promptId: promptId,
-              status: ComfyUITaskStatus.failed,
-              errorMessage: errData?['exception_message'] as String? ??
-                  errData?['exception_type'] as String? ??
-                  '执行出错',
-            ));
+            _progressController.add(
+              ComfyUIProgress(
+                promptId: promptId,
+                status: ComfyUITaskStatus.failed,
+                errorMessage: errData?['exception_message'] as String? ??
+                    errData?['exception_type'] as String? ??
+                    '执行出错',
+              ),
+            );
           }
           break;
       }
@@ -194,10 +204,12 @@ class ComfyUIWebSocketService {
     if (imageData.isEmpty) return;
 
     final isPreview = eventType == 1;
-    _imageController.add(ComfyUIImageFrame(
-      data: imageData,
-      isPreview: isPreview,
-    ));
+    _imageController.add(
+      ComfyUIImageFrame(
+        data: imageData,
+        isPreview: isPreview,
+      ),
+    );
 
     AppLogger.d(
       'Received ${isPreview ? "preview" : "final"} image: ${imageData.length} bytes',

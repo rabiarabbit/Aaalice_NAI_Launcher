@@ -47,8 +47,7 @@ class ComfyUIWorkflowDialog extends ConsumerStatefulWidget {
       _ComfyUIWorkflowDialogState();
 }
 
-class _ComfyUIWorkflowDialogState
-    extends ConsumerState<ComfyUIWorkflowDialog> {
+class _ComfyUIWorkflowDialogState extends ConsumerState<ComfyUIWorkflowDialog> {
   final Map<String, Uint8List> _inputImages = {};
   final Map<String, dynamic> _paramValues = {};
   List<Uint8List>? _results;
@@ -150,13 +149,15 @@ class _ComfyUIWorkflowDialogState
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(widget.template.name,
-                    style: theme.textTheme.titleMedium),
+                Text(
+                  widget.template.name,
+                  style: theme.textTheme.titleMedium,
+                ),
                 if (widget.template.description.isNotEmpty)
                   Text(
                     widget.template.description,
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurface.withOpacity(0.6),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -180,7 +181,7 @@ class _ComfyUIWorkflowDialogState
       decoration: BoxDecoration(
         border: Border(
           top: BorderSide(
-            color: theme.colorScheme.outline.withOpacity(0.2),
+            color: theme.colorScheme.outline.withValues(alpha: 0.2),
           ),
         ),
       ),
@@ -207,8 +208,7 @@ class _ComfyUIWorkflowDialogState
             )
           else
             OutlinedButton.icon(
-              onPressed: () =>
-                  ref.read(comfyUITaskProvider.notifier).cancel(),
+              onPressed: () => ref.read(comfyUITaskProvider.notifier).cancel(),
               icon: const Icon(Icons.stop, size: 18),
               label: const Text('取消'),
             ),
@@ -242,8 +242,10 @@ class _ComfyUIWorkflowDialogState
                 style: theme.textTheme.titleSmall,
               ),
               if (slot.required)
-                Text(' *',
-                    style: TextStyle(color: theme.colorScheme.error)),
+                Text(
+                  ' *',
+                  style: TextStyle(color: theme.colorScheme.error),
+                ),
             ],
           ),
           const SizedBox(height: 8),
@@ -273,7 +275,8 @@ class _ComfyUIWorkflowDialogState
                       _MiniButton(
                         icon: Icons.close,
                         onPressed: () => setState(
-                            () => _inputImages.remove(slot.id)),
+                          () => _inputImages.remove(slot.id),
+                        ),
                       ),
                     ],
                   ),
@@ -288,7 +291,7 @@ class _ComfyUIWorkflowDialogState
                 height: 80,
                 decoration: BoxDecoration(
                   border: Border.all(
-                    color: theme.colorScheme.outline.withOpacity(0.4),
+                    color: theme.colorScheme.outline.withValues(alpha: 0.4),
                   ),
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -301,14 +304,14 @@ class _ComfyUIWorkflowDialogState
                             ? Icons.format_paint
                             : Icons.add_photo_alternate_outlined,
                         color:
-                            theme.colorScheme.onSurface.withOpacity(0.4),
+                            theme.colorScheme.onSurface.withValues(alpha: 0.4),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         '点击选择图像',
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.onSurface
-                              .withOpacity(0.4),
+                              .withValues(alpha: 0.4),
                         ),
                       ),
                     ],
@@ -378,13 +381,14 @@ class _ComfyUIWorkflowDialogState
                 label: Text(c),
                 selected: current == c,
                 onSelected: (_) => setState(
-                    () => _paramValues[slot.id] = c),
+                  () => _paramValues[slot.id] = c,
+                ),
               );
             }).toList(),
           )
         else
           DropdownButtonFormField<String>(
-            value: choices.contains(current) ? current : null,
+            initialValue: choices.contains(current) ? current : null,
             decoration: InputDecoration(
               border: const OutlineInputBorder(),
               isDense: true,
@@ -413,19 +417,19 @@ class _ComfyUIWorkflowDialogState
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(slot.label, style: theme.textTheme.bodyMedium),
-              Text(val.toInt().toString(),
-                  style: theme.textTheme.bodySmall
-                      ?.copyWith(fontWeight: FontWeight.w600)),
+              Text(
+                val.toInt().toString(),
+                style: theme.textTheme.bodySmall
+                    ?.copyWith(fontWeight: FontWeight.w600),
+              ),
             ],
           ),
           Slider(
             value: val.toDouble().clamp(slot.min!, slot.max!),
             min: slot.min!,
             max: slot.max!,
-            divisions:
-                ((slot.max! - slot.min!) / (slot.step ?? 1)).round(),
-            onChanged: (v) =>
-                setState(() => _paramValues[slot.id] = v.round()),
+            divisions: ((slot.max! - slot.min!) / (slot.step ?? 1)).round(),
+            onChanged: (v) => setState(() => _paramValues[slot.id] = v.round()),
           ),
         ],
       );
@@ -458,9 +462,11 @@ class _ComfyUIWorkflowDialogState
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(slot.label, style: theme.textTheme.bodyMedium),
-              Text(val.toStringAsFixed(2),
-                  style: theme.textTheme.bodySmall
-                      ?.copyWith(fontWeight: FontWeight.w600)),
+              Text(
+                val.toStringAsFixed(2),
+                style: theme.textTheme.bodySmall
+                    ?.copyWith(fontWeight: FontWeight.w600),
+              ),
             ],
           ),
           Slider(
@@ -492,9 +498,8 @@ class _ComfyUIWorkflowDialogState
   }
 
   Widget _buildBoolInput(ThemeData theme, WorkflowSlot slot) {
-    final val = _paramValues[slot.id] as bool? ??
-        slot.defaultValue as bool? ??
-        false;
+    final val =
+        _paramValues[slot.id] as bool? ?? slot.defaultValue as bool? ?? false;
     return SwitchListTile(
       title: Text(slot.label),
       value: val,
@@ -511,8 +516,8 @@ class _ComfyUIWorkflowDialogState
     }
 
     return TextFormField(
-      initialValue: (_paramValues[slot.id] ?? slot.defaultValue ?? '')
-          .toString(),
+      initialValue:
+          (_paramValues[slot.id] ?? slot.defaultValue ?? '').toString(),
       decoration: InputDecoration(
         labelText: slot.label,
         border: const OutlineInputBorder(),
@@ -537,7 +542,7 @@ class _ComfyUIWorkflowDialogState
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
@@ -563,8 +568,10 @@ class _ComfyUIWorkflowDialogState
             const SizedBox(height: 8),
             LinearProgressIndicator(value: taskState.progress),
             const SizedBox(height: 4),
-            Text('${(taskState.progress * 100).toInt()}%',
-                style: theme.textTheme.bodySmall),
+            Text(
+              '${(taskState.progress * 100).toInt()}%',
+              style: theme.textTheme.bodySmall,
+            ),
           ],
         ],
       ),
@@ -575,7 +582,7 @@ class _ComfyUIWorkflowDialogState
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: theme.colorScheme.errorContainer.withOpacity(0.3),
+        color: theme.colorScheme.errorContainer.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -583,9 +590,11 @@ class _ComfyUIWorkflowDialogState
           Icon(Icons.error_outline, color: theme.colorScheme.error),
           const SizedBox(width: 12),
           Expanded(
-            child: Text(error,
-                style: theme.textTheme.bodyMedium
-                    ?.copyWith(color: theme.colorScheme.error)),
+            child: Text(
+              error,
+              style: theme.textTheme.bodyMedium
+                  ?.copyWith(color: theme.colorScheme.error),
+            ),
           ),
         ],
       ),
@@ -598,30 +607,39 @@ class _ComfyUIWorkflowDialogState
       children: [
         Row(
           children: [
-            Icon(Icons.check_circle,
-                color: theme.colorScheme.primary, size: 20),
+            Icon(
+              Icons.check_circle,
+              color: theme.colorScheme.primary,
+              size: 20,
+            ),
             const SizedBox(width: 8),
-            Text('执行完成',
-                style: theme.textTheme.titleSmall
-                    ?.copyWith(color: theme.colorScheme.primary)),
+            Text(
+              '执行完成',
+              style: theme.textTheme.titleSmall
+                  ?.copyWith(color: theme.colorScheme.primary),
+            ),
             const Spacer(),
-            Text('${_results!.length} 张图像',
-                style: theme.textTheme.bodySmall),
+            Text(
+              '${_results!.length} 张图像',
+              style: theme.textTheme.bodySmall,
+            ),
           ],
         ),
         const SizedBox(height: 8),
-        ..._results!.map((img) => Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Image.memory(
-                  img,
-                  height: 180,
-                  width: double.infinity,
-                  fit: BoxFit.contain,
-                ),
+        ..._results!.map(
+          (img) => Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.memory(
+                img,
+                height: 180,
+                width: double.infinity,
+                fit: BoxFit.contain,
               ),
-            )),
+            ),
+          ),
+        ),
       ],
     );
   }

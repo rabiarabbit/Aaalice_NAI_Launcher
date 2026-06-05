@@ -191,7 +191,7 @@ class ConditionalBranchProbabilityBar extends StatelessWidget {
               child: Tooltip(
                 message: '${branch.name}: ${branch.probability}%',
                 child: Container(
-                  color: color.withOpacity(0.7),
+                  color: color.withValues(alpha: 0.7),
                   child: Center(
                     child: Text(
                       branch.probability >= 10 ? '${branch.probability}%' : '',

@@ -10,20 +10,25 @@ import '../../../widgets/common/app_toast.dart';
 ///
 /// 使用 autoDispose 确保组件销毁时释放资源
 /// 通过统计信息失效回调机制实现实时刷新
-final cacheStatisticsProvider = FutureProvider.autoDispose<CacheStatistics>((ref) async {
+final cacheStatisticsProvider =
+    FutureProvider.autoDispose<CacheStatistics>((ref) async {
   GalleryCacheManager().registerOnStatisticsInvalidated(ref.invalidateSelf);
-  ref.onDispose(() => GalleryCacheManager().unregisterOnStatisticsInvalidated(ref.invalidateSelf));
+  ref.onDispose(
+    () => GalleryCacheManager()
+        .unregisterOnStatisticsInvalidated(ref.invalidateSelf),
+  );
   return await GalleryCacheManager().getStatistics();
 });
 
 /// 缓存统计展示组件
-/// 
+///
 /// 支持自动刷新，每 3 秒更新一次统计数据
 class CacheStatisticsTile extends ConsumerStatefulWidget {
   const CacheStatisticsTile({super.key});
 
   @override
-  ConsumerState<CacheStatisticsTile> createState() => _CacheStatisticsTileState();
+  ConsumerState<CacheStatisticsTile> createState() =>
+      _CacheStatisticsTileState();
 }
 
 class _CacheStatisticsTileState extends ConsumerState<CacheStatisticsTile> {
@@ -95,7 +100,11 @@ class _CacheStatisticsTileState extends ConsumerState<CacheStatisticsTile> {
     );
   }
 
-  Widget _buildContent(BuildContext context, WidgetRef ref, CacheStatistics stats) {
+  Widget _buildContent(
+    BuildContext context,
+    WidgetRef ref,
+    CacheStatistics stats,
+  ) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -107,7 +116,7 @@ class _CacheStatisticsTileState extends ConsumerState<CacheStatisticsTile> {
           subtitle: Text(
             '自动刷新 · 上次更新: ${_getTimeSinceLastRefresh()}',
             style: theme.textTheme.bodySmall?.copyWith(
-              color: colorScheme.onSurface.withOpacity(0.6),
+              color: colorScheme.onSurface.withValues(alpha: 0.6),
             ),
           ),
           trailing: Row(
@@ -209,7 +218,7 @@ class _AutoRefreshIndicatorState extends State<_AutoRefreshIndicator>
           child: CircularProgressIndicator(
             value: _controller.value,
             strokeWidth: 2,
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
           ),
         );
       },
@@ -286,9 +295,9 @@ class _CacheIndicator extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.05),
+        color: color.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Row(
         children: [
@@ -296,7 +305,7 @@ class _CacheIndicator extends StatelessWidget {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(icon, color: color, size: 20),
@@ -316,7 +325,7 @@ class _CacheIndicator extends StatelessWidget {
                 Text(
                   value,
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurface.withOpacity(0.6),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                 ),
               ],

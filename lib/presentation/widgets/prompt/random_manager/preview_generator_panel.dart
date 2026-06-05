@@ -109,8 +109,8 @@ class _PreviewGeneratorPanelState extends ConsumerState<PreviewGeneratorPanel>
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      colorScheme.secondary.withOpacity(0.2),
-                      colorScheme.secondary.withOpacity(0.1),
+                      colorScheme.secondary.withValues(alpha: 0.2),
+                      colorScheme.secondary.withValues(alpha: 0.1),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(8),
@@ -172,7 +172,7 @@ class _PreviewGeneratorPanelState extends ConsumerState<PreviewGeneratorPanel>
               borderRadius: BorderRadius.circular(8),
               boxShadow: [
                 BoxShadow(
-                  color: colorScheme.shadow.withOpacity(0.05),
+                  color: colorScheme.shadow.withValues(alpha: 0.05),
                   blurRadius: 4,
                   offset: const Offset(0, 1),
                 ),
@@ -212,7 +212,8 @@ class _PreviewGeneratorPanelState extends ConsumerState<PreviewGeneratorPanel>
               iconSize: 18,
               tooltip: '复制',
               style: IconButton.styleFrom(
-                backgroundColor: colorScheme.primaryContainer.withOpacity(0.3),
+                backgroundColor:
+                    colorScheme.primaryContainer.withValues(alpha: 0.3),
               ),
             ),
             const SizedBox(width: 4),
@@ -224,7 +225,7 @@ class _PreviewGeneratorPanelState extends ConsumerState<PreviewGeneratorPanel>
               tooltip: '重新生成',
               style: IconButton.styleFrom(
                 backgroundColor:
-                    colorScheme.secondaryContainer.withOpacity(0.3),
+                    colorScheme.secondaryContainer.withValues(alpha: 0.3),
               ),
             ),
           ],
@@ -273,22 +274,22 @@ class _GenerateButtonState extends State<_GenerateButton> {
               colors: _isHovered || widget.isGenerating
                   ? [colorScheme.primary, colorScheme.secondary]
                   : [
-                      colorScheme.primary.withOpacity(0.9),
-                      colorScheme.secondary.withOpacity(0.8),
+                      colorScheme.primary.withValues(alpha: 0.9),
+                      colorScheme.secondary.withValues(alpha: 0.8),
                     ],
             ),
             borderRadius: BorderRadius.circular(8),
             boxShadow: _isHovered && !widget.isGenerating
                 ? [
                     BoxShadow(
-                      color: colorScheme.primary.withOpacity(0.35),
+                      color: colorScheme.primary.withValues(alpha: 0.35),
                       blurRadius: 12,
                       offset: const Offset(0, 4),
                     ),
                   ]
                 : [
                     BoxShadow(
-                      color: colorScheme.primary.withOpacity(0.2),
+                      color: colorScheme.primary.withValues(alpha: 0.2),
                       blurRadius: 6,
                       offset: const Offset(0, 2),
                     ),
@@ -346,13 +347,13 @@ class _EmptyState extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: colorScheme.surfaceContainerHighest.withOpacity(0.5),
+              color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
               shape: BoxShape.circle,
             ),
             child: Icon(
               Icons.auto_awesome_outlined,
               size: 32,
-              color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
             ),
           ),
           const SizedBox(height: 12),
@@ -389,7 +390,7 @@ class _ErrorDisplay extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: colorScheme.errorContainer.withOpacity(0.3),
+          color: colorScheme.errorContainer.withValues(alpha: 0.3),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Column(
@@ -442,7 +443,7 @@ class _StatChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(

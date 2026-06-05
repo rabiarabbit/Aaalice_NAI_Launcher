@@ -124,7 +124,7 @@ class SectionHeader extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(6),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(6),
           ),
           child: Icon(
@@ -171,7 +171,7 @@ class DialogTitleBar extends StatelessWidget {
         color: colorScheme.surfaceContainerLowest,
         border: Border(
           bottom: BorderSide(
-            color: colorScheme.outlineVariant.withOpacity(0.2),
+            color: colorScheme.outlineVariant.withValues(alpha: 0.2),
           ),
         ),
       ),
@@ -250,7 +250,7 @@ class ProbabilityBar extends StatelessWidget {
             decoration: BoxDecoration(
               color: enabled
                   ? colorScheme.surfaceContainerHighest
-                  : primaryColor.withOpacity(0.15),
+                  : primaryColor.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(height / 2),
             ),
             child: FractionallySizedBox(
@@ -266,19 +266,19 @@ class ProbabilityBar extends StatelessWidget {
                         ? [primaryColor, tertiaryColor]
                         : enabled
                             ? [
-                                primaryColor.withOpacity(0.9),
-                                secondaryColor.withOpacity(0.7),
+                                primaryColor.withValues(alpha: 0.9),
+                                secondaryColor.withValues(alpha: 0.7),
                               ]
                             : [
-                                primaryColor.withOpacity(0.4),
-                                secondaryColor.withOpacity(0.3),
+                                primaryColor.withValues(alpha: 0.4),
+                                secondaryColor.withValues(alpha: 0.3),
                               ],
                   ),
                   borderRadius: BorderRadius.circular(height / 2),
                   boxShadow: (isHovered || enabled)
                       ? [
                           BoxShadow(
-                            color: primaryColor.withOpacity(0.3),
+                            color: primaryColor.withValues(alpha: 0.3),
                             blurRadius: 4,
                             offset: const Offset(0, 1),
                           ),
@@ -295,7 +295,7 @@ class ProbabilityBar extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: primaryColor.withOpacity(0.1),
+                color: primaryColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Text(
@@ -303,7 +303,7 @@ class ProbabilityBar extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.bold,
-                  color: primaryColor.withOpacity(enabled ? 1.0 : 0.6),
+                  color: primaryColor.withValues(alpha: enabled ? 1.0 : 0.6),
                 ),
               ),
             )
@@ -353,7 +353,7 @@ class ChartLegendItem extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.2),
+            color: color.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(4),
           ),
           child: Icon(

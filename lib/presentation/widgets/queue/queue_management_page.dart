@@ -155,7 +155,7 @@ class _QueueManagementPageState extends ConsumerState<QueueManagementPage>
         onPressed: onPressed,
         style: IconButton.styleFrom(
           backgroundColor: isHighlighted
-              ? theme.colorScheme.primaryContainer.withOpacity(0.5)
+              ? theme.colorScheme.primaryContainer.withValues(alpha: 0.5)
               : null,
         ),
       ),
@@ -222,7 +222,8 @@ class _QueueManagementPageState extends ConsumerState<QueueManagementPage>
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
               decoration: BoxDecoration(
-                color: (color ?? theme.colorScheme.primary).withOpacity(0.15),
+                color: (color ?? theme.colorScheme.primary)
+                    .withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Text(
@@ -249,10 +250,10 @@ class _QueueManagementPageState extends ConsumerState<QueueManagementPage>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
         border: Border(
           bottom: BorderSide(
-            color: theme.dividerColor.withOpacity(0.3),
+            color: theme.dividerColor.withValues(alpha: 0.3),
             width: 0.5,
           ),
         ),
@@ -262,7 +263,7 @@ class _QueueManagementPageState extends ConsumerState<QueueManagementPage>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: theme.colorScheme.primaryContainer.withOpacity(0.5),
+              color: theme.colorScheme.primaryContainer.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(6),
             ),
             child: Text(
@@ -315,7 +316,7 @@ class _QueueManagementPageState extends ConsumerState<QueueManagementPage>
             style: FilledButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
               minimumSize: const Size(0, 32),
-              backgroundColor: Colors.red.withOpacity(0.12),
+              backgroundColor: Colors.red.withValues(alpha: 0.12),
               foregroundColor: Colors.red,
             ),
           ),
@@ -487,20 +488,20 @@ class _QueueManagementPageState extends ConsumerState<QueueManagementPage>
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: displayColor.withOpacity(0.08),
+              color: displayColor.withValues(alpha: 0.08),
               shape: BoxShape.circle,
             ),
             child: Icon(
               icon,
               size: 48,
-              color: displayColor.withOpacity(0.6),
+              color: displayColor.withValues(alpha: 0.6),
             ),
           ),
           const SizedBox(height: 16),
           Text(
             message,
             style: theme.textTheme.titleMedium?.copyWith(
-              color: theme.colorScheme.onSurface.withOpacity(0.6),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
             ),
           ),
           if (hint != null) ...[
@@ -508,7 +509,7 @@ class _QueueManagementPageState extends ConsumerState<QueueManagementPage>
             Text(
               hint,
               style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.4),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
               ),
             ),
           ],

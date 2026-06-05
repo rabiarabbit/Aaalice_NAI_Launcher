@@ -139,8 +139,10 @@ class _StackedAreaChartState extends State<StackedAreaChart>
     final lineBarsData = <LineChartBarData>[];
     for (int i = widget.series.length - 1; i >= 0; i--) {
       final color = widget.series[i].color ??
-          ChartColors.getColorForIndex(i,
-              palette: ChartColors.stackedAreaPalette,);
+          ChartColors.getColorForIndex(
+            i,
+            palette: ChartColors.stackedAreaPalette,
+          );
 
       lineBarsData.add(
         LineChartBarData(
@@ -155,7 +157,7 @@ class _StackedAreaChartState extends State<StackedAreaChart>
           dotData: const FlDotData(show: false),
           belowBarData: BarAreaData(
             show: true,
-            color: color.withOpacity(0.4),
+            color: color.withValues(alpha: 0.4),
           ),
         ),
       );
@@ -171,7 +173,7 @@ class _StackedAreaChartState extends State<StackedAreaChart>
         drawVerticalLine: false,
         getDrawingHorizontalLine: (value) {
           return FlLine(
-            color: theme.dividerColor.withOpacity(0.3),
+            color: theme.dividerColor.withValues(alpha: 0.3),
             strokeWidth: 1,
           );
         },
@@ -242,8 +244,10 @@ class _StackedAreaChartState extends State<StackedAreaChart>
               }
               final series = widget.series[seriesIndex];
               final color = series.color ??
-                  ChartColors.getColorForIndex(seriesIndex,
-                      palette: ChartColors.stackedAreaPalette,);
+                  ChartColors.getColorForIndex(
+                    seriesIndex,
+                    palette: ChartColors.stackedAreaPalette,
+                  );
               return LineTooltipItem(
                 '${series.name}: ${spot.y.toInt()}',
                 TextStyle(
@@ -268,8 +272,10 @@ class _StackedAreaChartState extends State<StackedAreaChart>
         final index = entry.key;
         final series = entry.value;
         final color = series.color ??
-            ChartColors.getColorForIndex(index,
-                palette: ChartColors.stackedAreaPalette,);
+            ChartColors.getColorForIndex(
+              index,
+              palette: ChartColors.stackedAreaPalette,
+            );
 
         return Row(
           mainAxisSize: MainAxisSize.min,

@@ -128,15 +128,15 @@ class _SelectionToolbarState extends State<SelectionToolbar>
                 ),
                 decoration: BoxDecoration(
                   color: theme.colorScheme.surfaceContainerHigh
-                      .withOpacity(DesignTokens.glassOpacity),
+                      .withValues(alpha: DesignTokens.glassOpacity),
                   borderRadius: DesignTokens.borderRadiusLg,
                   border: Border.all(
                     color: theme.colorScheme.outline
-                        .withOpacity(DesignTokens.glassBorderOpacity),
+                        .withValues(alpha: DesignTokens.glassBorderOpacity),
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: theme.shadowColor.withOpacity(0.15),
+                      color: theme.shadowColor.withValues(alpha: 0.15),
                       blurRadius: DesignTokens.glassBlurRadius,
                       offset: const Offset(0, -2),
                     ),
@@ -179,7 +179,7 @@ class _SelectionToolbarState extends State<SelectionToolbar>
                     Container(
                       width: 1,
                       height: 24,
-                      color: theme.colorScheme.outline.withOpacity(0.3),
+                      color: theme.colorScheme.outline.withValues(alpha: 0.3),
                     ),
 
                     const SizedBox(width: DesignTokens.spacingSm),

@@ -44,7 +44,7 @@ class SafeDropdown<T> extends StatelessWidget {
               ? Text(
                   hintText!,
                   style: TextStyle(
-                    color: theme.colorScheme.onSurface.withOpacity(0.5),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                     fontSize: 14,
                   ),
                 )
@@ -52,7 +52,7 @@ class SafeDropdown<T> extends StatelessWidget {
           icon: icon ??
               Icon(
                 Icons.keyboard_arrow_down,
-                color: theme.colorScheme.onSurface.withOpacity(0.6),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
               ),
           dropdownColor: theme.colorScheme.surfaceContainerHigh,
           borderRadius: BorderRadius.zero,
@@ -115,7 +115,7 @@ class SafeDropdownFormField<T> extends StatelessWidget {
           Text(
             labelText!,
             style: theme.textTheme.labelMedium?.copyWith(
-              color: theme.colorScheme.onSurface.withOpacity(0.8),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
             ),
           ),
           const SizedBox(height: 6),
@@ -123,7 +123,7 @@ class SafeDropdownFormField<T> extends StatelessWidget {
         InsetShadowContainer(
           borderRadius: borderRadius,
           child: DropdownButtonFormField<T>(
-            value: validValue,
+            initialValue: validValue,
             items: items,
             onChanged: onChanged,
             isExpanded: isExpanded,

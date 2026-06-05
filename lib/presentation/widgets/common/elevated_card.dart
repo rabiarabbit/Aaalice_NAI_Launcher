@@ -134,12 +134,12 @@ class _ElevatedCardState extends State<ElevatedCard> {
         // Level 1: 轻微层叠（2层阴影）
         return [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04 * baseOpacity),
+            color: Colors.black.withValues(alpha: 0.04 * baseOpacity),
             blurRadius: 2,
             offset: const Offset(0, 1),
           ),
           BoxShadow(
-            color: Colors.black.withOpacity(0.06 * baseOpacity),
+            color: Colors.black.withValues(alpha: 0.06 * baseOpacity),
             blurRadius: 4,
             spreadRadius: -0.5,
             offset: const Offset(0, 2),
@@ -149,18 +149,18 @@ class _ElevatedCardState extends State<ElevatedCard> {
         // Level 2: 标准层叠（3层阴影）
         return [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04 * baseOpacity),
+            color: Colors.black.withValues(alpha: 0.04 * baseOpacity),
             blurRadius: 3,
             offset: const Offset(0, 1),
           ),
           BoxShadow(
-            color: Colors.black.withOpacity(0.08 * baseOpacity),
+            color: Colors.black.withValues(alpha: 0.08 * baseOpacity),
             blurRadius: 6,
             spreadRadius: -1,
             offset: const Offset(0, 3),
           ),
           BoxShadow(
-            color: Colors.black.withOpacity(0.12 * baseOpacity),
+            color: Colors.black.withValues(alpha: 0.12 * baseOpacity),
             blurRadius: 12,
             spreadRadius: -2,
             offset: const Offset(0, 6),
@@ -170,24 +170,24 @@ class _ElevatedCardState extends State<ElevatedCard> {
         // Level 3: 明显层叠（4层阴影）
         return [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04 * baseOpacity),
+            color: Colors.black.withValues(alpha: 0.04 * baseOpacity),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
           BoxShadow(
-            color: Colors.black.withOpacity(0.08 * baseOpacity),
+            color: Colors.black.withValues(alpha: 0.08 * baseOpacity),
             blurRadius: 8,
             spreadRadius: -1,
             offset: const Offset(0, 4),
           ),
           BoxShadow(
-            color: Colors.black.withOpacity(0.12 * baseOpacity),
+            color: Colors.black.withValues(alpha: 0.12 * baseOpacity),
             blurRadius: 16,
             spreadRadius: -2,
             offset: const Offset(0, 8),
           ),
           BoxShadow(
-            color: Colors.black.withOpacity(0.16 * baseOpacity),
+            color: Colors.black.withValues(alpha: 0.16 * baseOpacity),
             blurRadius: 24,
             spreadRadius: -3,
             offset: const Offset(0, 12),
@@ -197,24 +197,24 @@ class _ElevatedCardState extends State<ElevatedCard> {
         // Level 4: 极致层叠（4层阴影，更强）
         return [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06 * baseOpacity),
+            color: Colors.black.withValues(alpha: 0.06 * baseOpacity),
             blurRadius: 6,
             offset: const Offset(0, 3),
           ),
           BoxShadow(
-            color: Colors.black.withOpacity(0.10 * baseOpacity),
+            color: Colors.black.withValues(alpha: 0.10 * baseOpacity),
             blurRadius: 12,
             spreadRadius: -1,
             offset: const Offset(0, 6),
           ),
           BoxShadow(
-            color: Colors.black.withOpacity(0.14 * baseOpacity),
+            color: Colors.black.withValues(alpha: 0.14 * baseOpacity),
             blurRadius: 20,
             spreadRadius: -2,
             offset: const Offset(0, 12),
           ),
           BoxShadow(
-            color: Colors.black.withOpacity(0.20 * baseOpacity),
+            color: Colors.black.withValues(alpha: 0.20 * baseOpacity),
             blurRadius: 32,
             spreadRadius: -4,
             offset: const Offset(0, 18),
@@ -254,8 +254,8 @@ class _ElevatedCardState extends State<ElevatedCard> {
       duration: widget.animationDuration,
       curve: widget.animationCurve,
       transform: Matrix4.identity()
-        ..translate(0.0, translateY)
-        ..scale(scale),
+        ..translateByDouble(0.0, translateY, 0, 1)
+        ..scaleByDouble(scale, scale, scale, 1),
       transformAlignment: Alignment.center,
       margin: widget.margin,
       decoration: BoxDecoration(
@@ -358,8 +358,8 @@ class CardGradients {
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
       colors: [
-        colorScheme.primary.withOpacity(0.6),
-        colorScheme.secondary.withOpacity(0.4),
+        colorScheme.primary.withValues(alpha: 0.6),
+        colorScheme.secondary.withValues(alpha: 0.4),
       ],
     );
   }

@@ -92,14 +92,14 @@ class _DependencyConfigPanelState extends State<DependencyConfigPanel> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                colorScheme.tertiary.withOpacity(0.2),
-                colorScheme.tertiary.withOpacity(0.1),
+                colorScheme.tertiary.withValues(alpha: 0.2),
+                colorScheme.tertiary.withValues(alpha: 0.1),
               ],
             ),
             borderRadius: BorderRadius.circular(10),
             boxShadow: [
               BoxShadow(
-                color: colorScheme.tertiary.withOpacity(0.1),
+                color: colorScheme.tertiary.withValues(alpha: 0.1),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -142,7 +142,7 @@ class _DependencyConfigPanelState extends State<DependencyConfigPanel> {
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   border: Border.all(
-                    color: colorScheme.error.withOpacity(0.5),
+                    color: colorScheme.error.withValues(alpha: 0.5),
                   ),
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -203,7 +203,7 @@ class _DependencyConfigPanelState extends State<DependencyConfigPanel> {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: colorScheme.primaryContainer.withOpacity(0.5),
+                  color: colorScheme.primaryContainer.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Icon(
@@ -247,7 +247,7 @@ class _DependencyConfigPanelState extends State<DependencyConfigPanel> {
                               ? LinearGradient(
                                   begin: Alignment.topLeft,
                                   end: Alignment.bottomRight,
-                                  colors: [color, color.withOpacity(0.8)],
+                                  colors: [color, color.withValues(alpha: 0.8)],
                                 )
                               : null,
                           color: isSelected
@@ -257,12 +257,12 @@ class _DependencyConfigPanelState extends State<DependencyConfigPanel> {
                           border: Border.all(
                             color: isSelected
                                 ? Colors.transparent
-                                : colorScheme.outline.withOpacity(0.2),
+                                : colorScheme.outline.withValues(alpha: 0.2),
                           ),
                           boxShadow: isSelected
                               ? [
                                   BoxShadow(
-                                    color: color.withOpacity(0.3),
+                                    color: color.withValues(alpha: 0.3),
                                     blurRadius: 8,
                                     offset: const Offset(0, 2),
                                   ),
@@ -306,7 +306,7 @@ class _DependencyConfigPanelState extends State<DependencyConfigPanel> {
               color: colorScheme.surfaceContainerLowest,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color: colorScheme.outline.withOpacity(0.1),
+                color: colorScheme.outline.withValues(alpha: 0.1),
               ),
             ),
             child: Row(
@@ -351,7 +351,7 @@ class _DependencyConfigPanelState extends State<DependencyConfigPanel> {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: colorScheme.secondaryContainer.withOpacity(0.5),
+                  color: colorScheme.secondaryContainer.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Icon(
@@ -372,7 +372,7 @@ class _DependencyConfigPanelState extends State<DependencyConfigPanel> {
           const SizedBox(height: 12),
           if (widget.availableCategories.isNotEmpty)
             DropdownButtonFormField<String>(
-              value: _config.sourceCategoryId.isNotEmpty
+              initialValue: _config.sourceCategoryId.isNotEmpty
                   ? _config.sourceCategoryId
                   : null,
               decoration: InputDecoration(
@@ -387,7 +387,7 @@ class _DependencyConfigPanelState extends State<DependencyConfigPanel> {
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide(
-                    color: colorScheme.outline.withOpacity(0.3),
+                    color: colorScheme.outline.withValues(alpha: 0.3),
                   ),
                 ),
               ),
@@ -447,7 +447,7 @@ class _DependencyConfigPanelState extends State<DependencyConfigPanel> {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: colorScheme.tertiaryContainer.withOpacity(0.5),
+                  color: colorScheme.tertiaryContainer.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Icon(
@@ -477,7 +477,7 @@ class _DependencyConfigPanelState extends State<DependencyConfigPanel> {
                       ),
                       decoration: BoxDecoration(
                         border: Border.all(
-                          color: colorScheme.primary.withOpacity(0.5),
+                          color: colorScheme.primary.withValues(alpha: 0.5),
                         ),
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -512,7 +512,7 @@ class _DependencyConfigPanelState extends State<DependencyConfigPanel> {
                 color: colorScheme.surfaceContainerLowest,
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
-                  color: colorScheme.outline.withOpacity(0.1),
+                  color: colorScheme.outline.withValues(alpha: 0.1),
                 ),
               ),
               child: Center(
@@ -551,7 +551,7 @@ class _DependencyConfigPanelState extends State<DependencyConfigPanel> {
                     color: colorScheme.surfaceContainerLowest,
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
-                      color: colorScheme.outline.withOpacity(0.1),
+                      color: colorScheme.outline.withValues(alpha: 0.1),
                     ),
                   ),
                   child: Row(
@@ -563,7 +563,8 @@ class _DependencyConfigPanelState extends State<DependencyConfigPanel> {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: colorScheme.primaryContainer.withOpacity(0.5),
+                          color: colorScheme.primaryContainer
+                              .withValues(alpha: 0.5),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
@@ -588,8 +589,8 @@ class _DependencyConfigPanelState extends State<DependencyConfigPanel> {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color:
-                              colorScheme.secondaryContainer.withOpacity(0.5),
+                          color: colorScheme.secondaryContainer
+                              .withValues(alpha: 0.5),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
@@ -606,7 +607,7 @@ class _DependencyConfigPanelState extends State<DependencyConfigPanel> {
                           icon: Icon(
                             Icons.delete_outline_rounded,
                             size: 18,
-                            color: colorScheme.error.withOpacity(0.7),
+                            color: colorScheme.error.withValues(alpha: 0.7),
                           ),
                           onPressed: () => _removeMappingRule(entry.key),
                           tooltip: '删除规则',
@@ -639,7 +640,7 @@ class _DependencyConfigPanelState extends State<DependencyConfigPanel> {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: colorScheme.primaryContainer.withOpacity(0.5),
+                  color: colorScheme.primaryContainer.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Icon(
@@ -672,7 +673,7 @@ class _DependencyConfigPanelState extends State<DependencyConfigPanel> {
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
                 borderSide: BorderSide(
-                  color: colorScheme.outline.withOpacity(0.3),
+                  color: colorScheme.outline.withValues(alpha: 0.3),
                 ),
               ),
             ),
@@ -757,7 +758,7 @@ class _DependencyConfigPanelState extends State<DependencyConfigPanel> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: colorScheme.primaryContainer.withOpacity(0.5),
+                  color: colorScheme.primaryContainer.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(

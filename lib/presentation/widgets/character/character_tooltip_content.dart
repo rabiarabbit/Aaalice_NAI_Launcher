@@ -66,7 +66,7 @@ class _EmptyStateContent extends StatelessWidget {
           Icon(
             Icons.people_outline,
             size: 32,
-            color: colorScheme.outline.withOpacity(0.5),
+            color: colorScheme.outline.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 8),
           Text(

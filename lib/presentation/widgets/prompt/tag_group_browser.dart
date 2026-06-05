@@ -181,10 +181,10 @@ class _TagGroupBrowserState extends ConsumerState<TagGroupBrowser> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
         border: Border(
           bottom: BorderSide(
-            color: theme.colorScheme.outline.withOpacity(0.1),
+            color: theme.colorScheme.outline.withValues(alpha: 0.1),
           ),
         ),
       ),
@@ -206,17 +206,17 @@ class _TagGroupBrowserState extends ConsumerState<TagGroupBrowser> {
             hintText: context.l10n.tagGroupBrowser_searchHint,
             hintStyle: TextStyle(
               fontSize: 14,
-              color: theme.colorScheme.onSurface.withOpacity(0.5),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
             ),
             prefixIcon: Icon(
               Icons.search,
-              color: theme.colorScheme.onSurface.withOpacity(0.5),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
             ),
             suffixIcon: _searchController.text.isNotEmpty
                 ? IconButton(
                     icon: Icon(
                       Icons.clear,
-                      color: theme.colorScheme.onSurface.withOpacity(0.5),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                     ),
                     onPressed: () {
                       _searchController.clear();
@@ -255,10 +255,10 @@ class _TagGroupBrowserState extends ConsumerState<TagGroupBrowser> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: theme.colorScheme.primaryContainer.withOpacity(0.1),
+        color: theme.colorScheme.primaryContainer.withValues(alpha: 0.1),
         border: Border(
           bottom: BorderSide(
-            color: theme.colorScheme.outline.withOpacity(0.2),
+            color: theme.colorScheme.outline.withValues(alpha: 0.2),
           ),
         ),
       ),
@@ -319,13 +319,13 @@ class _TagGroupBrowserState extends ConsumerState<TagGroupBrowser> {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
             color: isSelected
-                ? theme.colorScheme.primary.withOpacity(0.15)
-                : theme.colorScheme.primaryContainer.withOpacity(0.3),
+                ? theme.colorScheme.primary.withValues(alpha: 0.15)
+                : theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
               color: isSelected
-                  ? theme.colorScheme.primary.withOpacity(0.5)
-                  : theme.colorScheme.primary.withOpacity(0.3),
+                  ? theme.colorScheme.primary.withValues(alpha: 0.5)
+                  : theme.colorScheme.primary.withValues(alpha: 0.3),
             ),
           ),
           child: Row(
@@ -348,7 +348,7 @@ class _TagGroupBrowserState extends ConsumerState<TagGroupBrowser> {
                     vertical: 1,
                   ),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withOpacity(0.2),
+                    color: theme.colorScheme.primary.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -392,7 +392,7 @@ class _TagGroupBrowserState extends ConsumerState<TagGroupBrowser> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
         side: BorderSide(
-          color: theme.colorScheme.outline.withOpacity(0.1),
+          color: theme.colorScheme.outline.withValues(alpha: 0.1),
         ),
       ),
       child: Column(
@@ -550,13 +550,13 @@ class _TagGroupBrowserState extends ConsumerState<TagGroupBrowser> {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
             color: isSelected
-                ? theme.colorScheme.primary.withOpacity(0.15)
+                ? theme.colorScheme.primary.withValues(alpha: 0.15)
                 : theme.colorScheme.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
               color: isSelected
-                  ? theme.colorScheme.primary.withOpacity(0.5)
-                  : theme.colorScheme.outline.withOpacity(0.2),
+                  ? theme.colorScheme.primary.withValues(alpha: 0.5)
+                  : theme.colorScheme.outline.withValues(alpha: 0.2),
             ),
           ),
           child: Text(
@@ -584,7 +584,7 @@ class _TagGroupBrowserState extends ConsumerState<TagGroupBrowser> {
             Icon(
               Icons.library_books_outlined,
               size: 64,
-              color: theme.colorScheme.outline.withOpacity(0.5),
+              color: theme.colorScheme.outline.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 16),
             Text(
@@ -599,7 +599,7 @@ class _TagGroupBrowserState extends ConsumerState<TagGroupBrowser> {
               context.l10n.tagGroupBrowser_importLibraryHint,
               textAlign: TextAlign.center,
               style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.outline.withOpacity(0.7),
+                color: theme.colorScheme.outline.withValues(alpha: 0.7),
               ),
             ),
           ],
@@ -619,7 +619,7 @@ class _TagGroupBrowserState extends ConsumerState<TagGroupBrowser> {
             Icon(
               Icons.category_outlined,
               size: 64,
-              color: theme.colorScheme.outline.withOpacity(0.5),
+              color: theme.colorScheme.outline.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 16),
             Text(
@@ -634,7 +634,7 @@ class _TagGroupBrowserState extends ConsumerState<TagGroupBrowser> {
               context.l10n.tagGroupBrowser_enableCategoriesHint,
               textAlign: TextAlign.center,
               style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.outline.withOpacity(0.7),
+                color: theme.colorScheme.outline.withValues(alpha: 0.7),
               ),
             ),
           ],

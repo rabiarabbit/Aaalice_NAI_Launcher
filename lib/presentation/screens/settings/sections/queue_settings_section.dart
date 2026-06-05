@@ -10,8 +10,11 @@ import '../../../widgets/common/themed_input.dart';
 import '../widgets/settings_card.dart';
 
 /// 构建标准输入框装饰
-InputDecoration _buildSettingsInputDecoration(ThemeData theme,
-    {String? labelText, String? hintText,}) {
+InputDecoration _buildSettingsInputDecoration(
+  ThemeData theme, {
+  String? labelText,
+  String? hintText,
+}) {
   return InputDecoration(
     labelText: labelText,
     hintText: hintText,
@@ -20,7 +23,8 @@ InputDecoration _buildSettingsInputDecoration(ThemeData theme,
     border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
     enabledBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(8),
-      borderSide: BorderSide(color: theme.colorScheme.outline.withOpacity(0.3)),
+      borderSide:
+          BorderSide(color: theme.colorScheme.outline.withValues(alpha: 0.3)),
     ),
     focusedBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(8),
@@ -39,7 +43,7 @@ SliderThemeData _buildSettingsSliderTheme(BuildContext context) {
 }
 
 /// 队列设置板块
-/// 
+///
 /// 包含重试次数、重试间隔和悬浮球背景图片设置
 class QueueSettingsSection extends ConsumerStatefulWidget {
   const QueueSettingsSection({super.key});
@@ -343,7 +347,7 @@ class _QueueSettingsSectionState extends ConsumerState<QueueSettingsSection> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: theme.colorScheme.outline.withOpacity(0.3),
+                      color: theme.colorScheme.outline.withValues(alpha: 0.3),
                     ),
                   ),
                   child: ClipOval(

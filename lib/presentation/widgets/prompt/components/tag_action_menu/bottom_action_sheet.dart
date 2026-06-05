@@ -107,11 +107,11 @@ class _TagBottomActionSheetState extends State<TagBottomActionSheet> {
         filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
         child: Container(
           decoration: BoxDecoration(
-            color: theme.colorScheme.surface.withOpacity(0.95),
+            color: theme.colorScheme.surface.withValues(alpha: 0.95),
             borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
             border: Border(
               top: BorderSide(
-                color: theme.colorScheme.outline.withOpacity(0.1),
+                color: theme.colorScheme.outline.withValues(alpha: 0.1),
               ),
             ),
           ),
@@ -126,7 +126,7 @@ class _TagBottomActionSheetState extends State<TagBottomActionSheet> {
                     height: 4,
                     margin: const EdgeInsets.only(top: 12, bottom: 16),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.onSurface.withOpacity(0.2),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -159,10 +159,10 @@ class _TagBottomActionSheetState extends State<TagBottomActionSheet> {
       margin: const EdgeInsets.symmetric(horizontal: 20),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: tagColor.withOpacity(0.12),
+        color: tagColor.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: tagColor.withOpacity(0.3),
+          color: tagColor.withValues(alpha: 0.3),
         ),
       ),
       child: Row(
@@ -179,7 +179,7 @@ class _TagBottomActionSheetState extends State<TagBottomActionSheet> {
                     fontWeight: FontWeight.w600,
                     color: widget.tag.enabled
                         ? theme.colorScheme.onSurface
-                        : theme.colorScheme.onSurface.withOpacity(0.5),
+                        : theme.colorScheme.onSurface.withValues(alpha: 0.5),
                     decoration:
                         widget.tag.enabled ? null : TextDecoration.lineThrough,
                   ),
@@ -190,7 +190,7 @@ class _TagBottomActionSheetState extends State<TagBottomActionSheet> {
                     widget.tag.translation!,
                     style: TextStyle(
                       fontSize: 13,
-                      color: theme.colorScheme.onSurface.withOpacity(0.6),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                   ),
                 ],
@@ -201,7 +201,7 @@ class _TagBottomActionSheetState extends State<TagBottomActionSheet> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: tagColor.withOpacity(0.2),
+              color: tagColor.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(6),
             ),
             child: Text(
@@ -257,7 +257,7 @@ class _TagBottomActionSheetState extends State<TagBottomActionSheet> {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: theme.colorScheme.onSurface.withOpacity(0.8),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
                 ),
               ),
               // 权重值和重置按钮
@@ -268,9 +268,11 @@ class _TagBottomActionSheetState extends State<TagBottomActionSheet> {
                         const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: isIncrease
-                          ? PromptTagColors.weightIncrease.withOpacity(0.15)
+                          ? PromptTagColors.weightIncrease
+                              .withValues(alpha: 0.15)
                           : isDecrease
-                              ? PromptTagColors.weightDecrease.withOpacity(0.15)
+                              ? PromptTagColors.weightDecrease
+                                  .withValues(alpha: 0.15)
                               : theme.colorScheme.surfaceContainerHighest,
                       borderRadius: BorderRadius.circular(6),
                     ),
@@ -307,7 +309,8 @@ class _TagBottomActionSheetState extends State<TagBottomActionSheet> {
                           context.l10n.weight_reset,
                           style: TextStyle(
                             fontSize: 12,
-                            color: theme.colorScheme.onSurface.withOpacity(0.6),
+                            color: theme.colorScheme.onSurface
+                                .withValues(alpha: 0.6),
                           ),
                         ),
                       ),
@@ -338,7 +341,7 @@ class _TagBottomActionSheetState extends State<TagBottomActionSheet> {
                       : isDecrease
                           ? PromptTagColors.weightDecrease
                           : theme.colorScheme.primary)
-                  .withOpacity(0.2),
+                  .withValues(alpha: 0.2),
               thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
             ),
             child: Slider(
@@ -362,21 +365,21 @@ class _TagBottomActionSheetState extends State<TagBottomActionSheet> {
                 '${(PromptTag.minWeight * 100).round()}%',
                 style: TextStyle(
                   fontSize: 11,
-                  color: theme.colorScheme.onSurface.withOpacity(0.4),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
                 ),
               ),
               Text(
                 '100%',
                 style: TextStyle(
                   fontSize: 11,
-                  color: theme.colorScheme.onSurface.withOpacity(0.4),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
                 ),
               ),
               Text(
                 '${(PromptTag.maxWeight * 100).round()}%',
                 style: TextStyle(
                   fontSize: 11,
-                  color: theme.colorScheme.onSurface.withOpacity(0.4),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
                 ),
               ),
             ],
@@ -500,26 +503,27 @@ class _ActionButton extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
             color: isDestructive
-                ? theme.colorScheme.error.withOpacity(0.1)
-                : theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                ? theme.colorScheme.error.withValues(alpha: 0.1)
+                : theme.colorScheme.surfaceContainerHighest
+                    .withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: isDestructive
-                  ? theme.colorScheme.error.withOpacity(0.3)
-                  : theme.colorScheme.outline.withOpacity(0.1),
+                  ? theme.colorScheme.error.withValues(alpha: 0.3)
+                  : theme.colorScheme.outline.withValues(alpha: 0.1),
             ),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 22, color: color.withOpacity(0.8)),
+              Icon(icon, size: 22, color: color.withValues(alpha: 0.8)),
               const SizedBox(height: 4),
               Text(
                 label,
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
-                  color: color.withOpacity(0.8),
+                  color: color.withValues(alpha: 0.8),
                 ),
               ),
             ],

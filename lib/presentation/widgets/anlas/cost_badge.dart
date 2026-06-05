@@ -28,15 +28,16 @@ class CostBadge extends ConsumerWidget {
     String displayText;
 
     if (isFree) {
-      backgroundColor = Colors.green.withOpacity(0.15);
+      backgroundColor = Colors.green.withValues(alpha: 0.15);
       textColor = Colors.green;
       displayText = 'FREE';
     } else if (isInsufficient) {
-      backgroundColor = theme.colorScheme.errorContainer.withOpacity(0.5);
+      backgroundColor = theme.colorScheme.errorContainer.withValues(alpha: 0.5);
       textColor = theme.colorScheme.error;
       displayText = cost.toString();
     } else {
-      backgroundColor = theme.colorScheme.primaryContainer.withOpacity(0.5);
+      backgroundColor =
+          theme.colorScheme.primaryContainer.withValues(alpha: 0.5);
       textColor = theme.colorScheme.primary;
       displayText = cost.toString();
     }

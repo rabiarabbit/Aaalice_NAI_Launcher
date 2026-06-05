@@ -180,7 +180,7 @@ class _VibeBulkTagDialogState extends ConsumerState<VibeBulkTagDialog> {
             Icon(
               Icons.label_off_outlined,
               size: 48,
-              color: theme.colorScheme.outline.withOpacity(0.5),
+              color: theme.colorScheme.outline.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 12),
             Text(
@@ -193,7 +193,7 @@ class _VibeBulkTagDialogState extends ConsumerState<VibeBulkTagDialog> {
             Text(
               '添加标签以方便筛选和管理',
               style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.outline.withOpacity(0.7),
+                color: theme.colorScheme.outline.withValues(alpha: 0.7),
               ),
             ),
           ],
@@ -212,7 +212,8 @@ class _VibeBulkTagDialogState extends ConsumerState<VibeBulkTagDialog> {
         Expanded(
           child: Container(
             decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
+              color: theme.colorScheme.surfaceContainerHighest
+                  .withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(8),
             ),
             child: ListView.builder(
@@ -239,7 +240,7 @@ class _VibeBulkTagDialogState extends ConsumerState<VibeBulkTagDialog> {
           const SizedBox(height: 8),
           Container(
             decoration: BoxDecoration(
-              color: theme.colorScheme.errorContainer.withOpacity(0.3),
+              color: theme.colorScheme.errorContainer.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Column(

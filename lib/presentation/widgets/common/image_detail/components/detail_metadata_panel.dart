@@ -294,7 +294,7 @@ class _DetailMetadataPanelState extends State<DetailMetadataPanel> {
             Icon(
               Icons.info_outline,
               size: 48,
-              color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 16),
             Text(
@@ -545,7 +545,7 @@ class _MetadataContent extends StatelessWidget {
               tags: fixedNegativeTags,
               initiallyExpanded: false,
               contentColor:
-                  Theme.of(context).colorScheme.error.withOpacity(0.8),
+                  Theme.of(context).colorScheme.error.withValues(alpha: 0.8),
               borderColor: Theme.of(context).colorScheme.error,
             ),
           ],
@@ -589,7 +589,7 @@ class _MetadataContent extends StatelessWidget {
               tags: negativeTags,
               initiallyExpanded: false,
               contentColor:
-                  Theme.of(context).colorScheme.error.withOpacity(0.8),
+                  Theme.of(context).colorScheme.error.withValues(alpha: 0.8),
               borderColor: Theme.of(context).colorScheme.error,
             ),
           ],
@@ -625,7 +625,8 @@ class _MetadataContent extends StatelessWidget {
             content: negativePrompt,
             tags: negativeTags,
             initiallyExpanded: false,
-            contentColor: Theme.of(context).colorScheme.error.withOpacity(0.8),
+            contentColor:
+                Theme.of(context).colorScheme.error.withValues(alpha: 0.8),
             borderColor: Theme.of(context).colorScheme.error,
           ),
         ],
@@ -771,10 +772,10 @@ class _InfoSection extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: colorScheme.surfaceContainerHighest.withOpacity(0.3),
+            color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: colorScheme.outline.withOpacity(0.1),
+              color: colorScheme.outline.withValues(alpha: 0.1),
             ),
           ),
           child: Column(
@@ -941,13 +942,13 @@ class _ActionButtonState extends State<_ActionButton> {
           padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: BoxDecoration(
             color: _isHovered
-                ? colorScheme.primary.withOpacity(0.1)
-                : colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                ? colorScheme.primary.withValues(alpha: 0.1)
+                : colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
               color: _isHovered
-                  ? colorScheme.primary.withOpacity(0.3)
-                  : colorScheme.outline.withOpacity(0.15),
+                  ? colorScheme.primary.withValues(alpha: 0.3)
+                  : colorScheme.outline.withValues(alpha: 0.15),
             ),
           ),
           child: Row(

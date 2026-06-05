@@ -107,7 +107,7 @@ class _PostDetailDialogState extends ConsumerState<PostDetailDialog>
             borderRadius: BorderRadius.circular(6),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.3),
+                color: Colors.black.withValues(alpha: 0.3),
                 blurRadius: 20,
                 spreadRadius: 5,
               ),
@@ -142,7 +142,8 @@ class _PostDetailDialogState extends ConsumerState<PostDetailDialog>
           width: 320,
           decoration: BoxDecoration(
             border: Border(
-              left: BorderSide(color: theme.dividerColor.withOpacity(0.3)),
+              left:
+                  BorderSide(color: theme.dividerColor.withValues(alpha: 0.3)),
             ),
           ),
           child: _buildInfoPanel(theme, authState, isFavorited),
@@ -255,7 +256,7 @@ class _PostDetailDialogState extends ConsumerState<PostDetailDialog>
                 onPressed: _close,
                 icon: const Icon(Icons.close),
                 style: IconButton.styleFrom(
-                  backgroundColor: Colors.black.withOpacity(0.5),
+                  backgroundColor: Colors.black.withValues(alpha: 0.5),
                   foregroundColor: Colors.white,
                 ),
               ),
@@ -269,7 +270,7 @@ class _PostDetailDialogState extends ConsumerState<PostDetailDialog>
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.5),
+                    color: Colors.black.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: const Row(
@@ -783,7 +784,7 @@ void showPostDetailDialog(
 }) {
   showDialog(
     context: context,
-    barrierColor: Colors.black.withOpacity(0.7),
+    barrierColor: Colors.black.withValues(alpha: 0.7),
     builder: (context) => PostDetailDialog(
       post: post,
       onTagTap: onTagTap,

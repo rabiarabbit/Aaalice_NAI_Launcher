@@ -124,14 +124,14 @@ class _ConditionalBranchPanelState extends State<ConditionalBranchPanel> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                colorScheme.secondary.withOpacity(0.2),
-                colorScheme.secondary.withOpacity(0.1),
+                colorScheme.secondary.withValues(alpha: 0.2),
+                colorScheme.secondary.withValues(alpha: 0.1),
               ],
             ),
             borderRadius: BorderRadius.circular(10),
             boxShadow: [
               BoxShadow(
-                color: colorScheme.secondary.withOpacity(0.1),
+                color: colorScheme.secondary.withValues(alpha: 0.1),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -167,7 +167,7 @@ class _ConditionalBranchPanelState extends State<ConditionalBranchPanel> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: colorScheme.secondaryContainer.withOpacity(0.5),
+              color: colorScheme.secondaryContainer.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
@@ -188,12 +188,12 @@ class _ConditionalBranchPanelState extends State<ConditionalBranchPanel> {
 
     // 渐变色组合
     final gradients = [
-      [colorScheme.primary, colorScheme.primary.withOpacity(0.7)],
-      [colorScheme.secondary, colorScheme.secondary.withOpacity(0.7)],
-      [colorScheme.tertiary, colorScheme.tertiary.withOpacity(0.7)],
-      [Colors.orange, Colors.orange.withOpacity(0.7)],
-      [Colors.purple, Colors.purple.withOpacity(0.7)],
-      [Colors.teal, Colors.teal.withOpacity(0.7)],
+      [colorScheme.primary, colorScheme.primary.withValues(alpha: 0.7)],
+      [colorScheme.secondary, colorScheme.secondary.withValues(alpha: 0.7)],
+      [colorScheme.tertiary, colorScheme.tertiary.withValues(alpha: 0.7)],
+      [Colors.orange, Colors.orange.withValues(alpha: 0.7)],
+      [Colors.purple, Colors.purple.withValues(alpha: 0.7)],
+      [Colors.teal, Colors.teal.withValues(alpha: 0.7)],
     ];
 
     final total =
@@ -234,13 +234,13 @@ class _ConditionalBranchPanelState extends State<ConditionalBranchPanel> {
                             colors: isSelected
                                 ? colors
                                 : [
-                                    colors[0].withOpacity(0.6),
-                                    colors[1].withOpacity(0.4),
+                                    colors[0].withValues(alpha: 0.6),
+                                    colors[1].withValues(alpha: 0.4),
                                   ],
                           ),
                           border: isSelected
                               ? Border.all(
-                                  color: Colors.white.withOpacity(0.5),
+                                  color: Colors.white.withValues(alpha: 0.5),
                                   width: 2,
                                 )
                               : null,
@@ -268,7 +268,8 @@ class _ConditionalBranchPanelState extends State<ConditionalBranchPanel> {
                                     Text(
                                       '$percent%',
                                       style: TextStyle(
-                                        color: Colors.white.withOpacity(0.9),
+                                        color:
+                                            Colors.white.withValues(alpha: 0.9),
                                         fontSize: 9,
                                         fontWeight: FontWeight.w500,
                                       ),
@@ -353,7 +354,7 @@ class _ConditionalBranchPanelState extends State<ConditionalBranchPanel> {
         itemCount: _config.branches.length,
         separatorBuilder: (_, __) => Divider(
           height: 1,
-          color: colorScheme.outline.withOpacity(0.1),
+          color: colorScheme.outline.withValues(alpha: 0.1),
         ),
         itemBuilder: (context, index) {
           final branch = _config.branches[index];
@@ -362,7 +363,7 @@ class _ConditionalBranchPanelState extends State<ConditionalBranchPanel> {
 
           return Material(
             color: isSelected
-                ? colorScheme.primaryContainer.withOpacity(0.3)
+                ? colorScheme.primaryContainer.withValues(alpha: 0.3)
                 : Colors.transparent,
             child: InkWell(
               onTap: () => setState(() => _selectedIndex = index),
@@ -380,7 +381,10 @@ class _ConditionalBranchPanelState extends State<ConditionalBranchPanel> {
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                           colors: branch.enabled
-                              ? [accentColor, accentColor.withOpacity(0.7)]
+                              ? [
+                                  accentColor,
+                                  accentColor.withValues(alpha: 0.7),
+                                ]
                               : [
                                   colorScheme.surfaceContainerHighest,
                                   colorScheme.surfaceContainerHighest,
@@ -390,7 +394,7 @@ class _ConditionalBranchPanelState extends State<ConditionalBranchPanel> {
                         boxShadow: branch.enabled
                             ? [
                                 BoxShadow(
-                                  color: accentColor.withOpacity(0.3),
+                                  color: accentColor.withValues(alpha: 0.3),
                                   blurRadius: 8,
                                   offset: const Offset(0, 2),
                                 ),
@@ -440,7 +444,8 @@ class _ConditionalBranchPanelState extends State<ConditionalBranchPanel> {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: colorScheme.errorContainer.withOpacity(0.5),
+                          color:
+                              colorScheme.errorContainer.withValues(alpha: 0.5),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
@@ -455,7 +460,7 @@ class _ConditionalBranchPanelState extends State<ConditionalBranchPanel> {
                       IconButton(
                         icon: Icon(
                           Icons.delete_outline_rounded,
-                          color: colorScheme.error.withOpacity(0.7),
+                          color: colorScheme.error.withValues(alpha: 0.7),
                         ),
                         onPressed: () => _removeBranch(index),
                         tooltip: '删除分支',
@@ -485,7 +490,7 @@ class _ConditionalBranchPanelState extends State<ConditionalBranchPanel> {
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             decoration: BoxDecoration(
               border: Border.all(
-                color: colorScheme.primary.withOpacity(0.5),
+                color: colorScheme.primary.withValues(alpha: 0.5),
                 width: 1.5,
               ),
               borderRadius: BorderRadius.circular(10),
@@ -526,8 +531,8 @@ class _ConditionalBranchPanelState extends State<ConditionalBranchPanel> {
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         colors: [
-          colorScheme.primary.withOpacity(0.5),
-          colorScheme.secondary.withOpacity(0.3),
+          colorScheme.primary.withValues(alpha: 0.5),
+          colorScheme.secondary.withValues(alpha: 0.3),
         ],
       ),
       gradientBorderWidth: 1.5,
@@ -541,7 +546,7 @@ class _ConditionalBranchPanelState extends State<ConditionalBranchPanel> {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: colorScheme.primaryContainer.withOpacity(0.5),
+                  color: colorScheme.primaryContainer.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Icon(
@@ -591,7 +596,7 @@ class _ConditionalBranchPanelState extends State<ConditionalBranchPanel> {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: colorScheme.tertiaryContainer.withOpacity(0.5),
+                  color: colorScheme.tertiaryContainer.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Icon(
@@ -629,8 +634,8 @@ class _ConditionalBranchPanelState extends State<ConditionalBranchPanel> {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      colorScheme.tertiary.withOpacity(0.15),
-                      colorScheme.tertiary.withOpacity(0.08),
+                      colorScheme.tertiary.withValues(alpha: 0.15),
+                      colorScheme.tertiary.withValues(alpha: 0.08),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(8),

@@ -213,7 +213,7 @@ class _CredentialsLoginFormState extends ConsumerState<CredentialsLoginForm> {
                           color: Theme.of(context)
                               .colorScheme
                               .onErrorContainer
-                              .withOpacity(0.8),
+                              .withValues(alpha: 0.8),
                           fontSize: 12,
                         ),
                       ),

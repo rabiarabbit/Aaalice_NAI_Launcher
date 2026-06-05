@@ -277,13 +277,17 @@ class ComfyUITask extends _$ComfyUITask {
         uploadedFiles: uploadedFiles,
       );
       AppLogger.d(
-          'Validating workflow node types for template=$templateId', _tag);
+        'Validating workflow node types for template=$templateId',
+        _tag,
+      );
       await manager.validateWorkflowNodeTypes(
         api: conn.api!,
         workflow: workflow,
       );
       AppLogger.d(
-          'Workflow node validation passed: template=$templateId', _tag);
+        'Workflow node validation passed: template=$templateId',
+        _tag,
+      );
 
       // 4. 提交工作流
       state = state.copyWith(status: ComfyUITaskStatus.queued);

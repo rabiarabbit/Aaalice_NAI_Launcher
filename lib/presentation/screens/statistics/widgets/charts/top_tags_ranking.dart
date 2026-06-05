@@ -128,10 +128,10 @@ class _TagRankRow extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(
-            color: colorScheme.surfaceContainerLow.withOpacity(0.3),
+            color: colorScheme.surfaceContainerLow.withValues(alpha: 0.3),
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
-              color: colorScheme.outlineVariant.withOpacity(0.15),
+              color: colorScheme.outlineVariant.withValues(alpha: 0.15),
             ),
           ),
           child: Row(
@@ -154,10 +154,10 @@ class _TagRankRow extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: rankColor.withOpacity(0.1),
+                    color: rankColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(6),
                     border: Border.all(
-                      color: rankColor.withOpacity(0.3),
+                      color: rankColor.withValues(alpha: 0.3),
                     ),
                   ),
                   child: Text(

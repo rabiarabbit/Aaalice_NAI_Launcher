@@ -55,7 +55,7 @@ class ThemedContainer extends StatelessWidget {
       decoration: effectiveDecoration.copyWith(
         // 如果启用了模糊，背景色应该由内部 Container 处理或者半透明
         color: blur > 0
-            ? effectiveDecoration.color?.withOpacity(0.5)
+            ? effectiveDecoration.color?.withValues(alpha: 0.5)
             : effectiveDecoration.color,
       ),
       child: child,
@@ -75,7 +75,7 @@ class ThemedContainer extends StatelessWidget {
               height: height,
               padding: padding,
               decoration: effectiveDecoration.copyWith(
-                color: effectiveDecoration.color?.withOpacity(0.3) ??
+                color: effectiveDecoration.color?.withValues(alpha: 0.3) ??
                     Colors.transparent,
               ),
               child: child,

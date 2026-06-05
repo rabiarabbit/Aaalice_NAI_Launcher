@@ -363,8 +363,9 @@ class GalleryCategoryRepository {
       }
 
       final newParentDir = Directory(p.dirname(newAbsolutePath));
-      if (!await newParentDir.exists())
+      if (!await newParentDir.exists()) {
         await newParentDir.create(recursive: true);
+      }
 
       await oldDir.rename(newAbsolutePath);
 
@@ -442,7 +443,9 @@ class GalleryCategoryRepository {
 
   /// 移动图片到分类
   Future<String?> moveImageToCategory(
-      String imagePath, GalleryCategory? targetCategory) async {
+    String imagePath,
+    GalleryCategory? targetCategory,
+  ) async {
     final rootPath = await getRootPath();
     if (rootPath == null) return null;
 
@@ -463,8 +466,10 @@ class GalleryCategoryRepository {
       if (await File(targetPath).exists()) {
         final baseName = p.basenameWithoutExtension(fileName);
         final ext = p.extension(fileName);
-        targetPath = p.join(targetDir,
-            '${baseName}_${DateTime.now().millisecondsSinceEpoch}$ext');
+        targetPath = p.join(
+          targetDir,
+          '${baseName}_${DateTime.now().millisecondsSinceEpoch}$ext',
+        );
       }
 
       await file.rename(targetPath);
@@ -477,11 +482,14 @@ class GalleryCategoryRepository {
 
   /// 批量移动图片到分类
   Future<int> moveImagesToCategory(
-      List<String> imagePaths, GalleryCategory? targetCategory) async {
+    List<String> imagePaths,
+    GalleryCategory? targetCategory,
+  ) async {
     int successCount = 0;
     for (final imagePath in imagePaths) {
-      if (await moveImageToCategory(imagePath, targetCategory) != null)
+      if (await moveImageToCategory(imagePath, targetCategory) != null) {
         successCount++;
+      }
     }
     return successCount;
   }
@@ -639,8 +647,10 @@ class GalleryCategoryRepository {
     }
   }
 
-  Future<int> _countImagesInFolder(String folderPath,
-      {bool recursive = false}) async {
+  Future<int> _countImagesInFolder(
+    String folderPath, {
+    bool recursive = false,
+  }) async {
     int count = 0;
     try {
       await for (final entity in Directory(folderPath)
@@ -653,7 +663,9 @@ class GalleryCategoryRepository {
       }
     } catch (e) {
       AppLogger.w(
-          'Failed to get total image count', 'GalleryCategoryRepository');
+        'Failed to get total image count',
+        'GalleryCategoryRepository',
+      );
     }
     return count;
   }

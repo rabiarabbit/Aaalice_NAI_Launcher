@@ -381,10 +381,10 @@ class _VibeExportDialogAdvancedState
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         border: Border.all(
-          color: theme.colorScheme.primary.withOpacity(0.3),
+          color: theme.colorScheme.primary.withValues(alpha: 0.3),
         ),
         borderRadius: BorderRadius.circular(12),
-        color: theme.colorScheme.primaryContainer.withOpacity(0.1),
+        color: theme.colorScheme.primaryContainer.withValues(alpha: 0.1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1238,7 +1238,7 @@ class _OptionCard extends StatelessWidget {
         decoration: BoxDecoration(
           border: Border.all(
             color: isDisabled
-                ? theme.colorScheme.outlineVariant.withOpacity(0.3)
+                ? theme.colorScheme.outlineVariant.withValues(alpha: 0.3)
                 : isSelected
                     ? theme.colorScheme.primary
                     : theme.colorScheme.outlineVariant,
@@ -1246,9 +1246,9 @@ class _OptionCard extends StatelessWidget {
           ),
           borderRadius: BorderRadius.circular(12),
           color: isDisabled
-              ? theme.colorScheme.surfaceContainerHighest.withOpacity(0.3)
+              ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3)
               : isSelected
-                  ? theme.colorScheme.primaryContainer.withOpacity(0.2)
+                  ? theme.colorScheme.primaryContainer.withValues(alpha: 0.2)
                   : theme.colorScheme.surface,
         ),
         child: Column(
@@ -1263,7 +1263,7 @@ class _OptionCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     border: Border.all(
                       color: isDisabled
-                          ? theme.colorScheme.outline.withOpacity(0.3)
+                          ? theme.colorScheme.outline.withValues(alpha: 0.3)
                           : isSelected
                               ? theme.colorScheme.primary
                               : theme.colorScheme.outline,
@@ -1295,7 +1295,8 @@ class _OptionCard extends StatelessWidget {
                             icon,
                             size: 20,
                             color: isDisabled
-                                ? theme.colorScheme.outline.withOpacity(0.5)
+                                ? theme.colorScheme.outline
+                                    .withValues(alpha: 0.5)
                                 : isSelected
                                     ? theme.colorScheme.primary
                                     : theme.colorScheme.onSurface,
@@ -1308,7 +1309,7 @@ class _OptionCard extends StatelessWidget {
                                 fontWeight: FontWeight.w600,
                                 color: isDisabled
                                     ? theme.colorScheme.onSurface
-                                        .withOpacity(0.5)
+                                        .withValues(alpha: 0.5)
                                     : isSelected
                                         ? theme.colorScheme.primary
                                         : theme.colorScheme.onSurface,
@@ -1322,7 +1323,7 @@ class _OptionCard extends StatelessWidget {
                         subtitle,
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: isDisabled
-                              ? theme.colorScheme.outline.withOpacity(0.5)
+                              ? theme.colorScheme.outline.withValues(alpha: 0.5)
                               : theme.colorScheme.outline,
                         ),
                       ),

@@ -102,14 +102,14 @@ class _VisibilityRulePanelState extends State<VisibilityRulePanel> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                colorScheme.secondary.withOpacity(0.2),
-                colorScheme.secondary.withOpacity(0.1),
+                colorScheme.secondary.withValues(alpha: 0.2),
+                colorScheme.secondary.withValues(alpha: 0.1),
               ],
             ),
             borderRadius: BorderRadius.circular(10),
             boxShadow: [
               BoxShadow(
-                color: colorScheme.secondary.withOpacity(0.1),
+                color: colorScheme.secondary.withValues(alpha: 0.1),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -145,7 +145,7 @@ class _VisibilityRulePanelState extends State<VisibilityRulePanel> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: colorScheme.secondaryContainer.withOpacity(0.5),
+              color: colorScheme.secondaryContainer.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
@@ -214,7 +214,7 @@ class _VisibilityRulePanelState extends State<VisibilityRulePanel> {
         itemCount: widget.rules.length,
         separatorBuilder: (_, __) => Divider(
           height: 1,
-          color: colorScheme.outline.withOpacity(0.1),
+          color: colorScheme.outline.withValues(alpha: 0.1),
         ),
         itemBuilder: (context, index) {
           final rule = widget.rules[index];
@@ -222,7 +222,7 @@ class _VisibilityRulePanelState extends State<VisibilityRulePanel> {
 
           return Material(
             color: isSelected
-                ? colorScheme.primaryContainer.withOpacity(0.3)
+                ? colorScheme.primaryContainer.withValues(alpha: 0.3)
                 : Colors.transparent,
             child: InkWell(
               onTap: () => setState(() => _selectedIndex = index),
@@ -244,11 +244,13 @@ class _VisibilityRulePanelState extends State<VisibilityRulePanel> {
                                 colors: rule.visibleWhenMatched
                                     ? [
                                         colorScheme.primary,
-                                        colorScheme.primary.withOpacity(0.7),
+                                        colorScheme.primary
+                                            .withValues(alpha: 0.7),
                                       ]
                                     : [
                                         colorScheme.tertiary,
-                                        colorScheme.tertiary.withOpacity(0.7),
+                                        colorScheme.tertiary
+                                            .withValues(alpha: 0.7),
                                       ],
                               )
                             : null,
@@ -262,7 +264,7 @@ class _VisibilityRulePanelState extends State<VisibilityRulePanel> {
                                   color: (rule.visibleWhenMatched
                                           ? colorScheme.primary
                                           : colorScheme.tertiary)
-                                      .withOpacity(0.3),
+                                      .withValues(alpha: 0.3),
                                   blurRadius: 8,
                                   offset: const Offset(0, 2),
                                 ),
@@ -301,7 +303,7 @@ class _VisibilityRulePanelState extends State<VisibilityRulePanel> {
                                 ),
                                 decoration: BoxDecoration(
                                   color: colorScheme.primaryContainer
-                                      .withOpacity(0.5),
+                                      .withValues(alpha: 0.5),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
@@ -329,7 +331,7 @@ class _VisibilityRulePanelState extends State<VisibilityRulePanel> {
                                 ),
                                 decoration: BoxDecoration(
                                   color: colorScheme.secondaryContainer
-                                      .withOpacity(0.5),
+                                      .withValues(alpha: 0.5),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
@@ -354,7 +356,8 @@ class _VisibilityRulePanelState extends State<VisibilityRulePanel> {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: colorScheme.errorContainer.withOpacity(0.5),
+                          color:
+                              colorScheme.errorContainer.withValues(alpha: 0.5),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
@@ -369,7 +372,7 @@ class _VisibilityRulePanelState extends State<VisibilityRulePanel> {
                       IconButton(
                         icon: Icon(
                           Icons.delete_outline_rounded,
-                          color: colorScheme.error.withOpacity(0.7),
+                          color: colorScheme.error.withValues(alpha: 0.7),
                         ),
                         onPressed: () => _removeRule(index),
                         tooltip: '删除规则',
@@ -399,7 +402,7 @@ class _VisibilityRulePanelState extends State<VisibilityRulePanel> {
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             decoration: BoxDecoration(
               border: Border.all(
-                color: colorScheme.primary.withOpacity(0.5),
+                color: colorScheme.primary.withValues(alpha: 0.5),
                 width: 1.5,
               ),
               borderRadius: BorderRadius.circular(10),
@@ -440,8 +443,8 @@ class _VisibilityRulePanelState extends State<VisibilityRulePanel> {
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         colors: [
-          colorScheme.secondary.withOpacity(0.5),
-          colorScheme.primary.withOpacity(0.3),
+          colorScheme.secondary.withValues(alpha: 0.5),
+          colorScheme.primary.withValues(alpha: 0.3),
         ],
       ),
       gradientBorderWidth: 1.5,
@@ -455,7 +458,7 @@ class _VisibilityRulePanelState extends State<VisibilityRulePanel> {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: colorScheme.secondaryContainer.withOpacity(0.5),
+                  color: colorScheme.secondaryContainer.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Icon(
@@ -528,7 +531,7 @@ class _VisibilityRulePanelState extends State<VisibilityRulePanel> {
           const SizedBox(height: 16),
           // 条件类型
           DropdownButtonFormField<VisibilityConditionType>(
-            value: rule.conditionType,
+            initialValue: rule.conditionType,
             decoration: InputDecoration(
               labelText: '条件类型',
               prefixIcon: Icon(
@@ -662,7 +665,7 @@ class _VisibilityRulePanelState extends State<VisibilityRulePanel> {
 
     if (widget.availableCategories.isNotEmpty) {
       return DropdownButtonFormField<String>(
-        value: value.isNotEmpty ? value : null,
+        initialValue: value.isNotEmpty ? value : null,
         decoration: InputDecoration(
           labelText: label,
           prefixIcon: Icon(icon, color: colorScheme.onSurfaceVariant),

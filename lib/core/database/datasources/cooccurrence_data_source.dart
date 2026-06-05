@@ -74,11 +74,17 @@ class CooccurrenceDataSource {
 
       // 验证数据
       final count = await getCount();
-      AppLogger.i('Cooccurrence data source initialized with $count records',
-          'CooccurrenceDS');
+      AppLogger.i(
+        'Cooccurrence data source initialized with $count records',
+        'CooccurrenceDS',
+      );
     } catch (e, stack) {
-      AppLogger.e('Failed to initialize CooccurrenceDataSource', e, stack,
-          'CooccurrenceDS');
+      AppLogger.e(
+        'Failed to initialize CooccurrenceDataSource',
+        e,
+        stack,
+        'CooccurrenceDS',
+      );
       rethrow;
     }
   }

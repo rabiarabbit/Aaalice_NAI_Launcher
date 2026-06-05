@@ -46,10 +46,10 @@ void main() {
             ),
           ),
         ],
-        child: MaterialApp(
+        child: const MaterialApp(
           supportedLocales: AppLocalizations.supportedLocales,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
-          home: const Scaffold(
+          home: Scaffold(
             body: SizedBox(
               width: 960,
               height: 420,

@@ -144,11 +144,11 @@ class _TagLibraryToolbarState extends ConsumerState<TagLibraryToolbar> {
           constraints: const BoxConstraints(minHeight: 62),
           decoration: BoxDecoration(
             color: isDark
-                ? theme.colorScheme.surfaceContainerHigh.withOpacity(0.9)
-                : theme.colorScheme.surface.withOpacity(0.8),
+                ? theme.colorScheme.surfaceContainerHigh.withValues(alpha: 0.9)
+                : theme.colorScheme.surface.withValues(alpha: 0.8),
             border: Border(
               bottom: BorderSide(
-                color: theme.dividerColor.withOpacity(isDark ? 0.2 : 0.3),
+                color: theme.dividerColor.withValues(alpha: isDark ? 0.2 : 0.3),
               ),
             ),
           ),
@@ -182,7 +182,7 @@ class _TagLibraryToolbarState extends ConsumerState<TagLibraryToolbar> {
               Container(
                 width: 1,
                 height: 24,
-                color: theme.dividerColor.withOpacity(0.3),
+                color: theme.dividerColor.withValues(alpha: 0.3),
               ),
               const SizedBox(width: 8),
 
@@ -229,7 +229,7 @@ class _TagLibraryToolbarState extends ConsumerState<TagLibraryToolbar> {
     return Container(
       height: 36,
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.4),
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
         borderRadius: BorderRadius.circular(18),
       ),
       child: TextField(
@@ -239,20 +239,21 @@ class _TagLibraryToolbarState extends ConsumerState<TagLibraryToolbar> {
         decoration: InputDecoration(
           hintText: context.l10n.tagLibrary_searchHint,
           hintStyle: TextStyle(
-            color: theme.colorScheme.onSurfaceVariant.withOpacity(0.5),
+            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
             fontSize: 13,
           ),
           prefixIcon: Icon(
             Icons.search,
             size: 18,
-            color: theme.colorScheme.onSurfaceVariant.withOpacity(0.6),
+            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
           ),
           suffixIcon: state.searchQuery.isNotEmpty
               ? IconButton(
                   icon: Icon(
                     Icons.close,
                     size: 16,
-                    color: theme.colorScheme.onSurfaceVariant.withOpacity(0.6),
+                    color: theme.colorScheme.onSurfaceVariant
+                        .withValues(alpha: 0.6),
                   ),
                   onPressed: () {
                     _searchController.clear();
@@ -279,7 +280,7 @@ class _TagLibraryToolbarState extends ConsumerState<TagLibraryToolbar> {
   Widget _buildViewModeToggle(ThemeData theme, TagLibraryPageState state) {
     return Container(
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.4),
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -317,10 +318,10 @@ class _TagLibraryToolbarState extends ConsumerState<TagLibraryToolbar> {
       height: 36,
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.4),
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: theme.colorScheme.outline.withOpacity(0.1),
+          color: theme.colorScheme.outline.withValues(alpha: 0.1),
           width: 1,
         ),
       ),
@@ -404,7 +405,7 @@ class _ViewModeButton extends StatelessWidget {
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
             color: isSelected
-                ? theme.colorScheme.primaryContainer.withOpacity(0.5)
+                ? theme.colorScheme.primaryContainer.withValues(alpha: 0.5)
                 : null,
             borderRadius: BorderRadius.circular(8),
           ),
@@ -413,7 +414,7 @@ class _ViewModeButton extends StatelessWidget {
             size: 18,
             color: isSelected
                 ? theme.colorScheme.primary
-                : theme.colorScheme.onSurfaceVariant.withOpacity(0.6),
+                : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
           ),
         ),
       ),
@@ -479,27 +480,29 @@ class _CompactIconButtonState extends State<_CompactIconButton>
         ? (_isHovered
             ? theme.colorScheme.primary
             : theme.colorScheme.onSurfaceVariant
-                .withOpacity(isDark ? 0.85 : 0.75))
-        : theme.colorScheme.onSurfaceVariant.withOpacity(0.35);
+                .withValues(alpha: isDark ? 0.85 : 0.75))
+        : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.35);
     labelColor = isEnabled
         ? (_isHovered
             ? theme.colorScheme.primary
-            : theme.colorScheme.onSurface.withOpacity(isDark ? 0.85 : 0.75))
-        : theme.colorScheme.onSurface.withOpacity(0.35);
+            : theme.colorScheme.onSurface
+                .withValues(alpha: isDark ? 0.85 : 0.75))
+        : theme.colorScheme.onSurface.withValues(alpha: 0.35);
     bgColor = _isPressed
-        ? theme.colorScheme.primary.withOpacity(isDark ? 0.2 : 0.14)
+        ? theme.colorScheme.primary.withValues(alpha: isDark ? 0.2 : 0.14)
         : (_isHovered
-            ? theme.colorScheme.primary.withOpacity(isDark ? 0.14 : 0.08)
+            ? theme.colorScheme.primary.withValues(alpha: isDark ? 0.14 : 0.08)
             : (isDark
-                ? Colors.white.withOpacity(0.04)
-                : Colors.white.withOpacity(0.6)));
+                ? Colors.white.withValues(alpha: 0.04)
+                : Colors.white.withValues(alpha: 0.6)));
     borderColor = _isHovered
-        ? theme.colorScheme.primary.withOpacity(isDark ? 0.5 : 0.35)
-        : theme.colorScheme.outline.withOpacity(isDark ? 0.2 : 0.15);
+        ? theme.colorScheme.primary.withValues(alpha: isDark ? 0.5 : 0.35)
+        : theme.colorScheme.outline.withValues(alpha: isDark ? 0.2 : 0.15);
     if (_isHovered && isEnabled) {
       shadows = [
         BoxShadow(
-          color: theme.colorScheme.shadow.withOpacity(isDark ? 0.15 : 0.08),
+          color:
+              theme.colorScheme.shadow.withValues(alpha: isDark ? 0.15 : 0.08),
           blurRadius: 6,
           spreadRadius: 0,
           offset: const Offset(0, 2),

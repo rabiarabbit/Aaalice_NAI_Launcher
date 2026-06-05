@@ -27,13 +27,13 @@ class ThemedBorder {
 
     // 优先使用主题扩展中的 dividerColor
     if (extension?.dividerColor != null) {
-      return extension!.dividerColor.withOpacity(opacity);
+      return extension!.dividerColor.withValues(alpha: opacity);
     }
 
     // 回退到默认颜色
     return isDark
-        ? Colors.white.withOpacity(opacity)
-        : Colors.black.withOpacity(opacity);
+        ? Colors.white.withValues(alpha: opacity)
+        : Colors.black.withValues(alpha: opacity);
   }
 
   /// 获取主题感知的 BorderSide

@@ -92,8 +92,8 @@ class _AutoSaveToggleChipState extends ConsumerState<AutoSaveToggleChip>
                         end: Alignment.bottomRight,
                         colors: isDark
                             ? [
-                                _cuteOrangeDark.withOpacity(0.25),
-                                _cuteOrange.withOpacity(0.18),
+                                _cuteOrangeDark.withValues(alpha: 0.25),
+                                _cuteOrange.withValues(alpha: 0.18),
                               ]
                             : [_cuteOrangeLight, _cuteOrangeBg],
                       )
@@ -107,15 +107,15 @@ class _AutoSaveToggleChipState extends ConsumerState<AutoSaveToggleChip>
                 border: Border.all(
                   color: isEnabled
                       ? (_isHovering ? _cuteOrangeDark : _cuteOrange)
-                          .withOpacity(isDark ? 0.5 : 0.6)
+                          .withValues(alpha: isDark ? 0.5 : 0.6)
                       : theme.colorScheme.outline
-                          .withOpacity(_isHovering ? 0.3 : 0.15),
+                          .withValues(alpha: _isHovering ? 0.3 : 0.15),
                   width: isEnabled ? 1.5 : 1,
                 ),
                 boxShadow: isEnabled && _isHovering
                     ? [
                         BoxShadow(
-                          color: _cuteOrange.withOpacity(0.25),
+                          color: _cuteOrange.withValues(alpha: 0.25),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
@@ -169,13 +169,13 @@ class _AutoSaveToggleChipState extends ConsumerState<AutoSaveToggleChip>
             border: Border.all(
               color: isEnabled
                   ? Colors.transparent
-                  : theme.colorScheme.outline.withOpacity(0.4),
+                  : theme.colorScheme.outline.withValues(alpha: 0.4),
               width: 1.5,
             ),
             boxShadow: isEnabled
                 ? [
                     BoxShadow(
-                      color: _cuteOrange.withOpacity(0.4),
+                      color: _cuteOrange.withValues(alpha: 0.4),
                       blurRadius: 4,
                       offset: const Offset(0, 1),
                     ),

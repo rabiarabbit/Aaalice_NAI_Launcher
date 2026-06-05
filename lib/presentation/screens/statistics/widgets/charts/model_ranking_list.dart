@@ -85,10 +85,10 @@ class _ModelRankRow extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: colorScheme.surfaceContainerLow.withOpacity(0.5),
+            color: colorScheme.surfaceContainerLow.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(6),
             border: Border.all(
-              color: colorScheme.outlineVariant.withOpacity(0.2),
+              color: colorScheme.outlineVariant.withValues(alpha: 0.2),
             ),
           ),
           child: Row(
@@ -133,7 +133,7 @@ class _ModelRankRow extends StatelessWidget {
                         value: item.percentage / 100,
                         backgroundColor: colorScheme.surfaceContainerHighest,
                         valueColor: AlwaysStoppedAnimation<Color>(
-                          colorScheme.primary.withOpacity(0.8),
+                          colorScheme.primary.withValues(alpha: 0.8),
                         ),
                         minHeight: 6,
                       ),

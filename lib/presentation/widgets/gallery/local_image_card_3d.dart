@@ -119,7 +119,9 @@ class _LocalImageCard3DState extends ConsumerState<LocalImageCard3D>
       final originalFile = File(path);
       if (!await originalFile.exists()) {
         AppLogger.e(
-            '[CardLoad] Original file NOT FOUND: $path', 'LocalImageCard3D');
+          '[CardLoad] Original file NOT FOUND: $path',
+          'LocalImageCard3D',
+        );
         if (mounted) {
           setState(() => _loadState = _ImageLoadState.error);
         }
@@ -289,7 +291,13 @@ $image = [System.Drawing.Image]::FromFile("''';
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
         curve: Curves.easeOut,
-        transform: Matrix4.identity()..scale(_isHovered ? 1.03 : 1.0),
+        transform: Matrix4.identity()
+          ..scaleByDouble(
+            _isHovered ? 1.03 : 1.0,
+            _isHovered ? 1.03 : 1.0,
+            _isHovered ? 1.03 : 1.0,
+            1,
+          ),
         transformAlignment: Alignment.center,
         child: Container(
           width: widget.width,
@@ -300,20 +308,22 @@ $image = [System.Drawing.Image]::FromFile("''';
                 ? Border.all(color: colorScheme.primary, width: 3)
                 : _isHovered
                     ? Border.all(
-                        color: colorScheme.primary.withOpacity(0.3), width: 2)
+                        color: colorScheme.primary.withValues(alpha: 0.3),
+                        width: 2,
+                      )
                     : null,
             boxShadow: [
               BoxShadow(
                 color: _isHovered
-                    ? Colors.black.withOpacity(0.35)
-                    : Colors.black.withOpacity(0.12),
+                    ? Colors.black.withValues(alpha: 0.35)
+                    : Colors.black.withValues(alpha: 0.12),
                 blurRadius: _isHovered ? 28 : 10,
                 offset: Offset(0, _isHovered ? 14 : 4),
                 spreadRadius: _isHovered ? 2 : 0,
               ),
               if (_isHovered)
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.15),
+                  color: Colors.black.withValues(alpha: 0.15),
                   blurRadius: 40,
                   offset: const Offset(0, 20),
                   spreadRadius: -4,
@@ -366,7 +376,7 @@ $image = [System.Drawing.Image]::FromFile("''';
                     child: IgnorePointer(
                       child: Container(
                         decoration: BoxDecoration(
-                          color: colorScheme.primary.withOpacity(0.15),
+                          color: colorScheme.primary.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
@@ -419,7 +429,9 @@ $image = [System.Drawing.Image]::FromFile("''';
               width: 32,
               height: 32,
               child: CircularProgressIndicator(
-                  strokeWidth: 2, color: Colors.grey[600]),
+                strokeWidth: 2,
+                color: Colors.grey[600],
+              ),
             ),
             const SizedBox(height: 8),
             Text(
@@ -434,21 +446,25 @@ $image = [System.Drawing.Image]::FromFile("''';
 
   Widget _buildErrorPlaceholder() {
     return Container(
-      color: Colors.red[900]?.withOpacity(0.3),
+      color: Colors.red[900]?.withValues(alpha: 0.3),
       child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(Icons.broken_image, color: Colors.red[400], size: 40),
             const SizedBox(height: 8),
-            Text('加载失败',
-                style: TextStyle(color: Colors.red[300], fontSize: 12)),
+            Text(
+              '加载失败',
+              style: TextStyle(color: Colors.red[300], fontSize: 12),
+            ),
             const SizedBox(height: 4),
             TextButton.icon(
               onPressed: _loadThumbnail,
               icon: Icon(Icons.refresh, color: Colors.red[300], size: 16),
-              label: Text('重试',
-                  style: TextStyle(color: Colors.red[300], fontSize: 11)),
+              label: Text(
+                '重试',
+                style: TextStyle(color: Colors.red[300], fontSize: 11),
+              ),
               style: TextButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 minimumSize: Size.zero,
@@ -482,14 +498,18 @@ $image = [System.Drawing.Image]::FromFile("''';
               width: 24,
               height: 24,
               child: CircularProgressIndicator(
-                  strokeWidth: 2, color: Colors.white38),
+                strokeWidth: 2,
+                color: Colors.white38,
+              ),
             ),
           ),
         );
       },
       errorBuilder: (context, error, stackTrace) {
-        AppLogger.w('Image load failed, attempting fallback: $imagePath',
-            'LocalImageCard3D');
+        AppLogger.w(
+          'Image load failed, attempting fallback: $imagePath',
+          'LocalImageCard3D',
+        );
         return _buildErrorFallback(imagePath);
       },
     );
@@ -519,7 +539,9 @@ $image = [System.Drawing.Image]::FromFile("''';
           visible: widget.onFavoriteToggle != null,
         ),
         FloatingActionButtonData(
-            icon: Icons.copy, onTap: _copyImageToClipboard),
+          icon: Icons.copy,
+          onTap: _copyImageToClipboard,
+        ),
         FloatingActionButtonData(
           icon: Icons.send,
           onTap: () => _showSendToHomeMenu(context),
@@ -586,7 +608,7 @@ $image = [System.Drawing.Image]::FromFile("''';
           border: Border.all(color: Colors.white, width: 2),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withValues(alpha: 0.2),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),
@@ -608,8 +630,8 @@ $image = [System.Drawing.Image]::FromFile("''';
           begin: Alignment.bottomCenter,
           end: Alignment.topCenter,
           colors: [
-            Colors.black.withOpacity(0.85),
-            Colors.black.withOpacity(0.4),
+            Colors.black.withValues(alpha: 0.85),
+            Colors.black.withValues(alpha: 0.4),
             Colors.transparent,
           ],
           stops: const [0.0, 0.6, 1.0],
@@ -650,7 +672,7 @@ $image = [System.Drawing.Image]::FromFile("''';
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
+        color: Colors.white.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(4),
       ),
       child:
@@ -708,7 +730,7 @@ class _EdgeGlowPainter extends CustomPainter {
       );
 
       final paint = Paint()
-        ..color = glowColor.withOpacity(0.12 * intensity * (3 - i) / 3)
+        ..color = glowColor.withValues(alpha: 0.12 * intensity * (3 - i) / 3)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2.0
         ..maskFilter = MaskFilter.blur(BlurStyle.normal, (3 - i) * 2.0);
@@ -717,7 +739,7 @@ class _EdgeGlowPainter extends CustomPainter {
     }
 
     final borderPaint = Paint()
-      ..color = glowColor.withOpacity(0.25 * intensity)
+      ..color = glowColor.withValues(alpha: 0.25 * intensity)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.0
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.0);
@@ -728,7 +750,7 @@ class _EdgeGlowPainter extends CustomPainter {
 
   void _drawCornerHighlights(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = glowColor.withOpacity(0.3 * intensity)
+      ..color = glowColor.withValues(alpha: 0.3 * intensity)
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4.0);
 
     const radius = 3.0;
@@ -784,9 +806,9 @@ class _GlossPainter extends CustomPainter {
         end: Alignment.bottomRight,
         colors: [
           Colors.transparent,
-          Colors.white.withOpacity(0.06 * intensity),
-          Colors.white.withOpacity(0.15 * intensity),
-          Colors.white.withOpacity(0.06 * intensity),
+          Colors.white.withValues(alpha: 0.06 * intensity),
+          Colors.white.withValues(alpha: 0.15 * intensity),
+          Colors.white.withValues(alpha: 0.06 * intensity),
           Colors.transparent,
         ],
         stops: const [0.0, 0.35, 0.5, 0.65, 1.0],
@@ -807,9 +829,9 @@ class _GlossPainter extends CustomPainter {
         end: Alignment.bottomRight,
         colors: [
           Colors.transparent,
-          const Color(0xFFB8E6F5).withOpacity(0.03 * intensity),
-          const Color(0xFFFFF5E1).withOpacity(0.05 * intensity),
-          const Color(0xFFE6B8F5).withOpacity(0.03 * intensity),
+          const Color(0xFFB8E6F5).withValues(alpha: 0.03 * intensity),
+          const Color(0xFFFFF5E1).withValues(alpha: 0.05 * intensity),
+          const Color(0xFFE6B8F5).withValues(alpha: 0.03 * intensity),
           Colors.transparent,
         ],
         stops: const [0.0, 0.3, 0.5, 0.7, 1.0],
@@ -871,7 +893,7 @@ class _SendToHomeMenu extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
+                    color: Colors.black.withValues(alpha: 0.2),
                     blurRadius: 16,
                     offset: const Offset(0, 4),
                   ),
@@ -924,7 +946,7 @@ class _SendToHomeMenu extends StatelessWidget {
     final theme = Theme.of(context);
     final color = enabled
         ? theme.colorScheme.onSurface
-        : theme.colorScheme.onSurface.withOpacity(0.38);
+        : theme.colorScheme.onSurface.withValues(alpha: 0.38);
 
     return Material(
       color: Colors.transparent,
@@ -940,7 +962,7 @@ class _SendToHomeMenu extends StatelessWidget {
                 size: 20,
                 color: enabled
                     ? theme.colorScheme.primary
-                    : theme.colorScheme.onSurface.withOpacity(0.38),
+                    : theme.colorScheme.onSurface.withValues(alpha: 0.38),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -948,9 +970,13 @@ class _SendToHomeMenu extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(label,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                            color: color, fontWeight: FontWeight.w500)),
+                    Text(
+                      label,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: color,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                     Text(
                       subtitle,
                       style: theme.textTheme.bodySmall?.copyWith(

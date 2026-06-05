@@ -36,7 +36,7 @@ class _ClearingDialog extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 32,
             spreadRadius: -8,
           ),
@@ -207,7 +207,7 @@ class _DataSourceCacheSettingsState
         icon: Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: theme.colorScheme.errorContainer.withOpacity(0.5),
+            color: theme.colorScheme.errorContainer.withValues(alpha: 0.5),
             shape: BoxShape.circle,
           ),
           child: Icon(
@@ -330,7 +330,11 @@ class _DataSourceCacheSettingsState
       }
     } catch (e, stack) {
       AppLogger.e(
-          '[CacheSettings] Clear cache error', e, stack, 'CacheSettings',);
+        '[CacheSettings] Clear cache error',
+        e,
+        stack,
+        'CacheSettings',
+      );
 
       if (context.mounted) {
         Navigator.of(context, rootNavigator: true).pop();
@@ -358,19 +362,22 @@ class _StatusCard extends StatelessWidget {
           end: Alignment.bottomRight,
           colors: isLoaded
               ? [
-                  theme.colorScheme.primaryContainer.withOpacity(0.3),
-                  theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                  theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
+                  theme.colorScheme.surfaceContainerHighest
+                      .withValues(alpha: 0.5),
                 ]
               : [
-                  theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
-                  theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                  theme.colorScheme.surfaceContainerHighest
+                      .withValues(alpha: 0.5),
+                  theme.colorScheme.surfaceContainerHighest
+                      .withValues(alpha: 0.3),
                 ],
         ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isLoaded
-              ? theme.colorScheme.primary.withOpacity(0.2)
-              : theme.colorScheme.outlineVariant.withOpacity(0.3),
+              ? theme.colorScheme.primary.withValues(alpha: 0.2)
+              : theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -387,8 +394,8 @@ class _StatusCard extends StatelessWidget {
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       color: isLoaded
-                          ? theme.colorScheme.primary.withOpacity(0.15)
-                          : theme.colorScheme.outline.withOpacity(0.15),
+                          ? theme.colorScheme.primary.withValues(alpha: 0.15)
+                          : theme.colorScheme.outline.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
@@ -425,8 +432,9 @@ class _StatusCard extends StatelessWidget {
                           ),
                         ),
                         // 预构建数据库统计
-                        if (isLoaded && 
-                            (state.translationCount > 0 || state.cooccurrenceCount > 0)) ...[
+                        if (isLoaded &&
+                            (state.translationCount > 0 ||
+                                state.cooccurrenceCount > 0)) ...[
                           const SizedBox(height: 8),
                           Row(
                             children: [
@@ -550,10 +558,10 @@ class _CategoryChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: color.withOpacity(0.3),
+          color: color.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -572,7 +580,7 @@ class _CategoryChip extends StatelessWidget {
           Text(
             '$label ${_formatNumber(count)}',
             style: theme.textTheme.bodySmall?.copyWith(
-              color: color.withOpacity(0.9),
+              color: color.withValues(alpha: 0.9),
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -810,10 +818,10 @@ class _CategoryThresholdBox extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.4),
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: theme.colorScheme.outlineVariant.withOpacity(0.3),
+          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -835,7 +843,7 @@ class _CategoryThresholdBox extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: iconColor.withOpacity(0.15),
+                  color: iconColor.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
@@ -879,7 +887,7 @@ class _CategoryThresholdBox extends StatelessWidget {
                       inactiveTrackColor:
                           theme.colorScheme.surfaceContainerHighest,
                       thumbColor: iconColor,
-                      overlayColor: iconColor.withOpacity(0.1),
+                      overlayColor: iconColor.withValues(alpha: 0.1),
                       trackHeight: 3,
                       thumbShape:
                           const RoundSliderThumbShape(enabledThumbRadius: 6),
@@ -932,7 +940,7 @@ class _ChoiceChip extends StatelessWidget {
     return Material(
       color: isSelected
           ? theme.colorScheme.primary
-          : theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
+          : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
       borderRadius: BorderRadius.circular(8),
       child: InkWell(
         onTap: onSelected,
@@ -974,8 +982,8 @@ class _SmallChoiceChip extends StatelessWidget {
 
     return Material(
       color: isSelected
-          ? accentColor.withOpacity(0.2)
-          : theme.colorScheme.surface.withOpacity(0.5),
+          ? accentColor.withValues(alpha: 0.2)
+          : theme.colorScheme.surface.withValues(alpha: 0.5),
       borderRadius: BorderRadius.circular(6),
       child: InkWell(
         onTap: onSelected,
@@ -1019,7 +1027,7 @@ class _ActionCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: theme.colorScheme.primary.withOpacity(0.3),
+            color: theme.colorScheme.primary.withValues(alpha: 0.3),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -1077,10 +1085,10 @@ class _SyncProgressCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: theme.colorScheme.primaryContainer.withOpacity(0.3),
+        color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: theme.colorScheme.primary.withOpacity(0.2),
+          color: theme.colorScheme.primary.withValues(alpha: 0.2),
           width: 1,
         ),
       ),
@@ -1157,10 +1165,10 @@ class _ErrorMessageCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: theme.colorScheme.errorContainer.withOpacity(0.5),
+        color: theme.colorScheme.errorContainer.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: theme.colorScheme.error.withOpacity(0.3),
+          color: theme.colorScheme.error.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -1199,10 +1207,10 @@ class _ErrorStateCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: theme.colorScheme.errorContainer.withOpacity(0.3),
+        color: theme.colorScheme.errorContainer.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: theme.colorScheme.error.withOpacity(0.2),
+          color: theme.colorScheme.error.withValues(alpha: 0.2),
           width: 1,
         ),
       ),
@@ -1253,13 +1261,13 @@ class _DangerZoneCardState extends State<_DangerZoneCard> {
         curve: Curves.easeInOut,
         decoration: BoxDecoration(
           color: _isHovered
-              ? theme.colorScheme.errorContainer.withOpacity(0.6)
-              : theme.colorScheme.errorContainer.withOpacity(0.3),
+              ? theme.colorScheme.errorContainer.withValues(alpha: 0.6)
+              : theme.colorScheme.errorContainer.withValues(alpha: 0.3),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: _isHovered
-                ? theme.colorScheme.error.withOpacity(0.5)
-                : theme.colorScheme.error.withOpacity(0.3),
+                ? theme.colorScheme.error.withValues(alpha: 0.5)
+                : theme.colorScheme.error.withValues(alpha: 0.3),
             width: _isHovered ? 2 : 1,
           ),
         ),
@@ -1269,8 +1277,8 @@ class _DangerZoneCardState extends State<_DangerZoneCard> {
           child: InkWell(
             onTap: widget.onClearAll,
             borderRadius: BorderRadius.circular(12),
-            splashColor: theme.colorScheme.error.withOpacity(0.1),
-            highlightColor: theme.colorScheme.error.withOpacity(0.05),
+            splashColor: theme.colorScheme.error.withValues(alpha: 0.1),
+            highlightColor: theme.colorScheme.error.withValues(alpha: 0.05),
             child: AnimatedPadding(
               duration: const Duration(milliseconds: 200),
               curve: Curves.easeInOut,

@@ -8,6 +8,9 @@ import '../core/editor_state.dart';
 import 'tool_base.dart';
 import '../../../widgets/common/themed_divider.dart';
 
+int _colorComponent8(double component) =>
+    (component * 255.0).round().clamp(0, 255).toInt();
+
 /// 拾色器工具
 class ColorPickerTool extends EditorTool {
   /// 静态取色方法（供其他工具在 Alt 模式下调用）
@@ -280,10 +283,10 @@ class ColorPickerTool extends EditorTool {
           for (int dy = -1; dy <= 1; dy++) {
             for (int dx = -1; dx <= 1; dx++) {
               final color = regionalPixels[halfGrid + dy][halfGrid + dx];
-              totalR += color.red;
-              totalG += color.green;
-              totalB += color.blue;
-              totalA += color.alpha;
+              totalR += _colorComponent8(color.r);
+              totalG += _colorComponent8(color.g);
+              totalB += _colorComponent8(color.b);
+              totalA += _colorComponent8(color.a);
             }
           }
           _previewColor = Color.fromARGB(
@@ -414,10 +417,10 @@ class ColorPickerTool extends EditorTool {
       for (int dy = -1; dy <= 1; dy++) {
         for (int dx = -1; dx <= 1; dx++) {
           final color = pixels[halfGrid + dy][halfGrid + dx];
-          totalR += color.red;
-          totalG += color.green;
-          totalB += color.blue;
-          totalA += color.alpha;
+          totalR += _colorComponent8(color.r);
+          totalG += _colorComponent8(color.g);
+          totalB += _colorComponent8(color.b);
+          totalA += _colorComponent8(color.a);
         }
       }
       finalColor = Color.fromARGB(
@@ -563,10 +566,10 @@ class ColorPickerTool extends EditorTool {
       for (int dy = -1; dy <= 1; dy++) {
         for (int dx = -1; dx <= 1; dx++) {
           final color = _magnifierPixels![halfGrid + dy][halfGrid + dx];
-          totalR += color.red;
-          totalG += color.green;
-          totalB += color.blue;
-          totalA += color.alpha;
+          totalR += _colorComponent8(color.r);
+          totalG += _colorComponent8(color.g);
+          totalB += _colorComponent8(color.b);
+          totalA += _colorComponent8(color.a);
           count++;
         }
       }
@@ -792,7 +795,7 @@ class _ColorPickerMagnifier extends StatelessWidget {
   static final _shadowDecoration = BoxDecoration(
     boxShadow: [
       BoxShadow(
-        color: Colors.black.withOpacity(0.3),
+        color: Colors.black.withValues(alpha: 0.3),
         blurRadius: 8,
         offset: const Offset(0, 2),
       ),
@@ -864,7 +867,7 @@ class _ColorPickerMagnifier extends StatelessWidget {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    '#${color.value.toRadixString(16).padLeft(8, '0').substring(2).toUpperCase()}',
+                    '#${color.toARGB32().toRadixString(16).padLeft(8, '0').substring(2).toUpperCase()}',
                     style: const TextStyle(
                       fontSize: 10,
                       color: Colors.black87,
@@ -901,7 +904,7 @@ class _MagnifierPainter extends CustomPainter {
     int hash = 0;
     for (final row in pixels) {
       for (final color in row) {
-        hash = hash ^ color.value;
+        hash = hash ^ color.toARGB32();
         hash = (hash << 1) | (hash >> 31); // 简单的位旋转
       }
     }
@@ -932,7 +935,7 @@ class _MagnifierPainter extends CustomPainter {
         canvas.drawRect(rect, isEven ? checkerPaint1 : checkerPaint2);
 
         // 像素颜色
-        if (pixels[row][col].alpha > 0) {
+        if (pixels[row][col].a > 0) {
           paint.color = pixels[row][col];
           canvas.drawRect(rect, paint);
         }
@@ -941,7 +944,7 @@ class _MagnifierPainter extends CustomPainter {
 
     // 绘制网格线
     final gridPaint = Paint()
-      ..color = Colors.black.withOpacity(0.2)
+      ..color = Colors.black.withValues(alpha: 0.2)
       ..strokeWidth = 0.5
       ..style = PaintingStyle.stroke;
 

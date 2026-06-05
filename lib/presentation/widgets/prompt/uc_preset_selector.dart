@@ -81,7 +81,7 @@ class _UcPresetSelectorState extends ConsumerState<UcPresetSelector> {
           borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withValues(alpha: 0.2),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -97,15 +97,15 @@ class _UcPresetSelectorState extends ConsumerState<UcPresetSelector> {
             decoration: BoxDecoration(
               color: isEnabled
                   ? (_isHovering
-                      ? Colors.red.withOpacity(0.2)
-                      : Colors.red.withOpacity(0.1))
+                      ? Colors.red.withValues(alpha: 0.2)
+                      : Colors.red.withValues(alpha: 0.1))
                   : (_isHovering
                       ? theme.colorScheme.surfaceContainerHighest
                       : Colors.transparent),
               borderRadius: BorderRadius.circular(6),
               border: Border.all(
                 color: isEnabled
-                    ? Colors.red.withOpacity(0.3)
+                    ? Colors.red.withValues(alpha: 0.3)
                     : Colors.transparent,
               ),
             ),
@@ -117,7 +117,7 @@ class _UcPresetSelectorState extends ConsumerState<UcPresetSelector> {
                   size: 14,
                   color: isEnabled
                       ? Colors.red.shade700
-                      : theme.colorScheme.onSurface.withOpacity(0.5),
+                      : theme.colorScheme.onSurface.withValues(alpha: 0.5),
                 ),
                 const SizedBox(width: 4),
                 Text(
@@ -127,7 +127,7 @@ class _UcPresetSelectorState extends ConsumerState<UcPresetSelector> {
                     fontWeight: isEnabled ? FontWeight.w600 : FontWeight.w500,
                     color: isEnabled
                         ? Colors.red.shade700
-                        : theme.colorScheme.onSurface.withOpacity(0.5),
+                        : theme.colorScheme.onSurface.withValues(alpha: 0.5),
                   ),
                 ),
                 const SizedBox(width: 2),
@@ -136,7 +136,7 @@ class _UcPresetSelectorState extends ConsumerState<UcPresetSelector> {
                   size: 14,
                   color: isEnabled
                       ? Colors.red.shade700
-                      : theme.colorScheme.onSurface.withOpacity(0.5),
+                      : theme.colorScheme.onSurface.withValues(alpha: 0.5),
                 ),
               ],
             ),
@@ -326,7 +326,7 @@ class _UcPresetSelectorState extends ConsumerState<UcPresetSelector> {
         Text(
           context.l10n.ucPreset_addToNegative,
           style: TextStyle(
-            color: theme.colorScheme.onSurface.withOpacity(0.7),
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
             fontSize: 11,
           ),
         ),
@@ -344,10 +344,10 @@ class _UcPresetSelectorState extends ConsumerState<UcPresetSelector> {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: theme.colorScheme.primaryContainer.withOpacity(0.3),
+              color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(4),
               border: Border.all(
-                color: theme.colorScheme.primary.withOpacity(0.3),
+                color: theme.colorScheme.primary.withValues(alpha: 0.3),
               ),
             ),
             child: Text(

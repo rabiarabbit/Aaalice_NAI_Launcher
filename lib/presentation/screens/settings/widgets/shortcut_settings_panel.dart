@@ -34,8 +34,7 @@ class ShortcutSettingsPanel extends ConsumerStatefulWidget {
       _ShortcutSettingsPanelState();
 }
 
-class _ShortcutSettingsPanelState
-    extends ConsumerState<ShortcutSettingsPanel> {
+class _ShortcutSettingsPanelState extends ConsumerState<ShortcutSettingsPanel> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   ShortcutContext? _expandedContext;
@@ -54,7 +53,8 @@ class _ShortcutSettingsPanelState
     final bindingsByContext = ref.watch(shortcutsByContextProvider);
 
     return configAsync.when(
-      data: (config) => _buildContent(context, theme, config, bindingsByContext),
+      data: (config) =>
+          _buildContent(context, theme, config, bindingsByContext),
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (error, _) => Center(
         child: Text('加载失败: $error'),
@@ -77,7 +77,7 @@ class _ShortcutSettingsPanelState
             color: theme.colorScheme.surface,
             border: Border(
               bottom: BorderSide(
-                color: theme.colorScheme.outline.withOpacity(0.2),
+                color: theme.colorScheme.outline.withValues(alpha: 0.2),
               ),
             ),
           ),
@@ -88,7 +88,7 @@ class _ShortcutSettingsPanelState
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.outline.withOpacity(0.3),
+                  color: theme.colorScheme.outline.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -313,7 +313,7 @@ class _ShortcutSettingsPanelState
 
     if (isEditing) {
       return Container(
-        color: theme.colorScheme.primaryContainer.withOpacity(0.2),
+        color: theme.colorScheme.primaryContainer.withValues(alpha: 0.2),
         padding: const EdgeInsets.all(16),
         child: ShortcutBindingEditor(
           binding: binding,
@@ -363,8 +363,8 @@ class _ShortcutSettingsPanelState
               borderRadius: BorderRadius.circular(4),
               border: Border.all(
                 color: binding.hasCustomShortcut
-                    ? theme.colorScheme.primary.withOpacity(0.3)
-                    : theme.colorScheme.outline.withOpacity(0.2),
+                    ? theme.colorScheme.primary.withValues(alpha: 0.3)
+                    : theme.colorScheme.outline.withValues(alpha: 0.2),
               ),
             ),
             child: Text(

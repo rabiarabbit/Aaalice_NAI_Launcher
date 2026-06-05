@@ -168,25 +168,25 @@ class _FixedTagsDialogState extends ConsumerState<FixedTagsDialog> {
             ),
             decoration: BoxDecoration(
               color: isDark
-                  ? theme.colorScheme.surface.withOpacity(0.85)
-                  : theme.colorScheme.surface.withOpacity(0.92),
+                  ? theme.colorScheme.surface.withValues(alpha: 0.85)
+                  : theme.colorScheme.surface.withValues(alpha: 0.92),
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
                 color: isDark
-                    ? Colors.white.withOpacity(0.08)
-                    : Colors.black.withOpacity(0.06),
+                    ? Colors.white.withValues(alpha: 0.08)
+                    : Colors.black.withValues(alpha: 0.06),
                 width: 1,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(isDark ? 0.4 : 0.15),
+                  color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.15),
                   blurRadius: 32,
                   spreadRadius: -4,
                   offset: const Offset(0, 16),
                 ),
                 if (isDark)
                   BoxShadow(
-                    color: theme.colorScheme.secondary.withOpacity(0.08),
+                    color: theme.colorScheme.secondary.withValues(alpha: 0.08),
                     blurRadius: 48,
                     spreadRadius: -8,
                   ),
@@ -229,15 +229,15 @@ class _FixedTagsDialogState extends ConsumerState<FixedTagsDialog> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            theme.colorScheme.secondary.withOpacity(isDark ? 0.08 : 0.05),
+            theme.colorScheme.secondary.withValues(alpha: isDark ? 0.08 : 0.05),
             Colors.transparent,
           ],
         ),
         border: Border(
           bottom: BorderSide(
             color: isDark
-                ? Colors.white.withOpacity(0.06)
-                : Colors.black.withOpacity(0.06),
+                ? Colors.white.withValues(alpha: 0.06)
+                : Colors.black.withValues(alpha: 0.06),
           ),
         ),
       ),
@@ -251,14 +251,14 @@ class _FixedTagsDialogState extends ConsumerState<FixedTagsDialog> {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  theme.colorScheme.secondary.withOpacity(0.2),
-                  theme.colorScheme.secondary.withOpacity(0.1),
+                  theme.colorScheme.secondary.withValues(alpha: 0.2),
+                  theme.colorScheme.secondary.withValues(alpha: 0.1),
                 ],
               ),
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: theme.colorScheme.secondary.withOpacity(0.15),
+                  color: theme.colorScheme.secondary.withValues(alpha: 0.15),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -293,8 +293,10 @@ class _FixedTagsDialogState extends ConsumerState<FixedTagsDialog> {
                         ),
                         decoration: BoxDecoration(
                           color: enabledCount > 0
-                              ? theme.colorScheme.secondary.withOpacity(0.15)
-                              : theme.colorScheme.outline.withOpacity(0.1),
+                              ? theme.colorScheme.secondary
+                                  .withValues(alpha: 0.15)
+                              : theme.colorScheme.outline
+                                  .withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
@@ -379,7 +381,7 @@ class _FixedTagsDialogState extends ConsumerState<FixedTagsDialog> {
                 child: Icon(
                   Icons.close_rounded,
                   size: 20,
-                  color: theme.colorScheme.onSurface.withOpacity(0.6),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
               ),
             ),
@@ -420,7 +422,7 @@ class _FixedTagsDialogState extends ConsumerState<FixedTagsDialog> {
             Text(
               context.l10n.fixedTags_empty,
               style: theme.textTheme.titleMedium?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.7),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -428,7 +430,7 @@ class _FixedTagsDialogState extends ConsumerState<FixedTagsDialog> {
             Text(
               context.l10n.fixedTags_emptyHint,
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.outline.withOpacity(0.7),
+                color: theme.colorScheme.outline.withValues(alpha: 0.7),
                 height: 1.5,
               ),
               textAlign: TextAlign.center,
@@ -921,7 +923,7 @@ class _FixedTagsDialogState extends ConsumerState<FixedTagsDialog> {
       decoration: BoxDecoration(
         border: Border(
           top: BorderSide(
-            color: theme.colorScheme.outlineVariant.withOpacity(0.3),
+            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
           ),
         ),
       ),
@@ -956,8 +958,9 @@ class _FixedTagsDialogState extends ConsumerState<FixedTagsDialog> {
               style: OutlinedButton.styleFrom(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                side:
-                    BorderSide(color: theme.colorScheme.error.withOpacity(0.5)),
+                side: BorderSide(
+                  color: theme.colorScheme.error.withValues(alpha: 0.5),
+                ),
               ),
             ),
           const Spacer(),
@@ -1355,21 +1358,22 @@ class _FixedTagEntryTileState extends State<_FixedTagEntryTile> {
                 ? (isDark
                     ? theme.colorScheme.surfaceContainerHigh
                     : theme.colorScheme.surfaceContainerHighest)
-                : theme.colorScheme.surfaceContainerLow.withOpacity(0.6),
+                : theme.colorScheme.surfaceContainerLow.withValues(alpha: 0.6),
             borderRadius: BorderRadius.circular(12),
             // 无边框 + 阴影
             boxShadow: entry.enabled
                 ? [
                     BoxShadow(
                       color: theme.colorScheme.shadow
-                          .withOpacity(isDark ? 0.3 : 0.1),
+                          .withValues(alpha: isDark ? 0.3 : 0.1),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                       spreadRadius: -2,
                     ),
                     if (_isHovering)
                       BoxShadow(
-                        color: theme.colorScheme.primary.withOpacity(0.15),
+                        color:
+                            theme.colorScheme.primary.withValues(alpha: 0.15),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -1377,7 +1381,7 @@ class _FixedTagEntryTileState extends State<_FixedTagEntryTile> {
                 : [
                     // 禁用状态也有轻微阴影
                     BoxShadow(
-                      color: theme.colorScheme.shadow.withOpacity(0.05),
+                      color: theme.colorScheme.shadow.withValues(alpha: 0.05),
                       blurRadius: 4,
                       offset: const Offset(0, 1),
                     ),
@@ -1416,12 +1420,13 @@ class _FixedTagEntryTileState extends State<_FixedTagEntryTile> {
                           fontWeight: FontWeight.w500,
                           color: entry.enabled
                               ? theme.colorScheme.onSurface
-                              : theme.colorScheme.onSurface.withOpacity(0.5),
+                              : theme.colorScheme.onSurface
+                                  .withValues(alpha: 0.5),
                           // 禁用时显示删除线
                           decoration:
                               entry.enabled ? null : TextDecoration.lineThrough,
                           decorationColor:
-                              theme.colorScheme.outline.withOpacity(0.6),
+                              theme.colorScheme.outline.withValues(alpha: 0.6),
                           decorationThickness: 2,
                         ),
                         overflow: TextOverflow.ellipsis,
@@ -1436,14 +1441,16 @@ class _FixedTagEntryTileState extends State<_FixedTagEntryTile> {
                             style: TextStyle(
                               fontSize: 11,
                               color: entry.enabled
-                                  ? theme.colorScheme.outline.withOpacity(0.8)
-                                  : theme.colorScheme.outline.withOpacity(0.5),
+                                  ? theme.colorScheme.outline
+                                      .withValues(alpha: 0.8)
+                                  : theme.colorScheme.outline
+                                      .withValues(alpha: 0.5),
                               height: 1.2,
                               decoration: entry.enabled
                                   ? null
                                   : TextDecoration.lineThrough,
-                              decorationColor:
-                                  theme.colorScheme.outline.withOpacity(0.4),
+                              decorationColor: theme.colorScheme.outline
+                                  .withValues(alpha: 0.4),
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -1467,8 +1474,8 @@ class _FixedTagEntryTileState extends State<_FixedTagEntryTile> {
                       ),
                       decoration: BoxDecoration(
                         color: entry.enabled
-                            ? posColor.withOpacity(0.15)
-                            : theme.colorScheme.outline.withOpacity(0.1),
+                            ? posColor.withValues(alpha: 0.15)
+                            : theme.colorScheme.outline.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Row(
@@ -1509,8 +1516,10 @@ class _FixedTagEntryTileState extends State<_FixedTagEntryTile> {
                         ),
                         decoration: BoxDecoration(
                           color: entry.enabled
-                              ? theme.colorScheme.secondary.withOpacity(0.15)
-                              : theme.colorScheme.outline.withOpacity(0.1),
+                              ? theme.colorScheme.secondary
+                                  .withValues(alpha: 0.15)
+                              : theme.colorScheme.outline
+                                  .withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
@@ -1541,14 +1550,16 @@ class _FixedTagEntryTileState extends State<_FixedTagEntryTile> {
                         icon: Icons.edit_outlined,
                         onPressed: widget.onEdit,
                         tooltip: context.l10n.common_edit,
-                        color: theme.colorScheme.onSurface.withOpacity(0.6),
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.6),
                         hoverColor: theme.colorScheme.primary,
                       ),
                       _CompactIconButton(
                         icon: Icons.close_rounded,
                         onPressed: widget.onDelete,
                         tooltip: context.l10n.common_delete,
-                        color: theme.colorScheme.onSurface.withOpacity(0.5),
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.5),
                         hoverColor: theme.colorScheme.error,
                       ),
                     ],
@@ -1697,7 +1708,7 @@ class _FixedTagLinkPainter extends CustomPainter {
           end.dy,
         );
       final paint = Paint()
-        ..color = color.withOpacity(isMismatched(link) ? 0.35 : 0.65)
+        ..color = color.withValues(alpha: isMismatched(link) ? 0.35 : 0.65)
         ..strokeWidth = 1.6
         ..style = PaintingStyle.stroke;
 

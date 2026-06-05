@@ -304,9 +304,9 @@ class _VibeCardState extends ConsumerState<VibeCard> {
       constraints: BoxConstraints(maxWidth: maxWidth),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -350,10 +350,10 @@ class _VibeCardState extends ConsumerState<VibeCard> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.orange.withOpacity(0.1),
+                color: Colors.orange.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                  color: Colors.orange.withOpacity(0.3),
+                  color: Colors.orange.withValues(alpha: 0.3),
                 ),
               ),
               child: Row(
@@ -447,7 +447,7 @@ class _VibeCardState extends ConsumerState<VibeCard> {
           color: theme.colorScheme.tertiaryContainer,
           borderRadius: BorderRadius.circular(4),
           border: Border.all(
-            color: theme.colorScheme.tertiary.withOpacity(0.5),
+            color: theme.colorScheme.tertiary.withValues(alpha: 0.5),
           ),
         ),
         child: Row(
@@ -501,7 +501,7 @@ class _VibeCardState extends ConsumerState<VibeCard> {
               child: Text(
                 label,
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurface.withOpacity(0.8),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
                 ),
               ),
             ),

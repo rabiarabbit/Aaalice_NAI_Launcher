@@ -256,7 +256,8 @@ class _ImportDialogState extends ConsumerState<ImportDialog> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: theme.colorScheme.tertiaryContainer.withOpacity(0.5),
+                color:
+                    theme.colorScheme.tertiaryContainer.withValues(alpha: 0.5),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
@@ -425,7 +426,7 @@ class _ImportDialogState extends ConsumerState<ImportDialog> {
       margin: const EdgeInsets.only(bottom: 4),
       decoration: BoxDecoration(
         color: isConflict
-            ? theme.colorScheme.tertiaryContainer.withOpacity(0.2)
+            ? theme.colorScheme.tertiaryContainer.withValues(alpha: 0.2)
             : null,
         borderRadius: BorderRadius.circular(8),
       ),
@@ -563,7 +564,7 @@ class _ImportDialogState extends ConsumerState<ImportDialog> {
         margin: const EdgeInsets.only(right: 8),
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: theme.colorScheme.tertiaryContainer.withOpacity(0.5),
+          color: theme.colorScheme.tertiaryContainer.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(4),
         ),
         child: Row(

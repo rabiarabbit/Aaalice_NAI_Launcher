@@ -102,7 +102,8 @@ class AccountDetailTile extends ConsumerWidget {
                       Text(
                         account.email,
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurface.withOpacity(0.5),
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.5),
                           fontSize: 12,
                         ),
                         maxLines: 1,
@@ -115,7 +116,7 @@ class AccountDetailTile extends ConsumerWidget {
                 // 编辑箭头
                 Icon(
                   Icons.chevron_right_rounded,
-                  color: theme.colorScheme.onSurface.withOpacity(0.3),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
                   size: 20,
                 ),
               ],
@@ -152,7 +153,7 @@ class AccountDetailTile extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: tierColor.withOpacity(0.15),
+                color: tierColor.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text(
@@ -169,7 +170,7 @@ class AccountDetailTile extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: theme.colorScheme.tertiary.withOpacity(0.12),
+                color: theme.colorScheme.tertiary.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Row(
@@ -256,7 +257,7 @@ class AccountDetailTile extends ConsumerWidget {
                   height: 44,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: theme.colorScheme.outline.withOpacity(0.1),
+                    color: theme.colorScheme.outline.withValues(alpha: 0.1),
                   ),
                   child: Icon(
                     Icons.person_outline_rounded,
@@ -270,7 +271,7 @@ class AccountDetailTile extends ConsumerWidget {
                   child: Text(
                     context.l10n.settings_notLoggedIn,
                     style: theme.textTheme.titleSmall?.copyWith(
-                      color: theme.colorScheme.onSurface.withOpacity(0.6),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                   ),
                 ),

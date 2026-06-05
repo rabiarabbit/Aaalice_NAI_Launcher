@@ -75,7 +75,7 @@ class _CustomRadarChartState extends State<CustomRadarChart>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final fillColor =
-        widget.fillColor ?? theme.colorScheme.primary.withOpacity(0.3);
+        widget.fillColor ?? theme.colorScheme.primary.withValues(alpha: 0.3);
     final strokeColor = widget.strokeColor ?? theme.colorScheme.primary;
 
     return AnimatedBuilder(
@@ -117,7 +117,10 @@ class _CustomRadarChartState extends State<CustomRadarChart>
   }
 
   List<Widget> _buildLabels(
-      ThemeData theme, Offset center, double labelRadius,) {
+    ThemeData theme,
+    Offset center,
+    double labelRadius,
+  ) {
     final labels = <Widget>[];
     final count = widget.data.length;
 
@@ -192,12 +195,12 @@ class _RadarChartPainter extends CustomPainter {
 
   void _drawGrid(Canvas canvas, int count) {
     final gridPaint = Paint()
-      ..color = gridColor.withOpacity(0.3)
+      ..color = gridColor.withValues(alpha: 0.3)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
 
     final axisPaint = Paint()
-      ..color = gridColor.withOpacity(0.5)
+      ..color = gridColor.withValues(alpha: 0.5)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
 

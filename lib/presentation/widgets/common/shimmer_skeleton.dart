@@ -53,11 +53,11 @@ class _ShimmerSkeletonState extends State<ShimmerSkeleton>
     // Dark mode: use lighter shimmer on dark surface
     // Light mode: use darker shimmer on light surface
     final baseColor = isDark
-        ? colorScheme.surfaceContainerHighest.withOpacity(0.2)
-        : colorScheme.surfaceContainerHighest.withOpacity(0.3);
+        ? colorScheme.surfaceContainerHighest.withValues(alpha: 0.2)
+        : colorScheme.surfaceContainerHighest.withValues(alpha: 0.3);
     final highlightColor = isDark
-        ? colorScheme.surfaceContainerHighest.withOpacity(0.5)
-        : colorScheme.surfaceContainerHighest.withOpacity(0.6);
+        ? colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)
+        : colorScheme.surfaceContainerHighest.withValues(alpha: 0.6);
 
     return AnimatedBuilder(
       animation: _controller,

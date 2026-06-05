@@ -124,15 +124,15 @@ class GenericSuggestionTile extends StatelessWidget {
     // 调试日志：输出翻译信息
     AppLogger.d(
       '[SuggestionTile] tag="${data.tag}", '
-      'rawTranslation="${data.translation}", '
-      'filteredTranslation="$filteredTranslation", '
-      'showTranslation=${config.showTranslation}',
+          'rawTranslation="${data.translation}", '
+          'filteredTranslation="$filteredTranslation", '
+          'showTranslation=${config.showTranslation}',
       'SuggestionTile',
     );
 
     return Material(
       color: isSelected
-          ? theme.colorScheme.primary.withOpacity(0.15)
+          ? theme.colorScheme.primary.withValues(alpha: 0.15)
           : Colors.transparent,
       child: InkWell(
         onTap: onTap,
@@ -146,7 +146,7 @@ class GenericSuggestionTile extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                   decoration: BoxDecoration(
-                    color: categoryColor.withOpacity(0.2),
+                    color: categoryColor.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(3),
                   ),
                   child: Text(

@@ -521,7 +521,7 @@ class _SaveAsPresetDialogState extends ConsumerState<SaveAsPresetDialog> {
       showCheckmark: true,
       backgroundColor: colorScheme.surfaceContainerHighest,
       selectedColor: colorScheme.primaryContainer,
-      disabledColor: colorScheme.surfaceContainerHighest.withOpacity(0.5),
+      disabledColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
       padding: EdgeInsets.zero,
       visualDensity: VisualDensity.compact,
     );

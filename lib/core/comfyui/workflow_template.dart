@@ -3,6 +3,7 @@
 /// 一个工作流模板由两部分组成：
 /// 1. workflow_api.json — ComfyUI 可执行的节点图
 /// 2. manifest（WorkflowTemplate）— 描述模板元信息和可注入槽位
+library;
 
 /// 槽位方向
 enum SlotDirection {

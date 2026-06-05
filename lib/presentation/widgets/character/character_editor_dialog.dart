@@ -172,12 +172,12 @@ class _DockToggleButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
               color: isDocked
-                  ? colorScheme.primary.withOpacity(0.6)
-                  : colorScheme.outline.withOpacity(0.3),
+                  ? colorScheme.primary.withValues(alpha: 0.6)
+                  : colorScheme.outline.withValues(alpha: 0.3),
               width: 1,
             ),
             color: isDocked
-                ? colorScheme.primary.withOpacity(0.12)
+                ? colorScheme.primary.withValues(alpha: 0.12)
                 : Colors.transparent,
           ),
           child: Row(
@@ -226,10 +226,10 @@ class _DialogHeader extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest.withOpacity(0.3),
+        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
         border: Border(
           bottom: BorderSide(
-            color: colorScheme.outlineVariant.withOpacity(0.3),
+            color: colorScheme.outlineVariant.withValues(alpha: 0.3),
             width: 1,
           ),
         ),
@@ -302,10 +302,10 @@ class _DialogFooter extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest.withOpacity(0.3),
+        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
         border: Border(
           top: BorderSide(
-            color: colorScheme.outlineVariant.withOpacity(0.3),
+            color: colorScheme.outlineVariant.withValues(alpha: 0.3),
             width: 1,
           ),
         ),
@@ -331,7 +331,7 @@ class _DialogFooter extends StatelessWidget {
                 child: Icon(
                   Icons.info_outline,
                   size: 16,
-                  color: colorScheme.onSurfaceVariant.withOpacity(0.6),
+                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
                 ),
               ),
               const SizedBox(width: 8),

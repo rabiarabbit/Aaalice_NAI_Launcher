@@ -103,14 +103,14 @@ class _PostProcessRulePanelState extends State<PostProcessRulePanel> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                colorScheme.tertiary.withOpacity(0.2),
-                colorScheme.tertiary.withOpacity(0.1),
+                colorScheme.tertiary.withValues(alpha: 0.2),
+                colorScheme.tertiary.withValues(alpha: 0.1),
               ],
             ),
             borderRadius: BorderRadius.circular(10),
             boxShadow: [
               BoxShadow(
-                color: colorScheme.tertiary.withOpacity(0.1),
+                color: colorScheme.tertiary.withValues(alpha: 0.1),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -146,7 +146,7 @@ class _PostProcessRulePanelState extends State<PostProcessRulePanel> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: colorScheme.tertiaryContainer.withOpacity(0.5),
+              color: colorScheme.tertiaryContainer.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
@@ -182,7 +182,7 @@ class _PostProcessRulePanelState extends State<PostProcessRulePanel> {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: colorScheme.secondaryContainer.withOpacity(0.5),
+                  color: colorScheme.secondaryContainer.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Icon(
@@ -221,7 +221,7 @@ class _PostProcessRulePanelState extends State<PostProcessRulePanel> {
                           color: colorScheme.surfaceContainerHighest,
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
-                            color: color.withOpacity(0.3),
+                            color: color.withValues(alpha: 0.3),
                           ),
                         ),
                         child: Row(
@@ -314,7 +314,7 @@ class _PostProcessRulePanelState extends State<PostProcessRulePanel> {
         itemCount: widget.rules.length,
         separatorBuilder: (_, __) => Divider(
           height: 1,
-          color: colorScheme.outline.withOpacity(0.1),
+          color: colorScheme.outline.withValues(alpha: 0.1),
         ),
         itemBuilder: (context, index) {
           final rule = widget.rules[index];
@@ -323,7 +323,7 @@ class _PostProcessRulePanelState extends State<PostProcessRulePanel> {
 
           return Material(
             color: isSelected
-                ? colorScheme.primaryContainer.withOpacity(0.3)
+                ? colorScheme.primaryContainer.withValues(alpha: 0.3)
                 : Colors.transparent,
             child: InkWell(
               onTap: () => setState(() => _selectedIndex = index),
@@ -344,7 +344,7 @@ class _PostProcessRulePanelState extends State<PostProcessRulePanel> {
                                 end: Alignment.bottomRight,
                                 colors: [
                                   actionColor,
-                                  actionColor.withOpacity(0.7),
+                                  actionColor.withValues(alpha: 0.7),
                                 ],
                               )
                             : null,
@@ -355,7 +355,7 @@ class _PostProcessRulePanelState extends State<PostProcessRulePanel> {
                         boxShadow: rule.enabled
                             ? [
                                 BoxShadow(
-                                  color: actionColor.withOpacity(0.3),
+                                  color: actionColor.withValues(alpha: 0.3),
                                   blurRadius: 8,
                                   offset: const Offset(0, 2),
                                 ),
@@ -402,7 +402,8 @@ class _PostProcessRulePanelState extends State<PostProcessRulePanel> {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: colorScheme.errorContainer.withOpacity(0.5),
+                          color:
+                              colorScheme.errorContainer.withValues(alpha: 0.5),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
@@ -417,7 +418,7 @@ class _PostProcessRulePanelState extends State<PostProcessRulePanel> {
                       IconButton(
                         icon: Icon(
                           Icons.delete_outline_rounded,
-                          color: colorScheme.error.withOpacity(0.7),
+                          color: colorScheme.error.withValues(alpha: 0.7),
                         ),
                         onPressed: () => _removeRule(index),
                         tooltip: '删除规则',
@@ -447,7 +448,7 @@ class _PostProcessRulePanelState extends State<PostProcessRulePanel> {
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             decoration: BoxDecoration(
               border: Border.all(
-                color: colorScheme.primary.withOpacity(0.5),
+                color: colorScheme.primary.withValues(alpha: 0.5),
                 width: 1.5,
               ),
               borderRadius: BorderRadius.circular(10),
@@ -488,8 +489,8 @@ class _PostProcessRulePanelState extends State<PostProcessRulePanel> {
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         colors: [
-          colorScheme.tertiary.withOpacity(0.5),
-          colorScheme.primary.withOpacity(0.3),
+          colorScheme.tertiary.withValues(alpha: 0.5),
+          colorScheme.primary.withValues(alpha: 0.3),
         ],
       ),
       gradientBorderWidth: 1.5,
@@ -503,7 +504,7 @@ class _PostProcessRulePanelState extends State<PostProcessRulePanel> {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: colorScheme.tertiaryContainer.withOpacity(0.5),
+                  color: colorScheme.tertiaryContainer.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Icon(
@@ -554,7 +555,7 @@ class _PostProcessRulePanelState extends State<PostProcessRulePanel> {
           const SizedBox(height: 16),
           // 操作类型
           DropdownButtonFormField<PostProcessAction>(
-            value: rule.action,
+            initialValue: rule.action,
             decoration: InputDecoration(
               labelText: '操作类型',
               prefixIcon: Icon(

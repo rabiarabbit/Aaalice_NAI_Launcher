@@ -42,10 +42,8 @@ class _ComfyUISettingsSectionState
       _urlController.text = settings.serverUrl;
     }
 
-    final customWorkflows =
-        workflows.where((t) => !t.isBuiltin).toList();
-    final builtinWorkflows =
-        workflows.where((t) => t.isBuiltin).toList();
+    final customWorkflows = workflows.where((t) => !t.isBuiltin).toList();
+    final builtinWorkflows = workflows.where((t) => t.isBuiltin).toList();
 
     return Column(
       children: [
@@ -111,7 +109,9 @@ class _ComfyUISettingsSectionState
                 if (_testResult != null)
                   Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 4),
+                      horizontal: 16,
+                      vertical: 4,
+                    ),
                     child: Row(
                       children: [
                         Icon(
@@ -125,9 +125,7 @@ class _ComfyUISettingsSectionState
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          _testResult == 'ok'
-                              ? '连接成功'
-                              : '连接失败: $_testResult',
+                          _testResult == 'ok' ? '连接成功' : '连接失败: $_testResult',
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: _testResult == 'ok'
                                 ? Colors.green
@@ -173,24 +171,29 @@ class _ComfyUISettingsSectionState
                 if (builtinWorkflows.isNotEmpty) ...[
                   Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 8),
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                     child: Row(
                       children: [
-                        Icon(Icons.inventory_2,
-                            size: 16,
-                            color:
-                                theme.colorScheme.onSurface.withOpacity(0.5)),
+                        Icon(
+                          Icons.inventory_2,
+                          size: 16,
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.5),
+                        ),
                         const SizedBox(width: 8),
-                        Text('内置工作流',
-                            style: theme.textTheme.labelMedium?.copyWith(
-                              color: theme.colorScheme.onSurface
-                                  .withOpacity(0.5),
-                            )),
+                        Text(
+                          '内置工作流',
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            color: theme.colorScheme.onSurface
+                                .withValues(alpha: 0.5),
+                          ),
+                        ),
                       ],
                     ),
                   ),
-                  ...builtinWorkflows
-                      .map((t) => _buildWorkflowTile(theme, t)),
+                  ...builtinWorkflows.map((t) => _buildWorkflowTile(theme, t)),
                 ],
 
                 // 用户自定义工作流
@@ -199,20 +202,23 @@ class _ComfyUISettingsSectionState
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Row(
                     children: [
-                      Icon(Icons.person,
-                          size: 16,
-                          color:
-                              theme.colorScheme.onSurface.withOpacity(0.5)),
+                      Icon(
+                        Icons.person,
+                        size: 16,
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                      ),
                       const SizedBox(width: 8),
-                      Text('自定义工作流',
-                          style: theme.textTheme.labelMedium?.copyWith(
-                            color: theme.colorScheme.onSurface
-                                .withOpacity(0.5),
-                          )),
+                      Text(
+                        '自定义工作流',
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.5),
+                        ),
+                      ),
                       const Spacer(),
                       TextButton.icon(
-                        onPressed: () =>
-                            WorkflowImportWizard.show(context),
+                        onPressed: () => WorkflowImportWizard.show(context),
                         icon: const Icon(Icons.add, size: 18),
                         label: const Text('导入'),
                       ),
@@ -222,18 +228,19 @@ class _ComfyUISettingsSectionState
                 if (customWorkflows.isEmpty)
                   Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 12),
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                     child: Text(
                       '暂无自定义工作流，点击「导入」添加 ComfyUI 工作流',
                       style: theme.textTheme.bodySmall?.copyWith(
                         color:
-                            theme.colorScheme.onSurface.withOpacity(0.4),
+                            theme.colorScheme.onSurface.withValues(alpha: 0.4),
                       ),
                     ),
                   )
                 else
-                  ...customWorkflows
-                      .map((t) => _buildWorkflowTile(theme, t)),
+                  ...customWorkflows.map((t) => _buildWorkflowTile(theme, t)),
                 const SizedBox(height: 8),
               ],
             ),
@@ -274,8 +281,11 @@ class _ComfyUISettingsSectionState
               visualDensity: VisualDensity.compact,
             )
           : IconButton(
-              icon: Icon(Icons.delete_outline,
-                  color: theme.colorScheme.error, size: 20),
+              icon: Icon(
+                Icons.delete_outline,
+                color: theme.colorScheme.error,
+                size: 20,
+              ),
               onPressed: () => _confirmDeleteWorkflow(template),
             ),
     );
@@ -318,9 +328,8 @@ class _ComfyUISettingsSectionState
     });
 
     try {
-      final ok = await ref
-          .read(comfyUIConnectionProvider.notifier)
-          .testConnection();
+      final ok =
+          await ref.read(comfyUIConnectionProvider.notifier).testConnection();
       if (mounted) {
         setState(() {
           _testResult = ok ? 'ok' : '服务器无响应';
