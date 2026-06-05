@@ -128,7 +128,7 @@ class _PaginationBarState extends State<PaginationBar> {
         color: isDark ? colorScheme.surfaceContainerHigh : colorScheme.surface,
         border: Border(
           top: BorderSide(
-            color: theme.dividerColor.withOpacity(0.2),
+            color: theme.dividerColor.withValues(alpha: 0.2),
           ),
         ),
       ),
@@ -397,7 +397,7 @@ class _PaginationBarState extends State<PaginationBar> {
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
           decoration: BoxDecoration(
             border: Border.all(
-              color: colorScheme.outline.withOpacity(0.3),
+              color: colorScheme.outline.withValues(alpha: 0.3),
             ),
             borderRadius: BorderRadius.circular(6),
           ),
@@ -438,7 +438,7 @@ class _PaginationBarState extends State<PaginationBar> {
           padding: const EdgeInsets.symmetric(horizontal: 8),
           decoration: BoxDecoration(
             border: Border.all(
-              color: colorScheme.outline.withOpacity(0.3),
+              color: colorScheme.outline.withValues(alpha: 0.3),
             ),
             borderRadius: BorderRadius.circular(6),
           ),

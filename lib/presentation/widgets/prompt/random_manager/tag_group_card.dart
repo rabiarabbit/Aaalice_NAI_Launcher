@@ -84,7 +84,7 @@ class _TagGroupCardState extends ConsumerState<TagGroupCard> {
                 width: 135,
                 padding: const EdgeInsets.all(12),
                 transform: Matrix4.identity()
-                  ..translate(0.0, _isHovered ? -2.0 : 0.0),
+                  ..translateByDouble(0.0, _isHovered ? -2.0 : 0.0, 0, 1),
                 transformAlignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: _isHovered
@@ -94,7 +94,7 @@ class _TagGroupCardState extends ConsumerState<TagGroupCard> {
                   boxShadow: _isHovered
                       ? [
                           BoxShadow(
-                            color: colorScheme.primary.withOpacity(0.15),
+                            color: colorScheme.primary.withValues(alpha: 0.15),
                             blurRadius: 12,
                             offset: const Offset(0, 4),
                           ),
@@ -111,8 +111,8 @@ class _TagGroupCardState extends ConsumerState<TagGroupCard> {
                           Container(
                             padding: const EdgeInsets.all(2),
                             decoration: BoxDecoration(
-                              color:
-                                  colorScheme.primaryContainer.withOpacity(0.3),
+                              color: colorScheme.primaryContainer
+                                  .withValues(alpha: 0.3),
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
@@ -357,13 +357,13 @@ class _DiyIconState extends State<_DiyIcon> {
               padding: const EdgeInsets.all(2),
               decoration: BoxDecoration(
                 color: _isHovered
-                    ? colorScheme.primary.withOpacity(0.25)
-                    : colorScheme.secondaryContainer.withOpacity(0.5),
+                    ? colorScheme.primary.withValues(alpha: 0.25)
+                    : colorScheme.secondaryContainer.withValues(alpha: 0.5),
                 borderRadius: BorderRadius.circular(3),
                 boxShadow: _isHovered
                     ? [
                         BoxShadow(
-                          color: colorScheme.primary.withOpacity(0.2),
+                          color: colorScheme.primary.withValues(alpha: 0.2),
                           blurRadius: 4,
                         ),
                       ]
@@ -452,12 +452,12 @@ class _TagGroupEditDialogState extends ConsumerState<_TagGroupEditDialog>
           borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
-              color: colorScheme.shadow.withOpacity(0.08),
+              color: colorScheme.shadow.withValues(alpha: 0.08),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
             BoxShadow(
-              color: colorScheme.shadow.withOpacity(0.16),
+              color: colorScheme.shadow.withValues(alpha: 0.16),
               blurRadius: 24,
               offset: const Offset(0, 12),
             ),
@@ -473,15 +473,15 @@ class _TagGroupEditDialogState extends ConsumerState<_TagGroupEditDialog>
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    colorScheme.primaryContainer.withOpacity(0.3),
-                    colorScheme.secondaryContainer.withOpacity(0.2),
+                    colorScheme.primaryContainer.withValues(alpha: 0.3),
+                    colorScheme.secondaryContainer.withValues(alpha: 0.2),
                   ],
                 ),
                 borderRadius:
                     const BorderRadius.vertical(top: Radius.circular(8)),
                 border: Border(
                   bottom: BorderSide(
-                    color: colorScheme.outlineVariant.withOpacity(0.2),
+                    color: colorScheme.outlineVariant.withValues(alpha: 0.2),
                   ),
                 ),
               ),
@@ -490,7 +490,7 @@ class _TagGroupEditDialogState extends ConsumerState<_TagGroupEditDialog>
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: colorScheme.primary.withOpacity(0.1),
+                      color: colorScheme.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
@@ -512,8 +512,8 @@ class _TagGroupEditDialogState extends ConsumerState<_TagGroupEditDialog>
                     icon: const Icon(Icons.close),
                     iconSize: 20,
                     style: IconButton.styleFrom(
-                      backgroundColor:
-                          colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                      backgroundColor: colorScheme.surfaceContainerHighest
+                          .withValues(alpha: 0.5),
                     ),
                   ),
                 ],
@@ -540,7 +540,8 @@ class _TagGroupEditDialogState extends ConsumerState<_TagGroupEditDialog>
                       const Icon(Icons.label_outline, size: 16),
                       const SizedBox(width: 6),
                       Text(
-                          '标签 (${ref.watch(groupTagCountProvider(_editingTagGroup))})',),
+                        '标签 (${ref.watch(groupTagCountProvider(_editingTagGroup))})',
+                      ),
                     ],
                   ),
                 ),
@@ -576,7 +577,7 @@ class _TagGroupEditDialogState extends ConsumerState<_TagGroupEditDialog>
                     const BorderRadius.vertical(bottom: Radius.circular(8)),
                 border: Border(
                   top: BorderSide(
-                    color: colorScheme.outlineVariant.withOpacity(0.2),
+                    color: colorScheme.outlineVariant.withValues(alpha: 0.2),
                   ),
                 ),
               ),
@@ -778,7 +779,7 @@ class _TagGroupEditDialogState extends ConsumerState<_TagGroupEditDialog>
                 borderRadius: BorderRadius.circular(8),
                 boxShadow: [
                   BoxShadow(
-                    color: colorScheme.shadow.withOpacity(0.05),
+                    color: colorScheme.shadow.withValues(alpha: 0.05),
                     blurRadius: 4,
                     offset: const Offset(0, 1),
                   ),
@@ -919,7 +920,7 @@ class _TagGroupEditDialogState extends ConsumerState<_TagGroupEditDialog>
               borderRadius: BorderRadius.circular(8),
               boxShadow: [
                 BoxShadow(
-                  color: colorScheme.shadow.withOpacity(0.05),
+                  color: colorScheme.shadow.withValues(alpha: 0.05),
                   blurRadius: 4,
                   offset: const Offset(0, 1),
                 ),
@@ -930,7 +931,7 @@ class _TagGroupEditDialogState extends ConsumerState<_TagGroupEditDialog>
                 Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                    color: colorScheme.tertiaryContainer.withOpacity(0.5),
+                    color: colorScheme.tertiaryContainer.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Icon(
@@ -951,9 +952,9 @@ class _TagGroupEditDialogState extends ConsumerState<_TagGroupEditDialog>
                       trackHeight: 4,
                       activeTrackColor: colorScheme.tertiary,
                       inactiveTrackColor:
-                          colorScheme.tertiaryContainer.withOpacity(0.3),
+                          colorScheme.tertiaryContainer.withValues(alpha: 0.3),
                       thumbColor: colorScheme.tertiary,
-                      overlayColor: colorScheme.tertiary.withOpacity(0.1),
+                      overlayColor: colorScheme.tertiary.withValues(alpha: 0.1),
                     ),
                     child: Slider(
                       value: _editingTagGroup.emphasisProbability,
@@ -1143,7 +1144,7 @@ class _DiySectionState extends State<_DiySection> {
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: widget.enabled
-              ? colorScheme.primaryContainer.withOpacity(0.3)
+              ? colorScheme.primaryContainer.withValues(alpha: 0.3)
               : _isHovered
                   ? colorScheme.surfaceContainerHighest
                   : colorScheme.surfaceContainerHigh,
@@ -1151,8 +1152,8 @@ class _DiySectionState extends State<_DiySection> {
           boxShadow: [
             BoxShadow(
               color: widget.enabled
-                  ? colorScheme.primary.withOpacity(0.15)
-                  : colorScheme.shadow.withOpacity(0.05),
+                  ? colorScheme.primary.withValues(alpha: 0.15)
+                  : colorScheme.shadow.withValues(alpha: 0.05),
               blurRadius: widget.enabled ? 8 : 4,
               offset: const Offset(0, 2),
             ),
@@ -1164,7 +1165,7 @@ class _DiySectionState extends State<_DiySection> {
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: widget.enabled
-                    ? colorScheme.primary.withOpacity(0.15)
+                    ? colorScheme.primary.withValues(alpha: 0.15)
                     : colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -1207,7 +1208,7 @@ class _DiySectionState extends State<_DiySection> {
                   Container(
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
-                      color: colorScheme.primary.withOpacity(0.1),
+                      color: colorScheme.primary.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -1278,12 +1279,12 @@ class _DiyConfigDialog extends StatelessWidget {
           borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
-              color: colorScheme.shadow.withOpacity(0.08),
+              color: colorScheme.shadow.withValues(alpha: 0.08),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
             BoxShadow(
-              color: colorScheme.shadow.withOpacity(0.16),
+              color: colorScheme.shadow.withValues(alpha: 0.16),
               blurRadius: 24,
               offset: const Offset(0, 12),
             ),
@@ -1299,15 +1300,15 @@ class _DiyConfigDialog extends StatelessWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    colorScheme.secondaryContainer.withOpacity(0.3),
-                    colorScheme.tertiaryContainer.withOpacity(0.2),
+                    colorScheme.secondaryContainer.withValues(alpha: 0.3),
+                    colorScheme.tertiaryContainer.withValues(alpha: 0.2),
                   ],
                 ),
                 borderRadius:
                     const BorderRadius.vertical(top: Radius.circular(8)),
                 border: Border(
                   bottom: BorderSide(
-                    color: colorScheme.outlineVariant.withOpacity(0.2),
+                    color: colorScheme.outlineVariant.withValues(alpha: 0.2),
                   ),
                 ),
               ),
@@ -1316,7 +1317,7 @@ class _DiyConfigDialog extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: colorScheme.secondary.withOpacity(0.1),
+                      color: colorScheme.secondary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
@@ -1338,8 +1339,8 @@ class _DiyConfigDialog extends StatelessWidget {
                     icon: const Icon(Icons.close),
                     iconSize: 20,
                     style: IconButton.styleFrom(
-                      backgroundColor:
-                          colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                      backgroundColor: colorScheme.surfaceContainerHighest
+                          .withValues(alpha: 0.5),
                     ),
                   ),
                 ],
@@ -1361,7 +1362,7 @@ class _DiyConfigDialog extends StatelessWidget {
                     const BorderRadius.vertical(bottom: Radius.circular(8)),
                 border: Border(
                   top: BorderSide(
-                    color: colorScheme.outlineVariant.withOpacity(0.2),
+                    color: colorScheme.outlineVariant.withValues(alpha: 0.2),
                   ),
                 ),
               ),

@@ -163,14 +163,14 @@ class _SearchInputState extends State<_SearchInput> {
       duration: const Duration(milliseconds: 200),
       decoration: BoxDecoration(
         color: _isFocused
-            ? colorScheme.primaryContainer.withOpacity(0.2)
+            ? colorScheme.primaryContainer.withValues(alpha: 0.2)
             : colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
             color: _isFocused
-                ? colorScheme.primary.withOpacity(0.15)
-                : colorScheme.shadow.withOpacity(0.05),
+                ? colorScheme.primary.withValues(alpha: 0.15)
+                : colorScheme.shadow.withValues(alpha: 0.05),
             blurRadius: _isFocused ? 8 : 4,
             offset: const Offset(0, 2),
           ),
@@ -185,7 +185,7 @@ class _SearchInputState extends State<_SearchInput> {
           decoration: InputDecoration(
             hintText: '搜索类别或标签组...',
             hintStyle: TextStyle(
-              color: colorScheme.onSurfaceVariant.withOpacity(0.6),
+              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
             ),
             prefixIcon: Icon(
               Icons.search,
@@ -253,7 +253,7 @@ class _FilterToggleState extends State<_FilterToggle> {
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
             color: widget.isExpanded || _isHovered
-                ? activeColor.withOpacity(0.12)
+                ? activeColor.withValues(alpha: 0.12)
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
           ),
@@ -312,7 +312,7 @@ class _ClearButtonState extends State<_ClearButton> {
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(
             color: _isHovered
-                ? colorScheme.errorContainer.withOpacity(0.3)
+                ? colorScheme.errorContainer.withValues(alpha: 0.3)
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(6),
           ),
@@ -362,7 +362,7 @@ class _FilterOptions extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.shadow.withOpacity(0.05),
+            color: colorScheme.shadow.withValues(alpha: 0.05),
             blurRadius: 4,
             offset: const Offset(0, 1),
           ),
@@ -486,7 +486,7 @@ class _FilterChipState extends State<_FilterChip> {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
             color: widget.isSelected
-                ? colorScheme.primary.withOpacity(0.15)
+                ? colorScheme.primary.withValues(alpha: 0.15)
                 : _isHovered
                     ? colorScheme.surfaceContainerHighest
                     : colorScheme.surfaceContainer,
@@ -494,14 +494,14 @@ class _FilterChipState extends State<_FilterChip> {
             boxShadow: widget.isSelected
                 ? [
                     BoxShadow(
-                      color: colorScheme.primary.withOpacity(0.2),
+                      color: colorScheme.primary.withValues(alpha: 0.2),
                       blurRadius: 6,
                       offset: const Offset(0, 2),
                     ),
                   ]
                 : [
                     BoxShadow(
-                      color: colorScheme.shadow.withOpacity(0.05),
+                      color: colorScheme.shadow.withValues(alpha: 0.05),
                       blurRadius: 4,
                       offset: const Offset(0, 1),
                     ),

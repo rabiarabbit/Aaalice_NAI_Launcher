@@ -124,14 +124,14 @@ class _PolarChartPainter extends CustomPainter {
     // Draw background circles with subtle gradient effect
     for (var i = 4; i >= 1; i--) {
       final bgPaint = Paint()
-        ..color = backgroundColor.withOpacity(0.15 + (4 - i) * 0.05)
+        ..color = backgroundColor.withValues(alpha: 0.15 + (4 - i) * 0.05)
         ..style = PaintingStyle.fill;
       canvas.drawCircle(center, radius * i / 4, bgPaint);
     }
 
     // Draw concentric circle guides
     final guidePaint = Paint()
-      ..color = backgroundColor.withOpacity(0.4)
+      ..color = backgroundColor.withValues(alpha: 0.4)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
 
@@ -144,7 +144,7 @@ class _PolarChartPainter extends CustomPainter {
       final angle = (hour * 15 - 90) * math.pi / 180;
       final isMainHour = hour % 3 == 0;
       final linePaint = Paint()
-        ..color = backgroundColor.withOpacity(isMainHour ? 0.5 : 0.2)
+        ..color = backgroundColor.withValues(alpha: isMainHour ? 0.5 : 0.2)
         ..strokeWidth = isMainHour ? 1.5 : 0.5;
 
       final startPoint = center;
@@ -183,8 +183,8 @@ class _PolarChartPainter extends CustomPainter {
     final gradientPaint = Paint()
       ..shader = RadialGradient(
         colors: [
-          color.withOpacity(isDark ? 0.6 : 0.5),
-          color.withOpacity(isDark ? 0.3 : 0.2),
+          color.withValues(alpha: isDark ? 0.6 : 0.5),
+          color.withValues(alpha: isDark ? 0.3 : 0.2),
         ],
       ).createShader(
         Rect.fromCircle(center: center, radius: radius),
@@ -203,7 +203,7 @@ class _PolarChartPainter extends CustomPainter {
 
     // Draw subtle glow
     final glowPaint = Paint()
-      ..color = color.withOpacity(0.3)
+      ..color = color.withValues(alpha: 0.3)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 6
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
@@ -227,7 +227,7 @@ class _PolarChartPainter extends CustomPainter {
         textPainter.text = TextSpan(
           text: hour.toString().padLeft(2, '0'),
           style: TextStyle(
-            color: textColor.withOpacity(animationValue),
+            color: textColor.withValues(alpha: animationValue),
             fontSize: 11,
             fontWeight: FontWeight.w600,
           ),
@@ -357,18 +357,20 @@ class _PeakTimeIndicatorState extends State<PeakTimeIndicator>
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    primaryColor.withOpacity(isDark ? 0.25 : 0.15),
-                    secondaryColor.withOpacity(isDark ? 0.15 : 0.08),
+                    primaryColor.withValues(alpha: isDark ? 0.25 : 0.15),
+                    secondaryColor.withValues(alpha: isDark ? 0.15 : 0.08),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                  color: primaryColor.withOpacity(_isHovered ? 0.5 : 0.3),
+                  color: primaryColor.withValues(alpha: _isHovered ? 0.5 : 0.3),
                   width: _isHovered ? 1.5 : 1,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: primaryColor.withOpacity(_isHovered ? 0.25 : 0.15),
+                    color: primaryColor.withValues(
+                      alpha: _isHovered ? 0.25 : 0.15,
+                    ),
                     blurRadius: _isHovered ? 16 : 10,
                     offset: const Offset(0, 4),
                     spreadRadius: _isHovered ? 0 : -2,
@@ -381,11 +383,11 @@ class _PeakTimeIndicatorState extends State<PeakTimeIndicator>
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: primaryColor.withOpacity(0.2),
+                      color: primaryColor.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(6),
                       boxShadow: [
                         BoxShadow(
-                          color: primaryColor.withOpacity(0.3),
+                          color: primaryColor.withValues(alpha: 0.3),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),

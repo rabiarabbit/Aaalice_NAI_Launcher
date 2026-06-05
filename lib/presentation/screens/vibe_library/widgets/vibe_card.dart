@@ -161,7 +161,13 @@ class _VibeCardState extends ConsumerState<VibeCard>
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           curve: Curves.easeOut,
-          transform: Matrix4.identity()..scale(_isHovered ? 1.02 : 1.0),
+          transform: Matrix4.identity()
+            ..scaleByDouble(
+              _isHovered ? 1.02 : 1.0,
+              _isHovered ? 1.02 : 1.0,
+              _isHovered ? 1.02 : 1.0,
+              1,
+            ),
           transformAlignment: Alignment.center,
           child: Container(
             width: widget.width,
@@ -215,7 +221,7 @@ class _VibeCardState extends ConsumerState<VibeCard>
     }
     if (_isHovered) {
       return Border.all(
-        color: colorScheme.primary.withOpacity(0.3),
+        color: colorScheme.primary.withValues(alpha: 0.3),
         width: 2,
       );
     }
@@ -226,13 +232,13 @@ class _VibeCardState extends ConsumerState<VibeCard>
     if (_isHovered) {
       return [
         BoxShadow(
-          color: Colors.black.withOpacity(0.35),
+          color: Colors.black.withValues(alpha: 0.35),
           blurRadius: 28,
           offset: const Offset(0, 14),
           spreadRadius: 2,
         ),
         BoxShadow(
-          color: Colors.black.withOpacity(0.15),
+          color: Colors.black.withValues(alpha: 0.15),
           blurRadius: 40,
           offset: const Offset(0, 20),
           spreadRadius: -4,
@@ -241,7 +247,7 @@ class _VibeCardState extends ConsumerState<VibeCard>
     }
     return [
       BoxShadow(
-        color: Colors.black.withOpacity(0.12),
+        color: Colors.black.withValues(alpha: 0.12),
         blurRadius: 10,
         offset: const Offset(0, 4),
       ),
@@ -254,7 +260,7 @@ class _VibeCardState extends ConsumerState<VibeCard>
     final cacheHeight = ((widget.height ?? widget.width) * pixelRatio).toInt();
 
     return Container(
-      color: Colors.black.withOpacity(0.05),
+      color: Colors.black.withValues(alpha: 0.05),
       child: _thumbnailData != null
           ? Image.memory(
               _thumbnailData!,
@@ -294,7 +300,7 @@ class _VibeCardState extends ConsumerState<VibeCard>
     final count = math.min(previews.length, 5);
 
     return Container(
-      color: Colors.black.withOpacity(0.7),
+      color: Colors.black.withValues(alpha: 0.7),
       child: AnimatedBuilder(
         animation: _animationController,
         builder: (context, child) {
@@ -343,9 +349,9 @@ class _VibeCardState extends ConsumerState<VibeCard>
 
     return Transform(
       transform: Matrix4.identity()
-        ..translate(0.0, translateY)
+        ..translateByDouble(0.0, translateY, 0, 1)
         ..rotateZ(rotate)
-        ..scale(scale),
+        ..scaleByDouble(scale, scale, scale, 1),
       alignment: Alignment.center,
       child: Container(
         width: cardWidth,
@@ -354,13 +360,13 @@ class _VibeCardState extends ConsumerState<VibeCard>
           borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.4 * progress),
+              color: Colors.black.withValues(alpha: 0.4 * progress),
               blurRadius: 12,
               offset: const Offset(0, 6),
             ),
           ],
           border: Border.all(
-            color: Colors.white.withOpacity(0.8 * progress),
+            color: Colors.white.withValues(alpha: 0.8 * progress),
             width: 2,
           ),
         ),
@@ -424,13 +430,13 @@ class _VibeCardState extends ConsumerState<VibeCard>
             borderRadius: BorderRadius.circular(8),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.3 + (0.2 * progress)),
+                color: Colors.black.withValues(alpha: 0.3 + (0.2 * progress)),
                 blurRadius: 8 + (6 * progress),
                 offset: Offset(0, 4 + (4 * progress)),
               ),
             ],
             border: Border.all(
-              color: Colors.white.withOpacity(0.6 + (0.3 * progress)),
+              color: Colors.white.withValues(alpha: 0.6 + (0.3 * progress)),
               width: 1.5,
             ),
           ),
@@ -467,7 +473,7 @@ class _VibeCardState extends ConsumerState<VibeCard>
           gradient: LinearGradient(
             colors: [
               Colors.transparent,
-              Colors.black.withOpacity(0.8),
+              Colors.black.withValues(alpha: 0.8),
             ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -522,7 +528,7 @@ class _VibeCardState extends ConsumerState<VibeCard>
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.82),
+                  color: Colors.white.withValues(alpha: 0.82),
                   fontSize: 10,
                   fontWeight: FontWeight.w500,
                 ),
@@ -532,7 +538,7 @@ class _VibeCardState extends ConsumerState<VibeCard>
             Text(
               '${(value * 100).toInt()}%',
               style: TextStyle(
-                color: Colors.white.withOpacity(0.78),
+                color: Colors.white.withValues(alpha: 0.78),
                 fontSize: 10,
                 fontWeight: FontWeight.w600,
               ),
@@ -544,7 +550,7 @@ class _VibeCardState extends ConsumerState<VibeCard>
           borderRadius: BorderRadius.circular(3),
           child: LinearProgressIndicator(
             value: value,
-            backgroundColor: Colors.white.withOpacity(0.2),
+            backgroundColor: Colors.white.withValues(alpha: 0.2),
             valueColor: AlwaysStoppedAnimation<Color>(color),
             minHeight: 5,
           ),
@@ -577,11 +583,11 @@ class _VibeCardState extends ConsumerState<VibeCard>
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
         decoration: BoxDecoration(
-          color: Colors.orange.withOpacity(0.9),
+          color: Colors.orange.withValues(alpha: 0.9),
           borderRadius: BorderRadius.circular(4),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withValues(alpha: 0.2),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),
@@ -611,7 +617,7 @@ class _VibeCardState extends ConsumerState<VibeCard>
       child: IgnorePointer(
         child: Container(
           decoration: BoxDecoration(
-            color: colorScheme.primary.withOpacity(0.15),
+            color: colorScheme.primary.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Center(
@@ -727,11 +733,13 @@ class _ActionButtonState extends State<_ActionButton> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final backgroundColor = widget.isDanger
-        ? (_isHovered ? colorScheme.error : colorScheme.error.withOpacity(0.9))
-        : (_isHovered ? Colors.white : Colors.white.withOpacity(0.9));
+        ? (_isHovered
+            ? colorScheme.error
+            : colorScheme.error.withValues(alpha: 0.9))
+        : (_isHovered ? Colors.white : Colors.white.withValues(alpha: 0.9));
     final iconColor = widget.isDanger
         ? colorScheme.onError
-        : (_isHovered ? Colors.black : Colors.black.withOpacity(0.65));
+        : (_isHovered ? Colors.black : Colors.black.withValues(alpha: 0.65));
 
     return MouseRegion(
       onEnter: (_) => _onEnter(),
@@ -754,7 +762,8 @@ class _ActionButtonState extends State<_ActionButton> {
                 color: backgroundColor,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(_isHovered ? 0.28 : 0.2),
+                    color:
+                        Colors.black.withValues(alpha: _isHovered ? 0.28 : 0.2),
                     blurRadius: _isHovered ? 8 : 4,
                     offset: Offset(0, _isHovered ? 3 : 2),
                   ),
@@ -779,7 +788,7 @@ class _ActionButtonState extends State<_ActionButton> {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.88),
+                      color: Colors.black.withValues(alpha: 0.88),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Column(
@@ -799,7 +808,7 @@ class _ActionButtonState extends State<_ActionButton> {
                           Text(
                             widget.modifierHint!,
                             style: TextStyle(
-                              color: Colors.white.withOpacity(0.7),
+                              color: Colors.white.withValues(alpha: 0.7),
                               fontSize: 10,
                             ),
                           ),

@@ -178,9 +178,13 @@ class DanbooruTagsLazyService implements LazyDataSourceService<LocalTag> {
     await prefs.setInt(StorageKeys.danbooruGeneralThreshold, generalThreshold);
     await prefs.setInt(StorageKeys.danbooruArtistThreshold, artistThreshold);
     await prefs.setInt(
-        StorageKeys.danbooruCharacterThreshold, characterThreshold);
+      StorageKeys.danbooruCharacterThreshold,
+      characterThreshold,
+    );
     await prefs.setInt(
-        StorageKeys.danbooruCopyrightThreshold, _copyrightThreshold);
+      StorageKeys.danbooruCopyrightThreshold,
+      _copyrightThreshold,
+    );
     await prefs.setInt(StorageKeys.danbooruMetaThreshold, _metaThreshold);
   }
 
@@ -198,15 +202,19 @@ class DanbooruTagsLazyService implements LazyDataSourceService<LocalTag> {
       // 检查数据库中实际有多少记录
       final tagCount = await _tagDataSource.getCount();
       AppLogger.i(
-          'Danbooru tag count in database: $tagCount', 'DanbooruTagsLazy');
+        'Danbooru tag count in database: $tagCount',
+        'DanbooruTagsLazy',
+      );
 
       // 加载元数据
       await _loadMeta();
 
       // 如果数据库为空，记录需要下载，但不阻塞初始化
       if (tagCount == 0) {
-        AppLogger.w('Database is empty, will download in warmup phase',
-            'DanbooruTagsLazy');
+        AppLogger.w(
+          'Database is empty, will download in warmup phase',
+          'DanbooruTagsLazy',
+        );
         _lastUpdate = null;
       }
 
@@ -273,15 +281,17 @@ class DanbooruTagsLazyService implements LazyDataSourceService<LocalTag> {
     // 统一标准化标签
     final normalizedKey = TagNormalizer.normalize(key);
     AppLogger.d(
-        '[DanbooruTagsLazy] get("$key") -> normalizedKey="$normalizedKey"',
-        'DanbooruTagsLazy');
+      '[DanbooruTagsLazy] get("$key") -> normalizedKey="$normalizedKey"',
+      'DanbooruTagsLazy',
+    );
 
     // 尝试精确匹配（热数据缓存直接返回，不防抖）
     if (_hotDataCache.containsKey(normalizedKey)) {
       final cached = _hotDataCache[normalizedKey];
       AppLogger.d(
-          '[DanbooruTagsLazy] cache hit: translation="${cached?.translation}"',
-          'DanbooruTagsLazy');
+        '[DanbooruTagsLazy] cache hit: translation="${cached?.translation}"',
+        'DanbooruTagsLazy',
+      );
       return cached;
     }
 
@@ -312,8 +322,9 @@ class DanbooruTagsLazyService implements LazyDataSourceService<LocalTag> {
         try {
           final record = await _tagDataSource.getByName(k);
           AppLogger.d(
-              '[DanbooruTagsLazy] DB record: ${record != null ? "found" : "not found"}',
-              'DanbooruTagsLazy');
+            '[DanbooruTagsLazy] DB record: ${record != null ? "found" : "not found"}',
+            'DanbooruTagsLazy',
+          );
 
           LocalTag? result;
           if (record != null) {
@@ -322,8 +333,10 @@ class DanbooruTagsLazyService implements LazyDataSourceService<LocalTag> {
             if (_translationDataSource != null) {
               translation = await _translationDataSource.query(k);
             }
-            AppLogger.d('[DanbooruTagsLazy] DB translation: "$translation"',
-                'DanbooruTagsLazy');
+            AppLogger.d(
+              '[DanbooruTagsLazy] DB translation: "$translation"',
+              'DanbooruTagsLazy',
+            );
             result = LocalTag(
               tag: record.tag,
               category: record.category,
@@ -551,7 +564,9 @@ class DanbooruTagsLazyService implements LazyDataSourceService<LocalTag> {
     AppLogger.i('[shouldRefresh] Total count: $count', 'DanbooruTagsLazy');
     if (count == 0) {
       AppLogger.i(
-          'Danbooru tags database is empty, need to fetch', 'DanbooruTagsLazy');
+        'Danbooru tags database is empty, need to fetch',
+        'DanbooruTagsLazy',
+      );
       return true;
     }
 
@@ -707,10 +722,14 @@ class DanbooruTagsLazyService implements LazyDataSourceService<LocalTag> {
           .toList();
 
       AppLogger.i(
-          'Preparing to import ${records.length} tags...', 'DanbooruTagsLazy');
+        'Preparing to import ${records.length} tags...',
+        'DanbooruTagsLazy',
+      );
       await _tagDataSource.upsertBatch(records);
       AppLogger.i(
-          'Successfully imported ${records.length} tags', 'DanbooruTagsLazy');
+        'Successfully imported ${records.length} tags',
+        'DanbooruTagsLazy',
+      );
 
       _onProgress?.call(0.99, '更新热数据...');
       await _loadHotData();
@@ -725,7 +744,11 @@ class DanbooruTagsLazyService implements LazyDataSourceService<LocalTag> {
       );
     } catch (e, stack) {
       AppLogger.e(
-          'Failed to refresh Danbooru tags', e, stack, 'DanbooruTagsLazy');
+        'Failed to refresh Danbooru tags',
+        e,
+        stack,
+        'DanbooruTagsLazy',
+      );
       _onProgress?.call(1.0, '刷新失败: $e');
       // 下载失败时不更新 _lastUpdate，确保下次启动会重新尝试下载
       rethrow;
@@ -830,7 +853,8 @@ class DanbooruTagsLazyService implements LazyDataSourceService<LocalTag> {
         // 请求间隔，避免限流
         if (currentPage <= maxPages && !_isCancelled) {
           await Future.delayed(
-              const Duration(milliseconds: _requestIntervalMs));
+            const Duration(milliseconds: _requestIntervalMs),
+          );
         }
       }
 
@@ -857,8 +881,10 @@ class DanbooruTagsLazyService implements LazyDataSourceService<LocalTag> {
         '画师标签导入完成，共 $importedCount 条',
       );
 
-      AppLogger.i('Artist tags fetch completed: $importedCount tags',
-          'DanbooruTagsLazy');
+      AppLogger.i(
+        'Artist tags fetch completed: $importedCount tags',
+        'DanbooruTagsLazy',
+      );
     } catch (e, stack) {
       AppLogger.e('Failed to fetch artist tags', e, stack, 'DanbooruTagsLazy');
       rethrow;
@@ -922,11 +948,15 @@ class DanbooruTagsLazyService implements LazyDataSourceService<LocalTag> {
         return [];
       }
       AppLogger.w(
-          'Failed to fetch artist tags page $page: $e', 'DanbooruTagsLazy');
+        'Failed to fetch artist tags page $page: $e',
+        'DanbooruTagsLazy',
+      );
       return null;
     } catch (e) {
       AppLogger.w(
-          'Failed to fetch artist tags page $page: $e', 'DanbooruTagsLazy');
+        'Failed to fetch artist tags page $page: $e',
+        'DanbooruTagsLazy',
+      );
       return null;
     }
   }
@@ -967,8 +997,10 @@ class DanbooruTagsLazyService implements LazyDataSourceService<LocalTag> {
         final pageTags = results[i];
 
         if (pageTags == null) {
-          AppLogger.w('Failed to fetch $progressPrefix page, stopping',
-              'DanbooruTagsLazy');
+          AppLogger.w(
+            'Failed to fetch $progressPrefix page, stopping',
+            'DanbooruTagsLazy',
+          );
           downloadFailed = true;
           _isCancelled = true;
           break;
@@ -978,7 +1010,9 @@ class DanbooruTagsLazyService implements LazyDataSourceService<LocalTag> {
           consecutiveEmpty++;
           if (consecutiveEmpty >= 2) {
             AppLogger.i(
-                'No more $progressPrefix available', 'DanbooruTagsLazy');
+              'No more $progressPrefix available',
+              'DanbooruTagsLazy',
+            );
             // 使用局部变量结束循环，不要设置 _isCancelled，避免影响其他分类
             break;
           }
@@ -1094,12 +1128,16 @@ class DanbooruTagsLazyService implements LazyDataSourceService<LocalTag> {
         }
 
         // 其他错误或重试耗尽
-        AppLogger.w('Failed to fetch category $category page $page: $e',
-            'DanbooruTagsLazy');
+        AppLogger.w(
+          'Failed to fetch category $category page $page: $e',
+          'DanbooruTagsLazy',
+        );
         return null;
       } catch (e) {
-        AppLogger.w('Failed to fetch category $category page $page: $e',
-            'DanbooruTagsLazy');
+        AppLogger.w(
+          'Failed to fetch category $category page $page: $e',
+          'DanbooruTagsLazy',
+        );
         return null;
       }
     }
@@ -1188,7 +1226,9 @@ class DanbooruTagsLazyService implements LazyDataSourceService<LocalTag> {
 
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt(
-          StorageKeys.danbooruTagsLastUpdate, now.millisecondsSinceEpoch);
+        StorageKeys.danbooruTagsLastUpdate,
+        now.millisecondsSinceEpoch,
+      );
     } catch (e) {
       AppLogger.w('Failed to save Danbooru tags meta: $e', 'DanbooruTagsLazy');
     }
@@ -1296,8 +1336,11 @@ class DanbooruTagsLazyService implements LazyDataSourceService<LocalTag> {
   }
 
   // 兼容旧 API 的方法
-  Future<List<LocalTag>> searchTags(String query,
-      {int? category, int limit = 20}) async {
+  Future<List<LocalTag>> searchTags(
+    String query, {
+    int? category,
+    int limit = 20,
+  }) async {
     return search(query, category: category, limit: limit);
   }
 
@@ -1320,7 +1363,9 @@ class DanbooruTagsLazyService implements LazyDataSourceService<LocalTag> {
     _refreshInterval = interval;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(
-        StorageKeys.danbooruTagsRefreshIntervalDays, interval.days);
+      StorageKeys.danbooruTagsRefreshIntervalDays,
+      interval.days,
+    );
   }
 
   // ===========================================================================
@@ -1337,7 +1382,9 @@ class DanbooruTagsLazyService implements LazyDataSourceService<LocalTag> {
       // 注意：不触发 refresh()，数据下载留到后台阶段
     } catch (e) {
       AppLogger.w(
-          'Danbooru tags lightweight init failed: $e', 'DanbooruTagsLazy');
+        'Danbooru tags lightweight init failed: $e',
+        'DanbooruTagsLazy',
+      );
       _isInitialized = true;
     }
   }
@@ -1360,7 +1407,9 @@ class DanbooruTagsLazyService implements LazyDataSourceService<LocalTag> {
       _onProgress?.call(1.0, '标签数据就绪');
     } catch (e) {
       AppLogger.w(
-          'Danbooru tags hot data preload failed: $e', 'DanbooruTagsLazy');
+        'Danbooru tags hot data preload failed: $e',
+        'DanbooruTagsLazy',
+      );
     }
   }
 
@@ -1445,7 +1494,9 @@ class DanbooruTagsLazyService implements LazyDataSourceService<LocalTag> {
 
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt(
-          StorageKeys.danbooruTagsLastUpdate, now.millisecondsSinceEpoch);
+        StorageKeys.danbooruTagsLastUpdate,
+        now.millisecondsSinceEpoch,
+      );
 
       AppLogger.i(
         'Tags meta saved after fetch: total=$totalTags, lastUpdate=$now',
@@ -1453,7 +1504,9 @@ class DanbooruTagsLazyService implements LazyDataSourceService<LocalTag> {
       );
     } catch (e) {
       AppLogger.w(
-          'Failed to save tags meta after fetch: $e', 'DanbooruTagsLazy');
+        'Failed to save tags meta after fetch: $e',
+        'DanbooruTagsLazy',
+      );
     }
   }
 

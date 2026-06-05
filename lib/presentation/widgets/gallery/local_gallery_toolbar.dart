@@ -266,11 +266,11 @@ class _LocalGalleryToolbarState extends ConsumerState<LocalGalleryToolbar> {
           constraints: const BoxConstraints(minHeight: 62),
           decoration: BoxDecoration(
             color: isDark
-                ? theme.colorScheme.surfaceContainerHigh.withOpacity(0.9)
-                : theme.colorScheme.surface.withOpacity(0.8),
+                ? theme.colorScheme.surfaceContainerHigh.withValues(alpha: 0.9)
+                : theme.colorScheme.surface.withValues(alpha: 0.8),
             border: Border(
               bottom: BorderSide(
-                color: theme.dividerColor.withOpacity(isDark ? 0.2 : 0.3),
+                color: theme.dividerColor.withValues(alpha: isDark ? 0.2 : 0.3),
               ),
             ),
           ),
@@ -298,9 +298,9 @@ class _LocalGalleryToolbarState extends ConsumerState<LocalGalleryToolbar> {
                       decoration: BoxDecoration(
                         color: isDark
                             ? theme.colorScheme.primaryContainer
-                                .withOpacity(0.4)
+                                .withValues(alpha: 0.4)
                             : theme.colorScheme.primaryContainer
-                                .withOpacity(0.3),
+                                .withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
@@ -376,7 +376,7 @@ class _LocalGalleryToolbarState extends ConsumerState<LocalGalleryToolbar> {
                     child: Container(
                       width: 1,
                       height: 24,
-                      color: theme.dividerColor.withOpacity(0.3),
+                      color: theme.dividerColor.withValues(alpha: 0.3),
                     ),
                   ),
                   // Category panel toggle
@@ -453,7 +453,7 @@ class _LocalGalleryToolbarState extends ConsumerState<LocalGalleryToolbar> {
       height: 36,
       constraints: const BoxConstraints(maxWidth: 300),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.4),
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
         borderRadius: BorderRadius.circular(18),
       ),
       child: TextField(
@@ -463,20 +463,21 @@ class _LocalGalleryToolbarState extends ConsumerState<LocalGalleryToolbar> {
         decoration: InputDecoration(
           hintText: '搜索文件名/Prompt，逗号分隔交集搜索...',
           hintStyle: TextStyle(
-            color: theme.colorScheme.onSurfaceVariant.withOpacity(0.5),
+            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
             fontSize: 13,
           ),
           prefixIcon: Icon(
             Icons.search,
             size: 18,
-            color: theme.colorScheme.onSurfaceVariant.withOpacity(0.6),
+            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
           ),
           suffixIcon: _searchController.text.isNotEmpty
               ? IconButton(
                   icon: Icon(
                     Icons.close,
                     size: 16,
-                    color: theme.colorScheme.onSurfaceVariant.withOpacity(0.6),
+                    color: theme.colorScheme.onSurfaceVariant
+                        .withValues(alpha: 0.6),
                   ),
                   onPressed: () {
                     _searchController.clear();
@@ -587,7 +588,9 @@ class _LocalGalleryToolbarState extends ConsumerState<LocalGalleryToolbar> {
       label: Text(
         hasDateRange
             ? _formatDateRange(
-                state.filterCriteria.dateStart, state.filterCriteria.dateEnd)
+                state.filterCriteria.dateStart,
+                state.filterCriteria.dateEnd,
+              )
             : '日期过滤',
         style: TextStyle(
           fontSize: 12,
@@ -632,7 +635,8 @@ class _LocalGalleryToolbarState extends ConsumerState<LocalGalleryToolbar> {
               state.filterCriteria.dateEnd != null
           ? DateTimeRange(
               start: state.filterCriteria.dateStart!,
-              end: state.filterCriteria.dateEnd!)
+              end: state.filterCriteria.dateEnd!,
+            )
           : DateTimeRange(
               start: now.subtract(const Duration(days: 30)),
               end: now,

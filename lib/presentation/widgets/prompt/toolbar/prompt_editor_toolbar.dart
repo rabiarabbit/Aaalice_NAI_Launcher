@@ -128,7 +128,7 @@ class PromptEditorToolbar extends StatelessWidget {
           size: iconSize,
           color: onRandomPressed != null
               ? theme.colorScheme.primary
-              : theme.colorScheme.onSurface.withOpacity(0.3),
+              : theme.colorScheme.onSurface.withValues(alpha: 0.3),
         ),
         tooltip: l10n.toolbar_randomPrompt,
         onPressed: onRandomPressed,
@@ -155,8 +155,8 @@ class PromptEditorToolbar extends StatelessWidget {
         Icons.fullscreen,
         size: iconSize,
         color: onFullscreenPressed != null
-            ? theme.colorScheme.onSurface.withOpacity(0.6)
-            : theme.colorScheme.onSurface.withOpacity(0.3),
+            ? theme.colorScheme.onSurface.withValues(alpha: 0.6)
+            : theme.colorScheme.onSurface.withValues(alpha: 0.3),
       ),
       tooltip: l10n.toolbar_fullscreenEdit,
       onPressed: onFullscreenPressed,
@@ -185,8 +185,8 @@ class PromptEditorToolbar extends StatelessWidget {
         Icons.clear,
         size: iconSize,
         color: onClearPressed != null
-            ? theme.colorScheme.onSurface.withOpacity(0.6)
-            : theme.colorScheme.onSurface.withOpacity(0.3),
+            ? theme.colorScheme.onSurface.withValues(alpha: 0.6)
+            : theme.colorScheme.onSurface.withValues(alpha: 0.3),
       ),
       tooltip: l10n.toolbar_clear,
       onPressed: onClearPressed,
@@ -212,8 +212,8 @@ class PromptEditorToolbar extends StatelessWidget {
         Icons.clear,
         size: iconSize,
         color: onClearPressed != null
-            ? theme.colorScheme.onSurface.withOpacity(0.6)
-            : theme.colorScheme.onSurface.withOpacity(0.3),
+            ? theme.colorScheme.onSurface.withValues(alpha: 0.6)
+            : theme.colorScheme.onSurface.withValues(alpha: 0.3),
       ),
       tooltip: l10n.toolbar_clear,
       enabled: onClearPressed != null,
@@ -267,8 +267,8 @@ class PromptEditorToolbar extends StatelessWidget {
           Icons.settings,
           size: iconSize,
           color: onSettingsPressed != null
-              ? theme.colorScheme.onSurface.withOpacity(0.6)
-              : theme.colorScheme.onSurface.withOpacity(0.3),
+              ? theme.colorScheme.onSurface.withValues(alpha: 0.6)
+              : theme.colorScheme.onSurface.withValues(alpha: 0.3),
         ),
         tooltip: l10n.toolbar_settings,
         onPressed: onSettingsPressed != null

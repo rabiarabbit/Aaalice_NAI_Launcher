@@ -96,8 +96,8 @@ class _ThemedRadioState<T> extends State<ThemedRadio<T>>
     final borderColor = _isSelected
         ? activeColorBase
         : (_isHovered
-            ? theme.colorScheme.primary.withOpacity(0.5)
-            : theme.colorScheme.outline.withOpacity(0.5));
+            ? theme.colorScheme.primary.withValues(alpha: 0.5)
+            : theme.colorScheme.outline.withValues(alpha: 0.5));
 
     // 背景色
     final backgroundColor = isDark
@@ -153,7 +153,7 @@ class _ThemedRadioState<T> extends State<ThemedRadio<T>>
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: activeColor.withOpacity(0.3),
+                  color: activeColor.withValues(alpha: 0.3),
                   blurRadius: 4,
                   offset: const Offset(0, 1),
                 ),
@@ -165,7 +165,6 @@ class _ThemedRadioState<T> extends State<ThemedRadio<T>>
     );
   }
 }
-
 
 /// 带标签的主题化单选框
 class ThemedRadioListTile<T> extends StatelessWidget {
@@ -255,7 +254,7 @@ class _SelectListTile extends StatelessWidget {
                                   .textTheme
                                   .bodyLarge!
                                   .color!
-                                  .withOpacity(0.5),
+                                  .withValues(alpha: 0.5),
                         ),
                     child: title,
                   ),
@@ -267,7 +266,7 @@ class _SelectListTile extends StatelessWidget {
                                 .textTheme
                                 .bodySmall!
                                 .color!
-                                .withOpacity(enabled ? 0.7 : 0.4),
+                                .withValues(alpha: enabled ? 0.7 : 0.4),
                           ),
                       child: subtitle!,
                     ),

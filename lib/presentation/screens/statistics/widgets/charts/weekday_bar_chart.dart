@@ -107,7 +107,7 @@ class _WeekdayBarChartState extends State<WeekdayBarChart> {
                         color: isTouched
                             ? color
                             : isWeekend
-                                ? colorScheme.error.withOpacity(0.7)
+                                ? colorScheme.error.withValues(alpha: 0.7)
                                 : colorScheme.onSurfaceVariant,
                         fontWeight:
                             isTouched ? FontWeight.bold : FontWeight.normal,
@@ -144,7 +144,7 @@ class _WeekdayBarChartState extends State<WeekdayBarChart> {
             drawVerticalLine: false,
             checkToShowHorizontalLine: (value) => true,
             getDrawingHorizontalLine: (value) => FlLine(
-              color: colorScheme.outlineVariant.withOpacity(0.2),
+              color: colorScheme.outlineVariant.withValues(alpha: 0.2),
               strokeWidth: 1,
             ),
           ),
@@ -152,7 +152,7 @@ class _WeekdayBarChartState extends State<WeekdayBarChart> {
             show: true,
             border: Border(
               bottom: BorderSide(
-                color: colorScheme.outlineVariant.withOpacity(0.2),
+                color: colorScheme.outlineVariant.withValues(alpha: 0.2),
                 width: 1,
               ),
             ),
@@ -171,8 +171,8 @@ class _WeekdayBarChartState extends State<WeekdayBarChart> {
                   color: isTouched
                       ? color
                       : isWeekend
-                          ? colorScheme.error.withOpacity(0.6)
-                          : color.withOpacity(0.6),
+                          ? colorScheme.error.withValues(alpha: 0.6)
+                          : color.withValues(alpha: 0.6),
                   width: 28,
                   borderRadius: const BorderRadius.vertical(
                     top: Radius.circular(6),
@@ -180,7 +180,8 @@ class _WeekdayBarChartState extends State<WeekdayBarChart> {
                   backDrawRodData: BackgroundBarChartRodData(
                     show: true,
                     toY: maxValue * 1.2,
-                    color: colorScheme.surfaceContainerHighest.withOpacity(0.2),
+                    color: colorScheme.surfaceContainerHighest
+                        .withValues(alpha: 0.2),
                   ),
                 ),
               ],
@@ -305,19 +306,19 @@ class _DaySummaryCardState extends State<_DaySummaryCard> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              widget.color.withOpacity(isDark ? 0.2 : 0.12),
-              widget.secondaryColor.withOpacity(isDark ? 0.1 : 0.06),
+              widget.color.withValues(alpha: isDark ? 0.2 : 0.12),
+              widget.secondaryColor.withValues(alpha: isDark ? 0.1 : 0.06),
             ],
           ),
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: widget.color.withOpacity(_isHovered ? 0.4 : 0.2),
+            color: widget.color.withValues(alpha: _isHovered ? 0.4 : 0.2),
             width: _isHovered ? 1.5 : 1,
           ),
           boxShadow: _isHovered
               ? [
                   BoxShadow(
-                    color: widget.color.withOpacity(0.15),
+                    color: widget.color.withValues(alpha: 0.15),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
@@ -329,7 +330,7 @@ class _DaySummaryCardState extends State<_DaySummaryCard> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: widget.color.withOpacity(0.15),
+                color: widget.color.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(widget.icon, color: widget.color, size: 20),
@@ -360,7 +361,7 @@ class _DaySummaryCardState extends State<_DaySummaryCard> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
-                color: widget.color.withOpacity(0.15),
+                color: widget.color.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Text(

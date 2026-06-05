@@ -189,7 +189,7 @@ class _ImagePickerCardState extends State<ImagePickerCard> {
             size: 28,
             color: _isHovered || _isDragOver
                 ? theme.colorScheme.primary
-                : theme.colorScheme.onSurface.withOpacity(0.5),
+                : theme.colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 8),
           Text(
@@ -197,7 +197,7 @@ class _ImagePickerCardState extends State<ImagePickerCard> {
             style: theme.textTheme.bodySmall?.copyWith(
               color: _isHovered || _isDragOver
                   ? theme.colorScheme.primary
-                  : theme.colorScheme.onSurface.withOpacity(0.6),
+                  : theme.colorScheme.onSurface.withValues(alpha: 0.6),
             ),
             textAlign: TextAlign.center,
           ),
@@ -206,7 +206,7 @@ class _ImagePickerCardState extends State<ImagePickerCard> {
             Text(
               widget.hintText!,
               style: theme.textTheme.labelSmall?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.4),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
               ),
             ),
           ],
@@ -290,7 +290,7 @@ class _ImagePickerCardState extends State<ImagePickerCard> {
       top: 4,
       right: 4,
       child: Material(
-        color: theme.colorScheme.surface.withOpacity(0.9),
+        color: theme.colorScheme.surface.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(12),
         child: InkWell(
           onTap: widget.onClear,
@@ -313,7 +313,7 @@ class _ImagePickerCardState extends State<ImagePickerCard> {
     return Positioned.fill(
       child: Container(
         decoration: BoxDecoration(
-          color: theme.colorScheme.primary.withOpacity(0.1),
+          color: theme.colorScheme.primary.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: theme.colorScheme.primary,
@@ -477,24 +477,24 @@ class _ImagePickerCardState extends State<ImagePickerCard> {
     if (_hasSelection) {
       return _isHovered
           ? theme.colorScheme.primary
-          : theme.colorScheme.primary.withOpacity(0.6);
+          : theme.colorScheme.primary.withValues(alpha: 0.6);
     }
     return _isHovered
         ? theme.colorScheme.primary
-        : theme.colorScheme.outline.withOpacity(0.5);
+        : theme.colorScheme.outline.withValues(alpha: 0.5);
   }
 
   Color _getBackgroundColor(ThemeData theme) {
     if (_isDragOver) {
-      return theme.colorScheme.primary.withOpacity(0.08);
+      return theme.colorScheme.primary.withValues(alpha: 0.08);
     }
     if (_hasSelection) {
       return _isHovered
-          ? theme.colorScheme.primary.withOpacity(0.08)
-          : theme.colorScheme.primary.withOpacity(0.04);
+          ? theme.colorScheme.primary.withValues(alpha: 0.08)
+          : theme.colorScheme.primary.withValues(alpha: 0.04);
     }
     return _isHovered
-        ? theme.colorScheme.primary.withOpacity(0.05)
+        ? theme.colorScheme.primary.withValues(alpha: 0.05)
         : Colors.transparent;
   }
 
@@ -504,7 +504,7 @@ class _ImagePickerCardState extends State<ImagePickerCard> {
 
     return [
       BoxShadow(
-        color: theme.colorScheme.primary.withOpacity(0.15),
+        color: theme.colorScheme.primary.withValues(alpha: 0.15),
         blurRadius: 20,
         spreadRadius: 0,
       ),

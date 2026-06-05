@@ -21,14 +21,6 @@ class WorkflowAnalyzer {
     'VHS_VideoCombine',
   };
 
-  /// 已知的采样器节点类型（含可调参数）
-  static const Set<String> _samplerNodeTypes = {
-    'KSampler',
-    'KSamplerAdvanced',
-    'SamplerCustom',
-    'SamplerCustomAdvanced',
-  };
-
   /// 不应暴露给用户调整的内部参数
   static const Set<String> _hiddenFields = {
     'model',
@@ -61,11 +53,13 @@ class WorkflowAnalyzer {
       final title = meta?['title'] as String? ?? classType;
       final inputs = nodeData['inputs'] as Map<String, dynamic>? ?? {};
 
-      nodeInfos.add(AnalyzedNode(
-        nodeId: nodeId,
-        classType: classType,
-        title: title,
-      ));
+      nodeInfos.add(
+        AnalyzedNode(
+          nodeId: nodeId,
+          classType: classType,
+          title: title,
+        ),
+      );
 
       // 识别输入图像节点
       if (_imageInputNodeTypes.contains(classType)) {
@@ -73,17 +67,19 @@ class WorkflowAnalyzer {
         if (imageField != null) {
           final existing = inputs[imageField];
           if (existing is! List) {
-            inputSlots.add(WorkflowSlot(
-              id: 'input_${nodeId}_image',
-              direction: SlotDirection.input,
-              dataType: classType.contains('Mask')
-                  ? SlotDataType.mask
-                  : SlotDataType.image,
-              nodeId: nodeId,
-              field: imageField,
-              label: '$title (节点 $nodeId)',
-              required: true,
-            ));
+            inputSlots.add(
+              WorkflowSlot(
+                id: 'input_${nodeId}_image',
+                direction: SlotDirection.input,
+                dataType: classType.contains('Mask')
+                    ? SlotDataType.mask
+                    : SlotDataType.image,
+                nodeId: nodeId,
+                field: imageField,
+                label: '$title (节点 $nodeId)',
+                required: true,
+              ),
+            );
           }
         }
       }
@@ -93,16 +89,18 @@ class WorkflowAnalyzer {
         final method = classType == 'SaveImageWebsocket'
             ? OutputMethod.websocket
             : OutputMethod.httpHistory;
-        outputSlots.add(WorkflowSlot(
-          id: 'output_$nodeId',
-          direction: SlotDirection.output,
-          dataType: SlotDataType.image,
-          nodeId: nodeId,
-          field: null,
-          label: '$title (节点 $nodeId)',
-          outputMethod: method,
-          nodeClass: classType,
-        ));
+        outputSlots.add(
+          WorkflowSlot(
+            id: 'output_$nodeId',
+            direction: SlotDirection.output,
+            dataType: SlotDataType.image,
+            nodeId: nodeId,
+            field: null,
+            label: '$title (节点 $nodeId)',
+            outputMethod: method,
+            nodeClass: classType,
+          ),
+        );
       }
 
       // 识别可调参数：扫描所有纯值（非连线）输入
@@ -116,15 +114,17 @@ class WorkflowAnalyzer {
         final slotType = _inferDataType(value);
         if (slotType == null) continue;
 
-        parameterSlots.add(WorkflowSlot(
-          id: 'param_${nodeId}_$field',
-          direction: SlotDirection.parameter,
-          dataType: slotType,
-          nodeId: nodeId,
-          field: field,
-          label: '$field ($title)',
-          defaultValue: value,
-        ));
+        parameterSlots.add(
+          WorkflowSlot(
+            id: 'param_${nodeId}_$field',
+            direction: SlotDirection.parameter,
+            dataType: slotType,
+            nodeId: nodeId,
+            field: field,
+            label: '$field ($title)',
+            defaultValue: value,
+          ),
+        );
       }
     }
 

@@ -177,7 +177,7 @@ class _BulkMetadataEditDialogState
               : theme.colorScheme.surface,
           borderRadius: const BorderRadius.all(Radius.circular(16)),
           border: Border.all(
-            color: theme.dividerColor.withOpacity(isDark ? 0.3 : 0.2),
+            color: theme.dividerColor.withValues(alpha: isDark ? 0.3 : 0.2),
           ),
         ),
         child: Column(
@@ -276,10 +276,10 @@ class _BulkMetadataEditDialogState
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
                             color: theme.colorScheme.surfaceContainerHighest
-                                .withOpacity(0.3),
+                                .withValues(alpha: 0.3),
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
-                              color: theme.dividerColor.withOpacity(0.2),
+                              color: theme.dividerColor.withValues(alpha: 0.2),
                             ),
                           ),
                           child: Row(
@@ -401,11 +401,13 @@ class _BulkMetadataEditDialogState
             height: 40,
             decoration: BoxDecoration(
               color: isDark
-                  ? theme.colorScheme.surfaceContainerHighest.withOpacity(0.6)
-                  : theme.colorScheme.surfaceContainerHighest.withOpacity(0.4),
+                  ? theme.colorScheme.surfaceContainerHighest
+                      .withValues(alpha: 0.6)
+                  : theme.colorScheme.surfaceContainerHighest
+                      .withValues(alpha: 0.4),
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color: theme.dividerColor.withOpacity(isDark ? 0.2 : 0.1),
+                color: theme.dividerColor.withValues(alpha: isDark ? 0.2 : 0.1),
               ),
             ),
             child: AutocompleteWrapper(
@@ -428,8 +430,8 @@ class _BulkMetadataEditDialogState
                 decoration: InputDecoration(
                   hintText: hintText,
                   hintStyle: TextStyle(
-                    color: theme.colorScheme.onSurfaceVariant.withOpacity(
-                      isDark ? 0.6 : 0.5,
+                    color: theme.colorScheme.onSurfaceVariant.withValues(
+                      alpha: isDark ? 0.6 : 0.5,
                     ),
                     fontSize: 13,
                   ),
@@ -451,7 +453,7 @@ class _BulkMetadataEditDialogState
           icon: const Icon(Icons.add, size: 20),
           tooltip: 'Add tag',
           style: IconButton.styleFrom(
-            backgroundColor: theme.colorScheme.primary.withOpacity(0.1),
+            backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
             foregroundColor: theme.colorScheme.primary,
           ),
         ),
@@ -478,14 +480,14 @@ class _BulkMetadataEditDialogState
           label: Text(
             tag,
             style: theme.textTheme.bodySmall?.copyWith(
-              color: color.withOpacity(0.9),
+              color: color.withValues(alpha: 0.9),
             ),
           ),
           deleteIconColor: color,
           onDeleted: () => onRemove(tag),
-          backgroundColor: color.withOpacity(0.1),
+          backgroundColor: color.withValues(alpha: 0.1),
           side: BorderSide(
-            color: color.withOpacity(0.3),
+            color: color.withValues(alpha: 0.3),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
         );

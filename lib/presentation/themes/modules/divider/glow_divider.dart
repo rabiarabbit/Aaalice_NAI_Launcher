@@ -52,18 +52,18 @@ class GlowDividerModule extends BaseDividerModule {
   BoxDecoration? get horizontalDecoration => BoxDecoration(
         border: Border(
           bottom: BorderSide(
-            color: _glowColor.withOpacity(0.8),
+            color: _glowColor.withValues(alpha: 0.8),
             width: thickness,
           ),
         ),
         boxShadow: [
           BoxShadow(
-            color: _glowColor.withOpacity(0.3 * _glowIntensity),
+            color: _glowColor.withValues(alpha: 0.3 * _glowIntensity),
             blurRadius: 4,
             spreadRadius: 0,
           ),
           BoxShadow(
-            color: _glowColor.withOpacity(0.2 * _glowIntensity),
+            color: _glowColor.withValues(alpha: 0.2 * _glowIntensity),
             blurRadius: 8,
             spreadRadius: 0,
           ),
@@ -74,13 +74,13 @@ class GlowDividerModule extends BaseDividerModule {
   BoxDecoration? get verticalDecoration => BoxDecoration(
         border: Border(
           right: BorderSide(
-            color: _glowColor.withOpacity(0.8),
+            color: _glowColor.withValues(alpha: 0.8),
             width: thickness,
           ),
         ),
         boxShadow: [
           BoxShadow(
-            color: _glowColor.withOpacity(0.3 * _glowIntensity),
+            color: _glowColor.withValues(alpha: 0.3 * _glowIntensity),
             blurRadius: 4,
             spreadRadius: 0,
           ),
@@ -97,21 +97,33 @@ class GlowDividerModule extends BaseDividerModule {
     return BoxDecoration(
       border: Border(
         top: top
-            ? BorderSide(color: _glowColor.withOpacity(0.8), width: thickness)
+            ? BorderSide(
+                color: _glowColor.withValues(alpha: 0.8),
+                width: thickness,
+              )
             : BorderSide.none,
         right: right
-            ? BorderSide(color: _glowColor.withOpacity(0.8), width: thickness)
+            ? BorderSide(
+                color: _glowColor.withValues(alpha: 0.8),
+                width: thickness,
+              )
             : BorderSide.none,
         bottom: bottom
-            ? BorderSide(color: _glowColor.withOpacity(0.8), width: thickness)
+            ? BorderSide(
+                color: _glowColor.withValues(alpha: 0.8),
+                width: thickness,
+              )
             : BorderSide.none,
         left: left
-            ? BorderSide(color: _glowColor.withOpacity(0.8), width: thickness)
+            ? BorderSide(
+                color: _glowColor.withValues(alpha: 0.8),
+                width: thickness,
+              )
             : BorderSide.none,
       ),
       boxShadow: [
         BoxShadow(
-          color: _glowColor.withOpacity(0.2 * _glowIntensity),
+          color: _glowColor.withValues(alpha: 0.2 * _glowIntensity),
           blurRadius: 6,
           spreadRadius: 0,
         ),

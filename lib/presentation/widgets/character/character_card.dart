@@ -9,6 +9,7 @@ import '../../../data/models/character/character_prompt.dart';
 import '../../providers/tag_library_page_provider.dart';
 import '../../themes/theme_extension.dart';
 import '../common/app_toast.dart';
+import '../common/decoded_memory_image.dart';
 import '../common/themed_switch.dart';
 import 'add_to_library_dialog.dart';
 
@@ -154,7 +155,12 @@ class _CharacterCardState extends ConsumerState<CharacterCard>
             duration: const Duration(milliseconds: 150),
             curve: Curves.easeOut,
             transform: Matrix4.identity()
-              ..translate(0.0, _isHovered && isEnabled ? -4.0 : 0.0),
+              ..translateByDouble(
+                0.0,
+                _isHovered && isEnabled ? -4.0 : 0.0,
+                0,
+                1,
+              ),
             transformAlignment: Alignment.center,
             child: Container(
               decoration: BoxDecoration(
@@ -164,8 +170,8 @@ class _CharacterCardState extends ConsumerState<CharacterCard>
                   // 外层柔和阴影
                   BoxShadow(
                     color: _isHovered
-                        ? genderColor.withOpacity(0.15)
-                        : Colors.black.withOpacity(0.06),
+                        ? genderColor.withValues(alpha: 0.15)
+                        : Colors.black.withValues(alpha: 0.06),
                     blurRadius: _isHovered ? 20 : 12,
                     offset: Offset(0, _isHovered ? 8 : 4),
                     spreadRadius: 0,
@@ -173,14 +179,14 @@ class _CharacterCardState extends ConsumerState<CharacterCard>
                   // 中层阴影
                   BoxShadow(
                     color: _isHovered
-                        ? genderColor.withOpacity(0.1)
-                        : Colors.black.withOpacity(0.04),
+                        ? genderColor.withValues(alpha: 0.1)
+                        : Colors.black.withValues(alpha: 0.04),
                     blurRadius: _isHovered ? 8 : 6,
                     offset: Offset(0, _isHovered ? 4 : 2),
                   ),
                   // 内层精细阴影
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.03),
+                    color: Colors.black.withValues(alpha: 0.03),
                     blurRadius: 2,
                     offset: const Offset(0, 1),
                   ),
@@ -353,7 +359,7 @@ class _CardBackground extends StatelessWidget {
           colors: [
             baseColor,
             accentColor,
-            baseColor.withOpacity(0.95),
+            baseColor.withValues(alpha: 0.95),
           ],
           stops: const [0.0, 0.5, 1.0],
         ),
@@ -377,10 +383,10 @@ class _CardBackground extends StatelessWidget {
                   begin: const Alignment(-1, -1),
                   end: const Alignment(1, 1),
                   colors: [
-                    Colors.white.withOpacity(isLight ? 0.15 : 0.05),
+                    Colors.white.withValues(alpha: isLight ? 0.15 : 0.05),
                     Colors.transparent,
                     Colors.transparent,
-                    Colors.white.withOpacity(isLight ? 0.08 : 0.03),
+                    Colors.white.withValues(alpha: isLight ? 0.08 : 0.03),
                   ],
                   stops: const [0.0, 0.3, 0.7, 1.0],
                 ),
@@ -408,7 +414,7 @@ class _CardTexturePainter extends CustomPainter {
     // 绘制细微点阵纹理（模拟塑料磨砂质感）
     final dotPaint = Paint()
       ..color = (isLight ? Colors.black : Colors.white)
-          .withOpacity(isLight ? 0.015 : 0.02);
+          .withValues(alpha: isLight ? 0.015 : 0.02);
 
     const dotSpacing = 4.0;
     for (double x = 0; x < size.width; x += dotSpacing) {
@@ -419,7 +425,7 @@ class _CardTexturePainter extends CustomPainter {
 
     // 绘制水印图案（安全线效果）
     final watermarkPaint = Paint()
-      ..color = genderColor.withOpacity(isLight ? 0.03 : 0.05)
+      ..color = genderColor.withValues(alpha: isLight ? 0.03 : 0.05)
       ..strokeWidth = 0.8
       ..style = PaintingStyle.stroke;
 
@@ -437,7 +443,7 @@ class _CardTexturePainter extends CustomPainter {
 
     // 边缘装饰线
     final borderPaint = Paint()
-      ..color = genderColor.withOpacity(isLight ? 0.08 : 0.12)
+      ..color = genderColor.withValues(alpha: isLight ? 0.08 : 0.12)
       ..strokeWidth = 1.0
       ..style = PaintingStyle.stroke;
 
@@ -468,15 +474,16 @@ class _TopStripe extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            genderColor.withOpacity(0.8),
+            genderColor.withValues(alpha: 0.8),
             genderColor,
-            genderColor.withOpacity(0.8),
+            genderColor.withValues(alpha: 0.8),
           ],
         ),
       ),
       // 顶部装饰图案
       child: CustomPaint(
-        painter: _StripPatternPainter(color: Colors.white.withOpacity(0.15)),
+        painter:
+            _StripPatternPainter(color: Colors.white.withValues(alpha: 0.15)),
       ),
     );
   }
@@ -535,12 +542,12 @@ class _AvatarSection extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                color: genderColor.withOpacity(0.5),
+                color: genderColor.withValues(alpha: 0.5),
                 width: 2,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: genderColor.withOpacity(0.25),
+                  color: genderColor.withValues(alpha: 0.25),
                   blurRadius: 8,
                   offset: const Offset(0, 3),
                 ),
@@ -549,11 +556,29 @@ class _AvatarSection extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: hasThumbnail
-                  ? Image.file(
-                      File(character.thumbnailPath!),
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stack) =>
-                          _buildPlaceholder(),
+                  ? LayoutBuilder(
+                      builder: (context, constraints) {
+                        final boundedSide = math.min(
+                          constraints.maxWidth,
+                          constraints.maxHeight,
+                        );
+                        final cacheSize =
+                            DecodedMemoryImage.resolveCacheDimension(
+                          logicalSize:
+                              boundedSide.isFinite ? boundedSide : null,
+                          constrainedSize: null,
+                          pixelRatio: MediaQuery.devicePixelRatioOf(context),
+                        );
+
+                        return Image.file(
+                          File(character.thumbnailPath!),
+                          fit: BoxFit.cover,
+                          cacheWidth: cacheSize,
+                          cacheHeight: cacheSize,
+                          errorBuilder: (context, error, stack) =>
+                              _buildPlaceholder(),
+                        );
+                      },
                     )
                   : _buildPlaceholder(),
             ),
@@ -570,8 +595,8 @@ class _AvatarSection extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            genderColor.withOpacity(0.3),
-            genderColor.withOpacity(0.15),
+            genderColor.withValues(alpha: 0.3),
+            genderColor.withValues(alpha: 0.15),
           ],
         ),
       ),
@@ -579,7 +604,7 @@ class _AvatarSection extends StatelessWidget {
         child: Icon(
           genderIcon,
           size: 40,
-          color: genderColor.withOpacity(0.8),
+          color: genderColor.withValues(alpha: 0.8),
         ),
       ),
     );
@@ -602,11 +627,11 @@ class _MetallicDivider extends StatelessWidget {
         gradient: LinearGradient(
           colors: [
             Colors.transparent,
-            genderColor.withOpacity(0.4),
-            genderColor.withOpacity(0.8),
-            Colors.white.withOpacity(0.9),
-            genderColor.withOpacity(0.8),
-            genderColor.withOpacity(0.4),
+            genderColor.withValues(alpha: 0.4),
+            genderColor.withValues(alpha: 0.8),
+            Colors.white.withValues(alpha: 0.9),
+            genderColor.withValues(alpha: 0.8),
+            genderColor.withValues(alpha: 0.4),
             Colors.transparent,
           ],
           stops: const [0.0, 0.15, 0.35, 0.5, 0.65, 0.85, 1.0],
@@ -673,7 +698,8 @@ class _InfoSection extends StatelessWidget {
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w700,
               decoration: isEnabled ? null : TextDecoration.lineThrough,
-              color: isEnabled ? textPrimary : textPrimary.withOpacity(0.5),
+              color:
+                  isEnabled ? textPrimary : textPrimary.withValues(alpha: 0.5),
               fontSize: 15,
             ),
             maxLines: 1,
@@ -689,14 +715,14 @@ class _InfoSection extends StatelessWidget {
               Icon(
                 genderIcon,
                 size: 12,
-                color: genderColor.withOpacity(0.8),
+                color: genderColor.withValues(alpha: 0.8),
               ),
               const SizedBox(width: 2),
               Text(
                 _getGenderText(),
                 style: TextStyle(
                   fontSize: 10,
-                  color: genderColor.withOpacity(0.8),
+                  color: genderColor.withValues(alpha: 0.8),
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -705,7 +731,7 @@ class _InfoSection extends StatelessWidget {
                 'NO.${_generateEmployeeId()}',
                 style: TextStyle(
                   fontSize: 9,
-                  color: textSecondary.withOpacity(0.7),
+                  color: textSecondary.withValues(alpha: 0.7),
                   fontWeight: FontWeight.w500,
                   letterSpacing: 0.5,
                 ),
@@ -722,7 +748,7 @@ class _InfoSection extends StatelessWidget {
               style: theme.textTheme.bodySmall?.copyWith(
                 color: character.prompt.isNotEmpty
                     ? textSecondary
-                    : textSecondary.withOpacity(0.5),
+                    : textSecondary.withValues(alpha: 0.5),
                 height: 1.2,
                 fontSize: 10,
               ),
@@ -772,7 +798,7 @@ class _StatusBar extends StatelessWidget {
         color: statusBg,
         border: Border(
           top: BorderSide(
-            color: genderColor.withOpacity(0.3),
+            color: genderColor.withValues(alpha: 0.3),
             width: 1,
           ),
         ),
@@ -790,7 +816,7 @@ class _StatusBar extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             decoration: BoxDecoration(
-              color: genderColor.withOpacity(0.2),
+              color: genderColor.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(
@@ -836,7 +862,7 @@ class _StatusBadge extends StatelessWidget {
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: color.withOpacity(0.2),
+        color: color.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Icon(
@@ -861,11 +887,11 @@ class _BottomStripe extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            genderColor.withOpacity(0.6),
-            genderColor.withOpacity(0.9),
+            genderColor.withValues(alpha: 0.6),
+            genderColor.withValues(alpha: 0.9),
             genderColor,
-            genderColor.withOpacity(0.9),
-            genderColor.withOpacity(0.6),
+            genderColor.withValues(alpha: 0.9),
+            genderColor.withValues(alpha: 0.6),
           ],
         ),
       ),
@@ -897,18 +923,18 @@ class _DeleteButton extends StatelessWidget {
           width: 24,
           height: 24,
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.5),
+            color: Colors.black.withValues(alpha: 0.5),
             borderRadius: const BorderRadius.only(
               topRight: Radius.circular(8),
               bottomLeft: Radius.circular(8),
             ),
             border: Border(
               left: BorderSide(
-                color: genderColor.withOpacity(0.5),
+                color: genderColor.withValues(alpha: 0.5),
                 width: 1,
               ),
               bottom: BorderSide(
-                color: genderColor.withOpacity(0.5),
+                color: genderColor.withValues(alpha: 0.5),
                 width: 1,
               ),
             ),
@@ -969,10 +995,10 @@ class _FavoriteButtonState extends State<_FavoriteButton> {
               height: 24,
               decoration: BoxDecoration(
                 color: isFavorited
-                    ? Colors.red.shade400.withOpacity(0.9)
+                    ? Colors.red.shade400.withValues(alpha: 0.9)
                     : (_isHovered
-                        ? Colors.black.withOpacity(0.7)
-                        : Colors.black.withOpacity(0.5)),
+                        ? Colors.black.withValues(alpha: 0.7)
+                        : Colors.black.withValues(alpha: 0.5)),
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(8),
                   bottomRight: Radius.circular(8),
@@ -980,21 +1006,21 @@ class _FavoriteButtonState extends State<_FavoriteButton> {
                 border: Border(
                   right: BorderSide(
                     color: isFavorited
-                        ? Colors.red.shade400.withOpacity(0.5)
-                        : widget.genderColor.withOpacity(0.5),
+                        ? Colors.red.shade400.withValues(alpha: 0.5)
+                        : widget.genderColor.withValues(alpha: 0.5),
                     width: 1,
                   ),
                   bottom: BorderSide(
                     color: isFavorited
-                        ? Colors.red.shade400.withOpacity(0.5)
-                        : widget.genderColor.withOpacity(0.5),
+                        ? Colors.red.shade400.withValues(alpha: 0.5)
+                        : widget.genderColor.withValues(alpha: 0.5),
                     width: 1,
                   ),
                 ),
                 boxShadow: isFavorited || _isHovered
                     ? [
                         BoxShadow(
-                          color: Colors.red.shade400.withOpacity(0.4),
+                          color: Colors.red.shade400.withValues(alpha: 0.4),
                           blurRadius: 8,
                           spreadRadius: isFavorited ? 1 : 0,
                         ),
@@ -1008,7 +1034,7 @@ class _FavoriteButtonState extends State<_FavoriteButton> {
                 size: 14,
                 color: isFavorited || _isHovered
                     ? Colors.white
-                    : Colors.white.withOpacity(0.9),
+                    : Colors.white.withValues(alpha: 0.9),
               ),
             ),
           ),
@@ -1079,7 +1105,7 @@ class _EdgeHighlightPainter extends CustomPainter {
       final blurAmount = (2 - i) * 2.0;
 
       final paint = Paint()
-        ..color = glowColor.withOpacity(opacity)
+        ..color = glowColor.withValues(alpha: opacity)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2.0
         ..maskFilter = MaskFilter.blur(BlurStyle.normal, blurAmount);
@@ -1137,9 +1163,9 @@ class _GlossPainter extends CustomPainter {
         end: Alignment.bottomRight,
         colors: [
           Colors.transparent,
-          Colors.white.withOpacity(0.08 * intensity),
-          Colors.white.withOpacity(0.2 * intensity),
-          Colors.white.withOpacity(0.08 * intensity),
+          Colors.white.withValues(alpha: 0.08 * intensity),
+          Colors.white.withValues(alpha: 0.2 * intensity),
+          Colors.white.withValues(alpha: 0.08 * intensity),
           Colors.transparent,
         ],
         stops: const [0.0, 0.35, 0.5, 0.65, 1.0],

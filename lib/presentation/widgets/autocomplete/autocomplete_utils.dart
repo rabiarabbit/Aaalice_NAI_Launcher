@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
+import '../../../core/utils/tag_normalizer.dart';
 import '../../../data/models/tag/local_tag.dart';
 import 'autocomplete_controller.dart';
 
@@ -20,16 +21,10 @@ class AutocompleteUtils {
     final lastSeparatorIndex = _findLastSeparator(textBeforeCursor);
 
     // 获取当前标签
-    var currentTag = textBeforeCursor.substring(lastSeparatorIndex + 1).trim();
+    final currentTag =
+        textBeforeCursor.substring(lastSeparatorIndex + 1).trim();
 
-    // 移除权重语法前缀
-    final weightMatch = RegExp(r'^-?(?:\d+\.?\d*|\.\d+)::').firstMatch(currentTag);
-    if (weightMatch != null) {
-      currentTag = currentTag.substring(weightMatch.end);
-    }
-
-    // 移除括号前缀
-    return currentTag.replaceAll(RegExp(r'^[\{\[\(]+'), '').trim();
+    return TagNormalizer.normalizeAutocompleteTag(currentTag);
   }
 
   /// 查找最后一个分隔符位置
@@ -69,7 +64,7 @@ class AutocompleteUtils {
 
     // 检测并提取权重前缀
     String weightPrefix = '';
-    final weightMatch = RegExp(r'^(-?\d+\.?\d*)::').firstMatch(tagText);
+    final weightMatch = TagNormalizer.weightPrefixPattern.firstMatch(tagText);
     if (weightMatch != null) {
       weightPrefix = weightMatch.group(0)!; // 包含 "::"
     }
@@ -148,9 +143,8 @@ class AutocompleteUtils {
     final tagName = suggestion.tag;
 
     // 如果有权重前缀，保留权重前缀并添加结尾的 "::"
-    final weightedTagName = weightPrefix.isNotEmpty
-        ? '$weightPrefix$tagName::'
-        : tagName;
+    final weightedTagName =
+        weightPrefix.isNotEmpty ? '$weightPrefix$tagName::' : tagName;
 
     // 添加前导空格（如果前面有内容）
     final needsLeadingSpace = prefix.isNotEmpty && !prefix.endsWith(' ');

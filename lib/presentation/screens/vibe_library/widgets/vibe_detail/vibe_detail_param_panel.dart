@@ -72,8 +72,8 @@ class VibeDetailParamPanel extends StatelessWidget {
           sigmaY: DesignTokens.glassBlurRadius,
         ),
         child: Container(
-          color:
-              theme.colorScheme.surface.withOpacity(DesignTokens.glassOpacity),
+          color: theme.colorScheme.surface
+              .withValues(alpha: DesignTokens.glassOpacity),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -113,7 +113,7 @@ class VibeDetailParamPanel extends StatelessWidget {
                           padding: const EdgeInsets.all(DesignTokens.spacingSm),
                           decoration: BoxDecoration(
                             color: theme.colorScheme.surfaceContainerHighest
-                                .withOpacity(0.2),
+                                .withValues(alpha: 0.2),
                             borderRadius: DesignTokens.borderRadiusMd,
                           ),
                           child: Text(
@@ -148,7 +148,7 @@ class VibeDetailParamPanel extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(
-            color: theme.colorScheme.outlineVariant.withOpacity(0.2),
+            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.2),
           ),
         ),
       ),
@@ -188,9 +188,9 @@ class VibeDetailParamPanel extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(DesignTokens.radiusSm),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -298,7 +298,7 @@ class VibeDetailParamPanel extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(DesignTokens.spacingSm),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
         borderRadius: DesignTokens.borderRadiusLg,
       ),
       child: Column(
@@ -355,7 +355,7 @@ class VibeDetailParamPanel extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border(
           top: BorderSide(
-            color: theme.colorScheme.outlineVariant.withOpacity(0.2),
+            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.2),
           ),
         ),
       ),

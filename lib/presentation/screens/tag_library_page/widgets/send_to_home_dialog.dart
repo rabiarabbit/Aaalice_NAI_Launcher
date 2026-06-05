@@ -301,7 +301,7 @@ class _SendToHomeDialogState extends ConsumerState<SendToHomeDialog> {
           color: theme.colorScheme.surfaceContainerHigh,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: theme.colorScheme.outlineVariant.withOpacity(0.5),
+            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
           ),
         ),
         child: Column(
@@ -344,14 +344,16 @@ class _SendToHomeDialogState extends ConsumerState<SendToHomeDialog> {
     }
 
     return switch (_selectedTarget) {
-      SendTargetType.smartDecompose => _buildSmartDecomposePreview(theme, parsed),
+      SendTargetType.smartDecompose =>
+        _buildSmartDecomposePreview(theme, parsed),
       SendTargetType.mainPrompt => _PreviewItem(
           label: '主提示词',
           content: _processedContent,
           color: theme.colorScheme.primary,
         ),
       SendTargetType.replaceCharacter ||
-      SendTargetType.appendCharacter => _buildCharacterPreview(parsed),
+      SendTargetType.appendCharacter =>
+        _buildCharacterPreview(parsed),
       SendTargetType.fixedTag => _PreviewItem(
           label: '固定词',
           content: _processedContent,
@@ -365,8 +367,10 @@ class _SendToHomeDialogState extends ConsumerState<SendToHomeDialog> {
     final (label, color) = switch (_selectedTarget) {
       SendTargetType.mainPrompt => ('主提示词', theme.colorScheme.primary),
       SendTargetType.smartDecompose => ('智能分解', theme.colorScheme.tertiary),
-      SendTargetType.replaceCharacter ||
-      SendTargetType.appendCharacter => ('角色提示词', theme.colorScheme.tertiary),
+      SendTargetType.replaceCharacter || SendTargetType.appendCharacter => (
+          '角色提示词',
+          theme.colorScheme.tertiary
+        ),
       SendTargetType.fixedTag => ('固定词', Colors.orange),
     };
     return _PreviewItem(label: label, content: _processedContent, color: color);
@@ -382,11 +386,13 @@ class _SendToHomeDialogState extends ConsumerState<SendToHomeDialog> {
           content: parsed.mainPrompt,
           color: theme.colorScheme.primary,
         ),
-        ...parsed.characters.asMap().entries.map((e) => _PreviewItem(
-              label: '角色 ${e.key + 1}',
-              content: e.value,
-              color: theme.colorScheme.secondary,
-            ),),
+        ...parsed.characters.asMap().entries.map(
+              (e) => _PreviewItem(
+                label: '角色 ${e.key + 1}',
+                content: e.value,
+                color: theme.colorScheme.secondary,
+              ),
+            ),
       ],
     );
   }
@@ -394,12 +400,10 @@ class _SendToHomeDialogState extends ConsumerState<SendToHomeDialog> {
   /// 构建角色预览
   Widget _buildCharacterPreview(ParsedResult parsed) {
     final hasCharacters = _isPipeFormat && parsed.characters.isNotEmpty;
-    final content = hasCharacters
-        ? parsed.characters.join('\n| ')
-        : _processedContent;
-    final label = hasCharacters
-        ? '角色提示词 (${parsed.characters.length}个)'
-        : '角色提示词';
+    final content =
+        hasCharacters ? parsed.characters.join('\n| ') : _processedContent;
+    final label =
+        hasCharacters ? '角色提示词 (${parsed.characters.length}个)' : '角色提示词';
     return _PreviewItem(
       label: label,
       content: content,
@@ -445,7 +449,7 @@ class _TargetOptionTile extends StatelessWidget {
 
     return Material(
       color: isSelected
-          ? theme.colorScheme.primaryContainer.withOpacity(0.3)
+          ? theme.colorScheme.primaryContainer.withValues(alpha: 0.3)
           : theme.colorScheme.surfaceContainerHigh,
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
@@ -466,7 +470,7 @@ class _TargetOptionTile extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: iconColor.withOpacity(0.1),
+                      color: iconColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
@@ -564,7 +568,7 @@ class _PreviewItem extends StatelessWidget {
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: color.withOpacity(0.3),
+          color: color.withValues(alpha: 0.3),
         ),
       ),
       child: Column(

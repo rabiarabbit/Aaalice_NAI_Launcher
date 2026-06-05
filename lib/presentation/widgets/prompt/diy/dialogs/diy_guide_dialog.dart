@@ -60,13 +60,13 @@ class DiyGuideDialog extends StatelessWidget {
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                           colors: [
-                            colorScheme.primaryContainer.withOpacity(0.3),
-                            colorScheme.primaryContainer.withOpacity(0.1),
+                            colorScheme.primaryContainer.withValues(alpha: 0.3),
+                            colorScheme.primaryContainer.withValues(alpha: 0.1),
                           ],
                         ),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: colorScheme.primary.withOpacity(0.2),
+                          color: colorScheme.primary.withValues(alpha: 0.2),
                         ),
                       ),
                       child: Row(
@@ -194,7 +194,7 @@ class DiyGuideDialog extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(
-            color: colorScheme.outline.withOpacity(0.1),
+            color: colorScheme.outline.withValues(alpha: 0.1),
           ),
         ),
       ),
@@ -208,14 +208,14 @@ class DiyGuideDialog extends StatelessWidget {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  colorScheme.primary.withOpacity(0.2),
-                  colorScheme.primary.withOpacity(0.1),
+                  colorScheme.primary.withValues(alpha: 0.2),
+                  colorScheme.primary.withValues(alpha: 0.1),
                 ],
               ),
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: colorScheme.primary.withOpacity(0.1),
+                  color: colorScheme.primary.withValues(alpha: 0.1),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -268,7 +268,7 @@ class DiyGuideDialog extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border(
           top: BorderSide(
-            color: colorScheme.outline.withOpacity(0.1),
+            color: colorScheme.outline.withValues(alpha: 0.1),
           ),
         ),
       ),
@@ -320,8 +320,8 @@ class _GuideSection extends StatelessWidget {
         child: Theme(
           data: theme.copyWith(
             dividerColor: Colors.transparent,
-            splashColor: color.withOpacity(0.1),
-            highlightColor: color.withOpacity(0.05),
+            splashColor: color.withValues(alpha: 0.1),
+            highlightColor: color.withValues(alpha: 0.05),
           ),
           child: ExpansionTile(
             tilePadding:
@@ -333,8 +333,8 @@ class _GuideSection extends StatelessWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    color.withOpacity(0.2),
-                    color.withOpacity(0.1),
+                    color.withValues(alpha: 0.2),
+                    color.withValues(alpha: 0.1),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(8),
@@ -367,11 +367,11 @@ class _GuideSection extends StatelessWidget {
                   color: colorScheme.surfaceContainerLowest,
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                    color: color.withOpacity(0.2),
+                    color: color.withValues(alpha: 0.2),
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: colorScheme.shadow.withOpacity(0.03),
+                      color: colorScheme.shadow.withValues(alpha: 0.03),
                       blurRadius: 4,
                       offset: const Offset(0, 2),
                     ),
@@ -388,7 +388,7 @@ class _GuideSection extends StatelessWidget {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: color.withOpacity(0.15),
+                            color: color.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
@@ -406,7 +406,7 @@ class _GuideSection extends StatelessWidget {
                       example,
                       style: theme.textTheme.bodySmall?.copyWith(
                         fontFamily: 'monospace',
-                        color: colorScheme.onSurface.withOpacity(0.9),
+                        color: colorScheme.onSurface.withValues(alpha: 0.9),
                         height: 1.5,
                       ),
                     ),

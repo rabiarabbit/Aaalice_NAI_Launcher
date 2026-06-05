@@ -80,7 +80,8 @@ class _StatItem extends StatelessWidget {
         color: colorScheme.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: colorScheme.outlineVariant.withOpacity(isDark ? 0.08 : 0.1),
+          color:
+              colorScheme.outlineVariant.withValues(alpha: isDark ? 0.08 : 0.1),
           width: 1,
         ),
       ),

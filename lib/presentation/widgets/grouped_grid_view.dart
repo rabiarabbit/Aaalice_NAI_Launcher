@@ -98,7 +98,11 @@ class GroupedGridViewState extends ConsumerState<GroupedGridView> {
     return [
       for (final (category, title) in groupConfigs)
         if (groups[category]!.isNotEmpty)
-          ImageGroup(category: category, images: groups[category]!, title: title),
+          ImageGroup(
+            category: category,
+            images: groups[category]!,
+            title: title,
+          ),
     ];
   }
 
@@ -146,9 +150,11 @@ class GroupedGridViewState extends ConsumerState<GroupedGridView> {
                   ),
                   const SizedBox(width: 12),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.primaryContainer.withOpacity(0.5),
+                      color: theme.colorScheme.primaryContainer
+                          .withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
@@ -170,7 +176,8 @@ class GroupedGridViewState extends ConsumerState<GroupedGridView> {
               mainAxisSpacing: 12,
               crossAxisSpacing: 12,
               itemCount: group.images.length,
-              itemBuilder: (context, index) => widget.buildCard(group.images[index]),
+              itemBuilder: (context, index) =>
+                  widget.buildCard(group.images[index]),
             ),
             const SizedBox(height: 16),
           ],

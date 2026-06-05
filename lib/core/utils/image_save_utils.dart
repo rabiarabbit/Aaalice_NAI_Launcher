@@ -188,18 +188,23 @@ class ImageSaveUtils {
             : embeddedSeed is num
                 ? embeddedSeed.toInt()
                 : params.seed);
-    final commentJson = existingMetadata?.commentJson ??
-        buildCommentJson(
-          params: params,
-          actualSeed: normalizedSeed,
-          fixedPrefixTags: fixedPrefixTags,
-          fixedSuffixTags: fixedSuffixTags,
-          fixedNegativePrefixTags: fixedNegativePrefixTags,
-          fixedNegativeSuffixTags: fixedNegativeSuffixTags,
-          charCaptions: charCaptions,
-          charNegCaptions: charNegCaptions,
-          useCoords: useCoords,
-        );
+    final rebuiltCommentJson = buildCommentJson(
+      params: params,
+      actualSeed: normalizedSeed,
+      fixedPrefixTags: fixedPrefixTags,
+      fixedSuffixTags: fixedSuffixTags,
+      fixedNegativePrefixTags: fixedNegativePrefixTags,
+      fixedNegativeSuffixTags: fixedNegativeSuffixTags,
+      charCaptions: charCaptions,
+      charNegCaptions: charNegCaptions,
+      useCoords: useCoords,
+    );
+    final commentJson = existingMetadata?.commentJson == null
+        ? rebuiltCommentJson
+        : {
+            ...existingMetadata!.commentJson,
+            ...rebuiltCommentJson,
+          };
 
     return _embedNaiAlignedMetadata(
       imageBytes: imageBytes,

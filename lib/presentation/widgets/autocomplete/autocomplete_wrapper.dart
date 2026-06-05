@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/utils/alias_parser.dart';
+import '../../../core/utils/tag_normalizer.dart';
 import '../../providers/locale_provider.dart';
 import 'autocomplete_controller.dart';
 import 'autocomplete_strategy.dart';
@@ -255,16 +256,8 @@ String _extractTagBeforeComma(String text, int commaIndex) {
     }
   }
 
-  var tag = text.substring(prevSeparatorIndex + 1, commaIndex).trim();
-
-  // 移除权重语法前缀
-  final weightMatch = RegExp(r'^-?(?:\d+\.?\d*|\.\d+)::').firstMatch(tag);
-  if (weightMatch != null) {
-    tag = tag.substring(weightMatch.end);
-  }
-
-  // 移除括号前缀
-  return tag.replaceAll(RegExp(r'^[\{\[\(]+'), '').trim();
+  final tag = text.substring(prevSeparatorIndex + 1, commaIndex).trim();
+  return TagNormalizer.normalizeAutocompleteTag(tag);
 }
 
 class _AutocompleteWrapperState extends ConsumerState<AutocompleteWrapper> {

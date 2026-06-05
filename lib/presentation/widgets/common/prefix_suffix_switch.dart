@@ -87,7 +87,7 @@ class _PrefixSuffixSwitchState extends State<PrefixSuffixSwitch>
             color: theme.colorScheme.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: theme.colorScheme.outline.withOpacity(0.2),
+              color: theme.colorScheme.outline.withValues(alpha: 0.2),
               width: 1,
             ),
           ),
@@ -107,11 +107,13 @@ class _PrefixSuffixSwitchState extends State<PrefixSuffixSwitch>
                         gradient: LinearGradient(
                           colors: isPrefix
                               ? [
-                                  theme.colorScheme.primary.withOpacity(0.85),
+                                  theme.colorScheme.primary
+                                      .withValues(alpha: 0.85),
                                   theme.colorScheme.primary,
                                 ]
                               : [
-                                  theme.colorScheme.tertiary.withOpacity(0.85),
+                                  theme.colorScheme.tertiary
+                                      .withValues(alpha: 0.85),
                                   theme.colorScheme.tertiary,
                                 ],
                         ),
@@ -121,7 +123,7 @@ class _PrefixSuffixSwitchState extends State<PrefixSuffixSwitch>
                             color: (isPrefix
                                     ? theme.colorScheme.primary
                                     : theme.colorScheme.tertiary)
-                                .withOpacity(0.3),
+                                .withValues(alpha: 0.3),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                           ),
@@ -178,7 +180,7 @@ class _PrefixSuffixSwitchState extends State<PrefixSuffixSwitch>
             size: 16,
             color: isSelected
                 ? Colors.white
-                : theme.colorScheme.onSurface.withOpacity(0.5),
+                : theme.colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           const SizedBox(width: 6),
           Text(
@@ -188,7 +190,7 @@ class _PrefixSuffixSwitchState extends State<PrefixSuffixSwitch>
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
               color: isSelected
                   ? Colors.white
-                  : theme.colorScheme.onSurface.withOpacity(0.5),
+                  : theme.colorScheme.onSurface.withValues(alpha: 0.5),
             ),
           ),
         ],

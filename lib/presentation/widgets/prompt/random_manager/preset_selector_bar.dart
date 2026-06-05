@@ -37,13 +37,13 @@ class PresetSelectorBar extends ConsumerWidget {
       decoration: BoxDecoration(
         // 稍深的背景色，与内容区形成微妙对比
         color: Color.alphaBlend(
-          Colors.black.withOpacity(0.15),
+          Colors.black.withValues(alpha: 0.15),
           colorScheme.surfaceContainerHighest,
         ),
         // 底部分隔线
         border: Border(
           bottom: BorderSide(
-            color: colorScheme.outlineVariant.withOpacity(0.25),
+            color: colorScheme.outlineVariant.withValues(alpha: 0.25),
             width: 1,
           ),
         ),
@@ -315,8 +315,8 @@ class _PresetDropdownState extends State<_PresetDropdown> {
           borderRadius: BorderRadius.circular(6),
           border: Border.all(
             color: _isHovered
-                ? colorScheme.primary.withOpacity(0.3)
-                : colorScheme.outlineVariant.withOpacity(0.2),
+                ? colorScheme.primary.withValues(alpha: 0.3)
+                : colorScheme.outlineVariant.withValues(alpha: 0.2),
             width: 1,
           ),
         ),
@@ -375,13 +375,13 @@ class _PresetDropdownState extends State<_PresetDropdown> {
                   Icon(
                     Icons.add_circle_outline,
                     size: 14,
-                    color: colorScheme.onSurface.withOpacity(0.35),
+                    color: colorScheme.onSurface.withValues(alpha: 0.35),
                   ),
                   const SizedBox(width: 6),
                   Text(
                     '新建预设...',
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurface.withOpacity(0.35),
+                      color: colorScheme.onSurface.withValues(alpha: 0.35),
                     ),
                   ),
                 ],
@@ -419,14 +419,14 @@ class _StatisticsInfo extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            colorScheme.surfaceContainerHigh.withOpacity(0.8),
-            colorScheme.surfaceContainerHighest.withOpacity(0.6),
+            colorScheme.surfaceContainerHigh.withValues(alpha: 0.8),
+            colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
           ],
         ),
         borderRadius: BorderRadius.circular(6),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.primary.withOpacity(0.1),
+            color: colorScheme.primary.withValues(alpha: 0.1),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -485,9 +485,9 @@ class _GradientDivider extends StatelessWidget {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            color.withOpacity(0.0),
-            color.withOpacity(0.4),
-            color.withOpacity(0.0),
+            color.withValues(alpha: 0.0),
+            color.withValues(alpha: 0.4),
+            color.withValues(alpha: 0.0),
           ],
         ),
         borderRadius: BorderRadius.circular(1),
@@ -513,9 +513,9 @@ class _VerticalDivider extends StatelessWidget {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            color.withOpacity(0),
-            color.withOpacity(0.4),
-            color.withOpacity(0),
+            color.withValues(alpha: 0),
+            color.withValues(alpha: 0.4),
+            color.withValues(alpha: 0),
           ],
         ),
       ),
@@ -653,16 +653,19 @@ class _SyncButtonState extends State<_SyncButton>
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: _isHovered || widget.isSyncing
-                    ? [syncColor.withOpacity(0.2), syncColor.withOpacity(0.1)]
+                    ? [
+                        syncColor.withValues(alpha: 0.2),
+                        syncColor.withValues(alpha: 0.1),
+                      ]
                     : [
-                        syncColor.withOpacity(0.08),
-                        syncColor.withOpacity(0.04),
+                        syncColor.withValues(alpha: 0.08),
+                        syncColor.withValues(alpha: 0.04),
                       ],
               ),
               borderRadius: BorderRadius.circular(6),
               boxShadow: [
                 BoxShadow(
-                  color: syncColor.withOpacity(_isHovered ? 0.25 : 0.15),
+                  color: syncColor.withValues(alpha: _isHovered ? 0.25 : 0.15),
                   blurRadius: _isHovered ? 8 : 4,
                   offset: const Offset(0, 2),
                 ),
@@ -736,24 +739,27 @@ class _ResetButtonState extends State<_ResetButton> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: _isHovered && isEnabled
-                    ? [resetColor.withOpacity(0.2), resetColor.withOpacity(0.1)]
+                    ? [
+                        resetColor.withValues(alpha: 0.2),
+                        resetColor.withValues(alpha: 0.1),
+                      ]
                     : [
-                        resetColor.withOpacity(0.08),
-                        resetColor.withOpacity(0.04),
+                        resetColor.withValues(alpha: 0.08),
+                        resetColor.withValues(alpha: 0.04),
                       ],
               ),
               borderRadius: BorderRadius.circular(6),
               boxShadow: _isHovered && isEnabled
                   ? [
                       BoxShadow(
-                        color: resetColor.withOpacity(0.25),
+                        color: resetColor.withValues(alpha: 0.25),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
                     ]
                   : [
                       BoxShadow(
-                        color: resetColor.withOpacity(0.15),
+                        color: resetColor.withValues(alpha: 0.15),
                         blurRadius: 4,
                         offset: const Offset(0, 2),
                       ),
@@ -765,7 +771,9 @@ class _ResetButtonState extends State<_ResetButton> {
                 Icon(
                   Icons.restart_alt,
                   size: 16,
-                  color: isEnabled ? resetColor : resetColor.withOpacity(0.4),
+                  color: isEnabled
+                      ? resetColor
+                      : resetColor.withValues(alpha: 0.4),
                 ),
                 const SizedBox(width: 6),
                 Text(
@@ -773,7 +781,9 @@ class _ResetButtonState extends State<_ResetButton> {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: isEnabled ? resetColor : resetColor.withOpacity(0.4),
+                    color: isEnabled
+                        ? resetColor
+                        : resetColor.withValues(alpha: 0.4),
                   ),
                 ),
               ],
@@ -827,13 +837,13 @@ class _ActionButtonState extends State<_ActionButton> {
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: _isHovered && isEnabled
-                  ? effectiveColor.withOpacity(0.12)
+                  ? effectiveColor.withValues(alpha: 0.12)
                   : Colors.transparent,
               borderRadius: BorderRadius.circular(6),
               boxShadow: _isHovered && isEnabled
                   ? [
                       BoxShadow(
-                        color: effectiveColor.withOpacity(0.25),
+                        color: effectiveColor.withValues(alpha: 0.25),
                         blurRadius: 12,
                         spreadRadius: -2,
                       ),
@@ -850,8 +860,8 @@ class _ActionButtonState extends State<_ActionButton> {
                 color: isEnabled
                     ? (_isHovered
                         ? effectiveColor
-                        : effectiveColor.withOpacity(0.8))
-                    : colorScheme.onSurfaceVariant.withOpacity(0.4),
+                        : effectiveColor.withValues(alpha: 0.8))
+                    : colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
               ),
             ),
           ),
@@ -876,13 +886,13 @@ class _ReadOnlyIndicator extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Colors.amber.shade100.withOpacity(0.15),
-              Colors.orange.shade100.withOpacity(0.1),
+              Colors.amber.shade100.withValues(alpha: 0.15),
+              Colors.orange.shade100.withValues(alpha: 0.1),
             ],
           ),
           borderRadius: BorderRadius.circular(6),
           border: Border.all(
-            color: Colors.amber.shade600.withOpacity(0.4),
+            color: Colors.amber.shade600.withValues(alpha: 0.4),
             width: 1,
           ),
         ),

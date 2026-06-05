@@ -31,7 +31,7 @@ class InsetShadowPainter extends CustomPainter {
       end: Alignment.bottomCenter,
       colors: [
         shadowColor,
-        shadowColor.withOpacity(shadowColor.opacity * 0.3),
+        shadowColor.withValues(alpha: shadowColor.a * 0.3),
         Colors.transparent,
       ],
       stops: const [0.0, 0.4, 1.0],
@@ -46,7 +46,7 @@ class InsetShadowPainter extends CustomPainter {
       begin: Alignment.centerLeft,
       end: Alignment.centerRight,
       colors: [
-        shadowColor.withOpacity(shadowColor.opacity * 0.5),
+        shadowColor.withValues(alpha: shadowColor.a * 0.5),
         Colors.transparent,
       ],
     );
@@ -60,7 +60,7 @@ class InsetShadowPainter extends CustomPainter {
       begin: Alignment.centerRight,
       end: Alignment.centerLeft,
       colors: [
-        shadowColor.withOpacity(shadowColor.opacity * 0.4),
+        shadowColor.withValues(alpha: shadowColor.a * 0.4),
         Colors.transparent,
       ],
     );

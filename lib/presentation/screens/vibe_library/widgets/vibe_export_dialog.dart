@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/utils/app_logger.dart';
+import '../../../../core/utils/file_name_sanitizer.dart';
 import '../../../../core/utils/localization_extension.dart';
 import '../../../../core/utils/vibe_export_utils.dart';
 import '../../../../data/models/vibe/vibe_library_category.dart';
@@ -320,77 +321,80 @@ class _VibeExportDialogState extends ConsumerState<VibeExportDialog> {
   Widget _buildFormatSelection(ThemeData theme) {
     final formats = _availableFormats;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('导出格式', style: theme.textTheme.titleSmall),
-        const SizedBox(height: 8),
-        ...formats.map((format) {
-          final isSelected = _exportFormat == format;
-          return InkWell(
-            onTap: () => _setExportFormat(format),
-            borderRadius: BorderRadius.circular(8),
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: isSelected
-                      ? theme.colorScheme.primary
-                      : theme.colorScheme.outlineVariant,
-                ),
-                borderRadius: BorderRadius.circular(8),
-                color: isSelected
-                    ? theme.colorScheme.primaryContainer.withValues(alpha: 0.3)
-                    : null,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Radio<VibeExportFormat>(
-                        value: format,
-                        groupValue: _exportFormat,
-                        onChanged: (value) {
-                          if (value != null) {
-                            _setExportFormat(value);
-                          }
-                        },
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              format.displayName,
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            Text(
-                              format.description,
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: theme.colorScheme.outline,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+    return RadioGroup<VibeExportFormat>(
+      groupValue: _exportFormat,
+      onChanged: (value) {
+        if (value != null) {
+          _setExportFormat(value);
+        }
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('导出格式', style: theme.textTheme.titleSmall),
+          const SizedBox(height: 8),
+          ...formats.map((format) {
+            final isSelected = _exportFormat == format;
+            return InkWell(
+              onTap: () => _setExportFormat(format),
+              borderRadius: BorderRadius.circular(8),
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: isSelected
+                        ? theme.colorScheme.primary
+                        : theme.colorScheme.outlineVariant,
                   ),
-                  if (isSelected && format == VibeExportFormat.embeddedPng) ...[
-                    const SizedBox(height: 12),
-                    const Divider(height: 1),
-                    const SizedBox(height: 12),
-                    _buildEmbeddedPngOptions(theme),
+                  borderRadius: BorderRadius.circular(8),
+                  color: isSelected
+                      ? theme.colorScheme.primaryContainer.withValues(
+                          alpha: 0.3,
+                        )
+                      : null,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Radio<VibeExportFormat>(value: format),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                format.displayName,
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              Text(
+                                format.description,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: theme.colorScheme.outline,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (isSelected &&
+                        format == VibeExportFormat.embeddedPng) ...[
+                      const SizedBox(height: 12),
+                      const Divider(height: 1),
+                      const SizedBox(height: 12),
+                      _buildEmbeddedPngOptions(theme),
+                    ],
                   ],
-                ],
+                ),
               ),
-            ),
-          );
-        }),
-      ],
+            );
+          }),
+        ],
+      ),
     );
   }
 
@@ -592,7 +596,7 @@ class _VibeExportDialogState extends ConsumerState<VibeExportDialog> {
   String _embeddedPngFileName(VibeLibraryEntry entry) {
     final baseName =
         entry.displayName.trim().isEmpty ? 'vibe' : entry.displayName.trim();
-    final safeBaseName = baseName.replaceAll(RegExp(r'[<>:"/\\|?*]'), '_');
+    final safeBaseName = FileNameSanitizer.sanitize(baseName, fallback: 'vibe');
     return '${safeBaseName}_vibe.png';
   }
 
@@ -1308,19 +1312,19 @@ class _SourceTypeBadge extends StatelessWidget {
 
     switch (sourceType) {
       case VibeSourceType.png:
-        backgroundColor = Colors.green.withOpacity(0.15);
+        backgroundColor = Colors.green.withValues(alpha: 0.15);
         textColor = Colors.green;
         label = 'PNG';
       case VibeSourceType.naiv4vibe:
-        backgroundColor = Colors.blue.withOpacity(0.15);
+        backgroundColor = Colors.blue.withValues(alpha: 0.15);
         textColor = Colors.blue;
         label = 'V4';
       case VibeSourceType.naiv4vibebundle:
-        backgroundColor = Colors.purple.withOpacity(0.15);
+        backgroundColor = Colors.purple.withValues(alpha: 0.15);
         textColor = Colors.purple;
         label = 'Bundle';
       case VibeSourceType.rawImage:
-        backgroundColor = Colors.orange.withOpacity(0.15);
+        backgroundColor = Colors.orange.withValues(alpha: 0.15);
         textColor = Colors.orange;
         label = 'Image';
     }

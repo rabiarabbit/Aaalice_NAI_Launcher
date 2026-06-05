@@ -143,8 +143,8 @@ class ProjectManager {
       height: state.canvasSize.height.toInt(),
       layers: layers,
       activeLayerId: state.layerManager.activeLayerId,
-      foregroundColor: state.foregroundColor.value,
-      backgroundColor: state.backgroundColor.value,
+      foregroundColor: state.foregroundColor.toARGB32(),
+      backgroundColor: state.backgroundColor.toARGB32(),
     );
   }
 
@@ -245,7 +245,9 @@ class ProjectManager {
   }
 
   /// 批量获取文件状态（每批20个，避免无界并发）
-  static Future<List<_FileStatInfo>> _getFilesWithStats(List<File> files) async {
+  static Future<List<_FileStatInfo>> _getFilesWithStats(
+    List<File> files,
+  ) async {
     const batchSize = 20;
     final result = <_FileStatInfo>[];
 

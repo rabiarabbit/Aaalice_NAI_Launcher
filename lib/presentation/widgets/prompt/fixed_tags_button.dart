@@ -47,7 +47,7 @@ class _FixedTagsButtonState extends ConsumerState<FixedTagsButton> {
           borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withValues(alpha: 0.2),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -76,16 +76,16 @@ class _FixedTagsButtonState extends ConsumerState<FixedTagsButton> {
             decoration: BoxDecoration(
               color: hasEnabled
                   ? (_isHovering
-                      ? theme.colorScheme.secondary.withOpacity(0.2)
-                      : theme.colorScheme.secondary.withOpacity(0.1))
+                      ? theme.colorScheme.secondary.withValues(alpha: 0.2)
+                      : theme.colorScheme.secondary.withValues(alpha: 0.1))
                   : (_isHovering
                       ? theme.colorScheme.surfaceContainerHighest
                       : Colors.transparent),
               borderRadius: BorderRadius.circular(6),
               border: Border.all(
                 color: hasEnabled
-                    ? theme.colorScheme.secondary.withOpacity(0.5)
-                    : theme.colorScheme.secondary.withOpacity(0.3),
+                    ? theme.colorScheme.secondary.withValues(alpha: 0.5)
+                    : theme.colorScheme.secondary.withValues(alpha: 0.3),
               ),
             ),
             child: Row(
@@ -96,7 +96,7 @@ class _FixedTagsButtonState extends ConsumerState<FixedTagsButton> {
                   size: 14,
                   color: hasEnabled
                       ? theme.colorScheme.secondary
-                      : theme.colorScheme.onSurface.withOpacity(0.5),
+                      : theme.colorScheme.onSurface.withValues(alpha: 0.5),
                 ),
                 const SizedBox(width: 4),
                 Text(
@@ -106,7 +106,7 @@ class _FixedTagsButtonState extends ConsumerState<FixedTagsButton> {
                     fontWeight: hasEnabled ? FontWeight.w600 : FontWeight.w500,
                     color: hasEnabled
                         ? theme.colorScheme.secondary
-                        : theme.colorScheme.onSurface.withOpacity(0.5),
+                        : theme.colorScheme.onSurface.withValues(alpha: 0.5),
                   ),
                 ),
                 if (hasEnabled) ...[
@@ -117,7 +117,7 @@ class _FixedTagsButtonState extends ConsumerState<FixedTagsButton> {
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.secondary.withOpacity(0.2),
+                      color: theme.colorScheme.secondary.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -134,7 +134,7 @@ class _FixedTagsButtonState extends ConsumerState<FixedTagsButton> {
                   Icon(
                     Icons.visibility_off,
                     size: 14,
-                    color: theme.colorScheme.onSurface.withOpacity(0.4),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
                   ),
                 ],
               ],
@@ -221,7 +221,7 @@ class _FixedTagsButtonState extends ConsumerState<FixedTagsButton> {
             child: Icon(
               Icons.push_pin_outlined,
               size: 18,
-              color: theme.colorScheme.outline.withOpacity(0.6),
+              color: theme.colorScheme.outline.withValues(alpha: 0.6),
             ),
           ),
           const SizedBox(width: 12),
@@ -234,7 +234,7 @@ class _FixedTagsButtonState extends ConsumerState<FixedTagsButton> {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
-                  color: theme.colorScheme.onSurface.withOpacity(0.7),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
               ),
               const SizedBox(height: 2),
@@ -264,8 +264,8 @@ class _FixedTagsButtonState extends ConsumerState<FixedTagsButton> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: isDark
-            ? theme.colorScheme.surfaceContainerHigh.withOpacity(0.4)
-            : theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
+            ? theme.colorScheme.surfaceContainerHigh.withValues(alpha: 0.4)
+            : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -285,7 +285,7 @@ class _FixedTagsButtonState extends ConsumerState<FixedTagsButton> {
             margin: const EdgeInsets.symmetric(horizontal: 12),
             width: 1,
             height: 16,
-            color: theme.colorScheme.outlineVariant.withOpacity(0.3),
+            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
           ),
           // 后缀统计
           _buildCompactStat(
@@ -300,7 +300,7 @@ class _FixedTagsButtonState extends ConsumerState<FixedTagsButton> {
             margin: const EdgeInsets.symmetric(horizontal: 12),
             width: 1,
             height: 16,
-            color: theme.colorScheme.outlineVariant.withOpacity(0.3),
+            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
           ),
           _buildCompactStat(
             theme,
@@ -343,7 +343,7 @@ class _FixedTagsButtonState extends ConsumerState<FixedTagsButton> {
           label,
           style: TextStyle(
             fontSize: 11,
-            color: displayColor.withOpacity(0.8),
+            color: displayColor.withValues(alpha: 0.8),
           ),
         ),
       ],
@@ -366,8 +366,8 @@ class _FixedTagsButtonState extends ConsumerState<FixedTagsButton> {
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: isDark
-            ? theme.colorScheme.surfaceContainerHigh.withOpacity(0.3)
-            : theme.colorScheme.surfaceContainerHighest.withOpacity(0.4),
+            ? theme.colorScheme.surfaceContainerHigh.withValues(alpha: 0.3)
+            : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
@@ -414,7 +414,7 @@ class _FixedTagsButtonState extends ConsumerState<FixedTagsButton> {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [color, color.withOpacity(0.4)],
+                colors: [color, color.withValues(alpha: 0.4)],
               ),
               borderRadius: BorderRadius.circular(2),
             ),
@@ -440,8 +440,8 @@ class _FixedTagsButtonState extends ConsumerState<FixedTagsButton> {
               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
               decoration: BoxDecoration(
                 color: entry.weight > 1.0
-                    ? theme.colorScheme.error.withOpacity(0.12)
-                    : theme.colorScheme.tertiary.withOpacity(0.12),
+                    ? theme.colorScheme.error.withValues(alpha: 0.12)
+                    : theme.colorScheme.tertiary.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Text(
@@ -465,7 +465,7 @@ class _FixedTagsButtonState extends ConsumerState<FixedTagsButton> {
                 truncatedContent,
                 style: TextStyle(
                   fontSize: 10,
-                  color: theme.colorScheme.onSurface.withOpacity(0.5),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -486,7 +486,7 @@ class _FixedTagsButtonState extends ConsumerState<FixedTagsButton> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
+              color: color.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(
@@ -515,10 +515,10 @@ class _FixedTagsButtonState extends ConsumerState<FixedTagsButton> {
       width: double.infinity,
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerLow.withOpacity(0.5),
+        color: theme.colorScheme.surfaceContainerLow.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: theme.colorScheme.outlineVariant.withOpacity(0.15),
+          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.15),
         ),
       ),
       child: Column(
@@ -571,7 +571,7 @@ class _FixedTagsButtonState extends ConsumerState<FixedTagsButton> {
               gradient: LinearGradient(
                 colors: [
                   Colors.transparent,
-                  theme.colorScheme.outlineVariant.withOpacity(0.4),
+                  theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
                 ],
               ),
             ),
@@ -580,14 +580,14 @@ class _FixedTagsButtonState extends ConsumerState<FixedTagsButton> {
           Icon(
             Icons.touch_app_rounded,
             size: 11,
-            color: theme.colorScheme.outline.withOpacity(0.6),
+            color: theme.colorScheme.outline.withValues(alpha: 0.6),
           ),
           const SizedBox(width: 4),
           Text(
             '点击管理，长按侧栏',
             style: TextStyle(
               fontSize: 10,
-              color: theme.colorScheme.outline.withOpacity(0.6),
+              color: theme.colorScheme.outline.withValues(alpha: 0.6),
             ),
           ),
           const SizedBox(width: 8),
@@ -597,7 +597,7 @@ class _FixedTagsButtonState extends ConsumerState<FixedTagsButton> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  theme.colorScheme.outlineVariant.withOpacity(0.4),
+                  theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
                   Colors.transparent,
                 ],
               ),
@@ -613,10 +613,10 @@ class _FixedTagsButtonState extends ConsumerState<FixedTagsButton> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(6),
         border: Border.all(
-          color: theme.colorScheme.outlineVariant.withOpacity(0.2),
+          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.2),
         ),
       ),
       child: Row(
@@ -636,7 +636,8 @@ class _FixedTagsButtonState extends ConsumerState<FixedTagsButton> {
                 fontSize: 10,
                 color: theme.colorScheme.outline,
                 decoration: TextDecoration.lineThrough,
-                decorationColor: theme.colorScheme.outline.withOpacity(0.5),
+                decorationColor:
+                    theme.colorScheme.outline.withValues(alpha: 0.5),
               ),
               overflow: TextOverflow.ellipsis,
             ),

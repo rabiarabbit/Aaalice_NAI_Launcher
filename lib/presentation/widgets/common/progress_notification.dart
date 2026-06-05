@@ -366,7 +366,7 @@ class _ProgressNotificationCard extends StatelessWidget {
           boxShadow: [
             BoxShadow(
               color: (isError || isSuccess ? backgroundColor : Colors.black)
-                  .withOpacity(0.25),
+                  .withValues(alpha: 0.25),
               blurRadius: 12,
               offset: const Offset(0, 4),
               spreadRadius: 2,
@@ -467,7 +467,7 @@ class _ProgressNotificationCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(4),
                 child: LinearProgressIndicator(
                   value: data.progress,
-                  backgroundColor: iconColor.withOpacity(0.2),
+                  backgroundColor: iconColor.withValues(alpha: 0.2),
                   valueColor: AlwaysStoppedAnimation<Color>(iconColor),
                   minHeight: 4,
                 ),

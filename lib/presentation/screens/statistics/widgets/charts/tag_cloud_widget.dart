@@ -166,8 +166,9 @@ class _TagChipState extends State<_TagChip> {
             vertical: widget.fontSize * 0.2,
           ),
           decoration: BoxDecoration(
-            color:
-                _isHovered ? widget.color.withOpacity(0.2) : Colors.transparent,
+            color: _isHovered
+                ? widget.color.withValues(alpha: 0.2)
+                : Colors.transparent,
             borderRadius: BorderRadius.circular(widget.fontSize * 0.3),
           ),
           child: Column(
@@ -178,8 +179,9 @@ class _TagChipState extends State<_TagChip> {
                 style: TextStyle(
                   fontSize: widget.fontSize,
                   fontWeight: _isHovered ? FontWeight.bold : FontWeight.normal,
-                  color:
-                      _isHovered ? widget.color : widget.color.withOpacity(0.8),
+                  color: _isHovered
+                      ? widget.color
+                      : widget.color.withValues(alpha: 0.8),
                 ),
               ),
               if (_isHovered)

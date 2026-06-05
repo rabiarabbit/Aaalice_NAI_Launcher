@@ -48,7 +48,8 @@ class BulkMoveCategoryDialog extends StatelessWidget {
                   color: theme.colorScheme.surfaceContainerLow,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: theme.colorScheme.outlineVariant.withOpacity(0.3),
+                    color:
+                        theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
                   ),
                 ),
                 child: ListView(
@@ -142,7 +143,7 @@ class _CategoryTile extends StatelessWidget {
           padding: EdgeInsets.fromLTRB(8 + depth * 20, 10, 12, 10),
           decoration: BoxDecoration(
             color: isSelected
-                ? theme.colorScheme.primaryContainer.withOpacity(0.5)
+                ? theme.colorScheme.primaryContainer.withValues(alpha: 0.5)
                 : null,
             borderRadius: BorderRadius.circular(8),
           ),

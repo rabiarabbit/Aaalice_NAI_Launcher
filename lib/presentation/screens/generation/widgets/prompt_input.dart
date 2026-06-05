@@ -994,7 +994,7 @@ class _PositivePromptTooltip extends StatelessWidget {
             gradient: LinearGradient(
               colors: [
                 Colors.transparent,
-                theme.colorScheme.outlineVariant.withOpacity(0.4),
+                theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
                 Colors.transparent,
               ],
             ),
@@ -1013,13 +1013,13 @@ class _PositivePromptTooltip extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            theme.colorScheme.primary.withOpacity(isDark ? 0.2 : 0.1),
-            theme.colorScheme.primary.withOpacity(isDark ? 0.1 : 0.05),
+            theme.colorScheme.primary.withValues(alpha: isDark ? 0.2 : 0.1),
+            theme.colorScheme.primary.withValues(alpha: isDark ? 0.1 : 0.05),
           ],
         ),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: theme.colorScheme.primary.withOpacity(0.2),
+          color: theme.colorScheme.primary.withValues(alpha: 0.2),
         ),
       ),
       child: Row(
@@ -1055,8 +1055,8 @@ class _PositivePromptTooltip extends StatelessWidget {
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: isDark
-            ? theme.colorScheme.surfaceContainerHigh.withOpacity(0.4)
-            : theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
+            ? theme.colorScheme.surfaceContainerHigh.withValues(alpha: 0.4)
+            : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
@@ -1072,7 +1072,7 @@ class _PositivePromptTooltip extends StatelessWidget {
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [color, color.withOpacity(0.4)],
+                    colors: [color, color.withValues(alpha: 0.4)],
                   ),
                   borderRadius: BorderRadius.circular(2),
                 ),
@@ -1103,7 +1103,7 @@ class _PositivePromptTooltip extends StatelessWidget {
                   content,
                   style: TextStyle(
                     fontSize: 11,
-                    color: theme.colorScheme.onSurface.withOpacity(0.8),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
                   ),
                 ),
               ),
@@ -1123,14 +1123,15 @@ class _PositivePromptTooltip extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            theme.colorScheme.primaryContainer.withOpacity(isDark ? 0.3 : 0.4),
+            theme.colorScheme.primaryContainer
+                .withValues(alpha: isDark ? 0.3 : 0.4),
             theme.colorScheme.secondaryContainer
-                .withOpacity(isDark ? 0.2 : 0.3),
+                .withValues(alpha: isDark ? 0.2 : 0.3),
           ],
         ),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: theme.colorScheme.primary.withOpacity(0.2),
+          color: theme.colorScheme.primary.withValues(alpha: 0.2),
         ),
       ),
       child: Column(
@@ -1232,8 +1233,8 @@ class _PositivePromptTooltip extends StatelessWidget {
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: isDark
-            ? theme.colorScheme.surfaceContainerHigh.withOpacity(0.4)
-            : theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
+            ? theme.colorScheme.surfaceContainerHigh.withValues(alpha: 0.4)
+            : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
@@ -1249,7 +1250,7 @@ class _PositivePromptTooltip extends StatelessWidget {
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [color, color.withOpacity(0.4)],
+                    colors: [color, color.withValues(alpha: 0.4)],
                   ),
                   borderRadius: BorderRadius.circular(2),
                 ),
@@ -1269,7 +1270,7 @@ class _PositivePromptTooltip extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.15),
+                  color: color.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
@@ -1302,7 +1303,8 @@ class _PositivePromptTooltip extends StatelessWidget {
                                   ? Icons.male
                                   : Icons.person,
                           size: 11,
-                          color: theme.colorScheme.onSurface.withOpacity(0.5),
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.5),
                         ),
                         const SizedBox(width: 4),
                         Expanded(
@@ -1310,8 +1312,8 @@ class _PositivePromptTooltip extends StatelessWidget {
                             '${character.name}: ${character.toNaiPrompt(useAiPosition: globalAiChoice)}',
                             style: TextStyle(
                               fontSize: 10,
-                              color:
-                                  theme.colorScheme.onSurface.withOpacity(0.8),
+                              color: theme.colorScheme.onSurface
+                                  .withValues(alpha: 0.8),
                             ),
                           ),
                         ),
@@ -1428,7 +1430,7 @@ class _NegativePromptTooltip extends StatelessWidget {
             gradient: LinearGradient(
               colors: [
                 Colors.transparent,
-                theme.colorScheme.outlineVariant.withOpacity(0.4),
+                theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
                 Colors.transparent,
               ],
             ),
@@ -1447,13 +1449,13 @@ class _NegativePromptTooltip extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            theme.colorScheme.error.withOpacity(isDark ? 0.2 : 0.1),
-            theme.colorScheme.error.withOpacity(isDark ? 0.1 : 0.05),
+            theme.colorScheme.error.withValues(alpha: isDark ? 0.2 : 0.1),
+            theme.colorScheme.error.withValues(alpha: isDark ? 0.1 : 0.05),
           ],
         ),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: theme.colorScheme.error.withOpacity(0.2),
+          color: theme.colorScheme.error.withValues(alpha: 0.2),
         ),
       ),
       child: Row(
@@ -1489,8 +1491,8 @@ class _NegativePromptTooltip extends StatelessWidget {
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: isDark
-            ? theme.colorScheme.surfaceContainerHigh.withOpacity(0.4)
-            : theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
+            ? theme.colorScheme.surfaceContainerHigh.withValues(alpha: 0.4)
+            : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
@@ -1506,7 +1508,7 @@ class _NegativePromptTooltip extends StatelessWidget {
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [color, color.withOpacity(0.4)],
+                    colors: [color, color.withValues(alpha: 0.4)],
                   ),
                   borderRadius: BorderRadius.circular(2),
                 ),
@@ -1537,7 +1539,7 @@ class _NegativePromptTooltip extends StatelessWidget {
                   content,
                   style: TextStyle(
                     fontSize: 11,
-                    color: theme.colorScheme.onSurface.withOpacity(0.8),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
                   ),
                 ),
               ),
@@ -1557,14 +1559,15 @@ class _NegativePromptTooltip extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            theme.colorScheme.errorContainer.withOpacity(isDark ? 0.3 : 0.4),
+            theme.colorScheme.errorContainer
+                .withValues(alpha: isDark ? 0.3 : 0.4),
             theme.colorScheme.surfaceContainerHighest
-                .withOpacity(isDark ? 0.2 : 0.3),
+                .withValues(alpha: isDark ? 0.2 : 0.3),
           ],
         ),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: theme.colorScheme.error.withOpacity(0.2),
+          color: theme.colorScheme.error.withValues(alpha: 0.2),
         ),
       ),
       child: Column(
@@ -1731,8 +1734,8 @@ class _PromptTypeButtonState extends State<_PromptTypeButton>
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        widget.color.withOpacity(0.2),
-                        widget.color.withOpacity(0.1),
+                        widget.color.withValues(alpha: 0.2),
+                        widget.color.withValues(alpha: 0.1),
                       ],
                     )
                   : null,
@@ -1744,16 +1747,16 @@ class _PromptTypeButtonState extends State<_PromptTypeButton>
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
                 color: widget.isSelected
-                    ? widget.color.withOpacity(0.5)
+                    ? widget.color.withValues(alpha: 0.5)
                     : (_isHovering
-                        ? theme.colorScheme.outline.withOpacity(0.3)
+                        ? theme.colorScheme.outline.withValues(alpha: 0.3)
                         : Colors.transparent),
                 width: widget.isSelected ? 1.5 : 1,
               ),
               boxShadow: widget.isSelected
                   ? [
                       BoxShadow(
-                        color: widget.color.withOpacity(0.2),
+                        color: widget.color.withValues(alpha: 0.2),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
@@ -1769,7 +1772,7 @@ class _PromptTypeButtonState extends State<_PromptTypeButton>
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
                     color: widget.isSelected
-                        ? widget.color.withOpacity(0.15)
+                        ? widget.color.withValues(alpha: 0.15)
                         : Colors.transparent,
                     borderRadius: BorderRadius.circular(6),
                   ),
@@ -1778,7 +1781,7 @@ class _PromptTypeButtonState extends State<_PromptTypeButton>
                     size: 16,
                     color: widget.isSelected
                         ? widget.color
-                        : theme.colorScheme.onSurface.withOpacity(0.5),
+                        : theme.colorScheme.onSurface.withValues(alpha: 0.5),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -1791,7 +1794,7 @@ class _PromptTypeButtonState extends State<_PromptTypeButton>
                         widget.isSelected ? FontWeight.w600 : FontWeight.w500,
                     color: widget.isSelected
                         ? widget.color
-                        : theme.colorScheme.onSurface.withOpacity(0.7),
+                        : theme.colorScheme.onSurface.withValues(alpha: 0.7),
                     letterSpacing: 0.3,
                   ),
                 ),
@@ -1803,7 +1806,7 @@ class _PromptTypeButtonState extends State<_PromptTypeButton>
                         const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
                       color: widget.isSelected
-                          ? widget.color.withOpacity(0.2)
+                          ? widget.color.withValues(alpha: 0.2)
                           : theme.colorScheme.surfaceContainerHighest,
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -1814,7 +1817,8 @@ class _PromptTypeButtonState extends State<_PromptTypeButton>
                         fontWeight: FontWeight.w600,
                         color: widget.isSelected
                             ? widget.color
-                            : theme.colorScheme.onSurface.withOpacity(0.6),
+                            : theme.colorScheme.onSurface
+                                .withValues(alpha: 0.6),
                       ),
                     ),
                   ),
@@ -1846,7 +1850,7 @@ class _PromptTypeButtonState extends State<_PromptTypeButton>
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withValues(alpha: 0.2),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -1898,14 +1902,16 @@ class _CopyIconButtonState extends State<_CopyIconButton> {
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
             color: _isHovering
-                ? widget.color.withOpacity(0.15)
+                ? widget.color.withValues(alpha: 0.15)
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(4),
           ),
           child: Icon(
             Icons.copy_rounded,
             size: 14,
-            color: _isHovering ? widget.color : widget.color.withOpacity(0.6),
+            color: _isHovering
+                ? widget.color
+                : widget.color.withValues(alpha: 0.6),
           ),
         ),
       ),

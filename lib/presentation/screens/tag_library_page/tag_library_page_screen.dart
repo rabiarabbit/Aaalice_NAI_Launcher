@@ -209,7 +209,7 @@ class _TagLibraryPageScreenState extends ConsumerState<TagLibraryPageScreen> {
         color: theme.colorScheme.surfaceContainerLow,
         border: Border(
           right: BorderSide(
-            color: theme.colorScheme.outlineVariant.withOpacity(0.3),
+            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
           ),
         ),
       ),
@@ -338,7 +338,7 @@ class _TagLibraryPageScreenState extends ConsumerState<TagLibraryPageScreen> {
           Icon(
             hasSearch ? Icons.search_off : Icons.library_books_outlined,
             size: 64,
-            color: theme.colorScheme.outline.withOpacity(0.5),
+            color: theme.colorScheme.outline.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 16),
           Text(
@@ -357,7 +357,7 @@ class _TagLibraryPageScreenState extends ConsumerState<TagLibraryPageScreen> {
                 ? context.l10n.tagLibrary_tryDifferentSearch
                 : context.l10n.tagLibrary_addFirstEntry,
             style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.outline.withOpacity(0.7),
+              color: theme.colorScheme.outline.withValues(alpha: 0.7),
             ),
           ),
           if (!hasSearch) ...[

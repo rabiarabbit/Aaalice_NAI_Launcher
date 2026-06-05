@@ -196,7 +196,7 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
                           border: Border(
                             right: BorderSide(
                               color: theme.colorScheme.outlineVariant
-                                  .withOpacity(0.3),
+                                  .withValues(alpha: 0.3),
                               width: 1,
                             ),
                           ),
@@ -248,7 +248,7 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
                             Divider(
                               height: 1,
                               color: theme.colorScheme.outlineVariant
-                                  .withOpacity(0.3),
+                                  .withValues(alpha: 0.3),
                             ),
                             // 分类树
                             Expanded(
@@ -407,12 +407,12 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
           constraints: const BoxConstraints(minHeight: 62),
           decoration: BoxDecoration(
             color: theme.brightness == Brightness.dark
-                ? theme.colorScheme.surfaceContainerHigh.withOpacity(0.9)
-                : theme.colorScheme.surface.withOpacity(0.8),
+                ? theme.colorScheme.surfaceContainerHigh.withValues(alpha: 0.9)
+                : theme.colorScheme.surface.withValues(alpha: 0.8),
             border: Border(
               bottom: BorderSide(
-                color: theme.dividerColor.withOpacity(
-                  theme.brightness == Brightness.dark ? 0.2 : 0.3,
+                color: theme.dividerColor.withValues(
+                  alpha: theme.brightness == Brightness.dark ? 0.2 : 0.3,
                 ),
               ),
             ),
@@ -436,8 +436,10 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
                   ),
                   decoration: BoxDecoration(
                     color: theme.brightness == Brightness.dark
-                        ? theme.colorScheme.primaryContainer.withOpacity(0.4)
-                        : theme.colorScheme.primaryContainer.withOpacity(0.3),
+                        ? theme.colorScheme.primaryContainer
+                            .withValues(alpha: 0.4)
+                        : theme.colorScheme.primaryContainer
+                            .withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
@@ -536,7 +538,7 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
       height: 36,
       constraints: const BoxConstraints(maxWidth: 300),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.4),
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
         borderRadius: BorderRadius.circular(18),
       ),
       child: TextField(
@@ -545,20 +547,21 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
         decoration: InputDecoration(
           hintText: '搜索Vibe名称或标签...',
           hintStyle: TextStyle(
-            color: theme.colorScheme.onSurfaceVariant.withOpacity(0.5),
+            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
             fontSize: 13,
           ),
           prefixIcon: Icon(
             Icons.search,
             size: 18,
-            color: theme.colorScheme.onSurfaceVariant.withOpacity(0.6),
+            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
           ),
           suffixIcon: _searchController.text.isNotEmpty
               ? IconButton(
                   icon: Icon(
                     Icons.close,
                     size: 16,
-                    color: theme.colorScheme.onSurfaceVariant.withOpacity(0.6),
+                    color: theme.colorScheme.onSurfaceVariant
+                        .withValues(alpha: 0.6),
                   ),
                   onPressed: () {
                     _searchDebounceTimer?.cancel();
@@ -619,7 +622,8 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
         height: 36,
         padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
-          color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.4),
+          color:
+              theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
@@ -713,10 +717,11 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
         height: 36,
         padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
-          color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
+          color:
+              theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: theme.colorScheme.outline.withOpacity(0.2),
+            color: theme.colorScheme.outline.withValues(alpha: 0.2),
             width: 1,
           ),
         ),
@@ -865,7 +870,7 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
         color: theme.colorScheme.surfaceContainerLow,
         border: Border(
           top: BorderSide(
-            color: theme.colorScheme.outlineVariant.withOpacity(0.3),
+            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
           ),
         ),
       ),
@@ -1780,7 +1785,7 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
     return Positioned.fill(
       child: IgnorePointer(
         child: Container(
-          color: theme.colorScheme.primary.withOpacity(0.1),
+          color: theme.colorScheme.primary.withValues(alpha: 0.1),
           child: Center(
             child: Container(
               padding: const EdgeInsets.symmetric(
@@ -1796,7 +1801,7 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
+                    color: Colors.black.withValues(alpha: 0.2),
                     blurRadius: 16,
                   ),
                 ],
@@ -1832,7 +1837,7 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
 
     return Positioned.fill(
       child: Container(
-        color: Colors.black.withOpacity(0.3),
+        color: Colors.black.withValues(alpha: 0.3),
         child: Center(
           child: Container(
             width: 320,
@@ -1845,7 +1850,7 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.3),
+                  color: Colors.black.withValues(alpha: 0.3),
                   blurRadius: 20,
                 ),
               ],

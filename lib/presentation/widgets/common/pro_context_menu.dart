@@ -55,16 +55,16 @@ class ProContextMenu extends StatelessWidget {
           width: 180,
           decoration: BoxDecoration(
             color: isDark
-                ? colorScheme.surface.withOpacity(0.98)
+                ? colorScheme.surface.withValues(alpha: 0.98)
                 : colorScheme.surface,
             borderRadius: BorderRadius.circular(6),
             border: Border.all(
-              color:
-                  colorScheme.outlineVariant.withOpacity(isDark ? 0.15 : 0.2),
+              color: colorScheme.outlineVariant
+                  .withValues(alpha: isDark ? 0.15 : 0.2),
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(isDark ? 0.3 : 0.12),
+                color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.12),
                 blurRadius: 6,
                 offset: const Offset(0, 2),
               ),
@@ -128,8 +128,8 @@ class _ContextMenuItemState extends State<_ContextMenuItem> {
           curve: Curves.easeOut,
           color: _isHovered
               ? (widget.item.isDanger
-                  ? colorScheme.error.withOpacity(isDark ? 0.15 : 0.1)
-                  : colorScheme.primary.withOpacity(isDark ? 0.15 : 0.08))
+                  ? colorScheme.error.withValues(alpha: isDark ? 0.15 : 0.1)
+                  : colorScheme.primary.withValues(alpha: isDark ? 0.15 : 0.08))
               : Colors.transparent,
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           child: Row(
@@ -138,7 +138,8 @@ class _ContextMenuItemState extends State<_ContextMenuItem> {
                 Icon(
                   widget.item.icon,
                   size: 16,
-                  color: _isHovered ? itemColor : itemColor.withOpacity(0.8),
+                  color:
+                      _isHovered ? itemColor : itemColor.withValues(alpha: 0.8),
                 ),
                 const SizedBox(width: 8),
               ],

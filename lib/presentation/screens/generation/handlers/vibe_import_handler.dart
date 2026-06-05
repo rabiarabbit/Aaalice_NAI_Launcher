@@ -674,32 +674,48 @@ class VibeImportHandler {
       }
 
       // 处理每个选中的条目（支持 bundle 展开）
-      for (final entry in result.selectedEntries) {
+      for (final selectedEntry in result.selectedEntries) {
         final currentCount =
             ref.read(generationParamsNotifierProvider).vibeReferencesV4.length;
         if (currentCount >= 16) break;
 
-        if (entry.isBundle) {
+        var addedForEntry = 0;
+        var canRecordUsage = selectedEntry.filePath != null;
+
+        if (selectedEntry.isBundle) {
           bundleEntries++;
-          // 从 bundle 提取 vibes
-          final added = await extractAndAddBundleVibes(entry);
-          totalAdded += added;
+          final hydratedEntry = selectedEntry.filePath == null
+              ? await storageService.getEntry(selectedEntry.id)
+              : null;
+          final importEntry = hydratedEntry ?? selectedEntry;
+          canRecordUsage = canRecordUsage || hydratedEntry != null;
+
+          // 从 bundle 提取 vibes；display entry 已包含 filePath 和数量缓存。
+          addedForEntry = await extractAndAddBundleVibes(importEntry);
+          totalAdded += addedForEntry;
         } else {
+          final hydratedEntry = await storageService.getEntry(selectedEntry.id);
+          final importEntry = hydratedEntry ?? selectedEntry;
+          canRecordUsage = canRecordUsage || hydratedEntry != null;
+
           // 普通 vibe
           final existingNames = ref
               .read(generationParamsNotifierProvider)
               .vibeReferencesV4
               .map((v) => v.displayName)
               .toSet();
-          if (!existingNames.contains(entry.displayName)) {
-            final vibe = entry.toVibeReference();
+          if (!existingNames.contains(importEntry.displayName)) {
+            final vibe = importEntry.toVibeReference();
             notifier.addVibeReferences([vibe], recordUsage: false);
+            addedForEntry = 1;
             totalAdded++;
           }
         }
 
-        // 更新使用统计
-        await storageService.incrementUsedCount(entry.id);
+        // 仅在真正添加成功后记录一次库条目使用次数。
+        if (addedForEntry > 0 && canRecordUsage) {
+          await storageService.incrementUsedCount(selectedEntry.id);
+        }
       }
 
       if (context.mounted) {

@@ -24,12 +24,12 @@ class TooltipHeader extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            color.withOpacity(isDark ? 0.2 : 0.1),
-            color.withOpacity(isDark ? 0.1 : 0.05),
+            color.withValues(alpha: isDark ? 0.2 : 0.1),
+            color.withValues(alpha: isDark ? 0.1 : 0.05),
           ],
         ),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -75,8 +75,8 @@ class TooltipSection extends StatelessWidget {
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: isDark
-            ? theme.colorScheme.surfaceContainerHigh.withOpacity(0.4)
-            : theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
+            ? theme.colorScheme.surfaceContainerHigh.withValues(alpha: 0.4)
+            : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
@@ -92,7 +92,7 @@ class TooltipSection extends StatelessWidget {
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [color, color.withOpacity(0.4)],
+                    colors: [color, color.withValues(alpha: 0.4)],
                   ),
                   borderRadius: BorderRadius.circular(2),
                 ),
@@ -123,7 +123,7 @@ class TooltipSection extends StatelessWidget {
                   content,
                   style: TextStyle(
                     fontSize: 11,
-                    color: theme.colorScheme.onSurface.withOpacity(0.8),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
                   ),
                 ),
               ),
@@ -160,14 +160,15 @@ class TooltipFinalPromptSection extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            theme.colorScheme.primaryContainer.withOpacity(isDark ? 0.3 : 0.4),
+            theme.colorScheme.primaryContainer
+                .withValues(alpha: isDark ? 0.3 : 0.4),
             theme.colorScheme.secondaryContainer
-                .withOpacity(isDark ? 0.2 : 0.3),
+                .withValues(alpha: isDark ? 0.2 : 0.3),
           ],
         ),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: theme.colorScheme.primary.withOpacity(0.2),
+          color: theme.colorScheme.primary.withValues(alpha: 0.2),
         ),
       ),
       child: Column(
@@ -206,7 +207,7 @@ class TooltipFinalPromptSection extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 11,
                     height: 1.4,
-                    color: theme.colorScheme.onSurface.withOpacity(0.9),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.9),
                   ),
                 ),
               ),

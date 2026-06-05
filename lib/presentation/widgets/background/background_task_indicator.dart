@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../providers/background_task_provider.dart' show BackgroundTask, backgroundTaskNotifierProvider;
+import '../../providers/background_task_provider.dart'
+    show BackgroundTask, backgroundTaskNotifierProvider;
 
 /// 后台任务进度指示器
 ///
@@ -33,7 +34,7 @@ class BackgroundTaskIndicator extends ConsumerWidget {
       child: Material(
         elevation: 4,
         borderRadius: BorderRadius.circular(8),
-        color: colorScheme.surfaceContainerHighest.withOpacity(0.95),
+        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.95),
         child: Container(
           width: 280,
           padding: const EdgeInsets.all(12),
@@ -74,15 +75,16 @@ class BackgroundTaskIndicator extends ConsumerWidget {
           child: Text(
             task.displayName,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w500,
-            ),
+                  fontWeight: FontWeight.w500,
+                ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
         ),
         if (task.id == 'artist_tags_sync')
           InkWell(
-            onTap: () => ref.read(backgroundTaskNotifierProvider.notifier).pause(),
+            onTap: () =>
+                ref.read(backgroundTaskNotifierProvider.notifier).pause(),
             child: Icon(
               Icons.close,
               size: 16,
@@ -172,7 +174,7 @@ class MobileBackgroundTaskIndicator extends ConsumerWidget {
       child: Material(
         elevation: 4,
         borderRadius: BorderRadius.circular(8),
-        color: colorScheme.surfaceContainerHighest.withOpacity(0.95),
+        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.95),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           child: Row(
@@ -182,7 +184,8 @@ class MobileBackgroundTaskIndicator extends ConsumerWidget {
                 height: 16,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(colorScheme.primary),
+                  valueColor:
+                      AlwaysStoppedAnimation<Color>(colorScheme.primary),
                 ),
               ),
               const SizedBox(width: 12),
@@ -205,7 +208,8 @@ class MobileBackgroundTaskIndicator extends ConsumerWidget {
                       child: LinearProgressIndicator(
                         value: task.progress > 0 ? task.progress : null,
                         backgroundColor: colorScheme.surfaceContainerHigh,
-                        valueColor: AlwaysStoppedAnimation<Color>(colorScheme.primary),
+                        valueColor:
+                            AlwaysStoppedAnimation<Color>(colorScheme.primary),
                         minHeight: 4,
                       ),
                     ),

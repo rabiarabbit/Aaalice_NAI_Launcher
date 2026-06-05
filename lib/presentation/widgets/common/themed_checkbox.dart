@@ -119,7 +119,7 @@ class _ThemedCheckboxState extends State<ThemedCheckbox>
     final activeColorBase = widget.activeColor ?? theme.colorScheme.primary;
     final checkColorBase = widget.checkColor ?? theme.colorScheme.onPrimary;
     final borderColorBase =
-        widget.borderColor ?? theme.colorScheme.outline.withOpacity(0.5);
+        widget.borderColor ?? theme.colorScheme.outline.withValues(alpha: 0.5);
 
     // 内阴影参数
     final shadowDepth = appExt?.insetShadowDepth ?? 0.12;
@@ -161,14 +161,14 @@ class _ThemedCheckboxState extends State<ThemedCheckbox>
                 color: isCheckedOrPartial
                     ? activeColorBase
                     : (_isHovered
-                        ? theme.colorScheme.primary.withOpacity(0.5)
+                        ? theme.colorScheme.primary.withValues(alpha: 0.5)
                         : borderColorBase),
                 width: 1.5,
               ),
               boxShadow: enableInsetShadow && isCheckedOrPartial
                   ? [
                       BoxShadow(
-                        color: Colors.black.withOpacity(shadowDepth),
+                        color: Colors.black.withValues(alpha: shadowDepth),
                         blurRadius: 2,
                         offset: const Offset(0, 1),
                         blurStyle: BlurStyle.inner,
@@ -268,9 +268,7 @@ class ThemedCheckboxListTile extends StatelessWidget {
       enabled: enabled,
       controlAffinity: controlAffinity,
       contentPadding: contentPadding,
-      onTap: enabled && onChanged != null
-          ? () => onChanged!(_nextValue)
-          : null,
+      onTap: enabled && onChanged != null ? () => onChanged!(_nextValue) : null,
     );
   }
 }
@@ -321,7 +319,7 @@ class _CheckboxListTile extends StatelessWidget {
                                   .textTheme
                                   .bodyLarge!
                                   .color!
-                                  .withOpacity(0.5),
+                                  .withValues(alpha: 0.5),
                         ),
                     child: title,
                   ),
@@ -333,7 +331,7 @@ class _CheckboxListTile extends StatelessWidget {
                                 .textTheme
                                 .bodySmall!
                                 .color!
-                                .withOpacity(enabled ? 0.7 : 0.4),
+                                .withValues(alpha: enabled ? 0.7 : 0.4),
                           ),
                       child: subtitle!,
                     ),

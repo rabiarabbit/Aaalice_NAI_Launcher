@@ -14,7 +14,7 @@ class GlowShadow extends BaseShadowModule {
   @override
   List<BoxShadow> get elevation1 => [
         BoxShadow(
-          color: glowColor.withOpacity(0.3),
+          color: glowColor.withValues(alpha: 0.3),
           blurRadius: 8,
           spreadRadius: 0,
         ),
@@ -23,12 +23,12 @@ class GlowShadow extends BaseShadowModule {
   @override
   List<BoxShadow> get elevation2 => [
         BoxShadow(
-          color: glowColor.withOpacity(0.4),
+          color: glowColor.withValues(alpha: 0.4),
           blurRadius: 16,
           spreadRadius: 0,
         ),
         BoxShadow(
-          color: glowColor.withOpacity(0.2),
+          color: glowColor.withValues(alpha: 0.2),
           blurRadius: 8,
           spreadRadius: -2,
         ),
@@ -37,12 +37,12 @@ class GlowShadow extends BaseShadowModule {
   @override
   List<BoxShadow> get elevation3 => [
         BoxShadow(
-          color: glowColor.withOpacity(0.5),
+          color: glowColor.withValues(alpha: 0.5),
           blurRadius: 24,
           spreadRadius: 0,
         ),
         BoxShadow(
-          color: glowColor.withOpacity(0.3),
+          color: glowColor.withValues(alpha: 0.3),
           blurRadius: 16,
           spreadRadius: -4,
         ),

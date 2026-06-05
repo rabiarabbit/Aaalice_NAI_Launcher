@@ -86,7 +86,7 @@ Widget buildImageDragFeedback(
 
   return Material(
     elevation: 8,
-    shadowColor: Colors.black.withOpacity(0.3),
+    shadowColor: Colors.black.withValues(alpha: 0.3),
     borderRadius: BorderRadius.circular(12),
     child: Container(
       width: width,
@@ -94,7 +94,7 @@ Widget buildImageDragFeedback(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: colorScheme.primary.withOpacity(0.4),
+          color: colorScheme.primary.withValues(alpha: 0.4),
           width: 1.5,
         ),
       ),
@@ -141,7 +141,7 @@ Widget buildImageDragFeedback(
                     end: Alignment.bottomCenter,
                     colors: [
                       Colors.transparent,
-                      Colors.black.withOpacity(0.7),
+                      Colors.black.withValues(alpha: 0.7),
                     ],
                   ),
                 ),
@@ -167,7 +167,7 @@ Widget buildImageDragFeedback(
                         height: 1.1,
                         shadows: [
                           Shadow(
-                            color: Colors.black.withOpacity(0.8),
+                            color: Colors.black.withValues(alpha: 0.8),
                             blurRadius: 2,
                             offset: const Offset(0, 1),
                           ),
@@ -182,11 +182,11 @@ Widget buildImageDragFeedback(
                       _formatFileSize(dragData.record.size),
                       style: TextStyle(
                         fontSize: 7,
-                        color: Colors.white.withOpacity(0.9),
+                        color: Colors.white.withValues(alpha: 0.9),
                         height: 1.1,
                         shadows: [
                           Shadow(
-                            color: Colors.black.withOpacity(0.8),
+                            color: Colors.black.withValues(alpha: 0.8),
                             blurRadius: 2,
                             offset: const Offset(0, 1),
                           ),
@@ -294,7 +294,7 @@ Widget _buildPlaceholder(ThemeData theme, ImageDragData dragData) {
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: colorScheme.surface.withOpacity(0.5),
+          color: colorScheme.surface.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Icon(
@@ -302,7 +302,7 @@ Widget _buildPlaceholder(ThemeData theme, ImageDragData dragData) {
               ? Icons.image_rounded
               : Icons.insert_drive_file_rounded,
           size: 22,
-          color: colorScheme.primary.withOpacity(0.6),
+          color: colorScheme.primary.withValues(alpha: 0.6),
         ),
       ),
     ),

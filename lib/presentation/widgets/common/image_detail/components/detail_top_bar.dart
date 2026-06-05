@@ -51,7 +51,7 @@ class DetailTopBar extends StatelessWidget {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Colors.black.withOpacity(0.7),
+            Colors.black.withValues(alpha: 0.7),
             Colors.transparent,
           ],
         ),
@@ -85,7 +85,7 @@ class DetailTopBar extends StatelessWidget {
                   Text(
                     metadata!.model!,
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.7),
+                      color: Colors.white.withValues(alpha: 0.7),
                       fontSize: 12,
                     ),
                   ),
@@ -161,7 +161,7 @@ class DetailTopBar extends StatelessWidget {
                   size: 24,
                   inactiveColor: Colors.white,
                   showBackground: true,
-                  backgroundColor: Colors.black.withOpacity(0.4),
+                  backgroundColor: Colors.black.withValues(alpha: 0.4),
                   onToggle: onFavoriteToggle,
                 );
               },

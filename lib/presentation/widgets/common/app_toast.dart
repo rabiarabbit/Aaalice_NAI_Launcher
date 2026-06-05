@@ -377,7 +377,7 @@ class _SingleToastWidgetState extends State<_SingleToastWidget>
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
-                    color: color.withOpacity(0.3),
+                    color: color.withValues(alpha: 0.3),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                     spreadRadius: 2,
@@ -564,7 +564,7 @@ class _ProgressToastWidgetState extends State<_ProgressToastWidget>
                 boxShadow: [
                   BoxShadow(
                     color: (_type == ToastType.progress ? Colors.black : color)
-                        .withOpacity(0.25),
+                        .withValues(alpha: 0.25),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                     spreadRadius: 2,
@@ -635,7 +635,7 @@ class _ProgressToastWidgetState extends State<_ProgressToastWidget>
                       borderRadius: BorderRadius.circular(4),
                       child: LinearProgressIndicator(
                         value: _progress,
-                        backgroundColor: color.withOpacity(0.2),
+                        backgroundColor: color.withValues(alpha: 0.2),
                         valueColor: AlwaysStoppedAnimation<Color>(color),
                         minHeight: 4,
                       ),

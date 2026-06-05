@@ -31,7 +31,7 @@ class RecentVibeItem extends StatelessWidget {
           color: theme.colorScheme.surfaceContainerLowest,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: theme.colorScheme.outlineVariant.withOpacity(0.5),
+            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
           ),
         ),
         child: Column(
@@ -75,8 +75,8 @@ class RecentVibeItem extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 2),
               decoration: BoxDecoration(
                 color: entry.isPreEncoded
-                    ? Colors.green.withOpacity(0.1)
-                    : Colors.orange.withOpacity(0.1),
+                    ? Colors.green.withValues(alpha: 0.1)
+                    : Colors.orange.withValues(alpha: 0.1),
                 borderRadius:
                     const BorderRadius.vertical(bottom: Radius.circular(7)),
               ),

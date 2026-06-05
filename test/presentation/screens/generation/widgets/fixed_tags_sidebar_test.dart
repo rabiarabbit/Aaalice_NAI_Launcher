@@ -1,9 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hive/hive.dart';
+import 'package:nai_launcher/core/constants/storage_keys.dart';
 import 'package:nai_launcher/core/storage/local_storage_service.dart';
 import 'package:nai_launcher/data/models/fixed_tag/fixed_tag_entry.dart';
 import 'package:nai_launcher/data/models/fixed_tag/fixed_tag_link.dart';
@@ -21,6 +24,25 @@ import 'package:nai_launcher/presentation/widgets/common/thumbnail_display.dart'
 import 'package:nai_launcher/presentation/widgets/prompt/fixed_tags_button.dart';
 
 void main() {
+  late Directory hiveDir;
+
+  setUpAll(() async {
+    hiveDir = Directory.systemTemp.createTempSync('fixed_tags_sidebar_hive_');
+    Hive.init(hiveDir.path);
+    await Hive.openBox(StorageKeys.settingsBox);
+  });
+
+  setUp(() async {
+    await Hive.box(StorageKeys.settingsBox).clear();
+  });
+
+  tearDownAll(() async {
+    await Hive.close();
+    if (await hiveDir.exists()) {
+      await hiveDir.delete(recursive: true);
+    }
+  });
+
   testWidgets(
       'renders enabled categorized entries without duplicate key errors',
       (tester) async {

@@ -28,7 +28,7 @@ class SubtleBorders {
   /// 白色微光，60% 透明度，营造高级感
   static BoxBorder lightBorder(ColorScheme colorScheme) {
     return Border.all(
-      color: Colors.white.withOpacity(0.6),
+      color: Colors.white.withValues(alpha: 0.6),
       width: 1.0,
     );
   }
@@ -38,7 +38,7 @@ class SubtleBorders {
   /// 降低强度至 15%，避免过亮
   static BoxBorder darkBorder(ColorScheme colorScheme) {
     return Border.all(
-      color: Colors.white.withOpacity(0.15),
+      color: Colors.white.withValues(alpha: 0.15),
       width: 1.0,
     );
   }
@@ -46,7 +46,7 @@ class SubtleBorders {
   /// 主题色微光边框（强调场景）
   static BoxBorder accentBorder(ColorScheme colorScheme) {
     return Border.all(
-      color: colorScheme.primary.withOpacity(0.3),
+      color: colorScheme.primary.withValues(alpha: 0.3),
       width: 1.0,
     );
   }
@@ -63,12 +63,12 @@ class SubtleBorders {
   static BorderSide autoSide(ColorScheme colorScheme) {
     if (colorScheme.brightness == Brightness.dark) {
       return BorderSide(
-        color: Colors.white.withOpacity(0.15),
+        color: Colors.white.withValues(alpha: 0.15),
         width: 1.0,
       );
     }
     return BorderSide(
-      color: Colors.white.withOpacity(0.6),
+      color: Colors.white.withValues(alpha: 0.6),
       width: 1.0,
     );
   }
@@ -78,11 +78,11 @@ class SubtleBorders {
     final opacity = colorScheme.brightness == Brightness.dark ? 0.12 : 0.4;
     return Border(
       top: BorderSide(
-        color: Colors.white.withOpacity(opacity),
+        color: Colors.white.withValues(alpha: opacity),
         width: 1.0,
       ),
       left: BorderSide(
-        color: Colors.white.withOpacity(opacity * 0.5),
+        color: Colors.white.withValues(alpha: opacity * 0.5),
         width: 1.0,
       ),
       right: BorderSide.none,

@@ -196,15 +196,19 @@ class GalleryStreamScanner {
     await _scanLock.synchronized(() async {
       if (_isRunning) {
         AppLogger.w(
-            '[StreamScan] Scanner already running', 'GalleryStreamScanner');
+          '[StreamScan] Scanner already running',
+          'GalleryStreamScanner',
+        );
         return;
       }
 
       _isRunning = true;
       _shouldCancel = false;
 
-      AppLogger.i('[StreamScan] Starting stream scan: ${rootDir.path}',
-          'GalleryStreamScanner');
+      AppLogger.i(
+        '[StreamScan] Starting stream scan: ${rootDir.path}',
+        'GalleryStreamScanner',
+      );
 
       try {
         // 1. 预加载数据库记录（只加载一次），获取已有元数据数量
@@ -223,10 +227,14 @@ class GalleryStreamScanner {
 
         // 3. 【关键修改】先遍历一遍统计总数（让用户看到固定的总进度）
         AppLogger.i(
-            '[StreamScan] Counting total files...', 'GalleryStreamScanner');
+          '[StreamScan] Counting total files...',
+          'GalleryStreamScanner',
+        );
         final totalFiles = await _countTotalFiles(rootDir);
-        AppLogger.i('[StreamScan] Total files to scan: $totalFiles',
-            'GalleryStreamScanner');
+        AppLogger.i(
+          '[StreamScan] Total files to scan: $totalFiles',
+          'GalleryStreamScanner',
+        );
 
         // 4. 启动扫描状态管理器（使用固定的总文件数）
         // 使用异步版本确保与 ScanStateManager 的状态同步
@@ -240,8 +248,9 @@ class GalleryStreamScanner {
 
         if (!scanStarted) {
           AppLogger.w(
-              '[StreamScan] Scan start was rejected by ScanStateManager',
-              'GalleryStreamScanner');
+            '[StreamScan] Scan start was rejected by ScanStateManager',
+            'GalleryStreamScanner',
+          );
           return;
         }
 
@@ -326,7 +335,11 @@ class GalleryStreamScanner {
         );
       } catch (e, stack) {
         AppLogger.e(
-            '[StreamScan] Scan failed', e, stack, 'GalleryStreamScanner');
+          '[StreamScan] Scan failed',
+          e,
+          stack,
+          'GalleryStreamScanner',
+        );
         _stateManager.errorScan(e.toString());
       } finally {
         _isRunning = false;
@@ -410,7 +423,9 @@ class GalleryStreamScanner {
   /// 返回被标记为删除的记录数量
   Future<int> _fixDataConsistency() async {
     AppLogger.i(
-        '[StreamScan] Checking data consistency...', 'GalleryStreamScanner');
+      '[StreamScan] Checking data consistency...',
+      'GalleryStreamScanner',
+    );
 
     final orphanedPaths = <String>[];
 
@@ -469,7 +484,9 @@ class GalleryStreamScanner {
         );
       } else {
         AppLogger.d(
-            '[StreamScan] Cache miss: $fileName', 'GalleryStreamScanner');
+          '[StreamScan] Cache miss: $fileName',
+          'GalleryStreamScanner',
+        );
       }
 
       // 【新增】检测移动/重命名：检查是否有相同签名（size+mtime）的旧记录
@@ -538,8 +555,11 @@ class GalleryStreamScanner {
           );
 
           // 更新文件路径
-          await _dataSource.updateFilePath(oldImageId, path,
-              newFileName: fileName);
+          await _dataSource.updateFilePath(
+            oldImageId,
+            path,
+            newFileName: fileName,
+          );
 
           // 更新本地缓存
           final oldRecord = _existingMap.remove(movedFromPath);
@@ -627,8 +647,10 @@ class GalleryStreamScanner {
         metadataUpdated: metadata != null && metadata.hasData,
       );
     } catch (e) {
-      AppLogger.w('[StreamScan] Error processing $fileName: $e',
-          'GalleryStreamScanner');
+      AppLogger.w(
+        '[StreamScan] Error processing $fileName: $e',
+        'GalleryStreamScanner',
+      );
 
       // 【修复】增加失败计数
       _stateManager.incrementFailedCount();
@@ -659,7 +681,10 @@ class GalleryStreamScanner {
   /// 【重要】同时更新 _statsController 和 ScanStateManager，
   /// 确保 UI 能实时看到阶段变化
   void _updateStage(
-      StreamScanStats stats, FileProcessingStage stage, String fileName) {
+    StreamScanStats stats,
+    FileProcessingStage stage,
+    String fileName,
+  ) {
     // 更新本地 stats controller（供内部使用）
     _statsController.add(
       stats.copyWith(
@@ -715,7 +740,8 @@ class GalleryStreamScanner {
       if (entity is File) {
         // 跳过缩略图
         if (entity.path.contains(
-                '${Platform.pathSeparator}.thumbs${Platform.pathSeparator}') ||
+              '${Platform.pathSeparator}.thumbs${Platform.pathSeparator}',
+            ) ||
             entity.path.contains('.thumb.')) {
           continue;
         }
@@ -744,7 +770,8 @@ class GalleryStreamScanner {
       if (entity is File) {
         // 跳过缩略图
         if (entity.path.contains(
-                '${Platform.pathSeparator}.thumbs${Platform.pathSeparator}') ||
+              '${Platform.pathSeparator}.thumbs${Platform.pathSeparator}',
+            ) ||
             entity.path.contains('.thumb.')) {
           continue;
         }

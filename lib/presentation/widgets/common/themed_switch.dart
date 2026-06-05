@@ -192,12 +192,12 @@ class _ThemedSwitchState extends State<ThemedSwitch>
     required ThemeData theme,
   }) {
     final borderRadius = BorderRadius.circular(trackHeight / 2);
-    final borderColor = theme.colorScheme.outline.withOpacity(0.2);
+    final borderColor = theme.colorScheme.outline.withValues(alpha: 0.2);
 
     // 内阴影颜色
     final shadowColor = isDark
-        ? Colors.black.withOpacity(shadowDepth * 1.5)
-        : Colors.black.withOpacity(shadowDepth);
+        ? Colors.black.withValues(alpha: shadowDepth * 1.5)
+        : Colors.black.withValues(alpha: shadowDepth);
 
     return Container(
       width: trackWidth,
@@ -250,7 +250,7 @@ class _ThemedSwitchState extends State<ThemedSwitch>
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(shadowOpacity),
+            color: Colors.black.withValues(alpha: shadowOpacity),
             blurRadius: shadowBlur,
             offset: shadowOffset,
           ),
@@ -259,4 +259,3 @@ class _ThemedSwitchState extends State<ThemedSwitch>
     );
   }
 }
-

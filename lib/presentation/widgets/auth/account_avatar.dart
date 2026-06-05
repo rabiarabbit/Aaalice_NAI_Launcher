@@ -28,7 +28,8 @@ class AccountAvatar extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(size / 2),
-        splashColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+        splashColor:
+            Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
         customBorder: const CircleBorder(side: BorderSide.none),
         child: Padding(
           padding: EdgeInsets.all(showEditBadge ? size * 0.15 : 0),

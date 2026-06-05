@@ -114,8 +114,8 @@ class _GenderButtonState extends State<_GenderButton> {
           decoration: BoxDecoration(
             // 无边框，常态淡背景，悬停时加深
             color: _isHovered
-                ? widget.color.withOpacity(0.18)
-                : widget.color.withOpacity(0.08),
+                ? widget.color.withValues(alpha: 0.18)
+                : widget.color.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(6),
           ),
           child: Row(
@@ -126,7 +126,7 @@ class _GenderButtonState extends State<_GenderButton> {
                 size: 15,
                 color: _isHovered
                     ? widget.color
-                    : colorScheme.onSurfaceVariant.withOpacity(0.7),
+                    : colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
               ),
               const SizedBox(width: 2),
               Icon(
@@ -183,8 +183,8 @@ class _LibraryButtonState extends State<_LibraryButton> {
           decoration: BoxDecoration(
             // 无边框，常态淡背景，悬停时加深
             color: _isHovered
-                ? accentColor.withOpacity(0.18)
-                : accentColor.withOpacity(0.08),
+                ? accentColor.withValues(alpha: 0.18)
+                : accentColor.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(6),
           ),
           child: Row(

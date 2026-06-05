@@ -176,8 +176,8 @@ class _AspectRatioLegendItem extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         decoration: BoxDecoration(
           color: isHighlighted
-              ? color.withOpacity(0.15)
-              : colorScheme.surfaceContainerLow.withOpacity(0.5),
+              ? color.withValues(alpha: 0.15)
+              : colorScheme.surfaceContainerLow.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(6),
           border: Border.all(
             color: isHighlighted ? color : Colors.transparent,
@@ -264,7 +264,7 @@ class _AspectRatioPreview extends StatelessWidget {
         width: boxW,
         height: boxH,
         decoration: BoxDecoration(
-          color: color.withOpacity(0.3),
+          color: color.withValues(alpha: 0.3),
           border: Border.all(color: color, width: 2),
           borderRadius: BorderRadius.circular(2),
         ),

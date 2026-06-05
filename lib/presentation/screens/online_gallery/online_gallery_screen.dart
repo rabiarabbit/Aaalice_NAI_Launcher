@@ -213,7 +213,7 @@ class _OnlineGalleryScreenState extends ConsumerState<OnlineGalleryScreen>
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         border: Border(
-          top: BorderSide(color: theme.dividerColor.withOpacity(0.3)),
+          top: BorderSide(color: theme.dividerColor.withValues(alpha: 0.3)),
         ),
       ),
       child: Row(
@@ -263,7 +263,7 @@ class _OnlineGalleryScreenState extends ConsumerState<OnlineGalleryScreen>
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         decoration: BoxDecoration(
-          color: theme.colorScheme.primaryContainer.withOpacity(0.3),
+          color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
           borderRadius: BorderRadius.circular(16),
         ),
         child: state.isLoading
@@ -289,7 +289,7 @@ class _OnlineGalleryScreenState extends ConsumerState<OnlineGalleryScreen>
                   Icon(
                     Icons.edit,
                     size: 12,
-                    color: theme.colorScheme.onSurface.withOpacity(0.5),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                   ),
                 ],
               ),
@@ -377,7 +377,7 @@ class _OnlineGalleryScreenState extends ConsumerState<OnlineGalleryScreen>
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         border: Border(
-          bottom: BorderSide(color: theme.dividerColor.withOpacity(0.3)),
+          bottom: BorderSide(color: theme.dividerColor.withValues(alpha: 0.3)),
         ),
       ),
       child: Column(
@@ -415,7 +415,7 @@ class _OnlineGalleryScreenState extends ConsumerState<OnlineGalleryScreen>
   ) {
     return Container(
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.4),
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -479,7 +479,8 @@ class _OnlineGalleryScreenState extends ConsumerState<OnlineGalleryScreen>
         height: 36,
         constraints: const BoxConstraints(maxWidth: 400),
         decoration: BoxDecoration(
-          color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.4),
+          color:
+              theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
           borderRadius: BorderRadius.circular(18),
         ),
         child: TextField(
@@ -489,21 +490,21 @@ class _OnlineGalleryScreenState extends ConsumerState<OnlineGalleryScreen>
           decoration: InputDecoration(
             hintText: context.l10n.onlineGallery_searchTags,
             hintStyle: TextStyle(
-              color: theme.colorScheme.onSurfaceVariant.withOpacity(0.5),
+              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
               fontSize: 13,
             ),
             prefixIcon: Icon(
               Icons.search,
               size: 18,
-              color: theme.colorScheme.onSurfaceVariant.withOpacity(0.6),
+              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
             ),
             suffixIcon: _searchController.text.isNotEmpty
                 ? IconButton(
                     icon: Icon(
                       Icons.close,
                       size: 16,
-                      color:
-                          theme.colorScheme.onSurfaceVariant.withOpacity(0.6),
+                      color: theme.colorScheme.onSurfaceVariant
+                          .withValues(alpha: 0.6),
                     ),
                     onPressed: () {
                       _searchController.clear();
@@ -906,7 +907,7 @@ class _OnlineGalleryScreenState extends ConsumerState<OnlineGalleryScreen>
           Icon(
             icon,
             size: 48,
-            color: theme.colorScheme.onSurfaceVariant.withOpacity(0.5),
+            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 12),
           Text(message, style: theme.textTheme.titleMedium),
@@ -1336,7 +1337,8 @@ class _SourceDropdown extends StatelessWidget {
         height: 32,
         padding: const EdgeInsets.symmetric(horizontal: 10),
         decoration: BoxDecoration(
-          color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.4),
+          color:
+              theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
           borderRadius: BorderRadius.circular(6),
         ),
         child: Row(
@@ -1619,7 +1621,7 @@ class _RatingDropdown extends StatelessWidget {
             '+${selectedCodes.length - visibleCount}',
             style: TextStyle(
               fontSize: 10,
-              color: theme.colorScheme.onSurfaceVariant.withOpacity(0.8),
+              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -1691,7 +1693,8 @@ class _RatingDropdown extends StatelessWidget {
         height: 32,
         padding: const EdgeInsets.symmetric(horizontal: 10),
         decoration: BoxDecoration(
-          color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.4),
+          color:
+              theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
           borderRadius: BorderRadius.circular(6),
         ),
         child: Row(

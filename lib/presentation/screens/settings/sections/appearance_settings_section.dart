@@ -95,25 +95,27 @@ class _AppearanceSettingsSectionState
           content: SizedBox(
             width: 300,
             height: 400,
-            child: ListView(
-              shrinkWrap: true,
-              children: sortedStyles.map((style) {
-                // grungeCollage 使用多语言的"默认"
-                final displayName = style == AppStyle.grungeCollage
-                    ? context.l10n.settings_defaultPreset
-                    : style.displayName;
-                return RadioListTile<AppStyle>(
-                  title: Text(displayName),
-                  value: style,
-                  groupValue: currentTheme,
-                  onChanged: (value) {
-                    if (value != null) {
-                      ref.read(themeNotifierProvider.notifier).setTheme(value);
-                      Navigator.pop(dialogContext);
-                    }
-                  },
-                );
-              }).toList(),
+            child: RadioGroup<AppStyle>(
+              groupValue: currentTheme,
+              onChanged: (value) {
+                if (value != null) {
+                  ref.read(themeNotifierProvider.notifier).setTheme(value);
+                  Navigator.pop(dialogContext);
+                }
+              },
+              child: ListView(
+                shrinkWrap: true,
+                children: sortedStyles.map((style) {
+                  // grungeCollage 使用多语言的"默认"
+                  final displayName = style == AppStyle.grungeCollage
+                      ? context.l10n.settings_defaultPreset
+                      : style.displayName;
+                  return RadioListTile<AppStyle>(
+                    title: Text(displayName),
+                    value: style,
+                  );
+                }).toList(),
+              ),
             ),
           ),
           actions: [
@@ -152,133 +154,135 @@ class _AppearanceSettingsSectionState
                     ),
                   ),
                   data: (fontGroups) {
-                    return ListView.builder(
-                      itemCount: fontGroups.length,
-                      itemBuilder: (context, groupIndex) {
-                        final groupName = fontGroups.keys.elementAt(groupIndex);
-                        final fonts = fontGroups[groupName]!;
+                    return RadioGroup<FontConfig>(
+                      groupValue: currentFont,
+                      onChanged: (value) {
+                        if (value != null) {
+                          ref
+                              .read(fontNotifierProvider.notifier)
+                              .setFont(value);
+                          Navigator.pop(dialogContext);
+                        }
+                      },
+                      child: ListView.builder(
+                        itemCount: fontGroups.length,
+                        itemBuilder: (context, groupIndex) {
+                          final groupName =
+                              fontGroups.keys.elementAt(groupIndex);
+                          final fonts = fontGroups[groupName]!;
 
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // 分组标题
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(8, 16, 8, 8),
-                              child: Text(
-                                '$groupName (${fonts.length})',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleSmall
-                                    ?.copyWith(
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // 分组标题
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(8, 16, 8, 8),
+                                child: Text(
+                                  '$groupName (${fonts.length})',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleSmall
+                                      ?.copyWith(
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.primary,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                ),
                               ),
-                            ),
-                            // 字体列表
-                            ...fonts.map((font) {
-                              final isSelected = font == currentFont;
-                              return InkWell(
-                                onTap: () {
-                                  ref
-                                      .read(fontNotifierProvider.notifier)
-                                      .setFont(font);
-                                  Navigator.pop(dialogContext);
-                                },
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 8,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: isSelected
-                                        ? Theme.of(context)
-                                            .colorScheme
-                                            .primaryContainer
-                                        : null,
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Radio<FontConfig>(
-                                        value: font,
-                                        groupValue: currentFont,
-                                        onChanged: (value) {
-                                          if (value != null) {
-                                            ref
-                                                .read(
-                                                  fontNotifierProvider.notifier,
-                                                )
-                                                .setFont(value);
-                                            Navigator.pop(dialogContext);
-                                          }
-                                        },
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Expanded(
-                                        child: Text(
-                                          font.displayName,
-                                          style: TextStyle(
-                                            fontFamily: font.fontFamily.isEmpty
-                                                ? null
-                                                : font.fontFamily,
-                                            fontSize: 16,
-                                            color: isSelected
-                                                ? Theme.of(context)
-                                                    .colorScheme
-                                                    .onPrimaryContainer
-                                                : null,
-                                          ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                      if (font.source == FontSource.google)
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 6,
-                                            vertical: 2,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .secondaryContainer,
-                                            borderRadius:
-                                                BorderRadius.circular(4),
-                                          ),
+                              // 字体列表
+                              ...fonts.map((font) {
+                                final isSelected = font == currentFont;
+                                return InkWell(
+                                  onTap: () {
+                                    ref
+                                        .read(fontNotifierProvider.notifier)
+                                        .setFont(font);
+                                    Navigator.pop(dialogContext);
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 8,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: isSelected
+                                          ? Theme.of(context)
+                                              .colorScheme
+                                              .primaryContainer
+                                          : null,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Radio<FontConfig>(value: font),
+                                        const SizedBox(width: 8),
+                                        Expanded(
                                           child: Text(
-                                            'Google',
+                                            font.displayName,
                                             style: TextStyle(
-                                              fontSize: 10,
+                                              fontFamily:
+                                                  font.fontFamily.isEmpty
+                                                      ? null
+                                                      : font.fontFamily,
+                                              fontSize: 16,
+                                              color: isSelected
+                                                  ? Theme.of(context)
+                                                      .colorScheme
+                                                      .onPrimaryContainer
+                                                  : null,
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                        if (font.source == FontSource.google)
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 6,
+                                              vertical: 2,
+                                            ),
+                                            decoration: BoxDecoration(
                                               color: Theme.of(context)
                                                   .colorScheme
-                                                  .onSecondaryContainer,
+                                                  .secondaryContainer,
+                                              borderRadius:
+                                                  BorderRadius.circular(4),
+                                            ),
+                                            child: Text(
+                                              'Google',
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSecondaryContainer,
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                      if (isSelected)
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 8),
-                                          child: Icon(
-                                            Icons.check,
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .onPrimaryContainer,
-                                            size: 20,
+                                        if (isSelected)
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                              left: 8,
+                                            ),
+                                            child: Icon(
+                                              Icons.check,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onPrimaryContainer,
+                                              size: 20,
+                                            ),
                                           ),
-                                        ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              );
-                            }),
-                            if (groupIndex < fontGroups.length - 1)
-                              const ThemedDivider(height: 1),
-                          ],
-                        );
-                      },
+                                );
+                              }),
+                              if (groupIndex < fontGroups.length - 1)
+                                const ThemedDivider(height: 1),
+                            ],
+                          );
+                        },
+                      ),
                     );
                   },
                 ),
@@ -305,32 +309,27 @@ class _AppearanceSettingsSectionState
       builder: (dialogContext) {
         return AlertDialog(
           title: Text(context.l10n.settings_selectLanguage),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              RadioListTile<String>(
-                title: Text(context.l10n.settings_languageChinese),
-                value: 'zh',
-                groupValue: currentLocale.languageCode,
-                onChanged: (value) {
-                  if (value != null) {
-                    ref.read(localeNotifierProvider.notifier).setLocale(value);
-                    Navigator.pop(dialogContext);
-                  }
-                },
-              ),
-              RadioListTile<String>(
-                title: Text(context.l10n.settings_languageEnglish),
-                value: 'en',
-                groupValue: currentLocale.languageCode,
-                onChanged: (value) {
-                  if (value != null) {
-                    ref.read(localeNotifierProvider.notifier).setLocale(value);
-                    Navigator.pop(dialogContext);
-                  }
-                },
-              ),
-            ],
+          content: RadioGroup<String>(
+            groupValue: currentLocale.languageCode,
+            onChanged: (value) {
+              if (value != null) {
+                ref.read(localeNotifierProvider.notifier).setLocale(value);
+                Navigator.pop(dialogContext);
+              }
+            },
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                RadioListTile<String>(
+                  title: Text(context.l10n.settings_languageChinese),
+                  value: 'zh',
+                ),
+                RadioListTile<String>(
+                  title: Text(context.l10n.settings_languageEnglish),
+                  value: 'en',
+                ),
+              ],
+            ),
           ),
           actions: [
             TextButton(
@@ -410,7 +409,7 @@ class _AppearanceSettingsSectionState
                                   theme.colorScheme.surfaceContainerHighest,
                               thumbColor: theme.colorScheme.primary,
                               overlayColor: theme.colorScheme.primary
-                                  .withOpacity(0.12),
+                                  .withValues(alpha: 0.12),
                             ),
                             child: Slider(
                               value: currentScale,
@@ -461,9 +460,7 @@ class _AppearanceSettingsSectionState
                     setState(() {
                       currentScale = 1.0;
                     });
-                    ref
-                        .read(fontScaleNotifierProvider.notifier)
-                        .reset();
+                    ref.read(fontScaleNotifierProvider.notifier).reset();
                   },
                   icon: const Icon(Icons.refresh),
                   label: Text(context.l10n.settings_fontScale_reset),

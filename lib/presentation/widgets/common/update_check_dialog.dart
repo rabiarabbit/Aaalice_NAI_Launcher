@@ -47,7 +47,8 @@ class UpdateCheckDialog extends ConsumerWidget {
   Widget _buildContent(BuildContext context, UpdateState state) {
     return switch (state.status) {
       UpdateStatus.checking => _buildLoadingContent(context),
-      UpdateStatus.available => _buildUpdateAvailableContent(context, state.versionInfo!),
+      UpdateStatus.available =>
+        _buildUpdateAvailableContent(context, state.versionInfo!),
       UpdateStatus.upToDate => _buildUpToDateContent(context),
       UpdateStatus.error => _buildErrorContent(context, state.errorMessage),
       UpdateStatus.idle => _buildLoadingContent(context),
@@ -71,7 +72,10 @@ class UpdateCheckDialog extends ConsumerWidget {
   }
 
   /// 构建有可用更新内容
-  Widget _buildUpdateAvailableContent(BuildContext context, VersionInfo versionInfo) {
+  Widget _buildUpdateAvailableContent(
+    BuildContext context,
+    VersionInfo versionInfo,
+  ) {
     final theme = Theme.of(context);
 
     return SingleChildScrollView(
@@ -102,7 +106,8 @@ class UpdateCheckDialog extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
           // 更新日志
-          if (versionInfo.releaseNotes != null && versionInfo.releaseNotes!.isNotEmpty) ...[
+          if (versionInfo.releaseNotes != null &&
+              versionInfo.releaseNotes!.isNotEmpty) ...[
             Text(
               context.l10n.releaseNotes,
               style: theme.textTheme.titleSmall?.copyWith(
@@ -117,7 +122,8 @@ class UpdateCheckDialog extends ConsumerWidget {
                 color: theme.colorScheme.surfaceContainerLowest,
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                  color: theme.colorScheme.outlineVariant.withOpacity(0.5),
+                  color:
+                      theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
                 ),
               ),
               child: SingleChildScrollView(
@@ -143,13 +149,13 @@ class UpdateCheckDialog extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: isHighlighted
-            ? theme.colorScheme.primaryContainer.withOpacity(0.5)
+            ? theme.colorScheme.primaryContainer.withValues(alpha: 0.5)
             : theme.colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color: isHighlighted
-              ? theme.colorScheme.primary.withOpacity(0.3)
-              : theme.colorScheme.outlineVariant.withOpacity(0.3),
+              ? theme.colorScheme.primary.withValues(alpha: 0.3)
+              : theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
         ),
       ),
       child: Column(
@@ -247,7 +253,11 @@ class UpdateCheckDialog extends ConsumerWidget {
   }
 
   /// 构建按钮操作
-  List<Widget> _buildActions(BuildContext context, WidgetRef ref, UpdateState state) {
+  List<Widget> _buildActions(
+    BuildContext context,
+    WidgetRef ref,
+    UpdateState state,
+  ) {
     return switch (state.status) {
       UpdateStatus.checking => [
           TextButton(

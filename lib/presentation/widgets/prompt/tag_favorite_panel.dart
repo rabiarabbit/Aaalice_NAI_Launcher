@@ -239,7 +239,7 @@ class _TagFavoritePanelState extends ConsumerState<TagFavoritePanel> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: BoxDecoration(
-              color: theme.colorScheme.primary.withOpacity(0.1),
+              color: theme.colorScheme.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
@@ -266,17 +266,17 @@ class _TagFavoritePanelState extends ConsumerState<TagFavoritePanel> {
         hintText: context.l10n.tagGroupBrowser_searchHint,
         hintStyle: TextStyle(
           fontSize: 14,
-          color: theme.colorScheme.onSurface.withOpacity(0.5),
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
         ),
         prefixIcon: Icon(
           Icons.search,
-          color: theme.colorScheme.onSurface.withOpacity(0.5),
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
         ),
         suffixIcon: _searchController.text.isNotEmpty
             ? IconButton(
                 icon: Icon(
                   Icons.clear,
-                  color: theme.colorScheme.onSurface.withOpacity(0.5),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                 ),
                 onPressed: () {
                   _searchController.clear();
@@ -293,7 +293,8 @@ class _TagFavoritePanelState extends ConsumerState<TagFavoritePanel> {
           borderSide: BorderSide.none,
         ),
         filled: true,
-        fillColor: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
+        fillColor:
+            theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
       ),
       style: const TextStyle(fontSize: 14),
     );
@@ -375,12 +376,13 @@ class _TagFavoritePanelState extends ConsumerState<TagFavoritePanel> {
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
               color: isInCurrent
-                  ? theme.colorScheme.primary.withOpacity(0.5)
-                  : theme.colorScheme.outline.withOpacity(0.3),
+                  ? theme.colorScheme.primary.withValues(alpha: 0.5)
+                  : theme.colorScheme.outline.withValues(alpha: 0.3),
             ),
             color: isInCurrent
-                ? theme.colorScheme.primary.withOpacity(0.08)
-                : theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                ? theme.colorScheme.primary.withValues(alpha: 0.08)
+                : theme.colorScheme.surfaceContainerHighest
+                    .withValues(alpha: 0.3),
           ),
           child: Row(
             children: [
@@ -388,7 +390,7 @@ class _TagFavoritePanelState extends ConsumerState<TagFavoritePanel> {
               Icon(
                 Icons.cloud_outlined,
                 size: 16,
-                color: theme.colorScheme.primary.withOpacity(0.7),
+                color: theme.colorScheme.primary.withValues(alpha: 0.7),
               ),
               const SizedBox(width: 12),
 
@@ -414,7 +416,8 @@ class _TagFavoritePanelState extends ConsumerState<TagFavoritePanel> {
                       Text(
                         '${suggestion.categoryEnum.displayName} • ${suggestion.formattedCount}',
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurface.withOpacity(0.6),
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.6),
                         ),
                       ),
                     ],
@@ -437,7 +440,7 @@ class _TagFavoritePanelState extends ConsumerState<TagFavoritePanel> {
                 Icons.add_circle_outline,
                 size: 18,
                 color: isInCurrent
-                    ? theme.colorScheme.onSurface.withOpacity(0.3)
+                    ? theme.colorScheme.onSurface.withValues(alpha: 0.3)
                     : theme.colorScheme.primary,
               ),
             ],
@@ -460,14 +463,14 @@ class _TagFavoritePanelState extends ConsumerState<TagFavoritePanel> {
             Icon(
               Icons.favorite_border,
               size: 48,
-              color: theme.colorScheme.primary.withOpacity(0.4),
+              color: theme.colorScheme.primary.withValues(alpha: 0.4),
             ),
             const SizedBox(height: 16),
             Text(
               context.l10n.tag_favoritesEmpty,
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.6),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             ),
             const SizedBox(height: 8),
@@ -475,7 +478,7 @@ class _TagFavoritePanelState extends ConsumerState<TagFavoritePanel> {
               context.l10n.tag_favoritesEmptyHint,
               textAlign: TextAlign.center,
               style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.4),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
               ),
             ),
           ],
@@ -522,12 +525,13 @@ class _TagFavoritePanelState extends ConsumerState<TagFavoritePanel> {
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
               color: isInCurrent
-                  ? theme.colorScheme.primary.withOpacity(0.5)
-                  : theme.colorScheme.outline.withOpacity(0.3),
+                  ? theme.colorScheme.primary.withValues(alpha: 0.5)
+                  : theme.colorScheme.outline.withValues(alpha: 0.3),
             ),
             color: isInCurrent
-                ? theme.colorScheme.primary.withOpacity(0.08)
-                : theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                ? theme.colorScheme.primary.withValues(alpha: 0.08)
+                : theme.colorScheme.surfaceContainerHighest
+                    .withValues(alpha: 0.3),
           ),
           child: Row(
             children: [
@@ -537,7 +541,7 @@ class _TagFavoritePanelState extends ConsumerState<TagFavoritePanel> {
                 size: 16,
                 color: isInCurrent
                     ? theme.colorScheme.primary
-                    : theme.colorScheme.error.withOpacity(0.7),
+                    : theme.colorScheme.error.withValues(alpha: 0.7),
               ),
               const SizedBox(width: 12),
 
@@ -563,7 +567,8 @@ class _TagFavoritePanelState extends ConsumerState<TagFavoritePanel> {
                       Text(
                         favorite.notes!,
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurface.withOpacity(0.6),
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.6),
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -587,7 +592,7 @@ class _TagFavoritePanelState extends ConsumerState<TagFavoritePanel> {
               Icon(
                 Icons.more_vert,
                 size: 18,
-                color: theme.colorScheme.onSurface.withOpacity(0.4),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
               ),
             ],
           ),

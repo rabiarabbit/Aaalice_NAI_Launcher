@@ -90,7 +90,7 @@ class TexturePainter extends CustomPainter {
   void _paintPaperGrain(Canvas canvas, Size size) {
     final random = math.Random(seed);
     final paint = Paint()
-      ..color = color.withOpacity(opacity)
+      ..color = color.withValues(alpha: opacity)
       ..style = PaintingStyle.fill;
 
     // Grid-based approach for even distribution
@@ -121,7 +121,7 @@ class TexturePainter extends CustomPainter {
   /// or perforated patterns.
   void _paintDotMatrix(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = color.withOpacity(opacity)
+      ..color = color.withValues(alpha: opacity)
       ..style = PaintingStyle.fill;
 
     // Regular grid spacing adjusted by density
@@ -143,7 +143,7 @@ class TexturePainter extends CustomPainter {
   void _paintHalftone(Canvas canvas, Size size) {
     final random = math.Random(seed);
     final paint = Paint()
-      ..color = color.withOpacity(opacity)
+      ..color = color.withValues(alpha: opacity)
       ..style = PaintingStyle.fill;
 
     // Larger spacing for halftone effect
@@ -201,7 +201,7 @@ class TexturePainter extends CustomPainter {
   /// Draws random dust particles for grunge texture.
   void _paintDustParticles(Canvas canvas, Size size, math.Random random) {
     final paint = Paint()
-      ..color = color.withOpacity(opacity * 0.6)
+      ..color = color.withValues(alpha: opacity * 0.6)
       ..style = PaintingStyle.fill;
 
     // Number of particles scales with area and density
@@ -219,7 +219,7 @@ class TexturePainter extends CustomPainter {
   /// Draws random scratches/lines for grunge texture.
   void _paintScratches(Canvas canvas, Size size, math.Random random) {
     final paint = Paint()
-      ..color = color.withOpacity(opacity * 0.4)
+      ..color = color.withValues(alpha: opacity * 0.4)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 0.5 + random.nextDouble() * 0.5
       ..strokeCap = StrokeCap.round;
@@ -254,7 +254,7 @@ class TexturePainter extends CustomPainter {
   /// Draws ink splatters for grunge texture.
   void _paintSplatters(Canvas canvas, Size size, math.Random random) {
     final paint = Paint()
-      ..color = color.withOpacity(opacity * 0.3)
+      ..color = color.withValues(alpha: opacity * 0.3)
       ..style = PaintingStyle.fill;
 
     // Fewer but larger splatters

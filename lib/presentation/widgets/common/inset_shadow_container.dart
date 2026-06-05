@@ -85,7 +85,7 @@ class InsetShadowContainer extends StatelessWidget {
     // 边框色 - 错误状态用红色，否则用极淡的边框
     final border = hasError
         ? theme.colorScheme.error
-        : (borderColor ?? theme.colorScheme.outline.withOpacity(0.1));
+        : (borderColor ?? theme.colorScheme.outline.withValues(alpha: 0.1));
 
     // 如果禁用内阴影，直接返回简单容器
     if (!isEnabled) {
@@ -106,8 +106,8 @@ class InsetShadowContainer extends StatelessWidget {
 
     // 阴影色 - 深色主题用黑色，浅色主题用深灰色
     final shadowColor = isDark
-        ? Colors.black.withOpacity(depth * 1.5)
-        : Colors.black.withOpacity(depth);
+        ? Colors.black.withValues(alpha: depth * 1.5)
+        : Colors.black.withValues(alpha: depth);
 
     return Container(
       decoration: BoxDecoration(
@@ -164,7 +164,7 @@ class _InsetShadowPainter extends CustomPainter {
       end: Alignment.bottomCenter,
       colors: [
         shadowColor,
-        shadowColor.withOpacity(shadowColor.opacity * 0.3),
+        shadowColor.withValues(alpha: shadowColor.a * 0.3),
         Colors.transparent,
       ],
       stops: const [0.0, 0.3, 1.0],
@@ -179,7 +179,7 @@ class _InsetShadowPainter extends CustomPainter {
       begin: Alignment.centerLeft,
       end: Alignment.centerRight,
       colors: [
-        shadowColor.withOpacity(shadowColor.opacity * 0.7),
+        shadowColor.withValues(alpha: shadowColor.a * 0.7),
         Colors.transparent,
       ],
     );
@@ -193,7 +193,7 @@ class _InsetShadowPainter extends CustomPainter {
       begin: Alignment.centerRight,
       end: Alignment.centerLeft,
       colors: [
-        shadowColor.withOpacity(shadowColor.opacity * 0.4),
+        shadowColor.withValues(alpha: shadowColor.a * 0.4),
         Colors.transparent,
       ],
     );
@@ -205,12 +205,12 @@ class _InsetShadowPainter extends CustomPainter {
 
     // 底部高光（模拟光源从上方照射）- 可选的微妙效果
     // 在深色主题中添加底部微弱高光增加立体感
-    if (shadowColor.opacity > 0.1) {
+    if (shadowColor.a > 0.1) {
       final bottomHighlight = LinearGradient(
         begin: Alignment.bottomCenter,
         end: Alignment.topCenter,
         colors: [
-          Colors.white.withOpacity(0.02),
+          Colors.white.withValues(alpha: 0.02),
           Colors.transparent,
         ],
       );

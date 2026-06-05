@@ -93,13 +93,15 @@ class _WorkflowImportWizardState extends ConsumerState<WorkflowImportWizard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('导入 ComfyUI 工作流',
-                    style: theme.textTheme.titleMedium),
+                Text(
+                  '导入 ComfyUI 工作流',
+                  style: theme.textTheme.titleMedium,
+                ),
                 const SizedBox(height: 2),
                 Text(
                   '步骤 ${_step + 1}/4: ${titles[_step]}',
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurface.withOpacity(0.6),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                 ),
               ],
@@ -135,7 +137,7 @@ class _WorkflowImportWizardState extends ConsumerState<WorkflowImportWizard> {
       decoration: BoxDecoration(
         border: Border(
           top: BorderSide(
-            color: theme.colorScheme.outline.withOpacity(0.2),
+            color: theme.colorScheme.outline.withValues(alpha: 0.2),
           ),
         ),
       ),
@@ -181,8 +183,9 @@ class _WorkflowImportWizardState extends ConsumerState<WorkflowImportWizard> {
       case 1:
         return _nameController.text.trim().isNotEmpty;
       case 2:
-        return _enabledSlotIds.any((id) =>
-            _analysis!.outputSlots.any((s) => s.id == id));
+        return _enabledSlotIds.any(
+          (id) => _analysis!.outputSlots.any((s) => s.id == id),
+        );
       default:
         return true;
     }
@@ -226,12 +229,12 @@ class _WorkflowImportWizardState extends ConsumerState<WorkflowImportWizard> {
               border: Border.all(
                 color: _workflowJson != null
                     ? theme.colorScheme.primary
-                    : theme.colorScheme.outline.withOpacity(0.5),
+                    : theme.colorScheme.outline.withValues(alpha: 0.5),
                 width: _workflowJson != null ? 2 : 1,
               ),
               borderRadius: BorderRadius.circular(12),
               color: _workflowJson != null
-                  ? theme.colorScheme.primaryContainer.withOpacity(0.1)
+                  ? theme.colorScheme.primaryContainer.withValues(alpha: 0.1)
                   : null,
             ),
             child: Center(
@@ -239,35 +242,49 @@ class _WorkflowImportWizardState extends ConsumerState<WorkflowImportWizard> {
                   ? Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.check_circle,
-                            color: theme.colorScheme.primary, size: 36),
+                        Icon(
+                          Icons.check_circle,
+                          color: theme.colorScheme.primary,
+                          size: 36,
+                        ),
                         const SizedBox(height: 8),
-                        Text(_fileName ?? 'workflow.json',
-                            style: theme.textTheme.titleSmall),
+                        Text(
+                          _fileName ?? 'workflow.json',
+                          style: theme.textTheme.titleSmall,
+                        ),
                         Text(
                           '${_workflowJson!.length} 个节点',
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurface.withOpacity(0.6),
+                            color: theme.colorScheme.onSurface
+                                .withValues(alpha: 0.6),
                           ),
                         ),
                         const SizedBox(height: 4),
-                        Text('点击重新选择',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.primary,
-                            )),
+                        Text(
+                          '点击重新选择',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.primary,
+                          ),
+                        ),
                       ],
                     )
                   : Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.upload_file,
-                            size: 40,
-                            color: theme.colorScheme.onSurface.withOpacity(0.4)),
+                        Icon(
+                          Icons.upload_file,
+                          size: 40,
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.4),
+                        ),
                         const SizedBox(height: 8),
-                        Text('点击选择 workflow_api.json',
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: theme.colorScheme.onSurface.withOpacity(0.5),
-                            )),
+                        Text(
+                          '点击选择 workflow_api.json',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.onSurface
+                                .withValues(alpha: 0.5),
+                          ),
+                        ),
                       ],
                     ),
             ),
@@ -303,8 +320,9 @@ class _WorkflowImportWizardState extends ConsumerState<WorkflowImportWizard> {
       }
 
       // 基本验证：至少有一个含 class_type 的节点
-      final hasNodes = parsed.values.any((v) =>
-          v is Map<String, dynamic> && v.containsKey('class_type'));
+      final hasNodes = parsed.values.any(
+        (v) => v is Map<String, dynamic> && v.containsKey('class_type'),
+      );
       if (!hasNodes) {
         if (mounted) {
           AppToast.error(context, '未检测到 ComfyUI 节点，请确认是 API 格式导出');
@@ -333,7 +351,7 @@ class _WorkflowImportWizardState extends ConsumerState<WorkflowImportWizard> {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: theme.colorScheme.primaryContainer.withOpacity(0.15),
+            color: theme.colorScheme.primaryContainer.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Column(
@@ -341,14 +359,30 @@ class _WorkflowImportWizardState extends ConsumerState<WorkflowImportWizard> {
             children: [
               Text('自动分析结果', style: theme.textTheme.titleSmall),
               const SizedBox(height: 8),
-              _infoRow(theme, Icons.input, '输入图像节点',
-                  '${a.inputSlots.length} 个'),
-              _infoRow(theme, Icons.tune, '可调参数',
-                  '${a.parameterSlots.length} 个'),
-              _infoRow(theme, Icons.output, '输出节点',
-                  '${a.outputSlots.length} 个'),
-              _infoRow(theme, Icons.widgets_outlined, '总节点数',
-                  '${a.nodes.length} 个'),
+              _infoRow(
+                theme,
+                Icons.input,
+                '输入图像节点',
+                '${a.inputSlots.length} 个',
+              ),
+              _infoRow(
+                theme,
+                Icons.tune,
+                '可调参数',
+                '${a.parameterSlots.length} 个',
+              ),
+              _infoRow(
+                theme,
+                Icons.output,
+                '输出节点',
+                '${a.outputSlots.length} 个',
+              ),
+              _infoRow(
+                theme,
+                Icons.widgets_outlined,
+                '总节点数',
+                '${a.nodes.length} 个',
+              ),
             ],
           ),
         ),
@@ -405,9 +439,11 @@ class _WorkflowImportWizardState extends ConsumerState<WorkflowImportWizard> {
           const SizedBox(width: 8),
           Text(label, style: theme.textTheme.bodySmall),
           const Spacer(),
-          Text(value,
-              style: theme.textTheme.bodySmall
-                  ?.copyWith(fontWeight: FontWeight.w600)),
+          Text(
+            value,
+            style: theme.textTheme.bodySmall
+                ?.copyWith(fontWeight: FontWeight.w600),
+          ),
         ],
       ),
     );
@@ -423,7 +459,7 @@ class _WorkflowImportWizardState extends ConsumerState<WorkflowImportWizard> {
         Text(
           '勾选需要暴露给 UI 的槽位。输入/输出槽位建议保留；不需要用户调整的参数可以取消勾选。',
           style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSurface.withOpacity(0.6),
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
           ),
         ),
         const SizedBox(height: 16),
@@ -445,7 +481,7 @@ class _WorkflowImportWizardState extends ConsumerState<WorkflowImportWizard> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: theme.colorScheme.errorContainer.withOpacity(0.2),
+              color: theme.colorScheme.errorContainer.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(8),
             ),
             child: const Text(
@@ -464,9 +500,11 @@ class _WorkflowImportWizardState extends ConsumerState<WorkflowImportWizard> {
         children: [
           Icon(icon, size: 18, color: theme.colorScheme.primary),
           const SizedBox(width: 8),
-          Text(title,
-              style: theme.textTheme.titleSmall
-                  ?.copyWith(color: theme.colorScheme.primary)),
+          Text(
+            title,
+            style: theme.textTheme.titleSmall
+                ?.copyWith(color: theme.colorScheme.primary),
+          ),
         ],
       ),
     );
@@ -482,7 +520,7 @@ class _WorkflowImportWizardState extends ConsumerState<WorkflowImportWizard> {
         '${slot.direction.name} · ${slot.dataType.name} · '
         '节点 ${slot.nodeId}${slot.field != null ? ".${slot.field}" : ""}',
         style: theme.textTheme.bodySmall?.copyWith(
-          color: theme.colorScheme.onSurface.withOpacity(0.5),
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
         ),
       ),
       value: enabled,
@@ -515,12 +553,17 @@ class _WorkflowImportWizardState extends ConsumerState<WorkflowImportWizard> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Icon(Icons.check_circle_outline,
-            size: 48, color: theme.colorScheme.primary),
+        Icon(
+          Icons.check_circle_outline,
+          size: 48,
+          color: theme.colorScheme.primary,
+        ),
         const SizedBox(height: 16),
-        Text('即将导入以下工作流',
-            textAlign: TextAlign.center,
-            style: theme.textTheme.titleMedium),
+        Text(
+          '即将导入以下工作流',
+          textAlign: TextAlign.center,
+          style: theme.textTheme.titleMedium,
+        ),
         const SizedBox(height: 16),
         _confirmRow(theme, '名称', _nameController.text.trim()),
         if (_descController.text.trim().isNotEmpty)
@@ -534,7 +577,7 @@ class _WorkflowImportWizardState extends ConsumerState<WorkflowImportWizard> {
         Text(
           '导入后可在生成界面的 ComfyUI 工作流列表中使用。',
           style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSurface.withOpacity(0.6),
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
           ),
           textAlign: TextAlign.center,
         ),
@@ -550,10 +593,12 @@ class _WorkflowImportWizardState extends ConsumerState<WorkflowImportWizard> {
         children: [
           Text(label, style: theme.textTheme.bodyMedium),
           Flexible(
-            child: Text(value,
-                style: theme.textTheme.bodyMedium
-                    ?.copyWith(fontWeight: FontWeight.w600),
-                textAlign: TextAlign.end),
+            child: Text(
+              value,
+              style: theme.textTheme.bodyMedium
+                  ?.copyWith(fontWeight: FontWeight.w600),
+              textAlign: TextAlign.end,
+            ),
           ),
         ],
       ),
@@ -580,10 +625,9 @@ class _WorkflowImportWizardState extends ConsumerState<WorkflowImportWizard> {
       version: '1.0.0',
       author: 'User',
       category: _category,
-      requiresInputImage: enabledSlots
-          .any((s) => s.direction == SlotDirection.input),
-      requiresMask: enabledSlots
-          .any((s) => s.dataType == SlotDataType.mask),
+      requiresInputImage:
+          enabledSlots.any((s) => s.direction == SlotDirection.input),
+      requiresMask: enabledSlots.any((s) => s.dataType == SlotDataType.mask),
       slots: enabledSlots,
       workflowJson: _workflowJson!,
       isBuiltin: false,

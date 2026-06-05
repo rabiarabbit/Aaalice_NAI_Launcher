@@ -226,7 +226,7 @@ class StrokeProjectData {
     return StrokeProjectData(
       points: points,
       size: stroke.size,
-      color: stroke.color.value,
+      color: stroke.color.toARGB32(),
       opacity: stroke.opacity,
       hardness: stroke.hardness,
       isEraser: stroke.isEraser,

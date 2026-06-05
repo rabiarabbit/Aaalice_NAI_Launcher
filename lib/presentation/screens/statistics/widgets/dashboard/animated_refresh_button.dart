@@ -80,13 +80,13 @@ class _AnimatedRefreshButtonState extends ConsumerState<AnimatedRefreshButton>
             // 边缘阴影
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(_isHovered ? 0.12 : 0.08),
+                color: Colors.black.withValues(alpha: _isHovered ? 0.12 : 0.08),
                 blurRadius: _isHovered ? 8 : 4,
                 offset: Offset(0, _isHovered ? 2 : 1),
               ),
               // 内发光效果
               BoxShadow(
-                color: Colors.white.withOpacity(0.03),
+                color: Colors.white.withValues(alpha: 0.03),
                 blurRadius: 1,
                 spreadRadius: 0,
                 offset: const Offset(0, -1),

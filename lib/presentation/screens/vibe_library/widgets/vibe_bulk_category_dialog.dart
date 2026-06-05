@@ -162,18 +162,22 @@ class _VibeBulkCategoryDialogState
         .toList()
         .sortedByOrder();
 
-    return ListView.builder(
-      itemCount: rootCategories.length + 1, // +1 为未分类选项
-      itemBuilder: (context, index) {
-        // 第一项是未分类
-        if (index == 0) {
-          return _buildUncategorizedTile(theme);
-        }
+    return RadioGroup<String?>(
+      groupValue: _selectedCategoryId,
+      onChanged: (value) => setState(() => _selectedCategoryId = value),
+      child: ListView.builder(
+        itemCount: rootCategories.length + 1, // +1 为未分类选项
+        itemBuilder: (context, index) {
+          // 第一项是未分类
+          if (index == 0) {
+            return _buildUncategorizedTile(theme);
+          }
 
-        // 然后是分类树
-        final category = rootCategories[index - 1];
-        return _buildCategoryTile(category, 0);
-      },
+          // 然后是分类树
+          final category = rootCategories[index - 1];
+          return _buildCategoryTile(category, 0);
+        },
+      ),
     );
   }
 
@@ -190,21 +194,16 @@ class _VibeBulkCategoryDialogState
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         decoration: BoxDecoration(
           color: isSelected
-              ? theme.colorScheme.primaryContainer.withOpacity(0.3)
+              ? theme.colorScheme.primaryContainer.withValues(alpha: 0.3)
               : null,
           borderRadius: BorderRadius.circular(8),
-          border: isSelected
-              ? Border.all(color: theme.colorScheme.primary)
-              : null,
+          border:
+              isSelected ? Border.all(color: theme.colorScheme.primary) : null,
         ),
         child: Row(
           children: [
-            Radio<String?>(
+            const Radio<String?>(
               value: '',
-              groupValue: _selectedCategoryId,
-              onChanged: (value) {
-                setState(() => _selectedCategoryId = value);
-              },
             ),
             const SizedBox(width: 8),
             Icon(
@@ -268,7 +267,8 @@ class _VibeBulkCategoryDialogState
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
                   color: isSelected
-                      ? theme.colorScheme.primaryContainer.withOpacity(0.3)
+                      ? theme.colorScheme.primaryContainer
+                          .withValues(alpha: 0.3)
                       : null,
                   borderRadius: BorderRadius.circular(8),
                   border: isSelected
@@ -308,12 +308,7 @@ class _VibeBulkCategoryDialogState
                     // 单选按钮
                     Radio<String?>(
                       value: category.id,
-                      groupValue: _selectedCategoryId,
-                      onChanged: isExcluded
-                          ? null
-                          : (value) {
-                              setState(() => _selectedCategoryId = value);
-                            },
+                      enabled: !isExcluded,
                     ),
 
                     const SizedBox(width: 8),
@@ -324,7 +319,7 @@ class _VibeBulkCategoryDialogState
                       size: 20,
                       color: isSelected
                           ? theme.colorScheme.primary
-                          : theme.colorScheme.primary.withOpacity(0.7),
+                          : theme.colorScheme.primary.withValues(alpha: 0.7),
                     ),
 
                     const SizedBox(width: 12),

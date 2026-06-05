@@ -68,10 +68,11 @@ class _ExecutionStatsPanelState extends ConsumerState<ExecutionStatsPanel>
       margin: const EdgeInsets.fromLTRB(12, 8, 12, 4),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.35),
+        color:
+            theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: theme.colorScheme.outline.withOpacity(0.08),
+          color: theme.colorScheme.outline.withValues(alpha: 0.08),
           width: 1,
         ),
       ),
@@ -200,7 +201,7 @@ class _ExecutionStatsPanelState extends ConsumerState<ExecutionStatsPanel>
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.06),
+          color: color.withValues(alpha: 0.06),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Column(
@@ -323,16 +324,16 @@ class _ExecutionStatsPanelState extends ConsumerState<ExecutionStatsPanel>
   /// 状态按钮装饰
   BoxDecoration _statusChipDecoration(Color color, bool isClickable) {
     return BoxDecoration(
-      color: color.withOpacity(_isHovered && isClickable ? 0.2 : 0.12),
+      color: color.withValues(alpha: _isHovered && isClickable ? 0.2 : 0.12),
       borderRadius: BorderRadius.circular(16),
       border: Border.all(
-        color: color.withOpacity(_isHovered && isClickable ? 0.5 : 0.2),
+        color: color.withValues(alpha: _isHovered && isClickable ? 0.5 : 0.2),
         width: 1.5,
       ),
       boxShadow: _isHovered && isClickable
           ? [
               BoxShadow(
-                color: color.withOpacity(0.15),
+                color: color.withValues(alpha: 0.15),
                 blurRadius: 6,
                 offset: const Offset(0, 2),
               ),

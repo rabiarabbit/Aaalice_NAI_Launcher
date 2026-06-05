@@ -7,6 +7,8 @@ import 'package:flutter/foundation.dart';
 import '../../../core/database/datasources/gallery_data_source.dart';
 import '../../../core/database/utils/lru_cache.dart';
 import '../../../core/utils/app_logger.dart';
+import '../../../core/utils/isolate_pool.dart';
+import '../../../core/utils/tag_normalizer.dart';
 
 export 'gallery_filter_service.dart' show FilterCriteria;
 
@@ -260,9 +262,6 @@ class GalleryFilterService {
   final LRUCache<String, FilterResult> _filterCache =
       LRUCache(maxSize: _maxCacheSize);
 
-  // 批量处理配置
-  static const int _dateBatchSize = 50;
-
   // 取消令牌
   final Map<String, CancelToken> _activeFilters = {};
 
@@ -452,8 +451,9 @@ class GalleryFilterService {
       filtered =
           await _filterByTags(filtered, criteria.selectedTags, cancelToken);
       AppLogger.d(
-          '_applyLocalFilters after tags filter: ${filtered.length} files',
-          'GalleryFilterService');
+        '_applyLocalFilters after tags filter: ${filtered.length} files',
+        'GalleryFilterService',
+      );
     }
 
     if (cancelToken.isCancelled) return [];
@@ -462,8 +462,9 @@ class GalleryFilterService {
     if (criteria.dateStart != null || criteria.dateEnd != null) {
       filtered = await _filterByDateRange(filtered, criteria, cancelToken);
       AppLogger.d(
-          '_applyLocalFilters after date filter: ${filtered.length} files',
-          'GalleryFilterService');
+        '_applyLocalFilters after date filter: ${filtered.length} files',
+        'GalleryFilterService',
+      );
     }
 
     if (cancelToken.isCancelled) return [];
@@ -472,8 +473,9 @@ class GalleryFilterService {
     if (criteria.showFavoritesOnly) {
       filtered = await _filterByFavorites(filtered, cancelToken);
       AppLogger.d(
-          '_applyLocalFilters after fav filter: ${filtered.length} files',
-          'GalleryFilterService');
+        '_applyLocalFilters after fav filter: ${filtered.length} files',
+        'GalleryFilterService',
+      );
     }
 
     if (cancelToken.isCancelled) return [];
@@ -481,14 +483,20 @@ class GalleryFilterService {
     // 分类过滤（按文件夹路径）
     if (criteria.categoryFolderPath != null) {
       filtered = await _filterByCategory(
-          filtered, criteria.categoryFolderPath!, cancelToken);
+        filtered,
+        criteria.categoryFolderPath!,
+        cancelToken,
+      );
       AppLogger.d(
-          '_applyLocalFilters after category filter: ${filtered.length} files',
-          'GalleryFilterService');
+        '_applyLocalFilters after category filter: ${filtered.length} files',
+        'GalleryFilterService',
+      );
     }
 
-    AppLogger.d('_applyLocalFilters END: ${filtered.length} files',
-        'GalleryFilterService');
+    AppLogger.d(
+      '_applyLocalFilters END: ${filtered.length} files',
+      'GalleryFilterService',
+    );
     return filtered;
   }
 
@@ -531,6 +539,7 @@ class GalleryFilterService {
       final imageIds = await _dataSource.searchByDelimitedTextSegments(
         segments,
         limit: max(1, files.length),
+        candidatePaths: files.map((file) => file.path).toList(),
       );
 
       if (cancelToken.isCancelled) return [];
@@ -559,7 +568,7 @@ class GalleryFilterService {
   ) async {
     try {
       final requiredTags = tags
-          .map(_normalizeTagForMatch)
+          .map(TagNormalizer.normalizeTagForMatch)
           .where((tag) => tag.isNotEmpty)
           .toSet();
       if (requiredTags.isEmpty) return files;
@@ -581,11 +590,12 @@ class GalleryFilterService {
         if (imageId == null) return false;
 
         final fileTags = (tagsMap[imageId] ?? [])
-            .map(_normalizeTagForMatch)
+            .map(TagNormalizer.normalizeTagForMatch)
             .where((tag) => tag.isNotEmpty)
             .toSet();
-        final metadataText =
-            _normalizeTagForMatch(metadataMap[imageId]?.fullPromptText ?? '');
+        final metadataText = TagNormalizer.normalizeTagForMatch(
+          metadataMap[imageId]?.fullPromptText ?? '',
+        );
 
         return requiredTags.every(
           (tag) =>
@@ -597,13 +607,6 @@ class GalleryFilterService {
       AppLogger.w('Failed to filter by tags: $e', 'GalleryFilterService');
       return files;
     }
-  }
-
-  String _normalizeTagForMatch(String value) {
-    return _normalizeSearchText(value)
-        .replaceAll(RegExp(r'[:]+'), ' ')
-        .replaceAll(RegExp(r'\s+'), ' ')
-        .trim();
   }
 
   bool _hasDelimitedSearchQuery(String value) {
@@ -618,22 +621,7 @@ class GalleryFilterService {
   }
 
   List<String> _parseDelimitedSearchSegments(String value) {
-    return value
-        .split(RegExp(r'[,，]+'))
-        .map(_normalizeSearchText)
-        .where((segment) => segment.isNotEmpty)
-        .toSet()
-        .toList(growable: false);
-  }
-
-  String _normalizeSearchText(String value) {
-    return value
-        .toLowerCase()
-        .replaceAll(RegExp(r'-?(?:\d+\.?\d*|\.\d+)::'), ' ')
-        .replaceAll(RegExp(r'[_/\\|,，;；\n\r\t]+'), ' ')
-        .replaceAll(RegExp(r'[\{\}\[\]\(\)]'), ' ')
-        .replaceAll(RegExp(r'\s+'), ' ')
-        .trim();
+    return TagNormalizer.parseDelimitedSearchSegments(value);
   }
 
   bool _normalizedTextContainsTag(String normalizedText, String normalizedTag) {
@@ -648,35 +636,22 @@ class GalleryFilterService {
     FilterCriteria criteria,
     CancelToken cancelToken,
   ) async {
+    if (files.isEmpty) return files;
+    if (cancelToken.isCancelled) return [];
+
     final effectiveEndDate = criteria.dateEnd?.add(const Duration(days: 1));
-    final result = <File>[];
+    final matchingPaths = await ComputeGate().runCompute(
+      _filterBatchByDate,
+      _DateFilterParams(
+        filePaths: files.map((file) => file.path).toList(),
+        dateStart: criteria.dateStart,
+        dateEnd: effectiveEndDate,
+      ),
+    );
 
-    // 分批处理避免阻塞
-    for (var i = 0; i < files.length; i += _dateBatchSize) {
-      if (cancelToken.isCancelled) return [];
+    if (cancelToken.isCancelled) return [];
 
-      final end = min(i + _dateBatchSize, files.length);
-      final batch = files.sublist(i, end);
-
-      // 使用 compute 在后台 isolate 处理
-      final batchResult = await compute(
-        _filterBatchByDate,
-        _DateFilterParams(
-          filePaths: batch.map((f) => f.path).toList(),
-          dateStart: criteria.dateStart,
-          dateEnd: effectiveEndDate,
-        ),
-      );
-
-      result.addAll(batchResult.map((path) => File(path)));
-
-      // 让出时间片
-      if (i + _dateBatchSize < files.length) {
-        await Future.delayed(Duration.zero);
-      }
-    }
-
-    return result;
+    return matchingPaths.map((path) => File(path)).toList();
   }
 
   /// 按收藏状态过滤

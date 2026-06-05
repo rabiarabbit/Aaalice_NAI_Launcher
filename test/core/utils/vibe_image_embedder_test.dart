@@ -27,7 +27,12 @@ void main() {
       final extracted = await VibeImageEmbedder.extractVibeFromImage(
         embeddedBytes,
       );
-      expect(extracted, reference);
+      expect(extracted.isBundle, isTrue);
+      expect(extracted.vibes, hasLength(1));
+      expect(
+        extracted.vibes.single,
+        reference.copyWith(sourceType: VibeSourceType.png),
+      );
     });
 
     test(
@@ -50,7 +55,8 @@ void main() {
           embeddedBytes,
         );
 
-        expect(extracted, original);
+        expect(extracted.isBundle, isTrue);
+        expect(extracted.vibes, [original]);
       },
     );
 
@@ -76,7 +82,8 @@ void main() {
       );
     });
 
-    test('extractVibeFromImage should throw when PNG has no vibe data', () async {
+    test('extractVibeFromImage should throw when PNG has no vibe data',
+        () async {
       final imageBytes = _createInMemoryPngBytes();
 
       await expectLater(

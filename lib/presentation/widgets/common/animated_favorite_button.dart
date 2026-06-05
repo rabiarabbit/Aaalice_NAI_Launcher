@@ -118,7 +118,9 @@ class _AnimatedFavoriteButtonState extends State<AnimatedFavoriteButton>
   Color get _inactiveColor {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return widget.inactiveColor ??
-        (isDark ? Colors.white : Theme.of(context).colorScheme.onSurfaceVariant);
+        (isDark
+            ? Colors.white
+            : Theme.of(context).colorScheme.onSurfaceVariant);
   }
 
   Color get _activeColor => widget.activeColor ?? Colors.red.shade400;
@@ -126,20 +128,20 @@ class _AnimatedFavoriteButtonState extends State<AnimatedFavoriteButton>
   Color get _hoverBgColor {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return widget.isFavorite
-        ? _activeColor.withOpacity(0.25)
+        ? _activeColor.withValues(alpha: 0.25)
         : (isDark
-            ? Colors.white.withOpacity(0.15)
-            : Colors.black.withOpacity(0.08));
+            ? Colors.white.withValues(alpha: 0.15)
+            : Colors.black.withValues(alpha: 0.08));
   }
 
   Color get _defaultBgColor {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return widget.backgroundColor ??
         (widget.isFavorite
-            ? _activeColor.withOpacity(0.15)
+            ? _activeColor.withValues(alpha: 0.15)
             : (isDark
-                ? Colors.white.withOpacity(0.1)
-                : Colors.black.withOpacity(0.05)));
+                ? Colors.white.withValues(alpha: 0.1)
+                : Colors.black.withValues(alpha: 0.05)));
   }
 
   @override
@@ -190,8 +192,8 @@ class _AnimatedFavoriteButtonState extends State<AnimatedFavoriteButton>
               widget.showBackground ? EdgeInsets.zero : const EdgeInsets.all(4),
           decoration: !widget.showBackground && _isHovered
               ? BoxDecoration(
-                  color:
-                      (isDark ? Colors.white : Colors.black).withOpacity(0.1),
+                  color: (isDark ? Colors.white : Colors.black)
+                      .withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(widget.size * 0.4),
                 )
               : null,
@@ -330,24 +332,24 @@ class _BaseFavoriteButtonState extends State<_BaseFavoriteButton>
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
               color: _isHovered
-                  ? Colors.black.withOpacity(0.7)
-                  : Colors.black.withOpacity(0.5),
+                  ? Colors.black.withValues(alpha: 0.7)
+                  : Colors.black.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(widget.borderRadius),
               boxShadow: [
                 if (widget.isFavorite)
                   BoxShadow(
-                    color: activeColor.withOpacity(0.3),
+                    color: activeColor.withValues(alpha: 0.3),
                     blurRadius: 8,
                     spreadRadius: 1,
                   ),
                 if (_isHovered && !widget.isFavorite)
                   BoxShadow(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     blurRadius: 6,
                   ),
               ],
               border: _isHovered && !widget.isFavorite
-                  ? Border.all(color: Colors.white.withOpacity(0.3))
+                  ? Border.all(color: Colors.white.withValues(alpha: 0.3))
                   : null,
             ),
             child: AnimatedBuilder(
@@ -364,7 +366,7 @@ class _BaseFavoriteButtonState extends State<_BaseFavoriteButton>
                         ? activeColor
                         : (_isHovered
                             ? Colors.white
-                            : Colors.white.withOpacity(0.9)),
+                            : Colors.white.withValues(alpha: 0.9)),
                   ),
                 );
               },

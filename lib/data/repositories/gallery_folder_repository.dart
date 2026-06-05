@@ -8,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 
 import '../../core/storage/local_storage_service.dart';
 import '../../core/utils/app_logger.dart';
+import '../../core/utils/file_name_sanitizer.dart';
 import '../models/gallery/gallery_folder.dart';
 
 /// 画廊文件夹仓库
@@ -54,7 +55,8 @@ class GalleryFolderRepository {
           if (folder != null) folders.add(folder);
         }
       }
-      folders.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+      folders
+          .sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
     } catch (e) {
       AppLogger.e('扫描文件夹失败', e);
     }
@@ -79,13 +81,17 @@ class GalleryFolderRepository {
     }
   }
 
-  String _generateFolderId(String path) => md5.convert(utf8.encode(path)).toString().substring(0, 16);
+  String _generateFolderId(String path) =>
+      md5.convert(utf8.encode(path)).toString().substring(0, 16);
 
   Future<int> _countImagesInFolder(String folderPath) async {
     int count = 0;
     try {
-      await for (final entity in Directory(folderPath).list(followLinks: false)) {
-        if (entity is File && _supportedExtensions.contains(p.extension(entity.path).toLowerCase())) {
+      await for (final entity
+          in Directory(folderPath).list(followLinks: false)) {
+        if (entity is File &&
+            _supportedExtensions
+                .contains(p.extension(entity.path).toLowerCase())) {
           count++;
         }
       }
@@ -122,10 +128,11 @@ class GalleryFolderRepository {
   }
 
   String _sanitizeFolderName(String name) {
-    return name
-        .replaceAll(RegExp(r'[\\/:*?"<>|]'), '_')
-        .replaceAll(RegExp(r'\s+'), ' ')
-        .trim();
+    return FileNameSanitizer.sanitize(
+      name,
+      fallback: '',
+      collapseWhitespace: true,
+    );
   }
 
   /// 删除文件夹
@@ -177,7 +184,10 @@ class GalleryFolderRepository {
   }
 
   /// 移动图片到文件夹
-  Future<bool> moveImageToFolder(String imagePath, String targetFolderPath) async {
+  Future<bool> moveImageToFolder(
+    String imagePath,
+    String targetFolderPath,
+  ) async {
     try {
       final file = File(imagePath);
       if (!await file.exists()) return false;
@@ -188,7 +198,10 @@ class GalleryFolderRepository {
       if (await File(newPath).exists()) {
         final baseName = p.basenameWithoutExtension(fileName);
         final ext = p.extension(fileName);
-        newPath = p.join(targetFolderPath, '${baseName}_${DateTime.now().millisecondsSinceEpoch}$ext');
+        newPath = p.join(
+          targetFolderPath,
+          '${baseName}_${DateTime.now().millisecondsSinceEpoch}$ext',
+        );
       }
 
       await file.rename(newPath);
@@ -200,7 +213,10 @@ class GalleryFolderRepository {
   }
 
   /// 批量移动图片到文件夹
-  Future<int> moveImagesToFolder(List<String> imagePaths, String targetFolderPath) async {
+  Future<int> moveImagesToFolder(
+    List<String> imagePaths,
+    String targetFolderPath,
+  ) async {
     int successCount = 0;
     for (final imagePath in imagePaths) {
       if (await moveImageToFolder(imagePath, targetFolderPath)) successCount++;
@@ -224,7 +240,8 @@ class GalleryFolderRepository {
       _watchSubscription = rootDir.watch().listen((event) {
         if (event is FileSystemCreateEvent || event is FileSystemDeleteEvent) {
           final entity = FileSystemEntity.typeSync(event.path);
-          if (entity == FileSystemEntityType.directory || event is FileSystemDeleteEvent) {
+          if (entity == FileSystemEntityType.directory ||
+              event is FileSystemDeleteEvent) {
             _onFoldersChanged?.call();
           }
         }
@@ -250,7 +267,9 @@ class GalleryFolderRepository {
 
     try {
       await for (final entity in rootDir.list(followLinks: false)) {
-        if (entity is File && _supportedExtensions.contains(p.extension(entity.path).toLowerCase())) {
+        if (entity is File &&
+            _supportedExtensions
+                .contains(p.extension(entity.path).toLowerCase())) {
           count++;
         } else if (entity is Directory) {
           count += await _countImagesInFolder(entity.path);

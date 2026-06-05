@@ -103,7 +103,7 @@ class _TaskListItemState extends ConsumerState<TaskListItem>
               alignment: Alignment.centerRight,
               padding: const EdgeInsets.only(right: 24),
               decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.9),
+                color: Colors.red.withValues(alpha: 0.9),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(
@@ -147,19 +147,21 @@ class _TaskListItemState extends ConsumerState<TaskListItem>
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
                             color: widget.isSelected
-                                ? theme.colorScheme.primary.withOpacity(0.5)
+                                ? theme.colorScheme.primary
+                                    .withValues(alpha: 0.5)
                                 : isRunning
-                                    ? theme.colorScheme.primary.withOpacity(0.3)
+                                    ? theme.colorScheme.primary
+                                        .withValues(alpha: 0.3)
                                     : theme.colorScheme.outline
-                                        .withOpacity(0.1),
+                                        .withValues(alpha: 0.1),
                             width: 1,
                           ),
                           // 如果是当前正在执行的任务，显示实心进度条；否则显示普通背景
                           color: widget.isSelected
                               ? theme.colorScheme.primaryContainer
-                                  .withOpacity(0.4)
+                                  .withValues(alpha: 0.4)
                               : theme.colorScheme.surfaceContainerHighest
-                                  .withOpacity(0.4),
+                                  .withValues(alpha: 0.4),
                         ),
                         child: Stack(
                           children: [
@@ -211,7 +213,7 @@ class _TaskListItemState extends ConsumerState<TaskListItem>
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   height: 1.35,
                                   color: theme.colorScheme.onSurface
-                                      .withOpacity(0.85),
+                                      .withValues(alpha: 0.85),
                                 ),
                               ),
                               // 错误信息
@@ -283,7 +285,7 @@ class _TaskListItemState extends ConsumerState<TaskListItem>
             child: Icon(
               Icons.image_rounded,
               size: 20,
-              color: theme.colorScheme.outline.withOpacity(0.5),
+              color: theme.colorScheme.outline.withValues(alpha: 0.5),
             ),
           ),
           errorWidget: (context, url, error) => Container(
@@ -296,7 +298,7 @@ class _TaskListItemState extends ConsumerState<TaskListItem>
             child: Icon(
               Icons.broken_image_rounded,
               size: 20,
-              color: theme.colorScheme.outline.withOpacity(0.5),
+              color: theme.colorScheme.outline.withValues(alpha: 0.5),
             ),
           ),
         ),
@@ -307,13 +309,13 @@ class _TaskListItemState extends ConsumerState<TaskListItem>
       width: 44,
       height: 44,
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.7),
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Icon(
         Icons.image_rounded,
         size: 20,
-        color: theme.colorScheme.outline.withOpacity(0.5),
+        color: theme.colorScheme.outline.withValues(alpha: 0.5),
       ),
     );
   }
@@ -328,7 +330,7 @@ class _TaskListItemState extends ConsumerState<TaskListItem>
         Container(
           padding: const EdgeInsets.all(3),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.12),
+            color: color.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(4),
           ),
           child: isRunning
@@ -348,7 +350,7 @@ class _TaskListItemState extends ConsumerState<TaskListItem>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
             decoration: BoxDecoration(
-              color: Colors.orange.withOpacity(0.12),
+              color: Colors.orange.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(
@@ -400,7 +402,7 @@ class _TaskListItemState extends ConsumerState<TaskListItem>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
       decoration: BoxDecoration(
-        color: Colors.red.withOpacity(0.08),
+        color: Colors.red.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Row(
@@ -641,11 +643,11 @@ class _TaskTooltipContent extends StatelessWidget {
           color: theme.colorScheme.surfaceContainerHigh,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: theme.colorScheme.outline.withOpacity(0.2),
+            color: theme.colorScheme.outline.withValues(alpha: 0.2),
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.25),
+              color: Colors.black.withValues(alpha: 0.25),
               blurRadius: 16,
               offset: const Offset(0, 4),
             ),
@@ -706,7 +708,7 @@ class _TaskTooltipContent extends StatelessWidget {
                   task.prompt,
                   style: theme.textTheme.bodySmall?.copyWith(
                     height: 1.4,
-                    color: theme.colorScheme.onSurface.withOpacity(0.9),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.9),
                   ),
                 ),
               ),
@@ -730,7 +732,7 @@ class _TaskTooltipContent extends StatelessWidget {
                     task.negativePrompt,
                     style: theme.textTheme.bodySmall?.copyWith(
                       height: 1.4,
-                      color: theme.colorScheme.onSurface.withOpacity(0.7),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                   ),
                 ),
@@ -770,10 +772,10 @@ class FailedTaskListItem extends ConsumerWidget {
         child: Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.red.withOpacity(0.04),
+            color: Colors.red.withValues(alpha: 0.04),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: Colors.red.withOpacity(0.15),
+              color: Colors.red.withValues(alpha: 0.15),
               width: 1,
             ),
           ),
@@ -796,7 +798,7 @@ class FailedTaskListItem extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.red.withOpacity(0.08),
+                    color: Colors.red.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
@@ -952,7 +954,7 @@ class _StripeProgressPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     // 背景填充
-    final bgPaint = Paint()..color = color.withOpacity(0.18);
+    final bgPaint = Paint()..color = color.withValues(alpha: 0.18);
     canvas.drawRect(Offset.zero & size, bgPaint);
 
     // 裁剪区域，确保条纹不超出边界（关键：末端垂直切割）
@@ -960,7 +962,7 @@ class _StripeProgressPainter extends CustomPainter {
 
     // 斜条纹
     final stripePaint = Paint()
-      ..color = color.withOpacity(0.12)
+      ..color = color.withValues(alpha: 0.12)
       ..style = PaintingStyle.fill;
 
     const stripeWidth = 10.0;

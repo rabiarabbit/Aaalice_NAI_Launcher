@@ -104,7 +104,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
               AppVersion.versionName,
               style: TextStyle(
                 fontSize: 12,
-                color: theme.colorScheme.onSurface.withOpacity(0.3),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -124,7 +124,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
               center: const Alignment(0, -0.3),
               radius: 1.5,
               colors: [
-                primaryColor.withOpacity(_glowAnimation.value * 0.15),
+                primaryColor.withValues(alpha: _glowAnimation.value * 0.15),
                 backgroundColor,
               ],
             ),
@@ -150,12 +150,14 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                 end: Alignment.bottomRight,
                 colors: [
                   primaryColor,
-                  primaryColor.withOpacity(0.6),
+                  primaryColor.withValues(alpha: 0.6),
                 ],
               ),
               boxShadow: [
                 BoxShadow(
-                  color: primaryColor.withOpacity(_glowAnimation.value * 0.5),
+                  color: primaryColor.withValues(
+                    alpha: _glowAnimation.value * 0.5,
+                  ),
                   blurRadius: 40,
                   spreadRadius: 5,
                 ),
@@ -199,7 +201,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
           'NovelAI Image Generation',
           style: TextStyle(
             fontSize: 14,
-            color: theme.colorScheme.onSurface.withOpacity(0.5),
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
             letterSpacing: 1,
           ),
         ),
@@ -368,7 +370,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                     height: 14,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color: theme.colorScheme.onSurface.withOpacity(0.4),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -377,7 +379,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                   translatedTask,
                   style: TextStyle(
                     fontSize: 13,
-                    color: theme.colorScheme.onSurface.withOpacity(0.6),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                 ),
               ],
@@ -391,7 +393,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
               _translateSubTaskMessage(context, subTaskMessage),
               style: TextStyle(
                 fontSize: 11,
-                color: theme.colorScheme.onSurface.withOpacity(0.4),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
               ),
             ),
           ],
@@ -407,7 +409,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       height: 4,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(2),
-        color: theme.colorScheme.onSurface.withOpacity(0.1),
+        color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {
@@ -428,7 +430,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: primaryColor.withOpacity(0.5),
+                      color: primaryColor.withValues(alpha: 0.5),
                       blurRadius: 8,
                     ),
                   ],

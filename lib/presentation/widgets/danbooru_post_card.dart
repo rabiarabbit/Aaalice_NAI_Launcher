@@ -180,11 +180,18 @@ class _DanbooruPostCardState extends State<DanbooruPostCard> {
                   curve: Curves.easeOut,
                   height: itemHeight,
                   transform: Matrix4.identity()
-                    ..translate(
+                    ..translateByDouble(
                       0.0,
                       _isHovering && !widget.selectionMode ? -4.0 : 0.0,
+                      0,
+                      1,
                     )
-                    ..scale(_isHovering && !widget.selectionMode ? 1.02 : 1.0),
+                    ..scaleByDouble(
+                      _isHovering && !widget.selectionMode ? 1.02 : 1.0,
+                      _isHovering && !widget.selectionMode ? 1.02 : 1.0,
+                      _isHovering && !widget.selectionMode ? 1.02 : 1.0,
+                      1,
+                    ),
                   transformAlignment: Alignment.center,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
@@ -192,28 +199,29 @@ class _DanbooruPostCardState extends State<DanbooruPostCard> {
                         ? Border.all(color: theme.colorScheme.primary, width: 3)
                         : _isHovering && !widget.selectionMode
                             ? Border.all(
-                                color:
-                                    theme.colorScheme.primary.withOpacity(0.4),
+                                color: theme.colorScheme.primary
+                                    .withValues(alpha: 0.4),
                                 width: 1.5,
                               )
                             : null,
                     boxShadow: _isHovering && !widget.selectionMode
                         ? [
                             BoxShadow(
-                              color: theme.colorScheme.primary.withOpacity(0.3),
+                              color: theme.colorScheme.primary
+                                  .withValues(alpha: 0.3),
                               blurRadius: 16,
                               offset: const Offset(0, 8),
                               spreadRadius: 2,
                             ),
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.15),
+                              color: Colors.black.withValues(alpha: 0.15),
                               blurRadius: 24,
                               offset: const Offset(0, 12),
                             ),
                           ]
                         : [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
+                              color: Colors.black.withValues(alpha: 0.2),
                               blurRadius: 4,
                             ),
                           ],
@@ -249,12 +257,13 @@ class _DanbooruPostCardState extends State<DanbooruPostCard> {
                           // Selection Overlay
                           if (widget.isSelected)
                             Container(
-                              color: theme.colorScheme.primary.withOpacity(0.2),
+                              color: theme.colorScheme.primary
+                                  .withValues(alpha: 0.2),
                             ),
                           // Disabled Overlay
                           if (!widget.canSelect)
                             Container(
-                              color: Colors.grey.withOpacity(0.7),
+                              color: Colors.grey.withValues(alpha: 0.7),
                               child: const Center(
                                 child: Icon(Icons.block, color: Colors.white54),
                               ),
@@ -269,7 +278,7 @@ class _DanbooruPostCardState extends State<DanbooruPostCard> {
                                   shape: BoxShape.circle,
                                   color: widget.isSelected
                                       ? theme.colorScheme.primary
-                                      : Colors.black.withOpacity(0.4),
+                                      : Colors.black.withValues(alpha: 0.4),
                                   border: Border.all(
                                     color: Colors.white,
                                     width: 2,
@@ -363,7 +372,7 @@ class _DanbooruPostCardState extends State<DanbooruPostCard> {
                                   begin: Alignment.bottomCenter,
                                   end: Alignment.topCenter,
                                   colors: [
-                                    Colors.black.withOpacity(0.7),
+                                    Colors.black.withValues(alpha: 0.7),
                                     Colors.transparent,
                                   ],
                                 ),
@@ -603,27 +612,27 @@ class _HoverPreviewCardInner extends ConsumerWidget {
           color: theme.colorScheme.surface,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: theme.colorScheme.primary.withOpacity(0.3),
+            color: theme.colorScheme.primary.withValues(alpha: 0.3),
             width: 2,
           ),
           boxShadow: [
             // 主阴影 - 深色悬浮感
             BoxShadow(
-              color: Colors.black.withOpacity(0.6),
+              color: Colors.black.withValues(alpha: 0.6),
               blurRadius: 32,
               spreadRadius: 8,
               offset: const Offset(0, 16),
             ),
             // 中层阴影 - 扩散阴影
             BoxShadow(
-              color: Colors.black.withOpacity(0.4),
+              color: Colors.black.withValues(alpha: 0.4),
               blurRadius: 60,
               spreadRadius: 16,
               offset: const Offset(0, 24),
             ),
             // 内发光效果 - 边缘高光
             BoxShadow(
-              color: theme.colorScheme.primary.withOpacity(0.25),
+              color: theme.colorScheme.primary.withValues(alpha: 0.25),
               blurRadius: 20,
               spreadRadius: -8,
               offset: const Offset(0, -4),
@@ -666,7 +675,7 @@ class _HoverPreviewCardInner extends ConsumerWidget {
                         child: Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.5),
+                            color: Colors.black.withValues(alpha: 0.5),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(

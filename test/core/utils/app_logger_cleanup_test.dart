@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:logger/logger.dart';
+import 'package:nai_launcher/core/utils/app_logger.dart';
 
 /// 日志文件轮换和清理测试
 ///
@@ -95,16 +97,17 @@ void main() {
       final file1 =
           File('${tempLogDir.path}${Platform.pathSeparator}app_1.log');
       await file1.writeAsString('content1');
-      await Future.delayed(const Duration(milliseconds: 100));
+      await file1.setLastModified(DateTime(2024, 1, 1, 12, 0, 1));
 
       final file2 =
           File('${tempLogDir.path}${Platform.pathSeparator}app_2.log');
       await file2.writeAsString('content2');
-      await Future.delayed(const Duration(milliseconds: 100));
+      await file2.setLastModified(DateTime(2024, 1, 1, 12, 0, 2));
 
       final file3 =
           File('${tempLogDir.path}${Platform.pathSeparator}app_3.log');
       await file3.writeAsString('content3');
+      await file3.setLastModified(DateTime(2024, 1, 1, 12, 0, 3));
 
       // 获取并排序
       final files = await tempLogDir
@@ -155,14 +158,14 @@ void main() {
     test('同时存在app_和test_日志文件', () async {
       // 创建混合日志文件
       await File(
-              '${tempLogDir.path}${Platform.pathSeparator}app_20240101_120000.log',)
-          .writeAsString('app log 1');
+        '${tempLogDir.path}${Platform.pathSeparator}app_20240101_120000.log',
+      ).writeAsString('app log 1');
       await File(
-              '${tempLogDir.path}${Platform.pathSeparator}test_20240101_120100.log',)
-          .writeAsString('test log 1');
+        '${tempLogDir.path}${Platform.pathSeparator}test_20240101_120100.log',
+      ).writeAsString('test log 1');
       await File(
-              '${tempLogDir.path}${Platform.pathSeparator}app_20240101_120200.log',)
-          .writeAsString('app log 2');
+        '${tempLogDir.path}${Platform.pathSeparator}app_20240101_120200.log',
+      ).writeAsString('app log 2');
 
       // 获取所有日志文件
       final logFiles = await tempLogDir
@@ -178,9 +181,10 @@ void main() {
       expect(logFiles.length, equals(3));
 
       // 验证包含app和test
-      final appFiles = logFiles.where((f) => f.path.contains('app_')).toList();
+      final appFiles =
+          logFiles.where((f) => _baseName(f).startsWith('app_')).toList();
       final testFiles =
-          logFiles.where((f) => f.path.contains('test_')).toList();
+          logFiles.where((f) => _baseName(f).startsWith('test_')).toList();
 
       expect(appFiles.length, equals(2));
       expect(testFiles.length, equals(1));
@@ -231,6 +235,52 @@ void main() {
       expect(fileName.endsWith('.log'), isTrue);
     });
   });
+
+  group('日志级别门禁', () {
+    tearDown(() {
+      AppLogger.debugSetMinimumLevelForTesting(null);
+    });
+
+    test('低于最低级别的惰性调试日志不会构建消息', () async {
+      await AppLogger.initialize(
+        isTestEnvironment: true,
+        enableFileLogging: false,
+      );
+      AppLogger.debugSetMinimumLevelForTesting(Level.warning);
+
+      var messageBuilt = false;
+      AppLogger.d(
+        () {
+          messageBuilt = true;
+          return 'expensive debug message';
+        },
+        'AppLoggerTest',
+      );
+
+      expect(messageBuilt, isFalse);
+    });
+
+    test('达到最低级别的惰性警告日志会构建消息', () async {
+      await AppLogger.initialize(
+        isTestEnvironment: true,
+        enableFileLogging: false,
+      );
+      AppLogger.debugSetMinimumLevelForTesting(Level.warning);
+
+      var messageBuilt = false;
+      AppLogger.w(
+        () {
+          messageBuilt = true;
+          return 'warning message';
+        },
+        'AppLoggerTest',
+      );
+
+      expect(messageBuilt, isTrue);
+    });
+  });
 }
 
 String _pad(int number) => number.toString().padLeft(2, '0');
+
+String _baseName(File file) => file.path.split(Platform.pathSeparator).last;

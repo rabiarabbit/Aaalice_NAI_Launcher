@@ -174,7 +174,7 @@ class _NewPresetDialogState extends State<NewPresetDialog> {
               decoration: BoxDecoration(
                 border: Border(
                   top: BorderSide(
-                    color: colorScheme.outlineVariant.withOpacity(0.3),
+                    color: colorScheme.outlineVariant.withValues(alpha: 0.3),
                   ),
                 ),
               ),
@@ -224,7 +224,7 @@ class _ModeOptionCard extends StatelessWidget {
 
     return Material(
       color: isSelected
-          ? colorScheme.primaryContainer.withOpacity(0.5)
+          ? colorScheme.primaryContainer.withValues(alpha: 0.5)
           : colorScheme.surfaceContainerHighest,
       borderRadius: BorderRadius.circular(8),
       child: InkWell(
@@ -237,7 +237,7 @@ class _ModeOptionCard extends StatelessWidget {
             border: Border.all(
               color: isSelected
                   ? colorScheme.primary
-                  : colorScheme.outlineVariant.withOpacity(0.5),
+                  : colorScheme.outlineVariant.withValues(alpha: 0.5),
               width: isSelected ? 2 : 1,
             ),
           ),

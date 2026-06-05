@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -430,7 +429,7 @@ class _VibeImageEncodeDialogState extends State<VibeImageEncodeDialog> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: theme.colorScheme.primaryContainer.withOpacity(0.3),
+        color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -588,12 +587,14 @@ class VibeImageEncodeErrorDialog extends StatelessWidget {
       ),
       actions: [
         TextButton.icon(
-          onPressed: () => Navigator.of(context).pop(VibeEncodeErrorAction.skip),
+          onPressed: () =>
+              Navigator.of(context).pop(VibeEncodeErrorAction.skip),
           icon: const Icon(Icons.skip_next),
           label: const Text('跳过此图'),
         ),
         FilledButton.icon(
-          onPressed: () => Navigator.of(context).pop(VibeEncodeErrorAction.retry),
+          onPressed: () =>
+              Navigator.of(context).pop(VibeEncodeErrorAction.retry),
           icon: const Icon(Icons.refresh),
           label: const Text('重试'),
         ),

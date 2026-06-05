@@ -88,8 +88,8 @@ void main() {
       final container = tester.widget<Container>(find.byType(Container));
       final decoration = container.decoration as BoxDecoration;
       expect(
-        (decoration.color as Color).value,
-        equals(Colors.red.withOpacity(0.9).value),
+        (decoration.color as Color).toARGB32(),
+        equals(Colors.red.withValues(alpha: 0.9).toARGB32()),
       );
     });
 
@@ -117,8 +117,8 @@ void main() {
       final container = tester.widget<Container>(find.byType(Container));
       final decoration = container.decoration as BoxDecoration;
       expect(
-        (decoration.color as Color).value,
-        equals(Colors.blue.withOpacity(0.9).value),
+        (decoration.color as Color).toARGB32(),
+        equals(Colors.blue.withValues(alpha: 0.9).toARGB32()),
       );
     });
   });

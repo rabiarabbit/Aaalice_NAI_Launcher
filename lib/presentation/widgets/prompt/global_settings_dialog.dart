@@ -399,12 +399,12 @@ class _GlobalSettingsDialogState extends ConsumerState<GlobalSettingsDialog> {
       decoration: BoxDecoration(
         color: option.enabled
             ? theme.colorScheme.surface
-            : theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
+            : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color: option.enabled
-              ? theme.colorScheme.outline.withOpacity(0.3)
-              : theme.colorScheme.outline.withOpacity(0.1),
+              ? theme.colorScheme.outline.withValues(alpha: 0.3)
+              : theme.colorScheme.outline.withValues(alpha: 0.1),
         ),
       ),
       child: Row(
@@ -426,7 +426,7 @@ class _GlobalSettingsDialogState extends ConsumerState<GlobalSettingsDialog> {
                     fontWeight: FontWeight.w500,
                     color: option.enabled
                         ? null
-                        : theme.colorScheme.onSurface.withOpacity(0.5),
+                        : theme.colorScheme.onSurface.withValues(alpha: 0.5),
                   ),
                 ),
                 // 合并显示主提示词和角色提示词
@@ -589,7 +589,7 @@ class _GlobalSettingsDialogState extends ConsumerState<GlobalSettingsDialog> {
                               const SizedBox(width: 12),
                               Expanded(
                                 child: DropdownButtonFormField<String>(
-                                  value: slotTags[i],
+                                  initialValue: slotTags[i],
                                   decoration: const InputDecoration(
                                     isDense: true,
                                     contentPadding: EdgeInsets.symmetric(

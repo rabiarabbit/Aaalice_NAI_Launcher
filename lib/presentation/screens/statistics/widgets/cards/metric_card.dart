@@ -50,7 +50,7 @@ class _MetricCardState extends State<MetricCard> {
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeOutCubic,
         transform: _isHovered
-            ? (Matrix4.identity()..translate(0.0, -2.0))
+            ? (Matrix4.identity()..translateByDouble(0.0, -2.0, 0, 1))
             : Matrix4.identity(),
         decoration: BoxDecoration(
           // 深度层叠风格：使用主题中明确定义的最亮容器色
@@ -59,14 +59,14 @@ class _MetricCardState extends State<MetricCard> {
           // 多层阴影替代边框
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(
-                _isHovered ? shadowIntensity * 1.5 : shadowIntensity,
+              color: Colors.black.withValues(
+                alpha: _isHovered ? shadowIntensity * 1.5 : shadowIntensity,
               ),
               blurRadius: _isHovered ? 16 : 12,
               offset: Offset(0, _isHovered ? 6 : 4),
             ),
             BoxShadow(
-              color: Colors.black.withOpacity(shadowIntensity * 0.5),
+              color: Colors.black.withValues(alpha: shadowIntensity * 0.5),
               blurRadius: 6,
               offset: const Offset(0, 2),
             ),
@@ -77,8 +77,8 @@ class _MetricCardState extends State<MetricCard> {
           child: InkWell(
             onTap: widget.onTap,
             borderRadius: BorderRadius.circular(8),
-            splashColor: effectiveIconColor.withOpacity(0.08),
-            highlightColor: effectiveIconColor.withOpacity(0.04),
+            splashColor: effectiveIconColor.withValues(alpha: 0.08),
+            highlightColor: effectiveIconColor.withValues(alpha: 0.04),
             child: Padding(
               padding: EdgeInsets.all(widget.compact ? 14 : 18),
               child: widget.compact
@@ -114,7 +114,7 @@ class _MetricCardState extends State<MetricCard> {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: effectiveIconColor.withOpacity(isDark ? 0.15 : 0.1),
+            color: effectiveIconColor.withValues(alpha: isDark ? 0.15 : 0.1),
             borderRadius: BorderRadius.circular(6),
           ),
           child: Icon(
@@ -166,7 +166,8 @@ class _MetricCardState extends State<MetricCard> {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: effectiveIconColor.withOpacity(isDark ? 0.15 : 0.1),
+                color:
+                    effectiveIconColor.withValues(alpha: isDark ? 0.15 : 0.1),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Icon(
@@ -293,13 +294,13 @@ class TrendIndicator extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            primaryColor.withOpacity(isDark ? 0.2 : 0.12),
-            secondaryColor.withOpacity(isDark ? 0.1 : 0.06),
+            primaryColor.withValues(alpha: isDark ? 0.2 : 0.12),
+            secondaryColor.withValues(alpha: isDark ? 0.1 : 0.06),
           ],
         ),
         borderRadius: BorderRadius.circular(6),
         border: Border.all(
-          color: primaryColor.withOpacity(0.2),
+          color: primaryColor.withValues(alpha: 0.2),
           width: 1,
         ),
       ),
@@ -322,7 +323,7 @@ class TrendIndicator extends StatelessWidget {
             Text(
               data.label!,
               style: theme.textTheme.labelSmall?.copyWith(
-                color: primaryColor.withOpacity(0.75),
+                color: primaryColor.withValues(alpha: 0.75),
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -399,16 +400,16 @@ class MiniSparkline extends StatelessWidget {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        color.withOpacity(0.35),
-                        color.withOpacity(0.08),
-                        color.withOpacity(0.0),
+                        color.withValues(alpha: 0.35),
+                        color.withValues(alpha: 0.08),
+                        color.withValues(alpha: 0.0),
                       ],
                       stops: const [0.0, 0.6, 1.0],
                     ),
                   )
                 : BarAreaData(show: false),
             shadow: Shadow(
-              color: color.withOpacity(0.3),
+              color: color.withValues(alpha: 0.3),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),

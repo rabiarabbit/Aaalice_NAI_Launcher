@@ -221,7 +221,7 @@ class _VibeCategoryTreeViewState extends State<VibeCategoryTreeView> {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: theme.colorScheme.primary.withOpacity(0.5),
+              color: theme.colorScheme.primary.withValues(alpha: 0.5),
               width: 1.5,
             ),
           ),
@@ -328,7 +328,7 @@ class _VibeCategoryTreeViewState extends State<VibeCategoryTreeView> {
           duration: const Duration(milliseconds: 200),
           decoration: BoxDecoration(
             color: isAccepting
-                ? theme.colorScheme.primary.withOpacity(0.1)
+                ? theme.colorScheme.primary.withValues(alpha: 0.1)
                 : Colors.transparent,
             border: isAccepting
                 ? Border.all(
@@ -337,7 +337,7 @@ class _VibeCategoryTreeViewState extends State<VibeCategoryTreeView> {
                   )
                 : isRejected
                     ? Border.all(
-                        color: theme.colorScheme.error.withOpacity(0.5),
+                        color: theme.colorScheme.error.withValues(alpha: 0.5),
                         width: 1,
                       )
                     : null,

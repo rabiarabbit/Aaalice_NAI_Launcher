@@ -225,7 +225,7 @@ class _GalleryCategoryTreeViewState extends State<GalleryCategoryTreeView> {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: theme.colorScheme.primary.withOpacity(0.5),
+              color: theme.colorScheme.primary.withValues(alpha: 0.5),
               width: 1.5,
             ),
           ),
@@ -307,13 +307,13 @@ class _GalleryCategoryTreeViewState extends State<GalleryCategoryTreeView> {
           duration: const Duration(milliseconds: 200),
           decoration: BoxDecoration(
             color: isAccepting
-                ? theme.colorScheme.primary.withOpacity(0.1)
+                ? theme.colorScheme.primary.withValues(alpha: 0.1)
                 : Colors.transparent,
             border: isAccepting
                 ? Border.all(color: theme.colorScheme.primary, width: 2)
                 : isRejected
                     ? Border.all(
-                        color: theme.colorScheme.error.withOpacity(0.5),
+                        color: theme.colorScheme.error.withValues(alpha: 0.5),
                         width: 1,
                       )
                     : null,
@@ -351,8 +351,8 @@ class _GalleryCategoryTreeViewState extends State<GalleryCategoryTreeView> {
             gradient: showDropEffect
                 ? LinearGradient(
                     colors: [
-                      Colors.green.withOpacity(0.15),
-                      Colors.green.withOpacity(0.05),
+                      Colors.green.withValues(alpha: 0.15),
+                      Colors.green.withValues(alpha: 0.05),
                     ],
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
@@ -617,7 +617,7 @@ class _CategoryItemState extends State<_CategoryItem> {
                       child: Icon(
                         Icons.drag_indicator,
                         size: 14,
-                        color: theme.colorScheme.outline.withOpacity(0.5),
+                        color: theme.colorScheme.outline.withValues(alpha: 0.5),
                       ),
                     ),
                   Text(

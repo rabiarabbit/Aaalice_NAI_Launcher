@@ -85,7 +85,9 @@ Animation<double> createHoverShadowAnimation(AnimationController controller) {
 ///
 /// Returns an Animation<double> that controls color brightness (0.0 to 0.1)
 /// Used to increase brightness by 5-10% during hover
-Animation<double> createHoverBrightnessAnimation(AnimationController controller) {
+Animation<double> createHoverBrightnessAnimation(
+  AnimationController controller,
+) {
   return Tween<double>(
     begin: 0.0,
     end: 0.1,
@@ -101,7 +103,9 @@ Animation<double> createHoverBrightnessAnimation(AnimationController controller)
 ///
 /// Returns an Animation<double> for fade-in effect
 /// Combine with slide animation for full entrance effect
-Animation<double> createEntranceOpacityAnimation(AnimationController controller) {
+Animation<double> createEntranceOpacityAnimation(
+  AnimationController controller,
+) {
   return Tween<double>(
     begin: TagChipAnimationConfig.entranceOpacityStart,
     end: TagChipAnimationConfig.entranceOpacityEnd,
@@ -263,7 +267,7 @@ class TagChipHoverBuilder extends StatelessWidget {
             decoration: BoxDecoration(
               boxShadow: [
                 BoxShadow(
-                  color: tagColor.withOpacity(shadowOpacity),
+                  color: tagColor.withValues(alpha: shadowOpacity),
                   blurRadius: shadowBlur,
                   offset: const Offset(0, 2),
                 ),
@@ -431,7 +435,9 @@ class TagChipAnimationControllerFactory {
   }
 
   /// Creates an animation controller for weight change animations
-  static AnimationController createWeightChangeController(TickerProvider vsync) {
+  static AnimationController createWeightChangeController(
+    TickerProvider vsync,
+  ) {
     return AnimationController(
       duration: TagChipAnimationConfig.weightChangeDuration,
       vsync: vsync,
@@ -496,8 +502,10 @@ class TagChipShimmerBuilder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final defaultBaseColor = baseColor ?? theme.colorScheme.surfaceContainerHighest.withOpacity(0.3);
-    final defaultHighlightColor = highlightColor ?? theme.colorScheme.onSurface.withOpacity(0.1);
+    final defaultBaseColor = baseColor ??
+        theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3);
+    final defaultHighlightColor =
+        highlightColor ?? theme.colorScheme.onSurface.withValues(alpha: 0.1);
 
     return AnimatedBuilder(
       animation: shimmerAnimation,

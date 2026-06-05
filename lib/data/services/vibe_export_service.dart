@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../core/utils/app_logger.dart';
+import '../../core/utils/file_name_sanitizer.dart';
 import '../models/vibe/vibe_export_format.dart';
 import '../models/vibe/vibe_library_entry.dart';
 
@@ -286,11 +287,11 @@ class VibeExportService {
 
   /// 清理文件名中的非法字符
   String _sanitizeFileName(String fileName) {
-    // 移除或替换 Windows/Unix 文件系统中的非法字符
-    return fileName
-        .replaceAll(RegExp(r'[<>:"/\|?*]'), '_')
-        .replaceAll(RegExp(r'\s+'), ' ')
-        .trim();
+    return FileNameSanitizer.sanitize(
+      fileName,
+      fallback: '',
+      collapseWhitespace: true,
+    );
   }
 
   /// 将数字格式化为两位字符串

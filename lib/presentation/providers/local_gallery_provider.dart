@@ -160,7 +160,8 @@ class LocalGalleryNotifier extends _$LocalGalleryNotifier {
         // 检查是否是错误状态的服务
         if (service is ErrorGalleryService) {
           throw GalleryDatabaseException(
-              message: '画廊服务初始化失败: ${service.error}');
+            message: '画廊服务初始化失败: ${service.error}',
+          );
         }
 
         // 使用 isInitialized 检查服务是否已初始化
@@ -272,7 +273,11 @@ class LocalGalleryNotifier extends _$LocalGalleryNotifier {
       );
     } catch (e) {
       AppLogger.e(
-          'Failed to initialize gallery', e, null, 'LocalGalleryNotifier');
+        'Failed to initialize gallery',
+        e,
+        null,
+        'LocalGalleryNotifier',
+      );
       _setState(
         state.copyWith(
           error: '初始化失败: $e',
@@ -295,7 +300,9 @@ class LocalGalleryNotifier extends _$LocalGalleryNotifier {
   Future<void> loadPage(int page, {bool showLoading = true}) async {
     if (!state.isInitialized) {
       AppLogger.w(
-          'Gallery not initialized, cannot load page', 'LocalGalleryNotifier');
+        'Gallery not initialized, cannot load page',
+        'LocalGalleryNotifier',
+      );
       return;
     }
 
@@ -359,7 +366,11 @@ class LocalGalleryNotifier extends _$LocalGalleryNotifier {
       );
     } on GalleryDatabaseException catch (e) {
       AppLogger.e(
-          'Database error loading page', e, null, 'LocalGalleryNotifier');
+        'Database error loading page',
+        e,
+        null,
+        'LocalGalleryNotifier',
+      );
       _setState(
         state.copyWith(
           error: '数据库错误: ${e.message}',
@@ -498,8 +509,10 @@ class LocalGalleryNotifier extends _$LocalGalleryNotifier {
       }
 
       if (addedCount > 0) {
-        AppLogger.i('[AddNewImages] Added $addedCount new images immediately',
-            'LocalGalleryNotifier');
+        AppLogger.i(
+          '[AddNewImages] Added $addedCount new images immediately',
+          'LocalGalleryNotifier',
+        );
 
         // 更新状态计数
         _setState(
@@ -515,8 +528,12 @@ class LocalGalleryNotifier extends _$LocalGalleryNotifier {
         }
       }
     } catch (e) {
-      AppLogger.e('[AddNewImages] Failed to add new images', e, null,
-          'LocalGalleryNotifier');
+      AppLogger.e(
+        '[AddNewImages] Failed to add new images',
+        e,
+        null,
+        'LocalGalleryNotifier',
+      );
     }
 
     return addedCount;
@@ -727,7 +744,9 @@ class LocalGalleryNotifier extends _$LocalGalleryNotifier {
   /// [categoryId] 分类ID（null表示全部）
   /// [categoryFolderPath] 分类的文件夹路径
   Future<void> setSelectedCategory(
-      String? categoryId, String? categoryFolderPath) async {
+    String? categoryId,
+    String? categoryFolderPath,
+  ) async {
     final criteria = state.filterCriteria;
 
     // 检查是否有变化
@@ -787,7 +806,11 @@ class LocalGalleryNotifier extends _$LocalGalleryNotifier {
       );
     } catch (e) {
       AppLogger.e(
-          'Failed to load grouped images', e, null, 'LocalGalleryNotifier');
+        'Failed to load grouped images',
+        e,
+        null,
+        'LocalGalleryNotifier',
+      );
       _setState(state.copyWith(isGroupedLoading: false));
     }
   }
@@ -982,8 +1005,10 @@ class LocalGalleryNotifier extends _$LocalGalleryNotifier {
 
     // 检查是否已有扫描在进行中
     if (ScanStateManager.instance.isScanning) {
-      AppLogger.w('[LocalGallery] Scan already in progress, skipping',
-          'LocalGalleryNotifier');
+      AppLogger.w(
+        '[LocalGallery] Scan already in progress, skipping',
+        'LocalGalleryNotifier',
+      );
       return;
     }
 

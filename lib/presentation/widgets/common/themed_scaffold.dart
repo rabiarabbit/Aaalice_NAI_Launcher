@@ -41,7 +41,7 @@ class ThemedScaffold extends StatelessWidget {
             IgnorePointer(
               child: CustomPaint(
                 painter: _DotMatrixPainter(
-                  color: theme.colorScheme.primary.withOpacity(0.1),
+                  color: theme.colorScheme.primary.withValues(alpha: 0.1),
                 ),
               ),
             ),
@@ -51,7 +51,7 @@ class ThemedScaffold extends StatelessWidget {
             IgnorePointer(
               child: CustomPaint(
                 painter: _ScanLinePainter(
-                  color: theme.colorScheme.primary.withOpacity(0.1),
+                  color: theme.colorScheme.primary.withValues(alpha: 0.1),
                 ),
               ),
             ),
@@ -66,7 +66,7 @@ class ThemedScaffold extends StatelessWidget {
                     radius: 1.5,
                     colors: [
                       Colors.transparent,
-                      Colors.black.withOpacity(0.3),
+                      Colors.black.withValues(alpha: 0.3),
                     ],
                     stops: const [0.6, 1.0],
                   ),

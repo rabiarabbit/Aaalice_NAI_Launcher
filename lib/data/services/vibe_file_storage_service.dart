@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:path/path.dart' as p;
 
 import '../../core/utils/app_logger.dart';
+import '../../core/utils/file_name_sanitizer.dart';
 import '../../core/utils/vibe_export_utils.dart';
 import '../../core/utils/vibe_file_parser.dart';
 import '../../core/utils/vibe_library_path_helper.dart';
@@ -722,16 +723,11 @@ class VibeFileStorageService {
   }
 
   String _normalizeFileBaseName(String name) {
-    final sanitized = name.replaceAll(RegExp(r'[<>:"/\\|?*]'), '_').trim();
-    if (sanitized.isEmpty) {
-      return 'vibe';
-    }
-
-    if (sanitized.length > 120) {
-      return sanitized.substring(0, 120);
-    }
-
-    return sanitized;
+    return FileNameSanitizer.sanitize(
+      name,
+      fallback: 'vibe',
+      maxLength: 120,
+    );
   }
 
   Map<String, dynamic>? _extractBundleImportInfo(

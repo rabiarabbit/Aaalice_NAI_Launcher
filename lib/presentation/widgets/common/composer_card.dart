@@ -51,9 +51,9 @@ class ComposerCard extends StatelessWidget {
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         colors: [
-          colorScheme.primary.withOpacity(0.25),
-          colorScheme.primary.withOpacity(0.15),
-          Colors.white.withOpacity(0.3),
+          colorScheme.primary.withValues(alpha: 0.25),
+          colorScheme.primary.withValues(alpha: 0.15),
+          Colors.white.withValues(alpha: 0.3),
         ],
       );
     }

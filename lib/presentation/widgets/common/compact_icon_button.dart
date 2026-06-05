@@ -69,25 +69,28 @@ class _CompactIconButtonState extends State<CompactIconButton> {
     if (widget.isDanger) {
       iconColor = theme.colorScheme.error;
       bgColor = _isHovered
-          ? theme.colorScheme.error.withOpacity(isDark ? 0.2 : 0.12)
-          : theme.colorScheme.error.withOpacity(isDark ? 0.08 : 0.04);
-      borderColor = theme.colorScheme.error.withOpacity(isDark ? 0.3 : 0.2);
+          ? theme.colorScheme.error.withValues(alpha: isDark ? 0.2 : 0.12)
+          : theme.colorScheme.error.withValues(alpha: isDark ? 0.08 : 0.04);
+      borderColor =
+          theme.colorScheme.error.withValues(alpha: isDark ? 0.3 : 0.2);
     } else if (widget.isActive) {
       iconColor = theme.colorScheme.primary;
       bgColor = _isHovered
-          ? theme.colorScheme.primary.withOpacity(isDark ? 0.25 : 0.15)
-          : theme.colorScheme.primary.withOpacity(isDark ? 0.15 : 0.08);
-      borderColor = theme.colorScheme.primary.withOpacity(isDark ? 0.4 : 0.25);
+          ? theme.colorScheme.primary.withValues(alpha: isDark ? 0.25 : 0.15)
+          : theme.colorScheme.primary.withValues(alpha: isDark ? 0.15 : 0.08);
+      borderColor =
+          theme.colorScheme.primary.withValues(alpha: isDark ? 0.4 : 0.25);
     } else {
       iconColor = isEnabled
           ? theme.colorScheme.onSurfaceVariant
-          : theme.colorScheme.onSurfaceVariant.withOpacity(0.4);
+          : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4);
       bgColor = _isHovered
-          ? theme.colorScheme.onSurfaceVariant.withOpacity(isDark ? 0.15 : 0.1)
+          ? theme.colorScheme.onSurfaceVariant
+              .withValues(alpha: isDark ? 0.15 : 0.1)
           : theme.colorScheme.onSurfaceVariant
-              .withOpacity(isDark ? 0.06 : 0.03);
-      borderColor =
-          theme.colorScheme.outlineVariant.withOpacity(isDark ? 0.3 : 0.4);
+              .withValues(alpha: isDark ? 0.06 : 0.03);
+      borderColor = theme.colorScheme.outlineVariant
+          .withValues(alpha: isDark ? 0.3 : 0.4);
     }
 
     final buttonContent = MouseRegion(
@@ -127,8 +130,7 @@ class _CompactIconButtonState extends State<CompactIconButton> {
                   widget.label!,
                   style: theme.textTheme.labelMedium?.copyWith(
                     color: iconColor,
-                    fontWeight:
-                        _isHovered ? FontWeight.w600 : FontWeight.w500,
+                    fontWeight: _isHovered ? FontWeight.w600 : FontWeight.w500,
                   ),
                 ),
               ],

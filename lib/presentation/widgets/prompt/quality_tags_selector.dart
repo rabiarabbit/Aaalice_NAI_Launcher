@@ -64,7 +64,7 @@ class _QualityTagsSelectorState extends ConsumerState<QualityTagsSelector> {
           borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withValues(alpha: 0.2),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -82,15 +82,15 @@ class _QualityTagsSelectorState extends ConsumerState<QualityTagsSelector> {
               decoration: BoxDecoration(
                 color: isEnabled
                     ? (_isHovering
-                        ? Colors.green.withOpacity(0.2)
-                        : Colors.green.withOpacity(0.1))
+                        ? Colors.green.withValues(alpha: 0.2)
+                        : Colors.green.withValues(alpha: 0.1))
                     : (_isHovering
                         ? theme.colorScheme.surfaceContainerHighest
                         : Colors.transparent),
                 borderRadius: BorderRadius.circular(6),
                 border: Border.all(
                   color: isEnabled
-                      ? Colors.green.withOpacity(0.3)
+                      ? Colors.green.withValues(alpha: 0.3)
                       : Colors.transparent,
                 ),
               ),
@@ -104,7 +104,7 @@ class _QualityTagsSelectorState extends ConsumerState<QualityTagsSelector> {
                     size: 14,
                     color: isEnabled
                         ? Colors.green.shade700
-                        : theme.colorScheme.onSurface.withOpacity(0.5),
+                        : theme.colorScheme.onSurface.withValues(alpha: 0.5),
                   ),
                   const SizedBox(width: 4),
                   Text(
@@ -114,7 +114,7 @@ class _QualityTagsSelectorState extends ConsumerState<QualityTagsSelector> {
                       fontWeight: isEnabled ? FontWeight.w600 : FontWeight.w500,
                       color: isEnabled
                           ? Colors.green.shade700
-                          : theme.colorScheme.onSurface.withOpacity(0.5),
+                          : theme.colorScheme.onSurface.withValues(alpha: 0.5),
                     ),
                   ),
                   const SizedBox(width: 2),
@@ -123,7 +123,7 @@ class _QualityTagsSelectorState extends ConsumerState<QualityTagsSelector> {
                     size: 14,
                     color: isEnabled
                         ? Colors.green.shade700
-                        : theme.colorScheme.onSurface.withOpacity(0.5),
+                        : theme.colorScheme.onSurface.withValues(alpha: 0.5),
                   ),
                 ],
               ),
@@ -371,7 +371,7 @@ class _QualityTagsSelectorState extends ConsumerState<QualityTagsSelector> {
         Text(
           context.l10n.qualityTags_addToEnd,
           style: TextStyle(
-            color: theme.colorScheme.onSurface.withOpacity(0.7),
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
             fontSize: 11,
           ),
         ),

@@ -198,7 +198,7 @@ class _SaveVibeDialogState extends ConsumerState<SaveVibeDialog> {
               // 分类选择
               if (categories.isNotEmpty)
                 DropdownButtonFormField<String?>(
-                  value: _selectedCategoryId,
+                  initialValue: _selectedCategoryId,
                   decoration: const InputDecoration(
                     labelText: '分类',
                     prefixIcon: Icon(Icons.folder_outlined),
@@ -288,10 +288,11 @@ class _SaveVibeDialogState extends ConsumerState<SaveVibeDialog> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                  color: colorScheme.surfaceContainerHighest
+                      .withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: colorScheme.outline.withOpacity(0.2),
+                    color: colorScheme.outline.withValues(alpha: 0.2),
                   ),
                 ),
                 child: Column(

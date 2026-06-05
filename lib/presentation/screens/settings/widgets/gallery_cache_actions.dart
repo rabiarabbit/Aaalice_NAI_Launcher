@@ -207,8 +207,8 @@ class _GalleryCacheActionsState extends ConsumerState<GalleryCacheActions>
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        Colors.green.withOpacity(0.2),
-                        Colors.lightGreen.withOpacity(0.1),
+                        Colors.green.withValues(alpha: 0.2),
+                        Colors.lightGreen.withValues(alpha: 0.1),
                       ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
@@ -217,7 +217,7 @@ class _GalleryCacheActionsState extends ConsumerState<GalleryCacheActions>
                     border: Border.all(
                       color: _isScanning
                           ? Colors.green
-                          : Colors.green.withOpacity(0.3),
+                          : Colors.green.withValues(alpha: 0.3),
                       width: _isScanning ? 2 : 1,
                     ),
                   ),
@@ -225,7 +225,7 @@ class _GalleryCacheActionsState extends ConsumerState<GalleryCacheActions>
                     Icons.refresh_rounded,
                     color: _isScanning
                         ? Colors.green
-                        : Colors.green.withOpacity(0.8),
+                        : Colors.green.withValues(alpha: 0.8),
                     size: 22,
                   ),
                 ),
@@ -244,7 +244,7 @@ class _GalleryCacheActionsState extends ConsumerState<GalleryCacheActions>
               Text(
                 _isScanning ? (_scanPhase ?? '正在扫描...') : '检查数据一致性、查漏补缺、提取元数据',
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurface.withOpacity(0.6),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
               ),
               if (_isScanning && _scanProgress != null) ...[
@@ -262,7 +262,7 @@ class _GalleryCacheActionsState extends ConsumerState<GalleryCacheActions>
                     '$_processedCount / $_totalCount',
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontSize: 10,
-                      color: theme.colorScheme.onSurface.withOpacity(0.5),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                     ),
                   ),
                 ],
@@ -284,13 +284,13 @@ class _GalleryCacheActionsState extends ConsumerState<GalleryCacheActions>
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        colorScheme.primary.withOpacity(0.1),
-                        colorScheme.primary.withOpacity(0.05),
+                        colorScheme.primary.withValues(alpha: 0.1),
+                        colorScheme.primary.withValues(alpha: 0.05),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: colorScheme.primary.withOpacity(0.2),
+                      color: colorScheme.primary.withValues(alpha: 0.2),
                     ),
                   ),
                   child: Row(

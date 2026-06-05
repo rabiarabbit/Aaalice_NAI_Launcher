@@ -50,9 +50,14 @@ class _VibeSectionState extends State<VibeSection> {
     for (var i = 0; i < widget.vibes.length; i++) {
       final vibe = widget.vibes[i];
       buffer.writeln('Vibe ${i + 1}: ${vibe.displayName}');
-      buffer.writeln('  Strength: ${(vibe.strength * 100).toStringAsFixed(0)}%');
-      buffer.writeln('  Info Extracted: ${(vibe.infoExtracted * 100).toStringAsFixed(0)}%');
-      buffer.writeln('  Encoding: ${vibe.vibeEncoding.substring(0, vibe.vibeEncoding.length > 50 ? 50 : vibe.vibeEncoding.length)}...');
+      buffer
+          .writeln('  Strength: ${(vibe.strength * 100).toStringAsFixed(0)}%');
+      buffer.writeln(
+        '  Info Extracted: ${(vibe.infoExtracted * 100).toStringAsFixed(0)}%',
+      );
+      buffer.writeln(
+        '  Encoding: ${vibe.vibeEncoding.substring(0, vibe.vibeEncoding.length > 50 ? 50 : vibe.vibeEncoding.length)}...',
+      );
       if (i < widget.vibes.length - 1) buffer.writeln();
     }
 
@@ -94,30 +99,42 @@ class _VibeSectionState extends State<VibeSection> {
         // 可点击的标题区域
         Expanded(
           child: GestureDetector(
-            onTap: hasVibes ? () => setState(() => _isExpanded = !_isExpanded) : null,
+            onTap: hasVibes
+                ? () => setState(() => _isExpanded = !_isExpanded)
+                : null,
             child: MouseRegion(
-              cursor: hasVibes ? SystemMouseCursors.click : SystemMouseCursors.basic,
+              cursor: hasVibes
+                  ? SystemMouseCursors.click
+                  : SystemMouseCursors.basic,
               child: Row(
                 children: [
                   Icon(
                     Icons.style_outlined,
                     size: 16,
-                    color: hasVibes ? colorScheme.primary : colorScheme.onSurfaceVariant,
+                    color: hasVibes
+                        ? colorScheme.primary
+                        : colorScheme.onSurfaceVariant,
                   ),
                   const SizedBox(width: 6),
                   Text(
                     widget.title,
                     style: theme.textTheme.titleSmall?.copyWith(
-                      color: hasVibes ? colorScheme.primary : colorScheme.onSurfaceVariant,
+                      color: hasVibes
+                          ? colorScheme.primary
+                          : colorScheme.onSurfaceVariant,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   const SizedBox(width: 8),
                   if (hasVibes)
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
-                        color: colorScheme.tertiaryContainer.withOpacity(0.5),
+                        color: colorScheme.tertiaryContainer
+                            .withValues(alpha: 0.5),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
@@ -205,10 +222,10 @@ class _VibeCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest.withOpacity(0.3),
+        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: colorScheme.outline.withOpacity(0.1),
+          color: colorScheme.outline.withValues(alpha: 0.1),
         ),
       ),
       child: Row(
@@ -353,13 +370,13 @@ class _VibeCard extends StatelessWidget {
         color: colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(6),
         border: Border.all(
-          color: colorScheme.outline.withOpacity(0.2),
+          color: colorScheme.outline.withValues(alpha: 0.2),
         ),
       ),
       child: Icon(
         Icons.image_outlined,
         size: 24,
-        color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+        color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
       ),
     );
   }

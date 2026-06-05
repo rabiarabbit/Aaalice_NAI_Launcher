@@ -106,7 +106,7 @@ class _QueueExportDialogState extends ConsumerState<QueueExportDialog>
                 child: Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.red.withOpacity(0.1),
+                    color: Colors.red.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
@@ -148,13 +148,23 @@ class _QueueExportDialogState extends ConsumerState<QueueExportDialog>
           const SizedBox(height: 12),
 
           // 格式选择
-          ...ExportFormat.values.map(
-            (format) => RadioListTile<ExportFormat>(
-              title: Text(format.displayName),
-              subtitle: Text(_getFormatDescription(format)),
-              value: format,
-              groupValue: _exportFormat,
-              onChanged: (value) => setState(() => _exportFormat = value!),
+          RadioGroup<ExportFormat>(
+            groupValue: _exportFormat,
+            onChanged: (value) {
+              if (value != null) {
+                setState(() => _exportFormat = value);
+              }
+            },
+            child: Column(
+              children: ExportFormat.values
+                  .map(
+                    (format) => RadioListTile<ExportFormat>(
+                      title: Text(format.displayName),
+                      subtitle: Text(_getFormatDescription(format)),
+                      value: format,
+                    ),
+                  )
+                  .toList(),
             ),
           ),
 
@@ -211,13 +221,23 @@ class _QueueExportDialogState extends ConsumerState<QueueExportDialog>
           const SizedBox(height: 12),
 
           // 策略选择
-          ...ImportStrategy.values.map(
-            (strategy) => RadioListTile<ImportStrategy>(
-              title: Text(strategy.displayName),
-              subtitle: Text(strategy.description),
-              value: strategy,
-              groupValue: _importStrategy,
-              onChanged: (value) => setState(() => _importStrategy = value!),
+          RadioGroup<ImportStrategy>(
+            groupValue: _importStrategy,
+            onChanged: (value) {
+              if (value != null) {
+                setState(() => _importStrategy = value);
+              }
+            },
+            child: Column(
+              children: ImportStrategy.values
+                  .map(
+                    (strategy) => RadioListTile<ImportStrategy>(
+                      title: Text(strategy.displayName),
+                      subtitle: Text(strategy.description),
+                      value: strategy,
+                    ),
+                  )
+                  .toList(),
             ),
           ),
 

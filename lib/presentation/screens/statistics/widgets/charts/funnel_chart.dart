@@ -270,7 +270,7 @@ class _FunnelChartPainter extends CustomPainter {
         ..close();
 
       final paint = Paint()
-        ..color = isHovered ? color : color.withOpacity(0.8)
+        ..color = isHovered ? color : color.withValues(alpha: 0.8)
         ..style = PaintingStyle.fill;
 
       canvas.drawPath(path, paint);

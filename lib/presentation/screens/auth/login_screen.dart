@@ -518,7 +518,7 @@ class _Header extends StatelessWidget {
         Text(
           context.l10n.app_subtitle,
           style: theme.textTheme.bodyMedium?.copyWith(
-            color: theme.colorScheme.onSurface.withOpacity(0.6),
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
           ),
           textAlign: TextAlign.center,
         ),
@@ -538,7 +538,7 @@ class _LoginTip extends StatelessWidget {
     return Text(
       context.l10n.auth_loginTip,
       style: theme.textTheme.bodySmall?.copyWith(
-        color: theme.colorScheme.onSurface.withOpacity(0.5),
+        color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
       ),
       textAlign: TextAlign.center,
     );
@@ -581,7 +581,9 @@ class _AccountSwitcherSkeleton extends StatelessWidget {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: theme.colorScheme.outline.withOpacity(0.2)),
+          side: BorderSide(
+            color: theme.colorScheme.outline.withValues(alpha: 0.2),
+          ),
         ),
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -683,7 +685,9 @@ class _QuickLoginView extends ConsumerWidget {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: theme.colorScheme.outline.withOpacity(0.2)),
+          side: BorderSide(
+            color: theme.colorScheme.outline.withValues(alpha: 0.2),
+          ),
         ),
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -722,7 +726,7 @@ class _QuickLoginView extends ConsumerWidget {
               Text(
                 context.l10n.auth_switchAccount,
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurface.withOpacity(0.5),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                 ),
               ),
               const SizedBox(height: 16),
@@ -769,7 +773,7 @@ class _QuickLoginView extends ConsumerWidget {
         Text(
           context.l10n.auth_switchAccount,
           style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSurface.withOpacity(0.5),
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
           ),
         ),
         const SizedBox(height: 24),
@@ -825,7 +829,7 @@ class _AccountSelectorButton extends StatelessWidget {
             const SizedBox(width: 4),
             Icon(
               Icons.arrow_drop_down,
-              color: theme.colorScheme.onSurface.withOpacity(0.6),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
             ),
           ],
         ),
@@ -926,7 +930,7 @@ class _AccountListItem extends StatelessWidget {
       subtitle: Text(
         context.l10n.auth_createdAt(createdDate),
         style: theme.textTheme.bodySmall?.copyWith(
-          color: theme.colorScheme.onSurface.withOpacity(0.5),
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
         ),
       ),
       trailing: IconButton(
@@ -984,7 +988,7 @@ class _LoadingOverlayState extends State<_LoadingOverlay>
       child: Material(
         color: Colors.transparent,
         child: Container(
-          color: theme.colorScheme.surface.withOpacity(0.7),
+          color: theme.colorScheme.surface.withValues(alpha: 0.7),
           child: Center(
             child: Card(
               elevation: 8,
@@ -1068,10 +1072,10 @@ class _ShimmerBoxState extends State<_ShimmerBox>
 
   @override
   Widget build(BuildContext context) {
-    final baseColor = widget.color?.withOpacity(0.3) ??
+    final baseColor = widget.color?.withValues(alpha: 0.3) ??
         widget.theme.colorScheme.surfaceContainerHighest;
-    final highlightColor =
-        widget.color?.withOpacity(0.1) ?? widget.theme.colorScheme.surface;
+    final highlightColor = widget.color?.withValues(alpha: 0.1) ??
+        widget.theme.colorScheme.surface;
 
     return AnimatedBuilder(
       animation: _animation,

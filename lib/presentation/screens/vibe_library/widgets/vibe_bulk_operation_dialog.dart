@@ -367,7 +367,8 @@ class _VibeBulkOperationDialogState
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
+            color: theme.colorScheme.surfaceContainerHighest
+                .withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Column(
@@ -399,7 +400,7 @@ class _VibeBulkOperationDialogState
               // 错误列表
               if (result.errors.isNotEmpty) ...[
                 const SizedBox(height: 12),
-                Divider(color: theme.dividerColor.withOpacity(0.5)),
+                Divider(color: theme.dividerColor.withValues(alpha: 0.5)),
                 const SizedBox(height: 8),
                 Text(
                   '错误信息:',
@@ -409,31 +410,31 @@ class _VibeBulkOperationDialogState
                 ),
                 const SizedBox(height: 4),
                 ...result.errors.take(3).map(
-                  (error) => Padding(
-                    padding: const EdgeInsets.only(left: 8, bottom: 4),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Icon(
-                          Icons.error_outline,
-                          size: 14,
-                          color: theme.colorScheme.error,
-                        ),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: Text(
-                            error,
-                            style: theme.textTheme.bodySmall?.copyWith(
+                      (error) => Padding(
+                        padding: const EdgeInsets.only(left: 8, bottom: 4),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(
+                              Icons.error_outline,
+                              size: 14,
                               color: theme.colorScheme.error,
                             ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                error,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: theme.colorScheme.error,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
                 if (result.errors.length > 3)
                   Padding(
                     padding: const EdgeInsets.only(left: 8),

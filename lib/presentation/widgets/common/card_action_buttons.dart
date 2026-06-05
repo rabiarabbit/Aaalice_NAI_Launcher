@@ -161,12 +161,12 @@ class _CardActionButtonState extends State<_CardActionButton> {
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
               color: _isHovering
-                  ? Colors.white.withOpacity(0.25)
-                  : Colors.black.withOpacity(0.55),
+                  ? Colors.white.withValues(alpha: 0.25)
+                  : Colors.black.withValues(alpha: 0.55),
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
+                  color: Colors.black.withValues(alpha: 0.2),
                   blurRadius: 4,
                 ),
               ],

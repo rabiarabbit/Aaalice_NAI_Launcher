@@ -127,7 +127,7 @@ class GalleryEmptyView extends StatelessWidget {
             icon,
             size: 64,
             color: theme.colorScheme.onSurfaceVariant
-                .withOpacity(isDark ? 0.6 : 1.0),
+                .withValues(alpha: isDark ? 0.6 : 1.0),
           ),
           const SizedBox(height: 16),
           Text(
@@ -141,7 +141,7 @@ class GalleryEmptyView extends StatelessWidget {
             subtitle,
             style: TextStyle(
               color: theme.colorScheme.onSurfaceVariant
-                  .withOpacity(isDark ? 0.7 : 1.0),
+                  .withValues(alpha: isDark ? 0.7 : 1.0),
             ),
           ),
         ],
@@ -190,7 +190,7 @@ class GalleryNoResultsView extends ConsumerWidget {
             icon ?? Icons.search_off,
             size: 48,
             color: theme.colorScheme.onSurfaceVariant
-                .withOpacity(isDark ? 0.6 : 0.5),
+                .withValues(alpha: isDark ? 0.6 : 0.5),
           ),
           const SizedBox(height: 12),
           Text(

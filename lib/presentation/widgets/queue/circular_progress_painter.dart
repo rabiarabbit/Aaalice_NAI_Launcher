@@ -30,7 +30,7 @@ class CircularProgressPainter extends CustomPainter {
 
     // 背景圆环
     final bgPaint = Paint()
-      ..color = backgroundColor ?? color.withOpacity(0.2)
+      ..color = backgroundColor ?? color.withValues(alpha: 0.2)
       ..strokeWidth = strokeWidth
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;

@@ -102,7 +102,8 @@ class _ScopeTripleSwitchState extends State<ScopeTripleSwitch> {
           color: colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: colorScheme.outline.withOpacity(widget.enabled ? 0.1 : 0.05),
+            color: colorScheme.outline
+                .withValues(alpha: widget.enabled ? 0.1 : 0.05),
             width: 1,
           ),
         ),
@@ -125,15 +126,15 @@ class _ScopeTripleSwitchState extends State<ScopeTripleSwitch> {
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
-                          currentColor.withOpacity(0.9),
-                          currentColor.withOpacity(0.7),
+                          currentColor.withValues(alpha: 0.9),
+                          currentColor.withValues(alpha: 0.7),
                         ],
                       ),
                       borderRadius: BorderRadius.circular(6),
                       boxShadow: widget.enabled
                           ? [
                               BoxShadow(
-                                color: currentColor.withOpacity(0.4),
+                                color: currentColor.withValues(alpha: 0.4),
                                 blurRadius: 8,
                                 offset: const Offset(0, 2),
                               ),
@@ -245,7 +246,7 @@ class ColorfulProbabilitySlider extends StatelessWidget {
                 enabledThumbRadius: 7,
                 elevation: 2,
               ),
-              overlayColor: primaryColor.withOpacity(0.12),
+              overlayColor: primaryColor.withValues(alpha: 0.12),
               overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),
             ),
             child: Stack(
@@ -274,19 +275,19 @@ class ColorfulProbabilitySlider extends StatelessWidget {
                         gradient: LinearGradient(
                           colors: enabled
                               ? [
-                                  primaryColor.withOpacity(0.9),
-                                  secondaryColor.withOpacity(0.7),
+                                  primaryColor.withValues(alpha: 0.9),
+                                  secondaryColor.withValues(alpha: 0.7),
                                 ]
                               : [
-                                  primaryColor.withOpacity(0.4),
-                                  secondaryColor.withOpacity(0.3),
+                                  primaryColor.withValues(alpha: 0.4),
+                                  secondaryColor.withValues(alpha: 0.3),
                                 ],
                         ),
                         borderRadius: BorderRadius.circular(3),
                         boxShadow: enabled
                             ? [
                                 BoxShadow(
-                                  color: primaryColor.withOpacity(0.3),
+                                  color: primaryColor.withValues(alpha: 0.3),
                                   blurRadius: 4,
                                   offset: const Offset(0, 1),
                                 ),
@@ -313,7 +314,7 @@ class ColorfulProbabilitySlider extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
           decoration: BoxDecoration(
-            color: primaryColor.withOpacity(0.1),
+            color: primaryColor.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(4),
           ),
           child: Text(
@@ -321,7 +322,7 @@ class ColorfulProbabilitySlider extends StatelessWidget {
             style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.bold,
-              color: primaryColor.withOpacity(enabled ? 1.0 : 0.6),
+              color: primaryColor.withValues(alpha: enabled ? 1.0 : 0.6),
             ),
           ),
         ),
@@ -380,7 +381,7 @@ class _AddTagGroupCardState extends State<AddTagGroupCard> {
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: (_isHovered && isEnabled)
-                          ? colorScheme.primary.withOpacity(0.15)
+                          ? colorScheme.primary.withValues(alpha: 0.15)
                           : colorScheme.surfaceContainerHighest,
                       shape: BoxShape.circle,
                     ),
@@ -445,8 +446,8 @@ class _AddCategoryButtonState extends State<AddCategoryButton> {
             gradient: _isHovered
                 ? LinearGradient(
                     colors: [
-                      colorScheme.primary.withOpacity(0.15),
-                      colorScheme.secondary.withOpacity(0.1),
+                      colorScheme.primary.withValues(alpha: 0.15),
+                      colorScheme.secondary.withValues(alpha: 0.1),
                     ],
                   )
                 : null,
@@ -455,7 +456,7 @@ class _AddCategoryButtonState extends State<AddCategoryButton> {
             boxShadow: _isHovered
                 ? [
                     BoxShadow(
-                      color: colorScheme.primary.withOpacity(0.2),
+                      color: colorScheme.primary.withValues(alpha: 0.2),
                       blurRadius: 8,
                       spreadRadius: -2,
                     ),
@@ -508,13 +509,14 @@ class EmptyCategoryPlaceholder extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                color:
+                    colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.inbox_outlined,
                 size: 48,
-                color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+                color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
               ),
             ),
             const SizedBox(height: 16),
@@ -529,7 +531,7 @@ class EmptyCategoryPlaceholder extends StatelessWidget {
             Text(
               '点击"新增类别"开始配置',
               style: theme.textTheme.bodySmall?.copyWith(
-                color: colorScheme.onSurfaceVariant.withOpacity(0.7),
+                color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
               ),
             ),
           ],

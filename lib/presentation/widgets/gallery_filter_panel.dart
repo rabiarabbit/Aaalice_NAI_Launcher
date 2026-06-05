@@ -87,10 +87,14 @@ class _GalleryFilterPanelState extends ConsumerState<GalleryFilterPanel>
     final state = ref.read(localGalleryNotifierProvider);
     _modelController.text = state.filterCriteria.filterModel ?? '';
     _samplerController.text = state.filterCriteria.filterSampler ?? '';
-    _minStepsController.text = state.filterCriteria.filterMinSteps?.toString() ?? '';
-    _maxStepsController.text = state.filterCriteria.filterMaxSteps?.toString() ?? '';
-    _minCfgController.text = state.filterCriteria.filterMinCfg?.toString() ?? '';
-    _maxCfgController.text = state.filterCriteria.filterMaxCfg?.toString() ?? '';
+    _minStepsController.text =
+        state.filterCriteria.filterMinSteps?.toString() ?? '';
+    _maxStepsController.text =
+        state.filterCriteria.filterMaxSteps?.toString() ?? '';
+    _minCfgController.text =
+        state.filterCriteria.filterMinCfg?.toString() ?? '';
+    _maxCfgController.text =
+        state.filterCriteria.filterMaxCfg?.toString() ?? '';
     _resolutionController.text = state.filterCriteria.filterResolution ?? '';
   }
 
@@ -200,12 +204,12 @@ class _GalleryFilterPanelState extends ConsumerState<GalleryFilterPanel>
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: isDark
-                  ? colorScheme.outline.withOpacity(0.2)
-                  : colorScheme.outline.withOpacity(0.1),
+                  ? colorScheme.outline.withValues(alpha: 0.2)
+                  : colorScheme.outline.withValues(alpha: 0.1),
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(isDark ? 0.4 : 0.15),
+                color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.15),
                 blurRadius: 30,
                 offset: const Offset(0, 10),
                 spreadRadius: 0,
@@ -391,12 +395,12 @@ class _GalleryFilterPanelState extends ConsumerState<GalleryFilterPanel>
           end: Alignment.bottomRight,
           colors: isDark
               ? [
-                  colorScheme.primary.withOpacity(0.15),
-                  colorScheme.secondary.withOpacity(0.1),
+                  colorScheme.primary.withValues(alpha: 0.15),
+                  colorScheme.secondary.withValues(alpha: 0.1),
                 ]
               : [
-                  colorScheme.primary.withOpacity(0.08),
-                  colorScheme.secondary.withOpacity(0.05),
+                  colorScheme.primary.withValues(alpha: 0.08),
+                  colorScheme.secondary.withValues(alpha: 0.05),
                 ],
         ),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
@@ -406,7 +410,7 @@ class _GalleryFilterPanelState extends ConsumerState<GalleryFilterPanel>
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: colorScheme.primary.withOpacity(0.15),
+              color: colorScheme.primary.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
@@ -449,7 +453,7 @@ class _GalleryFilterPanelState extends ConsumerState<GalleryFilterPanel>
             tooltip: l10n.common_close,
             style: IconButton.styleFrom(
               backgroundColor:
-                  colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                  colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
             ),
           ),
         ],
@@ -472,11 +476,11 @@ class _GalleryFilterPanelState extends ConsumerState<GalleryFilterPanel>
       padding: EdgeInsets.all(compact ? 12 : 16),
       decoration: BoxDecoration(
         color: isDark
-            ? colorScheme.surfaceContainerHighest.withOpacity(0.4)
+            ? colorScheme.surfaceContainerHighest.withValues(alpha: 0.4)
             : colorScheme.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: colorScheme.outline.withOpacity(isDark ? 0.15 : 0.08),
+          color: colorScheme.outline.withValues(alpha: isDark ? 0.15 : 0.08),
         ),
       ),
       child: Column(
@@ -487,7 +491,7 @@ class _GalleryFilterPanelState extends ConsumerState<GalleryFilterPanel>
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: iconColor.withOpacity(0.15),
+                  color: iconColor.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
@@ -527,11 +531,11 @@ class _GalleryFilterPanelState extends ConsumerState<GalleryFilterPanel>
     return Container(
       decoration: BoxDecoration(
         color: isDark
-            ? colorScheme.surface.withOpacity(0.5)
-            : colorScheme.surfaceContainerHighest.withOpacity(0.5),
+            ? colorScheme.surface.withValues(alpha: 0.5)
+            : colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: colorScheme.outline.withOpacity(isDark ? 0.2 : 0.1),
+          color: colorScheme.outline.withValues(alpha: isDark ? 0.2 : 0.1),
         ),
       ),
       child: ThemedInput(
@@ -542,7 +546,7 @@ class _GalleryFilterPanelState extends ConsumerState<GalleryFilterPanel>
         decoration: InputDecoration(
           hintText: hintText,
           hintStyle: TextStyle(
-            color: colorScheme.onSurfaceVariant.withOpacity(0.6),
+            color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
             fontSize: 13,
           ),
           border: InputBorder.none,
@@ -598,7 +602,7 @@ class _GalleryFilterPanelState extends ConsumerState<GalleryFilterPanel>
           child: Icon(
             Icons.remove,
             size: 16,
-            color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+            color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
           ),
         ),
         Expanded(
@@ -630,11 +634,11 @@ class _GalleryFilterPanelState extends ConsumerState<GalleryFilterPanel>
       height: 40,
       decoration: BoxDecoration(
         color: isDark
-            ? colorScheme.surface.withOpacity(0.5)
-            : colorScheme.surfaceContainerHighest.withOpacity(0.5),
+            ? colorScheme.surface.withValues(alpha: 0.5)
+            : colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: colorScheme.outline.withOpacity(isDark ? 0.2 : 0.1),
+          color: colorScheme.outline.withValues(alpha: isDark ? 0.2 : 0.1),
         ),
       ),
       child: ThemedInput(
@@ -656,7 +660,7 @@ class _GalleryFilterPanelState extends ConsumerState<GalleryFilterPanel>
         decoration: InputDecoration(
           hintText: hintText,
           hintStyle: TextStyle(
-            color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+            color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
             fontSize: 13,
           ),
           border: InputBorder.none,
@@ -699,13 +703,13 @@ class _GalleryFilterPanelState extends ConsumerState<GalleryFilterPanel>
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
               color: isSelected
-                  ? colorScheme.primary.withOpacity(0.15)
-                  : colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                  ? colorScheme.primary.withValues(alpha: 0.15)
+                  : colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(6),
               border: Border.all(
                 color: isSelected
-                    ? colorScheme.primary.withOpacity(0.5)
-                    : colorScheme.outline.withOpacity(0.1),
+                    ? colorScheme.primary.withValues(alpha: 0.5)
+                    : colorScheme.outline.withValues(alpha: 0.1),
               ),
             ),
             child: Text(
@@ -735,8 +739,8 @@ class _GalleryFilterPanelState extends ConsumerState<GalleryFilterPanel>
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
       decoration: BoxDecoration(
         color: isDark
-            ? colorScheme.surfaceContainerHighest.withOpacity(0.3)
-            : colorScheme.surfaceContainerLowest.withOpacity(0.8),
+            ? colorScheme.surfaceContainerHighest.withValues(alpha: 0.3)
+            : colorScheme.surfaceContainerLowest.withValues(alpha: 0.8),
         borderRadius: const BorderRadius.vertical(bottom: Radius.circular(20)),
       ),
       child: Row(
@@ -746,7 +750,7 @@ class _GalleryFilterPanelState extends ConsumerState<GalleryFilterPanel>
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
-                color: colorScheme.tertiary.withOpacity(0.15),
+                color: colorScheme.tertiary.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
@@ -779,14 +783,14 @@ class _GalleryFilterPanelState extends ConsumerState<GalleryFilterPanel>
               size: 18,
               color: _hasActiveFilters
                   ? colorScheme.error
-                  : colorScheme.onSurfaceVariant.withOpacity(0.5),
+                  : colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
             ),
             label: Text(
               l10n.localGallery_resetAdvancedFilters,
               style: TextStyle(
                 color: _hasActiveFilters
                     ? colorScheme.error
-                    : colorScheme.onSurfaceVariant.withOpacity(0.5),
+                    : colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
               ),
             ),
           ),

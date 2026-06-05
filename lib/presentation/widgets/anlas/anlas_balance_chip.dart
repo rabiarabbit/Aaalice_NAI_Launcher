@@ -95,7 +95,7 @@ class AnlasBalanceChip extends ConsumerWidget {
 
     if (isInsufficient) {
       textColor = theme.colorScheme.error;
-      backgroundColor = theme.colorScheme.errorContainer.withOpacity(0.3);
+      backgroundColor = theme.colorScheme.errorContainer.withValues(alpha: 0.3);
     } else {
       textColor = theme.colorScheme.onSurfaceVariant;
       backgroundColor = null;
@@ -145,7 +145,8 @@ class AnlasBalanceChip extends ConsumerWidget {
         message: '点击重试',
         child: _ChipContainer(
           compact: compact,
-          backgroundColor: theme.colorScheme.errorContainer.withOpacity(0.3),
+          backgroundColor:
+              theme.colorScheme.errorContainer.withValues(alpha: 0.3),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [

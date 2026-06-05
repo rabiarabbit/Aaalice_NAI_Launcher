@@ -239,8 +239,9 @@ class _CategorySettingsDialogState extends State<CategorySettingsDialog> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        border:
-            Border(top: BorderSide(color: theme.dividerColor.withOpacity(0.3))),
+        border: Border(
+          top: BorderSide(color: theme.dividerColor.withValues(alpha: 0.3)),
+        ),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,

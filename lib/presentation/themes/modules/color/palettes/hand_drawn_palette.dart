@@ -34,7 +34,7 @@ class HandDrawnPalette extends BaseColorModule {
         surface: _surface,
         onSurface: _primary,
         surfaceContainerHighest: _background,
-        outline: const Color(0xFF2D2D2D).withOpacity(0.3),
+        outline: const Color(0xFF2D2D2D).withValues(alpha: 0.3),
         error: _secondary,
       );
 

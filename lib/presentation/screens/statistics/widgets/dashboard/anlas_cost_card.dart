@@ -59,7 +59,11 @@ class AnlasCostCard extends ConsumerWidget {
                       label: l10n.statistics_avgDailyCost,
                       value: _formatAnlas(
                         dailyStats.isNotEmpty
-                            ? totalCost ~/ dailyStats.where((s) => s.cost > 0).length.clamp(1, 999)
+                            ? totalCost ~/
+                                dailyStats
+                                    .where((s) => s.cost > 0)
+                                    .length
+                                    .clamp(1, 999)
                             : 0,
                       ),
                       isDark: isDark,
@@ -117,7 +121,7 @@ class AnlasCostCard extends ConsumerWidget {
             Icon(
               Icons.savings_outlined,
               size: 40,
-              color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 12),
             Text(
@@ -159,7 +163,7 @@ class AnlasCostCard extends ConsumerWidget {
           drawVerticalLine: false,
           horizontalInterval: (maxValue / 3).clamp(1, double.infinity),
           getDrawingHorizontalLine: (value) => FlLine(
-            color: colorScheme.outlineVariant.withOpacity(0.3),
+            color: colorScheme.outlineVariant.withValues(alpha: 0.3),
             strokeWidth: 1,
           ),
         ),
@@ -214,8 +218,8 @@ class AnlasCostCard extends ConsumerWidget {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Colors.amber.withOpacity(0.3),
-                  Colors.amber.withOpacity(0.05),
+                  Colors.amber.withValues(alpha: 0.3),
+                  Colors.amber.withValues(alpha: 0.05),
                 ],
               ),
             ),
@@ -253,10 +257,10 @@ class _StatBox extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.amber.withOpacity(isDark ? 0.1 : 0.08),
+        color: Colors.amber.withValues(alpha: isDark ? 0.1 : 0.08),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: Colors.amber.withOpacity(0.2),
+          color: Colors.amber.withValues(alpha: 0.2),
           width: 1,
         ),
       ),

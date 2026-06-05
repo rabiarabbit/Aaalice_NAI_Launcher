@@ -39,10 +39,10 @@ class AccentDividerModule extends BaseDividerModule {
   BoxDecoration? get horizontalDecoration => BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            _accentColor.withOpacity(0.0),
+            _accentColor.withValues(alpha: 0.0),
             _accentColor,
             _accentColor,
-            _accentColor.withOpacity(0.0),
+            _accentColor.withValues(alpha: 0.0),
           ],
           stops: const [0.0, 0.2, 0.8, 1.0],
         ),

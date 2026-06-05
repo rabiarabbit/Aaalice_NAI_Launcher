@@ -122,7 +122,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
               Text(
                 '视频加载失败',
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.7),
+                  color: Colors.white.withValues(alpha: 0.7),
                   fontSize: 14,
                 ),
               ),
@@ -131,7 +131,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                 Text(
                   _errorMessage!,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.4),
+                    color: Colors.white.withValues(alpha: 0.4),
                     fontSize: 11,
                   ),
                   textAlign: TextAlign.center,
@@ -185,7 +185,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.5),
+                    color: Colors.black.withValues(alpha: 0.5),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -215,7 +215,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                       begin: Alignment.bottomCenter,
                       end: Alignment.topCenter,
                       colors: [
-                        Colors.black.withOpacity(0.6),
+                        Colors.black.withValues(alpha: 0.6),
                         Colors.transparent,
                       ],
                     ),
@@ -253,9 +253,10 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                               overlayRadius: 10,
                             ),
                             activeTrackColor: Colors.white,
-                            inactiveTrackColor: Colors.white.withOpacity(0.3),
+                            inactiveTrackColor:
+                                Colors.white.withValues(alpha: 0.3),
                             thumbColor: Colors.white,
-                            overlayColor: Colors.white.withOpacity(0.2),
+                            overlayColor: Colors.white.withValues(alpha: 0.2),
                           ),
                           child: Slider(
                             value: duration.inMilliseconds > 0

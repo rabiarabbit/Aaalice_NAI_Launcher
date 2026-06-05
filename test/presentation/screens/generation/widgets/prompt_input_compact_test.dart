@@ -23,10 +23,10 @@ void main() {
             ),
           ),
         ],
-        child: MaterialApp(
+        child: const MaterialApp(
           supportedLocales: AppLocalizations.supportedLocales,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
-          home: const Scaffold(
+          home: Scaffold(
             body: Center(
               child: SizedBox(
                 width: 720,

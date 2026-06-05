@@ -234,10 +234,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         fontWeight: FontWeight.w600,
       ),
       unselectedIconTheme: IconThemeData(
-        color: theme.colorScheme.onSurface.withOpacity(0.6),
+        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
       ),
       unselectedLabelTextStyle: TextStyle(
-        color: theme.colorScheme.onSurface.withOpacity(0.6),
+        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
       ),
       destinations: _sections.map((section) {
         return NavigationRailDestination(
@@ -259,7 +259,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           children: [
             DrawerHeader(
               decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer.withOpacity(0.3),
+                color:
+                    theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
               ),
               child: Center(
                 child: Column(
@@ -293,7 +294,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       isSelected ? section.selectedIcon : section.icon,
                       color: isSelected
                           ? theme.colorScheme.primary
-                          : theme.colorScheme.onSurface.withOpacity(0.6),
+                          : theme.colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                     title: Text(
                       section.label,
@@ -306,8 +307,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       ),
                     ),
                     selected: isSelected,
-                    selectedTileColor:
-                        theme.colorScheme.primaryContainer.withOpacity(0.3),
+                    selectedTileColor: theme.colorScheme.primaryContainer
+                        .withValues(alpha: 0.3),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),

@@ -74,10 +74,13 @@ class ComfyUIApiService {
     required String clientId,
   }) async {
     try {
-      final response = await _dio.post('/prompt', data: {
-        'prompt': workflow,
-        'client_id': clientId,
-      });
+      final response = await _dio.post(
+        '/prompt',
+        data: {
+          'prompt': workflow,
+          'client_id': clientId,
+        },
+      );
       final data = response.data as Map<String, dynamic>;
       return ComfyUIPromptResult(
         promptId: data['prompt_id'] as String,

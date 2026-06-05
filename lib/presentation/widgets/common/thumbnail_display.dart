@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:image/image.dart' as img;
 
 /// 缩略图显示组件
 ///
@@ -38,6 +39,7 @@ class ThumbnailDisplay extends StatefulWidget {
 
 class _ThumbnailDisplayState extends State<ThumbnailDisplay> {
   Size? _imageSize;
+  int _imageSizeRequestId = 0;
 
   @override
   void initState() {
@@ -53,33 +55,33 @@ class _ThumbnailDisplayState extends State<ThumbnailDisplay> {
     }
   }
 
-  void _loadImageSize() {
-    final file = File(widget.imagePath);
-    if (!file.existsSync()) {
-      setState(() => _imageSize = null);
-      return;
-    }
+  Future<void> _loadImageSize() async {
+    final requestId = ++_imageSizeRequestId;
+    final imageSize = await _readImageSize(widget.imagePath);
 
-    final imageProvider = FileImage(file);
-    imageProvider.resolve(const ImageConfiguration()).addListener(
-          ImageStreamListener(
-            (ImageInfo info, bool synchronousCall) {
-              if (mounted) {
-                setState(() {
-                  _imageSize = Size(
-                    info.image.width.toDouble(),
-                    info.image.height.toDouble(),
-                  );
-                });
-              }
-            },
-            onError: (exception, stackTrace) {
-              if (mounted) {
-                setState(() => _imageSize = null);
-              }
-            },
-          ),
-        );
+    if (!mounted || requestId != _imageSizeRequestId) return;
+    setState(() => _imageSize = imageSize);
+  }
+
+  Future<Size?> _readImageSize(String imagePath) async {
+    final file = File(imagePath);
+    if (!await file.exists()) return null;
+
+    try {
+      final bytes = await file.readAsBytes();
+      final decoder = img.findDecoderForData(bytes);
+      final info = decoder?.startDecode(bytes);
+      if (info == null) return null;
+      return Size(info.width.toDouble(), info.height.toDouble());
+    } catch (_) {
+      return null;
+    }
+  }
+
+  @override
+  void dispose() {
+    _imageSizeRequestId++;
+    super.dispose();
   }
 
   @override
@@ -127,6 +129,7 @@ class _ThumbnailDisplayState extends State<ThumbnailDisplay> {
     // 计算平移量
     final shiftX = ox * maxOffsetX;
     final shiftY = oy * maxOffsetY;
+    final devicePixelRatio = MediaQuery.devicePixelRatioOf(context);
 
     Widget image = ClipRect(
       child: SizedBox(
@@ -144,6 +147,8 @@ class _ThumbnailDisplayState extends State<ThumbnailDisplay> {
               File(widget.imagePath),
               width: virtualWidth,
               height: virtualHeight,
+              cacheWidth: _decodeCacheExtent(virtualWidth, devicePixelRatio),
+              cacheHeight: _decodeCacheExtent(virtualHeight, devicePixelRatio),
               fit: BoxFit.cover,
               errorBuilder: (_, __, ___) => _buildError(),
             ),
@@ -160,12 +165,15 @@ class _ThumbnailDisplayState extends State<ThumbnailDisplay> {
   }
 
   Widget _buildSimpleImage() {
+    final devicePixelRatio = MediaQuery.devicePixelRatioOf(context);
     Widget image = ClipRect(
       child: SizedBox(
         width: widget.width,
         height: widget.height,
         child: Image.file(
           File(widget.imagePath),
+          cacheWidth: _decodeCacheExtent(widget.width, devicePixelRatio),
+          cacheHeight: _decodeCacheExtent(widget.height, devicePixelRatio),
           fit: BoxFit.cover,
           errorBuilder: (_, __, ___) => _buildError(),
         ),
@@ -185,4 +193,18 @@ class _ThumbnailDisplayState extends State<ThumbnailDisplay> {
         color: Colors.grey.shade800,
         child: const Icon(Icons.broken_image_outlined, color: Colors.white38),
       );
+
+  static int? _decodeCacheExtent(
+    double logicalExtent,
+    double devicePixelRatio,
+  ) {
+    if (!logicalExtent.isFinite ||
+        !devicePixelRatio.isFinite ||
+        logicalExtent <= 0 ||
+        devicePixelRatio <= 0) {
+      return null;
+    }
+
+    return (logicalExtent * devicePixelRatio).ceil().clamp(1, 1 << 30);
+  }
 }

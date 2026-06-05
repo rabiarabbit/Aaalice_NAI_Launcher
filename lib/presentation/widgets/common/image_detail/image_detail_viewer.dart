@@ -291,7 +291,9 @@ class _ImageDetailViewerState extends ConsumerState<ImageDetailViewer> {
     if (lastCloseAt != null &&
         now.difference(lastCloseAt) <= _closeRequestThrottle) {
       AppLogger.d(
-          'Ignored duplicated close request: $reason', 'ImageDetailViewer');
+        'Ignored duplicated close request: $reason',
+        'ImageDetailViewer',
+      );
       return;
     }
     _lastCloseRequestedAt = now;
@@ -339,8 +341,13 @@ class _ImageDetailViewerState extends ConsumerState<ImageDetailViewer> {
     final centerY = screenSize.height / 2;
 
     final matrix = Matrix4.identity()
-      ..translate(centerX - centerX * newScale, centerY - centerY * newScale)
-      ..scale(newScale);
+      ..translateByDouble(
+        centerX - centerX * newScale,
+        centerY - centerY * newScale,
+        0,
+        1,
+      )
+      ..scaleByDouble(newScale, newScale, newScale, 1);
 
     controller.value = matrix;
   }
@@ -356,8 +363,13 @@ class _ImageDetailViewerState extends ConsumerState<ImageDetailViewer> {
     final centerY = screenSize.height / 2;
 
     final matrix = Matrix4.identity()
-      ..translate(centerX - centerX * newScale, centerY - centerY * newScale)
-      ..scale(newScale);
+      ..translateByDouble(
+        centerX - centerX * newScale,
+        centerY - centerY * newScale,
+        0,
+        1,
+      )
+      ..scaleByDouble(newScale, newScale, newScale, 1);
 
     controller.value = matrix;
   }
@@ -585,7 +597,7 @@ class _ImageDetailViewerState extends ConsumerState<ImageDetailViewer> {
           begin: Alignment.bottomCenter,
           end: Alignment.topCenter,
           colors: [
-            Colors.black.withOpacity(0.8),
+            Colors.black.withValues(alpha: 0.8),
             Colors.transparent,
           ],
         ),
@@ -634,7 +646,7 @@ class _ImageDetailViewerState extends ConsumerState<ImageDetailViewer> {
       margin: const EdgeInsets.symmetric(horizontal: 4),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
+        color: Colors.white.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
@@ -761,7 +773,7 @@ class _NavigationButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.black.withOpacity(0.3),
+      color: Colors.black.withValues(alpha: 0.3),
       borderRadius: BorderRadius.circular(8),
       child: InkWell(
         onTap: onPressed,

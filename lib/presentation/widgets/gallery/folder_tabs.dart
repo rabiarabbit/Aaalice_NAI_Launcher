@@ -50,24 +50,30 @@ class FolderTabs extends ConsumerWidget {
                   ),
                   const SizedBox(width: 8),
                   // 文件夹标签
-                  ...folderState.folders.map((folder) => Padding(
-                        padding: const EdgeInsets.only(right: 8),
-                        child: _FolderTab(
-                          label: folder.name,
-                          count: folder.imageCount,
-                          isActive: folderState.selectedFolderId == folder.id,
-                          onTap: () {
-                            ref
-                                .read(galleryFolderNotifierProvider.notifier)
-                                .selectFolder(folder.id);
-                            onFolderSelected?.call(folder.id);
-                          },
-                          onContextMenu: (details) {
-                            _showFolderContextMenu(
-                                context, ref, folder, details.globalPosition,);
-                          },
-                        ),
-                      ),),
+                  ...folderState.folders.map(
+                    (folder) => Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: _FolderTab(
+                        label: folder.name,
+                        count: folder.imageCount,
+                        isActive: folderState.selectedFolderId == folder.id,
+                        onTap: () {
+                          ref
+                              .read(galleryFolderNotifierProvider.notifier)
+                              .selectFolder(folder.id);
+                          onFolderSelected?.call(folder.id);
+                        },
+                        onContextMenu: (details) {
+                          _showFolderContextMenu(
+                            context,
+                            ref,
+                            folder,
+                            details.globalPosition,
+                          );
+                        },
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -84,7 +90,9 @@ class FolderTabs extends ConsumerWidget {
 
   /// 显示创建文件夹对话框
   Future<void> _showCreateFolderDialog(
-      BuildContext context, WidgetRef ref,) async {
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
     final result = await _showFolderNameDialog(
       context: context,
       title: '创建文件夹',
@@ -115,7 +123,11 @@ class FolderTabs extends ConsumerWidget {
     showMenu(
       context: context,
       position: RelativeRect.fromLTRB(
-          position.dx, position.dy, position.dx, position.dy,),
+        position.dx,
+        position.dy,
+        position.dx,
+        position.dy,
+      ),
       items: [
         PopupMenuItem(
           child: const Row(
@@ -130,11 +142,16 @@ class FolderTabs extends ConsumerWidget {
         PopupMenuItem(
           child: Row(
             children: [
-              Icon(Icons.delete_outline,
-                  size: 18, color: Theme.of(context).colorScheme.error,),
+              Icon(
+                Icons.delete_outline,
+                size: 18,
+                color: Theme.of(context).colorScheme.error,
+              ),
               const SizedBox(width: 8),
-              Text('删除',
-                  style: TextStyle(color: Theme.of(context).colorScheme.error),),
+              Text(
+                '删除',
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ),
             ],
           ),
           onTap: () => _showDeleteFolderDialog(context, ref, folder),
@@ -333,16 +350,17 @@ class _FolderTabState extends State<_FolderTab> {
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           decoration: BoxDecoration(
             color: widget.isActive
-                ? colorScheme.primaryContainer.withOpacity(isDark ? 0.4 : 0.3)
+                ? colorScheme.primaryContainer
+                    .withValues(alpha: isDark ? 0.4 : 0.3)
                 : _isHovered
-                    ? colorScheme.surfaceContainerHighest.withOpacity(0.5)
+                    ? colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)
                     : Colors.transparent,
             border: Border.all(
               color: widget.isActive
                   ? colorScheme.primary
                   : _isHovered
-                      ? colorScheme.outline.withOpacity(0.3)
-                      : colorScheme.outline.withOpacity(0.15),
+                      ? colorScheme.outline.withValues(alpha: 0.3)
+                      : colorScheme.outline.withValues(alpha: 0.15),
               width: widget.isActive ? 1.5 : 1,
             ),
             borderRadius: BorderRadius.circular(8),
@@ -365,7 +383,7 @@ class _FolderTabState extends State<_FolderTab> {
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
                   color: widget.isActive
-                      ? colorScheme.primary.withOpacity(0.2)
+                      ? colorScheme.primary.withValues(alpha: 0.2)
                       : colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -419,12 +437,12 @@ class _CreateFolderButtonState extends State<_CreateFolderButton> {
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: _isHovered
-                  ? colorScheme.primary.withOpacity(0.1)
+                  ? colorScheme.primary.withValues(alpha: 0.1)
                   : Colors.transparent,
               border: Border.all(
                 color: _isHovered
-                    ? colorScheme.primary.withOpacity(0.5)
-                    : colorScheme.outline.withOpacity(0.2),
+                    ? colorScheme.primary.withValues(alpha: 0.5)
+                    : colorScheme.outline.withValues(alpha: 0.2),
                 width: 1,
               ),
               borderRadius: BorderRadius.circular(8),

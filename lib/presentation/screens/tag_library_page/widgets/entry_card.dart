@@ -150,7 +150,7 @@ class _EntryCardState extends State<EntryCard>
     final borderColor = widget.isSelected
         ? theme.colorScheme.primary
         : (_isHovering
-            ? theme.colorScheme.primary.withOpacity(0.5)
+            ? theme.colorScheme.primary.withValues(alpha: 0.5)
             : Colors.transparent);
 
     // 构建卡片主体内容（在GestureDetector内）
@@ -176,15 +176,15 @@ class _EntryCardState extends State<EntryCard>
                   if (widget.isSelected || _isHovering)
                     BoxShadow(
                       color: widget.isSelected
-                          ? theme.colorScheme.primary.withOpacity(0.5)
-                          : theme.colorScheme.primary.withOpacity(0.25),
+                          ? theme.colorScheme.primary.withValues(alpha: 0.5)
+                          : theme.colorScheme.primary.withValues(alpha: 0.25),
                       blurRadius: 16,
                       spreadRadius: 1,
                     ),
                   // 悬浮阴影（动态）
                   BoxShadow(
-                    color: Colors.black.withOpacity(
-                      0.15 + (0.15 * _elevationAnimation.value),
+                    color: Colors.black.withValues(
+                      alpha: 0.15 + (0.15 * _elevationAnimation.value),
                     ),
                     blurRadius: 10 + (12 * _elevationAnimation.value),
                     offset: Offset(
@@ -279,7 +279,7 @@ class _EntryCardState extends State<EntryCard>
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(16),
                   child: Container(
-                    color: Colors.black.withOpacity(0.5),
+                    color: Colors.black.withValues(alpha: 0.5),
                     child: _buildFloatingButtons(theme, entry),
                   ),
                 ),
@@ -362,7 +362,7 @@ class _EntryCardState extends State<EntryCard>
   /// 构建轻微暗化遮罩
   Widget _buildDarkenOverlay() {
     return Container(
-      color: Colors.black.withOpacity(0.35),
+      color: Colors.black.withValues(alpha: 0.35),
     );
   }
 
@@ -440,12 +440,12 @@ class _EntryCardState extends State<EntryCard>
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: theme.colorScheme.primary.withOpacity(0.8),
+            color: theme.colorScheme.primary.withValues(alpha: 0.8),
             width: 2,
           ),
           boxShadow: [
             BoxShadow(
-              color: theme.colorScheme.primary.withOpacity(0.4),
+              color: theme.colorScheme.primary.withValues(alpha: 0.4),
               blurRadius: 20,
               spreadRadius: 2,
             ),
@@ -482,7 +482,7 @@ class _EntryCardState extends State<EntryCard>
                     borderRadius: BorderRadius.circular(6),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.35),
+                        color: Colors.black.withValues(alpha: 0.35),
                         blurRadius: 4,
                       ),
                     ],
@@ -572,8 +572,8 @@ class _ActionIconState extends State<_ActionIcon> {
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = Colors.white.withOpacity(0.15);
-    final hoverBgColor = Colors.white.withOpacity(0.35);
+    final bgColor = Colors.white.withValues(alpha: 0.15);
+    final hoverBgColor = Colors.white.withValues(alpha: 0.35);
 
     return Tooltip(
       message: widget.tooltip,
@@ -596,7 +596,7 @@ class _ActionIconState extends State<_ActionIcon> {
                 boxShadow: _isHovering
                     ? [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.4),
+                          color: Colors.black.withValues(alpha: 0.4),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
@@ -631,7 +631,7 @@ class _FavoriteIndicator extends StatelessWidget {
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withValues(alpha: 0.3),
             blurRadius: 4,
             offset: const Offset(0, 1),
           ),
@@ -669,12 +669,12 @@ class _SelectionCheckbox extends StatelessWidget {
         decoration: BoxDecoration(
           color: isSelected
               ? theme.colorScheme.primary
-              : Colors.black.withOpacity(0.5),
+              : Colors.black.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(6),
           border: Border.all(
             color: isSelected
                 ? theme.colorScheme.primary
-                : Colors.white.withOpacity(0.8),
+                : Colors.white.withValues(alpha: 0.8),
             width: 2,
           ),
         ),
@@ -739,7 +739,7 @@ class _EntryPreviewOverlay extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.1),
+                  color: Colors.white.withValues(alpha: 0.1),
                   width: 1,
                 ),
               ),
@@ -802,7 +802,7 @@ class _EntryPreviewOverlay extends StatelessWidget {
                                     ),
                                     decoration: BoxDecoration(
                                       color: theme.colorScheme.primaryContainer
-                                          .withOpacity(0.5),
+                                          .withValues(alpha: 0.5),
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                     child: Text(

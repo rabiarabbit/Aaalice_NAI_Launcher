@@ -98,8 +98,8 @@ class _AlgorithmConfigCardState extends ConsumerState<AlgorithmConfigCard> {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    colorScheme.primary.withOpacity(0.15),
-                    colorScheme.primary.withOpacity(0.05),
+                    colorScheme.primary.withValues(alpha: 0.15),
+                    colorScheme.primary.withValues(alpha: 0.05),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(6),
@@ -110,7 +110,7 @@ class _AlgorithmConfigCardState extends ConsumerState<AlgorithmConfigCard> {
                   Container(
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
-                      color: colorScheme.primary.withOpacity(0.2),
+                      color: colorScheme.primary.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Icon(
@@ -138,7 +138,8 @@ class _AlgorithmConfigCardState extends ConsumerState<AlgorithmConfigCard> {
               child: Container(
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
-                  color: colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                  color: colorScheme.surfaceContainerHighest
+                      .withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Icon(
@@ -192,7 +193,7 @@ class _AlgorithmConfigCardState extends ConsumerState<AlgorithmConfigCard> {
             borderRadius: BorderRadius.circular(8),
             boxShadow: [
               BoxShadow(
-                color: colorScheme.shadow.withOpacity(0.04),
+                color: colorScheme.shadow.withValues(alpha: 0.04),
                 blurRadius: 4,
                 offset: const Offset(0, 1),
               ),
@@ -253,7 +254,7 @@ class _AlgorithmConfigCardState extends ConsumerState<AlgorithmConfigCard> {
             borderRadius: BorderRadius.circular(8),
             boxShadow: [
               BoxShadow(
-                color: colorScheme.shadow.withOpacity(0.04),
+                color: colorScheme.shadow.withValues(alpha: 0.04),
                 blurRadius: 4,
                 offset: const Offset(0, 1),
               ),
@@ -372,8 +373,8 @@ class _AlgorithmConfigCardState extends ConsumerState<AlgorithmConfigCard> {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                colorScheme.primary.withOpacity(0.3),
-                colorScheme.secondary.withOpacity(0.1),
+                colorScheme.primary.withValues(alpha: 0.3),
+                colorScheme.secondary.withValues(alpha: 0.1),
                 Colors.transparent,
               ],
             ),
@@ -602,20 +603,20 @@ class _HorizontalBarState extends State<_HorizontalBar> {
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         decoration: BoxDecoration(
           color: _isHovered
-              ? widget.color.withOpacity(0.15)
+              ? widget.color.withValues(alpha: 0.15)
               : colorScheme.surfaceContainer,
           borderRadius: BorderRadius.circular(6),
           boxShadow: _isHovered
               ? [
                   BoxShadow(
-                    color: widget.color.withOpacity(0.2),
+                    color: widget.color.withValues(alpha: 0.2),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
                 ]
               : [
                   BoxShadow(
-                    color: colorScheme.shadow.withOpacity(0.05),
+                    color: colorScheme.shadow.withValues(alpha: 0.05),
                     blurRadius: 4,
                     offset: const Offset(0, 1),
                   ),
@@ -653,14 +654,14 @@ class _HorizontalBarState extends State<_HorizontalBar> {
                           gradient: LinearGradient(
                             colors: [
                               widget.color,
-                              widget.color.withOpacity(0.7),
+                              widget.color.withValues(alpha: 0.7),
                             ],
                           ),
                           borderRadius: BorderRadius.circular(4),
                           boxShadow: _isHovered
                               ? [
                                   BoxShadow(
-                                    color: widget.color.withOpacity(0.4),
+                                    color: widget.color.withValues(alpha: 0.4),
                                     blurRadius: 6,
                                     offset: const Offset(0, 2),
                                   ),
@@ -678,7 +679,7 @@ class _HorizontalBarState extends State<_HorizontalBar> {
               width: 40,
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: widget.color.withOpacity(0.15),
+                color: widget.color.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Text(
@@ -742,13 +743,15 @@ class _GenderSegmentState extends State<_GenderSegment> {
                 end: Alignment.bottomCenter,
                 colors: [
                   widget.color,
-                  _isHovered ? widget.color : widget.color.withOpacity(0.8),
+                  _isHovered
+                      ? widget.color
+                      : widget.color.withValues(alpha: 0.8),
                 ],
               ),
               boxShadow: _isHovered
                   ? [
                       BoxShadow(
-                        color: widget.color.withOpacity(0.5),
+                        color: widget.color.withValues(alpha: 0.5),
                         blurRadius: 8,
                         spreadRadius: 1,
                       ),
@@ -854,8 +857,8 @@ class _WeightSliderState extends State<_WeightSlider> {
                   data: SliderTheme.of(context).copyWith(
                     activeTrackColor: effectiveColor,
                     thumbColor: effectiveColor,
-                    inactiveTrackColor: effectiveColor.withOpacity(0.15),
-                    overlayColor: effectiveColor.withOpacity(0.1),
+                    inactiveTrackColor: effectiveColor.withValues(alpha: 0.15),
+                    overlayColor: effectiveColor.withValues(alpha: 0.1),
                     trackHeight: 5,
                     thumbShape: const RoundSliderThumbShape(
                       enabledThumbRadius: 7,
@@ -878,7 +881,7 @@ class _WeightSliderState extends State<_WeightSlider> {
                 width: 50,
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: effectiveColor.withOpacity(0.1),
+                  color: effectiveColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
@@ -935,8 +938,8 @@ class _SettingRowState extends State<_SettingRow> {
           boxShadow: [
             BoxShadow(
               color: _isHovered
-                  ? colorScheme.shadow.withOpacity(0.1)
-                  : colorScheme.shadow.withOpacity(0.05),
+                  ? colorScheme.shadow.withValues(alpha: 0.1)
+                  : colorScheme.shadow.withValues(alpha: 0.05),
               blurRadius: _isHovered ? 8 : 4,
               offset: const Offset(0, 2),
             ),
@@ -947,7 +950,7 @@ class _SettingRowState extends State<_SettingRow> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: colorScheme.primaryContainer.withOpacity(0.3),
+                color: colorScheme.primaryContainer.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(

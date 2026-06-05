@@ -58,12 +58,14 @@ class _OnlineGalleryBlacklistSettingsPanelState
     final localTags = state.localTags.toList()..sort();
 
     return Card(
-      margin: widget.compact ? EdgeInsets.zero : const EdgeInsets.symmetric(vertical: 8),
+      margin: widget.compact
+          ? EdgeInsets.zero
+          : const EdgeInsets.symmetric(vertical: 8),
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(
-          color: theme.colorScheme.outline.withOpacity(0.2),
+          color: theme.colorScheme.outline.withValues(alpha: 0.2),
         ),
       ),
       child: Padding(
@@ -158,7 +160,9 @@ class _OnlineGalleryBlacklistSettingsPanelState
                         label: Text(tag),
                         onDeleted: () {
                           ref
-                              .read(onlineGalleryBlacklistNotifierProvider.notifier)
+                              .read(
+                                onlineGalleryBlacklistNotifierProvider.notifier,
+                              )
                               .removeLocalTag(tag);
                         },
                       ),
@@ -220,7 +224,9 @@ class _OnlineGalleryBlacklistSettingsPanelState
     final value = _tagController.text.trim();
     if (value.isEmpty) return;
 
-    ref.read(onlineGalleryBlacklistNotifierProvider.notifier).addLocalTag(value);
+    ref
+        .read(onlineGalleryBlacklistNotifierProvider.notifier)
+        .addLocalTag(value);
     _tagController.clear();
     _tagFocusNode.requestFocus();
   }

@@ -162,7 +162,7 @@ class _ParameterDistributionBarState extends State<ParameterDistributionBar> {
           show: true,
           drawVerticalLine: false,
           getDrawingHorizontalLine: (value) => FlLine(
-            color: colorScheme.outlineVariant.withOpacity(0.2),
+            color: colorScheme.outlineVariant.withValues(alpha: 0.2),
             strokeWidth: 1,
           ),
         ),
@@ -179,7 +179,7 @@ class _ParameterDistributionBarState extends State<ParameterDistributionBar> {
                 color: item.color ??
                     (isTouched
                         ? colorScheme.primary
-                        : colorScheme.primary.withOpacity(0.7)),
+                        : colorScheme.primary.withValues(alpha: 0.7)),
                 width: 24,
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(6),
@@ -187,7 +187,8 @@ class _ParameterDistributionBarState extends State<ParameterDistributionBar> {
                 backDrawRodData: BackgroundBarChartRodData(
                   show: true,
                   toY: maxValue * 1.2,
-                  color: colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                  color: colorScheme.surfaceContainerHighest
+                      .withValues(alpha: 0.3),
                 ),
               ),
             ],
@@ -280,7 +281,8 @@ class _HorizontalBarRow extends StatelessWidget {
                 Container(
                   height: 20,
                   decoration: BoxDecoration(
-                    color: colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                    color: colorScheme.surfaceContainerHighest
+                        .withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
@@ -289,7 +291,7 @@ class _HorizontalBarRow extends StatelessWidget {
                   child: Container(
                     height: 20,
                     decoration: BoxDecoration(
-                      color: color.withOpacity(0.8),
+                      color: color.withValues(alpha: 0.8),
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),

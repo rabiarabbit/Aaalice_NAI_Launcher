@@ -131,28 +131,32 @@ class GroupedEntriesView extends ConsumerWidget {
     for (final category in sortedCategories) {
       // 只包含有条目的分类
       if (categoryIdsWithEntries.contains(category.id)) {
-        final categoryEntries = entries
-            .where((e) => e.categoryId == category.id)
-            .toList();
-        groups.add(CategoryGroup(
-          category: category,
-          entries: categoryEntries,
-        ),);
+        final categoryEntries =
+            entries.where((e) => e.categoryId == category.id).toList();
+        groups.add(
+          CategoryGroup(
+            category: category,
+            entries: categoryEntries,
+          ),
+        );
       }
     }
 
     // 处理未分类条目（categoryId 为 null）
-    final uncategorizedEntries = entries.where((e) => e.categoryId == null).toList();
+    final uncategorizedEntries =
+        entries.where((e) => e.categoryId == null).toList();
     if (uncategorizedEntries.isNotEmpty) {
-      groups.add(CategoryGroup(
-        category: TagLibraryCategory(
-          id: 'uncategorized',
-          name: '未分类',
-          sortOrder: -1,
-          createdAt: DateTime.now(),
+      groups.add(
+        CategoryGroup(
+          category: TagLibraryCategory(
+            id: 'uncategorized',
+            name: '未分类',
+            sortOrder: -1,
+            createdAt: DateTime.now(),
+          ),
+          entries: uncategorizedEntries,
         ),
-        entries: uncategorizedEntries,
-      ),);
+      );
     }
 
     return groups;
@@ -168,7 +172,7 @@ class GroupedEntriesView extends ConsumerWidget {
           Icon(
             Icons.folder_open_outlined,
             size: 64,
-            color: theme.colorScheme.outline.withOpacity(0.5),
+            color: theme.colorScheme.outline.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 16),
           Text(

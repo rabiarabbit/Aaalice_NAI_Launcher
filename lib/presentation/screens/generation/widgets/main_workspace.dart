@@ -63,7 +63,7 @@ class MainWorkspace extends ConsumerWidget {
                     child: Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.surface.withOpacity(0.5),
+                        color: theme.colorScheme.surface.withValues(alpha: 0.5),
                       ),
                       child: PromptInputWidget(
                         onToggleMaximize: onToggleMaximize,
@@ -76,7 +76,7 @@ class MainWorkspace extends ConsumerWidget {
                     child: Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.surface.withOpacity(0.5),
+                        color: theme.colorScheme.surface.withValues(alpha: 0.5),
                       ),
                       child: PromptInputWidget(
                         onToggleMaximize: onToggleMaximize,
@@ -113,7 +113,7 @@ class MainWorkspace extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: theme.colorScheme.surface.withOpacity(0.5),
+                color: theme.colorScheme.surface.withValues(alpha: 0.5),
                 border: Border(
                   top: BorderSide(
                     color: theme.dividerColor,

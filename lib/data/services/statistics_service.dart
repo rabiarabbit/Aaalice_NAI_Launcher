@@ -95,7 +95,10 @@ class StatisticsService {
       counts,
       totalImages,
       (label, count, percentage) => ResolutionStatistics(
-          label: label, count: count, percentage: percentage),
+        label: label,
+        count: count,
+        percentage: percentage,
+      ),
     );
   }
 
@@ -110,7 +113,10 @@ class StatisticsService {
       counts,
       totalImages,
       (label, count, percentage) => ModelStatistics(
-          modelName: label, count: count, percentage: percentage),
+        modelName: label,
+        count: count,
+        percentage: percentage,
+      ),
     );
   }
 
@@ -133,7 +139,10 @@ class StatisticsService {
       counts,
       totalImages,
       (label, count, percentage) => SamplerStatistics(
-          samplerName: label, count: count, percentage: percentage),
+        samplerName: label,
+        count: count,
+        percentage: percentage,
+      ),
     );
   }
 
@@ -175,8 +184,10 @@ class StatisticsService {
         .replaceAll('k_', '')
         .replaceAll('_', ' ')
         .split(' ')
-        .map((word) =>
-            word.isNotEmpty ? word[0].toUpperCase() + word.substring(1) : '')
+        .map(
+          (word) =>
+              word.isNotEmpty ? word[0].toUpperCase() + word.substring(1) : '',
+        )
         .join(' ');
   }
 
@@ -262,7 +273,9 @@ class StatisticsService {
     );
 
     return compute(
-        _computeTimeTrendsIsolate, _TimeTrendParams(records, groupBy));
+      _computeTimeTrendsIsolate,
+      _TimeTrendParams(records, groupBy),
+    );
   }
 
   /// 异步计算标签使用统计
@@ -276,7 +289,9 @@ class StatisticsService {
     );
 
     return compute(
-        _computeTagStatisticsIsolate, _TagStatisticsParams(records, limit));
+      _computeTagStatisticsIsolate,
+      _TagStatisticsParams(records, limit),
+    );
   }
 
   /// 异步计算参数分布统计
@@ -328,7 +343,9 @@ class StatisticsService {
     );
 
     return compute(
-        _computeRecentActivityIsolate, _RecentActivityParams(records, days));
+      _computeRecentActivityIsolate,
+      _RecentActivityParams(records, days),
+    );
   }
 }
 
