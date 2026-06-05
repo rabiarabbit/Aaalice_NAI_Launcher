@@ -6,7 +6,6 @@ import '../../../../core/utils/vibe_performance_diagnostics.dart';
 import '../../../../data/models/vibe/vibe_library_entry.dart';
 import '../../../../data/models/vibe/vibe_reference.dart';
 import '../../../../data/services/vibe_file_storage_service.dart';
-import '../../../../data/services/vibe_library_storage_service.dart';
 import '../../../../presentation/providers/vibe_library_provider.dart';
 import '../../../widgets/common/decoded_memory_image.dart';
 import 'vibe_card.dart';
@@ -51,6 +50,83 @@ class VibeSelectionResult {
     required this.selectedEntries,
     required this.shouldReplace,
   });
+}
+
+typedef BundleChildHydrator = Future<VibeReference?> Function(
+  VibeLibraryEntry bundleEntry,
+  int index,
+);
+
+typedef VibeUsageRecorder = Future<void> Function(String id);
+
+Future<VibeSelectionResult> buildLightweightVibeSelectionResult({
+  required Set<String> selectedIds,
+  required List<VibeLibraryEntry> entries,
+  required bool shouldReplace,
+  required BundleChildHydrator hydrateBundleChild,
+  required VibeUsageRecorder recordUsage,
+}) async {
+  assert(() {
+    recordUsage;
+    return true;
+  }());
+
+  final entriesById = {for (final entry in entries) entry.id: entry};
+  final selectedEntries = <VibeLibraryEntry>[];
+
+  for (final id in selectedIds) {
+    final childSelection = _parseBundleChildSelectionId(id);
+    if (childSelection != null) {
+      final bundleEntry = entriesById[childSelection.bundleId];
+      if (bundleEntry == null) continue;
+
+      final vibeRef = await hydrateBundleChild(
+        bundleEntry,
+        childSelection.index,
+      );
+      if (vibeRef == null) continue;
+
+      final name =
+          childSelection.index < (bundleEntry.bundledVibeNames?.length ?? 0)
+              ? bundleEntry.bundledVibeNames![childSelection.index]
+              : '${bundleEntry.displayName} - ${childSelection.index + 1}';
+
+      selectedEntries.add(
+        VibeLibraryEntry.create(
+          name: name,
+          vibeDisplayName: vibeRef.displayName,
+          vibeEncoding: vibeRef.vibeEncoding,
+          thumbnail: vibeRef.thumbnail,
+          sourceType: vibeRef.sourceType,
+          strength: vibeRef.strength,
+          infoExtracted: vibeRef.infoExtracted,
+        ),
+      );
+      continue;
+    }
+
+    final entry = entriesById[id];
+    if (entry != null) {
+      selectedEntries.add(entry);
+    }
+  }
+
+  return VibeSelectionResult(
+    selectedEntries: selectedEntries,
+    shouldReplace: shouldReplace,
+  );
+}
+
+({String bundleId, int index})? _parseBundleChildSelectionId(String id) {
+  if (!id.contains('#vibe#')) return null;
+
+  final parts = id.split('#vibe#');
+  if (parts.length != 2) return null;
+
+  final index = int.tryParse(parts[1]) ?? -1;
+  if (index < 0) return null;
+
+  return (bundleId: parts[0], index: index);
 }
 
 /// Vibe 选择器对话框
@@ -334,15 +410,6 @@ class _VibeSelectorDialogState extends ConsumerState<VibeSelectorDialog> {
     });
   }
 
-  VibeLibraryEntry? _findEntryById(String id) {
-    for (final entry in _allEntries) {
-      if (entry.id == id) {
-        return entry;
-      }
-    }
-    return null;
-  }
-
   Future<void> _confirmSelection() async {
     if (_selectedIds.isEmpty) return;
 
@@ -356,67 +423,32 @@ class _VibeSelectorDialogState extends ConsumerState<VibeSelectorDialog> {
     var bundleSelections = 0;
     var fullEntrySelections = 0;
     var selectedEntryCount = 0;
-    final storageService = ref.read(vibeLibraryStorageServiceProvider);
     final fileService = VibeFileStorageService();
-
-    final selectedEntries = <VibeLibraryEntry>[];
 
     try {
       for (final id in _selectedIds) {
-        if (id.contains('#vibe#')) {
+        if (_parseBundleChildSelectionId(id) != null) {
           bundleSelections++;
-          final parts = id.split('#vibe#');
-          if (parts.length != 2) continue;
-
-          final bundleId = parts[0];
-          final index = int.tryParse(parts[1]) ?? -1;
-          if (index < 0) continue;
-
-          final bundleEntry = _findEntryById(bundleId);
-          if (bundleEntry == null) continue;
-
-          if (bundleEntry.filePath == null) continue;
-
-          final vibeRef = await fileService.extractVibeFromBundle(
-            bundleEntry.filePath!,
-            index,
-          );
-          if (vibeRef == null) continue;
-
-          final name = index < (bundleEntry.bundledVibeNames?.length ?? 0)
-              ? bundleEntry.bundledVibeNames![index]
-              : '${bundleEntry.displayName} - ${index + 1}';
-
-          selectedEntries.add(
-            VibeLibraryEntry.create(
-              name: name,
-              vibeDisplayName: vibeRef.displayName,
-              vibeEncoding: vibeRef.vibeEncoding,
-              thumbnail: vibeRef.thumbnail,
-              sourceType: vibeRef.sourceType,
-              strength: vibeRef.strength,
-              infoExtracted: vibeRef.infoExtracted,
-            ),
-          );
         } else {
           fullEntrySelections++;
-          final entry = _findEntryById(id);
-          if (entry == null) continue;
-
-          final actualEntry = await storageService.getEntry(id) ?? entry;
-          await storageService.incrementUsedCount(id);
-          selectedEntries.add(actualEntry);
         }
       }
-      selectedEntryCount = selectedEntries.length;
+
+      final result = await buildLightweightVibeSelectionResult(
+        selectedIds: _selectedIds,
+        entries: _allEntries,
+        shouldReplace: _isReplaceMode,
+        hydrateBundleChild: (bundleEntry, index) async {
+          final filePath = bundleEntry.filePath;
+          if (filePath == null) return null;
+          return fileService.extractVibeFromBundle(filePath, index);
+        },
+        recordUsage: (_) async {},
+      );
+      selectedEntryCount = result.selectedEntries.length;
 
       if (mounted) {
-        Navigator.of(context).pop(
-          VibeSelectionResult(
-            selectedEntries: selectedEntries,
-            shouldReplace: _isReplaceMode,
-          ),
-        );
+        Navigator.of(context).pop(result);
       }
     } finally {
       span.finish(
