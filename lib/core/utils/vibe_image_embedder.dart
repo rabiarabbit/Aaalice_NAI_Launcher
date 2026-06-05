@@ -18,7 +18,14 @@ import 'app_logger.dart';
 /// 所有涉及 PNG 解析的方法都在 Isolate 中执行，避免阻塞 UI。
 class VibeImageEmbedder {
   static const List<int> _pngSignature = <int>[
-    0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A,
+    0x89,
+    0x50,
+    0x4E,
+    0x47,
+    0x0D,
+    0x0A,
+    0x1A,
+    0x0A,
   ];
 
   static const String _vibeKeyword = 'naiv4vibe';
@@ -28,6 +35,7 @@ class VibeImageEmbedder {
   static const String _textChunkType = 'tEXt';
   static const String _idatChunkType = 'IDAT';
   static const String _iendChunkType = 'IEND';
+  static const String _defaultVibeModel = 'nai-diffusion-4-full';
 
   static const int _minPngSize = 20; // 8 (signature) + 12 (minimum chunk)
   static const int _chunkHeaderSize = 12; // 4 (length) + 4 (type) + 4 (crc)
@@ -73,14 +81,22 @@ class VibeImageEmbedder {
 
       return await compute(_embedVibesIsolate, params).timeout(_embedTimeout);
     } on TimeoutException {
-      AppLogger.w('[VibeImageEmbedder] Vibe embedding timeout', 'VibeImageEmbedder');
+      AppLogger.w(
+        '[VibeImageEmbedder] Vibe embedding timeout',
+        'VibeImageEmbedder',
+      );
       throw VibeEmbedException('Vibe embedding operation timed out');
     } on InvalidImageFormatException {
       rethrow;
     } on VibeEmbedException {
       rethrow;
     } catch (e, stack) {
-      AppLogger.e('Error embedding vibes to image', e, stack, 'VibeImageEmbedder');
+      AppLogger.e(
+        'Error embedding vibes to image',
+        e,
+        stack,
+        'VibeImageEmbedder',
+      );
       throw VibeEmbedException('Failed to embed vibes: $e');
     }
   }
@@ -92,7 +108,8 @@ class VibeImageEmbedder {
       _validatePngDimensions(params.imageBytes);
 
       final chunks = _parsePngChunks(params.imageBytes);
-      final vibeReferences = params.vibeReferencesData.map(_vibeDataToReference).toList();
+      final vibeReferences =
+          params.vibeReferencesData.map(_vibeDataToReference).toList();
       final naiData = _buildNaiVibeBundleData(vibeReferences);
       final naiDataBase64 = base64.encode(utf8.encode(jsonEncode(naiData)));
       final vibeChunk = _buildITxtChunk(_naiDataKeyword, naiDataBase64);
@@ -200,22 +217,31 @@ class VibeImageEmbedder {
   ) {
     final now = DateTime.now().toIso8601String();
     final vibes = references.map((ref) {
-      final thumbnailBase64 = ref.thumbnail != null
-          ? base64.encode(ref.thumbnail!)
-          : null;
+      final thumbnailBase64 =
+          ref.thumbnail != null ? base64.encode(ref.thumbnail!) : null;
       return {
         'identifier': 'novelai-vibe-transfer',
         'version': 1,
         'type': 'image',
         'image': thumbnailBase64 ?? '',
         'id': _generateVibeId(),
-        'encodings': {'vibe': ref.vibeEncoding},
+        'encodings': ref.vibeEncoding.isNotEmpty
+            ? {
+                _defaultVibeModel: {
+                  'vibe': {
+                    'encoding': ref.vibeEncoding,
+                  },
+                },
+              }
+            : {},
         'name': ref.displayName,
         'thumbnail': thumbnailBase64,
         'createdAt': now,
         'importInfo': {
           'source': 'nai_launcher',
           'importedAt': now,
+          'strength': ref.strength,
+          'information_extracted': ref.infoExtracted,
         },
       };
     }).toList();
@@ -258,7 +284,11 @@ class VibeImageEmbedder {
     final chunkTypeBytes = ascii.encode(_itxtChunkType);
     final crcInput = Uint8List(chunkTypeBytes.length + chunkData.length)
       ..setRange(0, chunkTypeBytes.length, chunkTypeBytes)
-      ..setRange(chunkTypeBytes.length, chunkTypeBytes.length + chunkData.length, chunkData);
+      ..setRange(
+        chunkTypeBytes.length,
+        chunkTypeBytes.length + chunkData.length,
+        chunkData,
+      );
 
     final out = BytesBuilder(copy: false);
     final lengthBytes = ByteData(4)..setUint32(0, chunkData.length, Endian.big);
@@ -274,6 +304,7 @@ class VibeImageEmbedder {
 
   /// CRC32 calculation (PNG standard, safe for Isolate use)
   static int _crc32(List<int> data) {
+    // dart format off
     const table = [
       0x00000000, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419, 0x706af48f, 0xe963a535, 0x9e6495a3,
       0x0edb8832, 0x79dcb8a4, 0xe0d5e91e, 0x97d2d988, 0x09b64c2b, 0x7eb17cbd, 0xe7b82d07, 0x90bf1d91,
@@ -308,6 +339,7 @@ class VibeImageEmbedder {
       0xbdbdf21c, 0xcabac28a, 0x53b39330, 0x24b4a3a6, 0xbad03605, 0xcdd70693, 0x54de5729, 0x23d967bf,
       0xb3667a2e, 0xc4614ab8, 0x5d681b02, 0x2a6f2b94, 0xb40bbe37, 0xc30c8ea1, 0x5a05df1b, 0x2d02ef8d,
     ];
+    // dart format on
 
     var crc = 0xffffffff;
     for (final byte in data) {
@@ -317,7 +349,8 @@ class VibeImageEmbedder {
   }
 
   /// 从图片提取 Vibes（使用 Isolate 避免阻塞 UI）
-  static Future<({List<VibeReference> vibes, bool isBundle})> extractVibeFromImage(
+  static Future<({List<VibeReference> vibes, bool isBundle})>
+      extractVibeFromImage(
     Uint8List imageBytes,
   ) async {
     _validateFileSize(imageBytes.length, _maxFileSize, 'Input file');
@@ -330,7 +363,10 @@ class VibeImageEmbedder {
       final vibes = result.vibesData.map(_vibeDataToReference).toList();
       return (vibes: vibes, isBundle: result.isBundle);
     } on TimeoutException {
-      AppLogger.w('[VibeImageEmbedder] Vibe extraction timeout', 'VibeImageEmbedder');
+      AppLogger.w(
+        '[VibeImageEmbedder] Vibe extraction timeout',
+        'VibeImageEmbedder',
+      );
       throw VibeExtractException('Vibe extraction operation timed out');
     } on NoVibeDataException {
       rethrow;
@@ -339,13 +375,20 @@ class VibeImageEmbedder {
     } on VibeExtractException {
       rethrow;
     } catch (e, stack) {
-      AppLogger.e('Error extracting vibe from image', e, stack, 'VibeImageEmbedder');
+      AppLogger.e(
+        'Error extracting vibe from image',
+        e,
+        stack,
+        'VibeImageEmbedder',
+      );
       throw VibeExtractException('Failed to extract vibe: $e');
     }
   }
 
   /// Isolate entry point for vibe extraction
-  static _ExtractVibeResult _extractVibesFromImageIsolate(Uint8List imageBytes) {
+  static _ExtractVibeResult _extractVibesFromImageIsolate(
+    Uint8List imageBytes,
+  ) {
     try {
       _validatePngSignature(imageBytes);
       _validatePngDimensions(imageBytes);
@@ -371,7 +414,9 @@ class VibeImageEmbedder {
         );
       }
 
-      throw NoVibeDataException('No naiv4vibe or naidata metadata found in PNG');
+      throw NoVibeDataException(
+        'No naiv4vibe or naidata metadata found in PNG',
+      );
     } on InvalidImageFormatException {
       rethrow;
     } on NoVibeDataException {
@@ -447,7 +492,9 @@ class VibeImageEmbedder {
   /// 验证字段类型
   static void _validateFieldType<T>(Object? value, String fieldName) {
     if (value != null && value is! T) {
-      throw VibeExtractException('Invalid $fieldName type: ${value.runtimeType}');
+      throw VibeExtractException(
+        'Invalid $fieldName type: ${value.runtimeType}',
+      );
     }
   }
 
@@ -620,13 +667,20 @@ class VibeImageEmbedder {
     final name = (rawName != null && rawName.isNotEmpty) ? rawName : 'vibe';
     final encoding = _extractEncodingFromVibe(vibe);
     final thumbnail = _extractThumbnailFromVibe(vibe);
+    final importInfo = vibe['importInfo'];
+    final strength = importInfo is Map<String, dynamic>
+        ? _parseDouble(importInfo['strength'], 0.6)
+        : 0.6;
+    final infoExtracted = importInfo is Map<String, dynamic>
+        ? _parseDouble(importInfo['information_extracted'], 1.0)
+        : 1.0;
 
     return VibeReference(
       displayName: name,
       vibeEncoding: encoding,
       thumbnail: thumbnail,
-      strength: 0.6,
-      infoExtracted: 1.0,
+      strength: VibeReference.sanitizeStrength(strength),
+      infoExtracted: VibeReference.sanitizeInfoExtracted(infoExtracted),
       sourceType: VibeSourceType.png,
     );
   }
@@ -638,7 +692,10 @@ class VibeImageEmbedder {
     // 尝试从 thumbnail 字段提取
     final thumbnailBase64 = vibe['thumbnail'] as String?;
     if (thumbnailBase64 != null && thumbnailBase64.isNotEmpty) {
-      AppLogger.d('Found thumbnail field, length: ${thumbnailBase64.length}', 'VibeImageEmbedder');
+      AppLogger.d(
+        'Found thumbnail field, length: ${thumbnailBase64.length}',
+        'VibeImageEmbedder',
+      );
       final decoded = _decodeBase64WithLimit(thumbnailBase64, 'thumbnail');
       if (decoded != null) return decoded;
     }
@@ -646,12 +703,18 @@ class VibeImageEmbedder {
     // 尝试从 image 字段提取
     final imageBase64 = vibe['image'] as String?;
     if (imageBase64 != null && imageBase64.isNotEmpty) {
-      AppLogger.d('Found image field, length: ${imageBase64.length}', 'VibeImageEmbedder');
+      AppLogger.d(
+        'Found image field, length: ${imageBase64.length}',
+        'VibeImageEmbedder',
+      );
       final decoded = _decodeBase64WithLimit(imageBase64, 'image');
       if (decoded != null) return decoded;
     }
 
-    AppLogger.w('No thumbnail or image field found in vibe data', 'VibeImageEmbedder');
+    AppLogger.w(
+      'No thumbnail or image field found in vibe data',
+      'VibeImageEmbedder',
+    );
     return null;
   }
 
@@ -693,20 +756,40 @@ class VibeImageEmbedder {
     final encodings = vibe['encodings'];
     if (encodings is! Map<String, dynamic>) return '';
 
-    final firstModel = encodings.values.firstOrNull;
-    if (firstModel is! Map<String, dynamic>) return '';
+    final directVibe = encodings['vibe'];
+    if (directVibe is String) return directVibe;
+    if (directVibe is Map<String, dynamic>) {
+      final encoding = directVibe['encoding'];
+      if (encoding is String) return encoding;
+    }
 
-    final firstHash = firstModel.values.firstOrNull;
-    if (firstHash is! Map<String, dynamic>) return '';
+    for (final firstModel in encodings.values) {
+      if (firstModel is! Map<String, dynamic>) continue;
 
-    return firstHash['encoding'] as String? ?? '';
+      final modelVibe = firstModel['vibe'];
+      if (modelVibe is String) return modelVibe;
+      if (modelVibe is Map<String, dynamic>) {
+        final encoding = modelVibe['encoding'];
+        if (encoding is String) return encoding;
+      }
+
+      for (final firstHash in firstModel.values) {
+        if (firstHash is! Map<String, dynamic>) continue;
+        final encoding = firstHash['encoding'];
+        if (encoding is String) return encoding;
+      }
+    }
+
+    return '';
   }
 
   static Map<String, dynamic> _decodeMetadataPayload(String payloadJson) {
     try {
       final dynamic decoded = jsonDecode(payloadJson);
       if (decoded is! Map<String, dynamic>) {
-        throw VibeExtractException('Vibe metadata payload is not a JSON object');
+        throw VibeExtractException(
+          'Vibe metadata payload is not a JSON object',
+        );
       }
 
       final type = decoded['type'] as String?;
@@ -729,10 +812,9 @@ class VibeImageEmbedder {
     // 验证并处理 displayName 字段，空字符串视为无效
     final rawDisplayName =
         (dataRaw['displayName'] ?? dataRaw['name']) as String?;
-    final displayName =
-        (rawDisplayName != null && rawDisplayName.isNotEmpty)
-            ? rawDisplayName
-            : 'unknown';
+    final displayName = (rawDisplayName != null && rawDisplayName.isNotEmpty)
+        ? rawDisplayName
+        : 'unknown';
     final vibeEncoding =
         (dataRaw['vibeEncoding'] ?? dataRaw['encoding']) as String? ?? '';
     final strength = VibeReference.sanitizeStrength(

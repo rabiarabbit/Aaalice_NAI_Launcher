@@ -145,7 +145,7 @@ class KritaBridgeNotifier extends StateNotifier<KritaBridgeState> {
       });
       _connectionSubscription =
           server.authenticationChanges.listen((connected) {
-        if (!state.enabled) {
+        if (!mounted || !state.enabled) {
           return;
         }
         if (!connected) {
@@ -163,6 +163,10 @@ class KritaBridgeNotifier extends StateNotifier<KritaBridgeState> {
           clearConnectedClientLabel: !connected,
         );
       });
+      if (!mounted) {
+        await server.stop();
+        return;
+      }
       state = KritaBridgeState(
         enabled: true,
         status: KritaBridgeStatus.listening,
@@ -173,10 +177,17 @@ class KritaBridgeNotifier extends StateNotifier<KritaBridgeState> {
       if (persist) {
         await _persistEnabled?.call(true);
       }
+      if (!mounted) {
+        await server.stop();
+        return;
+      }
       AppLogger.i('Krita bridge enabled on port ${server.port}', _logTag);
     } catch (error) {
       await server.stop();
       AppLogger.e('Failed to enable Krita bridge', error, null, _logTag);
+      if (!mounted) {
+        return;
+      }
       state = KritaBridgeState(
         enabled: false,
         status: KritaBridgeStatus.error,
@@ -203,6 +214,9 @@ class KritaBridgeNotifier extends StateNotifier<KritaBridgeState> {
       await server.stop();
     }
 
+    if (!mounted) {
+      return;
+    }
     state = const KritaBridgeState();
     if (persist) {
       await _persistEnabled?.call(false);
@@ -211,7 +225,7 @@ class KritaBridgeNotifier extends StateNotifier<KritaBridgeState> {
   }
 
   void _setActiveRequest(String? requestId) {
-    if (!state.enabled) {
+    if (!mounted || !state.enabled) {
       return;
     }
     state = state.copyWith(

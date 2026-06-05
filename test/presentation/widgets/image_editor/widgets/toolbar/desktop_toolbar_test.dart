@@ -33,10 +33,11 @@ void main() {
       ),
     );
 
-    final fillInkWellFinder = find.ancestor(
-      of: find.byIcon(Icons.format_color_fill),
+    final fillInkWellFinder = find.descendant(
+      of: find.byTooltip('填充封闭区域'),
       matching: find.byType(InkWell),
     );
+    expect(fillInkWellFinder, findsOneWidget);
 
     expect(tester.widget<InkWell>(fillInkWellFinder).onTap, isNull);
 
