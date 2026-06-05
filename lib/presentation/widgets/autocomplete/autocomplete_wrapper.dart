@@ -93,7 +93,10 @@ class AutocompleteWrapper extends ConsumerStatefulWidget {
     this.contentPadding,
     this.maxLines,
     this.expands = false,
-  }) : assert(strategy != null || asyncStrategy != null, '必须提供 strategy 或 asyncStrategy');
+  }) : assert(
+          strategy != null || asyncStrategy != null,
+          '必须提供 strategy 或 asyncStrategy',
+        );
 
   /// 便捷构造：使用本地标签策略
   factory AutocompleteWrapper.localTag({
@@ -277,6 +280,8 @@ class _AutocompleteWrapperState extends ConsumerState<AutocompleteWrapper> {
   // 用于防抖隐藏菜单的计时器
   Timer? _hideTimer;
 
+  Timer? _selectionResetTimer;
+
   // 防止键盘事件重复处理（选择建议后短暂忽略键盘事件）
   bool _isSelecting = false;
 
@@ -351,6 +356,7 @@ class _AutocompleteWrapperState extends ConsumerState<AutocompleteWrapper> {
   @override
   void dispose() {
     _hideTimer?.cancel();
+    _selectionResetTimer?.cancel();
     _searchDebounceTimer?.cancel();
     _removeOverlay();
     _focusNode.removeListener(_onFocusChanged);
@@ -392,6 +398,11 @@ class _AutocompleteWrapperState extends ConsumerState<AutocompleteWrapper> {
     // 取消之前的防抖计时器
     _searchDebounceTimer?.cancel();
 
+    if (_isSelecting) {
+      widget.onChanged?.call(text);
+      return;
+    }
+
     // 使用防抖延迟搜索，避免快速连续变化（如长按滑动选择文本）时频繁触发
     _searchDebounceTimer = Timer(_searchDebounceDelay, () {
       if (!mounted) return;
@@ -430,7 +441,9 @@ class _AutocompleteWrapperState extends ConsumerState<AutocompleteWrapper> {
       // 延迟隐藏，给策略切换留出时间
       // 如果150ms内又有新建议，取消隐藏
       _hideTimer = Timer(const Duration(milliseconds: 300), () {
-        if (mounted && !_effectiveStrategy!.hasSuggestions && _showSuggestions) {
+        if (mounted &&
+            !_effectiveStrategy!.hasSuggestions &&
+            _showSuggestions) {
           _hideSuggestions();
         }
       });
@@ -454,13 +467,13 @@ class _AutocompleteWrapperState extends ConsumerState<AutocompleteWrapper> {
     Overlay.of(context).insert(_overlayEntry!);
   }
 
-  void _hideSuggestions() {
+  void _hideSuggestions({bool force = false}) {
     if (!_showSuggestions) {
       return;
     }
 
     // 如果选择建议期间，不要隐藏（避免清空刚加载的共现策略）
-    if (_isSelecting) {
+    if (_isSelecting && !force) {
       return;
     }
 
@@ -619,14 +632,15 @@ class _AutocompleteWrapperState extends ConsumerState<AutocompleteWrapper> {
       selection: TextSelection.collapsed(offset: newCursorPosition),
     );
 
-    _hideSuggestions();
+    _hideSuggestions(force: true);
 
     // 通知外部选择了补全建议
     widget.onSuggestionSelected?.call(newText);
 
     // 延迟重置标志，防止同一键盘事件触发多次
     // 延长到 300ms，确保共现菜单显示后不会立即被选择
-    Future.delayed(const Duration(milliseconds: 300), () {
+    _selectionResetTimer?.cancel();
+    _selectionResetTimer = Timer(const Duration(milliseconds: 300), () {
       _isSelecting = false;
     });
   }

@@ -12,6 +12,38 @@ part 'online_gallery_provider.g.dart';
 
 const Set<String> kAllRatings = {'g', 's', 'q', 'e'};
 
+String buildOnlineGallerySearchQuery(
+  String query, {
+  required bool fuzzyMatch,
+}) {
+  final trimmed = query.trim();
+  if (trimmed.isEmpty) return '';
+
+  final tags = trimmed
+      .split(RegExp(r'[,，]'))
+      .map((tag) => tag.trim())
+      .where((tag) => tag.isNotEmpty)
+      .toList();
+
+  if (tags.isEmpty) return '';
+
+  final processedTags = tags.map((tag) {
+    if (!fuzzyMatch || _isOnlineGallerySpecialTag(tag)) {
+      return tag;
+    }
+    return '*$tag*';
+  }).toList();
+
+  return processedTags.join(' ');
+}
+
+bool _isOnlineGallerySpecialTag(String tag) {
+  if (tag.contains('*')) return true;
+  if (tag.contains(':')) return true;
+  if (tag.startsWith('-')) return true;
+  return false;
+}
+
 /// 顶级函数：在 Isolate 中解析帖子数据 (用于 compute)
 ///
 /// 避免主线程阻塞，提升 UI 流畅度
@@ -93,6 +125,7 @@ class OnlineGalleryState {
   final bool isLoading;
   final String? error;
   final String searchQuery;
+  final bool fuzzySearchEnabled;
   final String source;
   final Set<String> selectedRatings;
 
@@ -124,6 +157,7 @@ class OnlineGalleryState {
     this.isLoading = false,
     this.error,
     this.searchQuery = '',
+    this.fuzzySearchEnabled = false,
     this.source = 'danbooru',
     this.selectedRatings = kAllRatings,
     this.viewMode = GalleryViewMode.search,
@@ -166,6 +200,7 @@ class OnlineGalleryState {
     bool? isLoading,
     String? error,
     String? searchQuery,
+    bool? fuzzySearchEnabled,
     String? source,
     Set<String>? selectedRatings,
     GalleryViewMode? viewMode,
@@ -186,8 +221,10 @@ class OnlineGalleryState {
       isLoading: isLoading ?? this.isLoading,
       error: clearError ? null : (error ?? this.error),
       searchQuery: searchQuery ?? this.searchQuery,
+      fuzzySearchEnabled: fuzzySearchEnabled ?? this.fuzzySearchEnabled,
       source: source ?? this.source,
-      selectedRatings: Set.unmodifiable(selectedRatings ?? this.selectedRatings),
+      selectedRatings:
+          Set.unmodifiable(selectedRatings ?? this.selectedRatings),
       viewMode: viewMode ?? this.viewMode,
       searchCache: searchCache ?? this.searchCache,
       popularCache: popularCache ?? this.popularCache,
@@ -595,9 +632,13 @@ class OnlineGalleryNotifier extends _$OnlineGalleryNotifier {
 
     try {
       // 1. 获取原始数据和过滤后的数据
+      final searchQuery = buildOnlineGallerySearchQuery(
+        state.searchQuery,
+        fuzzyMatch: state.fuzzySearchEnabled,
+      );
       final (posts, rawCount) = await _fetchPosts(
         source: state.source,
-        query: state.searchQuery,
+        query: searchQuery,
         selectedRatings: state.selectedRatings,
         page: apiPage,
       );
@@ -654,61 +695,27 @@ class OnlineGalleryNotifier extends _$OnlineGalleryNotifier {
   ///
   /// 支持：
   /// - 逗号分隔多个 tag（AND 逻辑，结果必须包含所有 tag）
-  /// - 模糊匹配（自动添加通配符）
+  /// - 开启模糊匹配时自动添加通配符
   /// - 末尾逗号会被忽略
   Future<void> search(String query) async {
     // 立即取消当前请求，确保快速响应
     _cancelCurrentRequest();
-    final processedQuery = _processSearchQuery(query);
     state = state.copyWith(
-      searchQuery: processedQuery,
+      searchQuery: query.trim(),
       viewMode: GalleryViewMode.search,
     );
     await loadPosts(refresh: true);
   }
 
-  /// 处理搜索查询
-  ///
-  /// 将逗号分隔的 tag 转换为 Danbooru API 格式：
-  /// - 逗号分隔 → 空格分隔（AND 逻辑）
-  /// - 每个 tag 添加通配符实现模糊匹配
-  /// - 忽略空 tag（处理末尾逗号）
-  String _processSearchQuery(String query) {
-    final trimmed = query.trim();
-    if (trimmed.isEmpty) return '';
-
-    // 按逗号分隔，处理中英文逗号
-    final tags = trimmed
-        .split(RegExp(r'[,，]'))
-        .map((tag) => tag.trim())
-        .where((tag) => tag.isNotEmpty)
-        .toList();
-
-    if (tags.isEmpty) return '';
-
-    // 对每个 tag 进行处理
-    final processedTags = tags.map((tag) {
-      // 如果 tag 已经包含特殊语法（如 rating:, order:, date:, *）则不处理
-      if (_isSpecialTag(tag)) {
-        return tag;
-      }
-      // 添加通配符实现模糊匹配
-      return '*$tag*';
-    }).toList();
-
-    // 用空格连接（Danbooru 的 AND 语法）
-    return processedTags.join(' ');
-  }
-
-  /// 检查是否为特殊标签（不应添加通配符）
-  bool _isSpecialTag(String tag) {
-    // 已包含通配符
-    if (tag.contains('*')) return true;
-    // 包含冒号的元标签（rating:, order:, date:, score:, etc.）
-    if (tag.contains(':')) return true;
-    // 包含波浪号的排除标签
-    if (tag.startsWith('-')) return true;
-    return false;
+  /// 设置模糊匹配开关
+  Future<void> setFuzzySearchEnabled(bool enabled) async {
+    if (state.fuzzySearchEnabled == enabled) return;
+    _cancelCurrentRequest();
+    state = state.copyWith(
+      fuzzySearchEnabled: enabled,
+      viewMode: GalleryViewMode.search,
+    );
+    await loadPosts(refresh: true);
   }
 
   /// 设置数据源
@@ -804,7 +811,9 @@ class OnlineGalleryNotifier extends _$OnlineGalleryNotifier {
 
     // 请求级过滤仅做前置优化，本地过滤仍是最终兜底。
     final querySafeTags = blacklistTags
-        .where((tag) => tag.isNotEmpty && !tag.contains(':') && !tag.startsWith('-'))
+        .where(
+          (tag) => tag.isNotEmpty && !tag.contains(':') && !tag.startsWith('-'),
+        )
         .take(50)
         .toList();
     final blacklistExpr = querySafeTags.map((tag) => '-$tag').join(' ');
