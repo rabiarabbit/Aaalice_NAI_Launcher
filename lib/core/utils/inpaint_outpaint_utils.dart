@@ -1,5 +1,6 @@
 import 'dart:isolate';
 import 'dart:typed_data';
+import 'dart:ui' show Offset, Rect, Size;
 
 import 'package:image/image.dart' as img;
 import 'package:nai_launcher/core/utils/inpaint_mask_utils.dart';
@@ -234,6 +235,164 @@ class OutpaintFrameResizeResult {
   });
 }
 
+class OutpaintVirtualApplyResult {
+  final OutpaintVirtualFrame frame;
+  final OutpaintFrameResolvedGeometry geometry;
+  final Offset contentShift;
+
+  const OutpaintVirtualApplyResult({
+    required this.frame,
+    required this.geometry,
+    required this.contentShift,
+  });
+
+  List<Rect> get outpaintMaskRects => frame.outpaintMaskRects;
+}
+
+class OutpaintVirtualMaterializeResult {
+  final Uint8List sourceImage;
+  final int width;
+  final int height;
+
+  const OutpaintVirtualMaterializeResult({
+    required this.sourceImage,
+    required this.width,
+    required this.height,
+  });
+}
+
+class OutpaintVirtualFrame {
+  final int sourceWidth;
+  final int sourceHeight;
+  final int frameLeft;
+  final int frameTop;
+  final int frameRight;
+  final int frameBottom;
+
+  const OutpaintVirtualFrame({
+    required this.sourceWidth,
+    required this.sourceHeight,
+    required this.frameLeft,
+    required this.frameTop,
+    required this.frameRight,
+    required this.frameBottom,
+  });
+
+  factory OutpaintVirtualFrame.fromSource({
+    required int sourceWidth,
+    required int sourceHeight,
+  }) {
+    return OutpaintVirtualFrame(
+      sourceWidth: sourceWidth,
+      sourceHeight: sourceHeight,
+      frameLeft: 0,
+      frameTop: 0,
+      frameRight: sourceWidth,
+      frameBottom: sourceHeight,
+    );
+  }
+
+  int get width => frameRight - frameLeft;
+  int get height => frameBottom - frameTop;
+  Size get canvasSize => Size(width.toDouble(), height.toDouble());
+  Offset get sourceDrawOffset =>
+      Offset((-frameLeft).toDouble(), (-frameTop).toDouble());
+
+  bool get hasOutpaintChanges =>
+      frameLeft != 0 ||
+      frameTop != 0 ||
+      frameRight != sourceWidth ||
+      frameBottom != sourceHeight;
+
+  Rect get sourceDestinationRect => Rect.fromLTWH(
+        sourceDrawOffset.dx,
+        sourceDrawOffset.dy,
+        sourceWidth.toDouble(),
+        sourceHeight.toDouble(),
+      );
+
+  List<Rect> get outpaintMaskRects {
+    final rects = <Rect>[];
+    final canvasRect = Rect.fromLTWH(0, 0, width.toDouble(), height.toDouble());
+    final sourceRect = sourceDestinationRect.intersect(canvasRect);
+    if (sourceRect.isEmpty) {
+      return [canvasRect];
+    }
+    if (sourceRect.top > 0) {
+      rects.add(Rect.fromLTRB(0, 0, canvasRect.right, sourceRect.top));
+    }
+    if (sourceRect.bottom < canvasRect.bottom) {
+      rects.add(
+        Rect.fromLTRB(
+          0,
+          sourceRect.bottom,
+          canvasRect.right,
+          canvasRect.bottom,
+        ),
+      );
+    }
+    if (sourceRect.left > 0) {
+      rects.add(
+        Rect.fromLTRB(
+          0,
+          sourceRect.top,
+          sourceRect.left,
+          sourceRect.bottom,
+        ),
+      );
+    }
+    if (sourceRect.right < canvasRect.right) {
+      rects.add(
+        Rect.fromLTRB(
+          sourceRect.right,
+          sourceRect.top,
+          canvasRect.right,
+          sourceRect.bottom,
+        ),
+      );
+    }
+    return rects;
+  }
+
+  OutpaintVirtualApplyResult applyDelta(
+    OutpaintFrameDelta delta, {
+    bool snapTo64 = true,
+    OutpaintHorizontalSnapTarget horizontalSnapTarget =
+        OutpaintHorizontalSnapTarget.right,
+    OutpaintVerticalSnapTarget verticalSnapTarget =
+        OutpaintVerticalSnapTarget.bottom,
+  }) {
+    final geometry = InpaintOutpaintUtils.resolveFrameGeometry(
+      sourceWidth: width,
+      sourceHeight: height,
+      delta: delta,
+      snapTo64: snapTo64,
+      horizontalSnapTarget: horizontalSnapTarget,
+      verticalSnapTarget: verticalSnapTarget,
+    );
+
+    final nextFrameLeft = frameLeft + geometry.appliedFrameLeft;
+    final nextFrameTop = frameTop + geometry.appliedFrameTop;
+    final nextFrame = OutpaintVirtualFrame(
+      sourceWidth: sourceWidth,
+      sourceHeight: sourceHeight,
+      frameLeft: nextFrameLeft,
+      frameTop: nextFrameTop,
+      frameRight: frameLeft + geometry.appliedFrameRight,
+      frameBottom: frameTop + geometry.appliedFrameBottom,
+    );
+
+    return OutpaintVirtualApplyResult(
+      frame: nextFrame,
+      geometry: geometry,
+      contentShift: Offset(
+        (frameLeft - nextFrameLeft).toDouble(),
+        (frameTop - nextFrameTop).toDouble(),
+      ),
+    );
+  }
+}
+
 class InpaintOutpaintUtils {
   InpaintOutpaintUtils._();
 
@@ -325,6 +484,77 @@ class InpaintOutpaintUtils {
         includeEditorOverlay: includeEditorOverlay,
         editorOverlayAlpha: editorOverlayAlpha,
       ),
+    );
+  }
+
+  static Future<OutpaintVirtualMaterializeResult> materializeVirtualFrameAsync({
+    required Uint8List sourceImage,
+    required OutpaintVirtualFrame frame,
+  }) {
+    return Isolate.run(
+      () => materializeVirtualFrame(
+        sourceImage: sourceImage,
+        frame: frame,
+      ),
+    );
+  }
+
+  static OutpaintVirtualMaterializeResult materializeVirtualFrame({
+    required Uint8List sourceImage,
+    required OutpaintVirtualFrame frame,
+  }) {
+    final decodedSource = _decodeSourceImage(sourceImage);
+    if (decodedSource == null) {
+      throw const FormatException('Unable to decode source image');
+    }
+    final source =
+        decodedSource.convert(format: img.Format.uint8, numChannels: 4);
+    if (source.width != frame.sourceWidth ||
+        source.height != frame.sourceHeight) {
+      throw ArgumentError(
+        'Virtual frame source dimensions do not match source image',
+      );
+    }
+    final frameWidth = frame.width;
+    final frameHeight = frame.height;
+    if (frameWidth <= 0 || frameHeight <= 0) {
+      throw ArgumentError('Virtual frame dimensions must be positive');
+    }
+    _validateExpandedDimensions(frameWidth, frameHeight);
+
+    final output = img.Image(
+      width: frameWidth,
+      height: frameHeight,
+      numChannels: 4,
+    );
+    img.fill(output, color: img.ColorRgba8(0, 0, 0, 0));
+
+    for (var y = 0; y < frameHeight; y++) {
+      final sourceY = y + frame.frameTop;
+      if (sourceY < 0 || sourceY >= source.height) {
+        continue;
+      }
+      for (var x = 0; x < frameWidth; x++) {
+        final sourceX = x + frame.frameLeft;
+        if (sourceX < 0 || sourceX >= source.width) {
+          continue;
+        }
+        final pixel = source.getPixel(sourceX, sourceY);
+        output.setPixelRgba(
+          x,
+          y,
+          pixel.r,
+          pixel.g,
+          pixel.b,
+          pixel.a,
+        );
+      }
+    }
+
+    return OutpaintVirtualMaterializeResult(
+      sourceImage: Uint8List.fromList(img.encodePng(output)),
+      width: frameWidth,
+      height: frameHeight,
     );
   }
 
@@ -701,11 +931,30 @@ class InpaintOutpaintUtils {
     if (!snapTo64) {
       return clamped;
     }
-    if (requestedSize < sourceSize) {
-      final floored = (clamped ~/ _snapSize) * _snapSize;
-      return floored.clamp(_snapSize, _maxDimension).toInt();
+    final lower = (clamped ~/ _snapSize) * _snapSize;
+    final upper = lower == clamped ? lower : lower + _snapSize;
+    if (lower == upper) {
+      return lower.clamp(_snapSize, _maxDimension).toInt();
     }
-    return clamped + _snapRemainder(clamped);
+
+    final lowerDistance = (clamped - lower).abs();
+    final upperDistance = (upper - clamped).abs();
+    if (lowerDistance < upperDistance) {
+      return lower.clamp(_snapSize, _maxDimension).toInt();
+    }
+    if (upperDistance < lowerDistance) {
+      return upper.clamp(_snapSize, _maxDimension).toInt();
+    }
+
+    final clampedSource = sourceSize.clamp(_snapSize, _maxDimension).toInt();
+    if (clampedSource % _snapSize == 0 &&
+        (clampedSource == lower || clampedSource == upper)) {
+      return clampedSource;
+    }
+
+    return requestedSize >= sourceSize
+        ? upper.clamp(_snapSize, _maxDimension).toInt()
+        : lower.clamp(_snapSize, _maxDimension).toInt();
   }
 
   static img.Image _createExpandedSource(

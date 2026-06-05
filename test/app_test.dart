@@ -29,13 +29,16 @@ import 'package:nai_launcher/data/models/vibe/vibe_reference.dart';
 import 'package:nai_launcher/data/services/local_onnx_tagger_service.dart';
 import 'package:nai_launcher/data/services/statistics_service.dart';
 import 'package:nai_launcher/l10n/app_localizations.dart';
+import 'package:nai_launcher/presentation/providers/danbooru_suggestion_provider.dart';
 import 'package:nai_launcher/presentation/providers/fixed_tags_provider.dart';
 import 'package:nai_launcher/presentation/providers/generation/image_workflow_controller.dart';
 import 'package:nai_launcher/presentation/providers/local_gallery_provider.dart';
+import 'package:nai_launcher/presentation/providers/online_gallery_provider.dart';
 import 'package:nai_launcher/presentation/providers/selection_mode_provider.dart';
 import 'package:nai_launcher/presentation/providers/share_image_settings_provider.dart';
 import 'package:nai_launcher/presentation/providers/shortcuts_provider.dart';
 import 'package:nai_launcher/presentation/providers/tag_library_page_provider.dart';
+import 'package:nai_launcher/presentation/screens/online_gallery/online_gallery_screen.dart';
 import 'package:nai_launcher/presentation/prompt_assistant/models/prompt_assistant_models.dart';
 import 'package:nai_launcher/presentation/prompt_assistant/providers/prompt_assistant_history_provider.dart';
 import 'package:nai_launcher/presentation/prompt_assistant/services/provider_adapters/prompt_assistant_adapter.dart';
@@ -47,6 +50,9 @@ import 'package:nai_launcher/presentation/screens/vibe_library/widgets/vibe_expo
 import 'package:nai_launcher/presentation/screens/vibe_library/widgets/vibe_export_dialog_advanced.dart';
 import 'package:nai_launcher/presentation/utils/dropped_file_reader.dart';
 import 'package:nai_launcher/presentation/widgets/gallery/local_gallery_toolbar.dart';
+import 'package:nai_launcher/presentation/widgets/autocomplete/autocomplete_strategy.dart';
+import 'package:nai_launcher/presentation/widgets/autocomplete/autocomplete_wrapper.dart';
+import 'package:nai_launcher/presentation/widgets/autocomplete/generic_suggestion_tile.dart';
 import 'package:nai_launcher/presentation/widgets/metadata/metadata_import_dialog.dart';
 import 'package:nai_launcher/presentation/widgets/shortcuts/shortcut_aware_widget.dart';
 
@@ -306,6 +312,113 @@ void main() {
         find.textContaining(ImageModels.animeDiffusionV45Full),
         findsNothing,
       );
+    });
+  });
+
+  group('Online gallery search filters', () {
+    test('keeps plain tags exact when fuzzy matching is disabled', () {
+      expect(
+        buildOnlineGallerySearchQuery('kanzarin', fuzzyMatch: false),
+        'kanzarin',
+      );
+    });
+
+    test('wraps plain tags with wildcards when fuzzy matching is enabled', () {
+      expect(
+        buildOnlineGallerySearchQuery('kanzarin', fuzzyMatch: true),
+        '*kanzarin*',
+      );
+    });
+
+    test('keeps special Danbooru syntax unchanged in fuzzy mode', () {
+      expect(
+        buildOnlineGallerySearchQuery(
+          'rating:g, order:score, -comic, *kanzarin*',
+          fuzzyMatch: true,
+        ),
+        'rating:g order:score -comic *kanzarin*',
+      );
+    });
+
+    test('converts comma separated tags to Danbooru AND syntax', () {
+      expect(
+        buildOnlineGallerySearchQuery(
+          'kanzarin, 1girl，solo',
+          fuzzyMatch: false,
+        ),
+        'kanzarin 1girl solo',
+      );
+    });
+
+    testWidgets('shows a fuzzy matching toggle in the search toolbar', (
+      tester,
+    ) async {
+      await _pumpOnlineGalleryScreen(tester);
+      await tester.pump();
+
+      expect(find.text('模糊匹配'), findsOneWidget);
+    });
+
+    testWidgets('opens date range controls in a compact anchored popup', (
+      tester,
+    ) async {
+      await _pumpOnlineGalleryScreen(tester);
+      await tester.pump();
+
+      await tester.tap(find.text('Date Range'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(DateRangePickerDialog), findsNothing);
+      expect(find.text('开始日期'), findsOneWidget);
+      expect(find.text('结束日期'), findsOneWidget);
+      expect(find.text('应用'), findsOneWidget);
+    });
+  });
+
+  group('AutocompleteWrapper', () {
+    testWidgets('hides suggestions immediately after selecting an item', (
+      tester,
+    ) async {
+      final controller = TextEditingController();
+      final focusNode = FocusNode();
+      final strategy = _FakeAutocompleteStrategy();
+      addTearDown(controller.dispose);
+      addTearDown(focusNode.dispose);
+      addTearDown(strategy.dispose);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          child: MaterialApp(
+            home: Scaffold(
+              body: AutocompleteWrapper(
+                controller: controller,
+                focusNode: focusNode,
+                strategy: strategy,
+                child: TextField(
+                  controller: controller,
+                  focusNode: focusNode,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.byType(TextField));
+      await tester.enterText(find.byType(TextField), 'kan');
+      await tester.pump(const Duration(milliseconds: 80));
+      await tester.pump();
+
+      expect(find.byType(GenericSuggestionTile), findsOneWidget);
+
+      await tester.tap(find.text('kanzarin', findRichText: true));
+      await tester.pump();
+
+      expect(controller.text, 'kanzarin');
+      expect(find.byType(GenericSuggestionTile), findsNothing);
+
+      await tester.pump(const Duration(milliseconds: 350));
+      expect(find.byType(GenericSuggestionTile), findsNothing);
     });
   });
 
@@ -1670,6 +1783,119 @@ void main() {
       );
     });
   });
+}
+
+Future<void> _pumpOnlineGalleryScreen(WidgetTester tester) async {
+  tester.view.physicalSize = const Size(1400, 900);
+  tester.view.devicePixelRatio = 1;
+  addTearDown(tester.view.resetPhysicalSize);
+  addTearDown(tester.view.resetDevicePixelRatio);
+
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: [
+        onlineGalleryNotifierProvider.overrideWith(
+          _FakeOnlineGalleryNotifier.new,
+        ),
+        danbooruSuggestionNotifierProvider.overrideWith(
+          _FakeDanbooruSuggestionNotifier.new,
+        ),
+      ],
+      child: const MaterialApp(
+        locale: Locale('en'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: OnlineGalleryScreen(),
+      ),
+    ),
+  );
+}
+
+class _FakeOnlineGalleryNotifier extends OnlineGalleryNotifier {
+  @override
+  OnlineGalleryState build() => const OnlineGalleryState();
+
+  @override
+  Future<void> loadPosts({bool refresh = false}) async {}
+
+  @override
+  Future<void> loadMore() async {}
+
+  @override
+  Future<void> search(String query) async {
+    state = state.copyWith(searchQuery: query);
+  }
+
+  @override
+  Future<void> setFuzzySearchEnabled(bool enabled) async {
+    state = state.copyWith(fuzzySearchEnabled: enabled);
+  }
+
+  @override
+  Future<void> setDateRange(DateTime? start, DateTime? end) async {
+    state = state.copyWith(
+      dateRangeStart: start,
+      dateRangeEnd: end,
+      clearDateRange: start == null && end == null,
+    );
+  }
+}
+
+class _FakeDanbooruSuggestionNotifier extends DanbooruSuggestionNotifier {
+  @override
+  TagSuggestionState build() => const TagSuggestionState();
+
+  @override
+  void search(String query, {bool immediate = false}) {}
+
+  @override
+  void clear() {
+    state = const TagSuggestionState();
+  }
+}
+
+class _FakeAutocompleteStrategy extends AutocompleteStrategy<String> {
+  List<String> _suggestions = const [];
+
+  @override
+  List<String> get suggestions => _suggestions;
+
+  @override
+  bool get isLoading => false;
+
+  @override
+  Future<void> search(
+    String text,
+    int cursorPosition, {
+    bool immediate = false,
+  }) async {
+    _suggestions = const ['kanzarin'];
+    notifyListeners();
+  }
+
+  @override
+  void clear() {
+    _suggestions = const [];
+    notifyListeners();
+  }
+
+  @override
+  SuggestionData toSuggestionData(String item) {
+    return SuggestionData(
+      tag: item,
+      category: 4,
+      count: 606,
+    );
+  }
+
+  @override
+  (String, int) applySuggestion(
+    String item,
+    String text,
+    int cursorPosition,
+  ) {
+    return (item, item.length);
+  }
 }
 
 class _FakeLocalGalleryNotifier extends LocalGalleryNotifier {

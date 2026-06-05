@@ -272,6 +272,7 @@ void main() {
       await tester.pumpWidget(
         _wrapOverlay(
           controller: controller,
+          canvasSize: const Size(128, 128),
           onPreviewChanged: previews.add,
           onCommitted: (
             edges, {
@@ -284,7 +285,7 @@ void main() {
       final gesture = await tester.startGesture(
         tester.getCenter(find.byKey(const Key('outpaint_handle_right'))),
       );
-      await gesture.moveBy(const Offset(1, 0));
+      await gesture.moveBy(const Offset(17, 0));
       await gesture.moveBy(const Offset(1, 0));
       await gesture.moveBy(const Offset(1, 0));
       await tester.pump();
@@ -306,6 +307,7 @@ void main() {
       await tester.pumpWidget(
         _wrapOverlay(
           controller: controller,
+          canvasSize: const Size(128, 128),
           onPreviewChanged: previews.add,
           onCommitted: (
             edges, {
@@ -323,9 +325,8 @@ void main() {
       await gesture.moveBy(const Offset(1, 0));
       await tester.pump();
 
-      expect(previews, hasLength(1));
-      expect(previews.single.right, 2);
-      expect(find.text('Applied: 192 x 128'), findsOneWidget);
+      expect(previews, isEmpty);
+      expect(find.text('Applied: 192 x 128'), findsNothing);
 
       await gesture.moveBy(const Offset(31, 0));
       await gesture.up();
@@ -360,13 +361,13 @@ void main() {
       final gesture = await tester.startGesture(
         tester.getCenter(find.byKey(const Key('outpaint_handle_right'))),
       );
-      await gesture.moveBy(const Offset(1, 0));
+      await gesture.moveBy(const Offset(17, 0));
       await tester.pump();
 
       expect(previews, hasLength(1));
-      expect(previews.single.right, 2);
+      expect(previews.single.right, 34);
 
-      await gesture.moveBy(const Offset(31, 0));
+      await gesture.moveBy(const Offset(15, 0));
       await gesture.cancel();
       await tester.pumpAndSettle();
 
@@ -452,24 +453,24 @@ void main() {
         _OverlayGeometryCase(
           description: 'left',
           handleKey: Key('outpaint_handle_left'),
-          dragDelta: Offset(-8.5, 0),
-          expectedRequestedEdges: OutpaintEdges(left: 17),
+          dragDelta: Offset(-16.5, 0),
+          expectedRequestedEdges: OutpaintEdges(left: 33),
           horizontalSnapTarget: OutpaintHorizontalSnapTarget.left,
           verticalSnapTarget: OutpaintVerticalSnapTarget.bottom,
         ),
         _OverlayGeometryCase(
           description: 'top',
           handleKey: Key('outpaint_handle_top'),
-          dragDelta: Offset(0, -11.5),
-          expectedRequestedEdges: OutpaintEdges(top: 23),
+          dragDelta: Offset(0, -32),
+          expectedRequestedEdges: OutpaintEdges(top: 64),
           horizontalSnapTarget: OutpaintHorizontalSnapTarget.right,
           verticalSnapTarget: OutpaintVerticalSnapTarget.top,
         ),
         _OverlayGeometryCase(
           description: 'right',
           handleKey: Key('outpaint_handle_right'),
-          dragDelta: Offset(15.5, 0),
-          expectedRequestedEdges: OutpaintEdges(right: 31),
+          dragDelta: Offset(16.5, 0),
+          expectedRequestedEdges: OutpaintEdges(right: 33),
           horizontalSnapTarget: OutpaintHorizontalSnapTarget.right,
           verticalSnapTarget: OutpaintVerticalSnapTarget.bottom,
         ),
@@ -484,32 +485,32 @@ void main() {
         _OverlayGeometryCase(
           description: 'top-left',
           handleKey: Key('outpaint_handle_top_left'),
-          dragDelta: Offset(-8.5, -11.5),
-          expectedRequestedEdges: OutpaintEdges(left: 17, top: 23),
+          dragDelta: Offset(-16.5, -32),
+          expectedRequestedEdges: OutpaintEdges(left: 33, top: 64),
           horizontalSnapTarget: OutpaintHorizontalSnapTarget.left,
           verticalSnapTarget: OutpaintVerticalSnapTarget.top,
         ),
         _OverlayGeometryCase(
           description: 'top-right',
           handleKey: Key('outpaint_handle_top_right'),
-          dragDelta: Offset(15.5, -11.5),
-          expectedRequestedEdges: OutpaintEdges(top: 23, right: 31),
+          dragDelta: Offset(16.5, -32),
+          expectedRequestedEdges: OutpaintEdges(top: 64, right: 33),
           horizontalSnapTarget: OutpaintHorizontalSnapTarget.right,
           verticalSnapTarget: OutpaintVerticalSnapTarget.top,
         ),
         _OverlayGeometryCase(
           description: 'bottom-left',
           handleKey: Key('outpaint_handle_bottom_left'),
-          dragDelta: Offset(-8.5, 20.5),
-          expectedRequestedEdges: OutpaintEdges(left: 17, bottom: 41),
+          dragDelta: Offset(-16.5, 20.5),
+          expectedRequestedEdges: OutpaintEdges(left: 33, bottom: 41),
           horizontalSnapTarget: OutpaintHorizontalSnapTarget.left,
           verticalSnapTarget: OutpaintVerticalSnapTarget.bottom,
         ),
         _OverlayGeometryCase(
           description: 'bottom-right',
           handleKey: Key('outpaint_handle_bottom_right'),
-          dragDelta: Offset(15.5, 20.5),
-          expectedRequestedEdges: OutpaintEdges(right: 31, bottom: 41),
+          dragDelta: Offset(16.5, 20.5),
+          expectedRequestedEdges: OutpaintEdges(right: 33, bottom: 41),
           horizontalSnapTarget: OutpaintHorizontalSnapTarget.right,
           verticalSnapTarget: OutpaintVerticalSnapTarget.bottom,
         ),
@@ -544,10 +545,12 @@ void main() {
           testCase.expectedRequestedEdges,
           reason: '${testCase.description} requested preview edges',
         );
-        final resolvedGeometry = InpaintOutpaintUtils.resolveExpansionGeometry(
+        final requestedDelta =
+            OutpaintFrameDelta.fromExpansionEdges(requestedEdges);
+        final resolvedGeometry = InpaintOutpaintUtils.resolveFrameGeometry(
           sourceWidth: 128,
           sourceHeight: 96,
-          edges: requestedEdges,
+          delta: requestedDelta,
           horizontalSnapTarget: testCase.horizontalSnapTarget,
           verticalSnapTarget: testCase.verticalSnapTarget,
         );
@@ -557,9 +560,9 @@ void main() {
         await tester.pumpAndSettle();
 
         final materialized = await tester.runAsync(
-          () => InpaintOutpaintUtils.expandAsync(
+          () => InpaintOutpaintUtils.resizeFrameAsync(
             sourceImage: sourceImage,
-            edges: requestedEdges,
+            delta: requestedDelta,
             horizontalSnapTarget: testCase.horizontalSnapTarget,
             verticalSnapTarget: testCase.verticalSnapTarget,
           ),
@@ -587,19 +590,14 @@ void main() {
           reason: '${testCase.description} materialized height',
         );
         _expectEdges(
-          materialized.appliedEdges,
-          resolvedGeometry.appliedEdges,
+          materialized.appliedExpansionEdges,
+          resolvedGeometry.appliedExpansionEdges,
           reason: '${testCase.description} materialized applied edges',
         );
         expect(
-          materialized.sourceOffsetX,
-          resolvedGeometry.sourceOffsetX,
-          reason: '${testCase.description} source offset x',
-        );
-        expect(
-          materialized.sourceOffsetY,
-          resolvedGeometry.sourceOffsetY,
-          reason: '${testCase.description} source offset y',
+          materialized.appliedCropEdges.isEmpty,
+          resolvedGeometry.appliedCropEdges.isEmpty,
+          reason: '${testCase.description} materialized crop edges',
         );
       }
     },
@@ -804,6 +802,7 @@ void main() {
       await tester.pumpWidget(
         _wrapOverlay(
           controller: controller,
+          canvasSize: const Size(128, 128),
           onCommitted: (
             edges, {
             required horizontalSnapTarget,
@@ -818,25 +817,24 @@ void main() {
       final gesture = await tester.startGesture(
         tester.getCenter(find.byKey(const Key('outpaint_handle_top_left'))),
       );
-      await gesture.moveBy(const Offset(-8, -8));
+      await gesture.moveBy(const Offset(-17, -17));
       await tester.pump();
 
-      expect(find.text('Applied: 192 x 128'), findsOneWidget);
+      expect(find.text('Applied: 192 x 192'), findsOneWidget);
 
-      await gesture.moveBy(const Offset(-24, -8));
       await gesture.up();
       await tester.pump();
 
       expect(committedEdges, isNotNull);
-      expect(committedEdges!.left, 64);
-      expect(committedEdges!.top, 32);
-      expect(find.text('Applied: 192 x 128'), findsOneWidget);
+      expect(committedEdges!.left, 34);
+      expect(committedEdges!.top, 34);
+      expect(find.text('Applied: 192 x 192'), findsOneWidget);
       expect(find.byKey(const Key('outpaint_handle_top_left')), findsNothing);
 
       commit.complete();
       await tester.pumpAndSettle();
 
-      expect(find.text('Applied: 192 x 128'), findsNothing);
+      expect(find.text('Applied: 192 x 192'), findsNothing);
       expect(find.byKey(const Key('outpaint_handle_top_left')), findsOneWidget);
     },
   );

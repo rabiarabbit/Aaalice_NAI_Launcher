@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'dart:ui' show Offset, Rect, Size;
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image/image.dart' as img;
@@ -484,12 +485,64 @@ void main() {
   });
 
   group('InpaintOutpaintUtils.resizeFrame', () {
+    test('keeps small signed frame drags at the original 64 multiple', () {
+      final rightOut = InpaintOutpaintUtils.resolveFrameGeometry(
+        sourceWidth: 128,
+        sourceHeight: 128,
+        delta: const OutpaintFrameDelta(right: 31),
+      );
+      final rightIn = InpaintOutpaintUtils.resolveFrameGeometry(
+        sourceWidth: 128,
+        sourceHeight: 128,
+        delta: const OutpaintFrameDelta(right: -31),
+      );
+      final leftOut = InpaintOutpaintUtils.resolveFrameGeometry(
+        sourceWidth: 128,
+        sourceHeight: 128,
+        delta: const OutpaintFrameDelta(left: 31),
+        horizontalSnapTarget: OutpaintHorizontalSnapTarget.left,
+      );
+      final leftIn = InpaintOutpaintUtils.resolveFrameGeometry(
+        sourceWidth: 128,
+        sourceHeight: 128,
+        delta: const OutpaintFrameDelta(left: -31),
+        horizontalSnapTarget: OutpaintHorizontalSnapTarget.left,
+      );
+
+      for (final geometry in [rightOut, rightIn, leftOut, leftIn]) {
+        expect(geometry.width, equals(128));
+        expect(geometry.height, equals(128));
+        expect(geometry.appliedFrameLeft, equals(0));
+        expect(geometry.appliedFrameRight, equals(128));
+        expect(geometry.hasAppliedChange, isFalse);
+      }
+    });
+
+    test('snaps signed frame drags beyond half a cell to the next 64 multiple',
+        () {
+      final rightOut = InpaintOutpaintUtils.resolveFrameGeometry(
+        sourceWidth: 128,
+        sourceHeight: 128,
+        delta: const OutpaintFrameDelta(right: 33),
+      );
+      final rightIn = InpaintOutpaintUtils.resolveFrameGeometry(
+        sourceWidth: 128,
+        sourceHeight: 128,
+        delta: const OutpaintFrameDelta(right: -33),
+      );
+
+      expect(rightOut.width, equals(192));
+      expect(rightOut.appliedExpansionEdges.right, equals(64));
+      expect(rightIn.width, equals(64));
+      expect(rightIn.appliedCropEdges.right, equals(64));
+    });
+
     test('crops an inward right edge resize to the previous 64 multiple', () {
       final sourceImage = _horizontalGradientPng(128, 128);
 
       final result = InpaintOutpaintUtils.resizeFrame(
         sourceImage: sourceImage,
-        delta: const OutpaintFrameDelta(right: -32),
+        delta: const OutpaintFrameDelta(right: -33),
       );
 
       expect(result.width, equals(64));
@@ -514,7 +567,7 @@ void main() {
 
       final result = InpaintOutpaintUtils.resizeFrame(
         sourceImage: sourceImage,
-        delta: const OutpaintFrameDelta(left: -32),
+        delta: const OutpaintFrameDelta(left: -33),
         horizontalSnapTarget: OutpaintHorizontalSnapTarget.left,
       );
 
@@ -533,11 +586,11 @@ void main() {
 
       final expanded = InpaintOutpaintUtils.expand(
         sourceImage: sourceImage,
-        edges: const OutpaintEdges(right: 32),
+        edges: const OutpaintEdges(right: 33),
       );
       final resized = InpaintOutpaintUtils.resizeFrame(
         sourceImage: sourceImage,
-        delta: const OutpaintFrameDelta(right: 32),
+        delta: const OutpaintFrameDelta(right: 33),
       );
 
       expect(resized.width, equals(expanded.width));
@@ -547,6 +600,189 @@ void main() {
       expect(resized.appliedExpansionEdges.right, equals(64));
       expect(resized.appliedExpansionEdges.bottom, equals(32));
       expect(resized.appliedCropEdges.isEmpty, isTrue);
+    });
+  });
+
+  group('OutpaintVirtualFrame', () {
+    test('expands left then returns to the original source frame', () {
+      final frame = OutpaintVirtualFrame.fromSource(
+        sourceWidth: 128,
+        sourceHeight: 128,
+      );
+
+      final expanded = frame.applyDelta(
+        const OutpaintFrameDelta(left: 33),
+        horizontalSnapTarget: OutpaintHorizontalSnapTarget.left,
+      );
+      expect(expanded.frame.canvasSize, equals(const Size(192, 128)));
+      expect(expanded.frame.sourceDrawOffset, equals(const Offset(64, 0)));
+      expect(expanded.contentShift, equals(const Offset(64, 0)));
+      expect(
+        expanded.outpaintMaskRects,
+        equals([const Rect.fromLTWH(0, 0, 64, 128)]),
+      );
+
+      final restored = expanded.frame.applyDelta(
+        const OutpaintFrameDelta(left: -33),
+        horizontalSnapTarget: OutpaintHorizontalSnapTarget.left,
+      );
+      expect(restored.frame.canvasSize, equals(const Size(128, 128)));
+      expect(restored.frame.sourceDrawOffset, Offset.zero);
+      expect(restored.contentShift, equals(const Offset(-64, 0)));
+      expect(restored.frame.hasOutpaintChanges, isFalse);
+    });
+
+    test('applies a corner expansion as one coherent virtual frame', () {
+      final frame = OutpaintVirtualFrame.fromSource(
+        sourceWidth: 128,
+        sourceHeight: 96,
+      );
+      final expectedGeometry = InpaintOutpaintUtils.resolveFrameGeometry(
+        sourceWidth: frame.width,
+        sourceHeight: frame.height,
+        delta: const OutpaintFrameDelta(left: 33, top: 33),
+        horizontalSnapTarget: OutpaintHorizontalSnapTarget.left,
+        verticalSnapTarget: OutpaintVerticalSnapTarget.top,
+      );
+
+      final result = frame.applyDelta(
+        const OutpaintFrameDelta(left: 33, top: 33),
+        horizontalSnapTarget: OutpaintHorizontalSnapTarget.left,
+        verticalSnapTarget: OutpaintVerticalSnapTarget.top,
+      );
+
+      expect(result.geometry.width, expectedGeometry.width);
+      expect(result.geometry.height, expectedGeometry.height);
+      expect(
+        result.geometry.appliedFrameLeft,
+        expectedGeometry.appliedFrameLeft,
+      );
+      expect(result.geometry.appliedFrameTop, expectedGeometry.appliedFrameTop);
+      expect(
+        result.geometry.appliedFrameRight,
+        expectedGeometry.appliedFrameRight,
+      );
+      expect(
+        result.geometry.appliedFrameBottom,
+        expectedGeometry.appliedFrameBottom,
+      );
+      expect(result.frame.canvasSize, equals(const Size(192, 128)));
+      expect(result.frame.sourceDrawOffset, equals(const Offset(64, 32)));
+      expect(result.contentShift, equals(const Offset(64, 32)));
+      expect(
+        result.outpaintMaskRects,
+        equals([
+          const Rect.fromLTWH(0, 0, 192, 32),
+          const Rect.fromLTWH(0, 32, 64, 96),
+        ]),
+      );
+    });
+
+    test('crops the current frame without mutating original source dimensions',
+        () {
+      final frame = OutpaintVirtualFrame.fromSource(
+        sourceWidth: 128,
+        sourceHeight: 128,
+      );
+
+      final result = frame.applyDelta(
+        const OutpaintFrameDelta(right: -33),
+      );
+
+      expect(result.frame.sourceWidth, equals(128));
+      expect(result.frame.sourceHeight, equals(128));
+      expect(result.frame.canvasSize, equals(const Size(64, 128)));
+      expect(result.frame.sourceDrawOffset, Offset.zero);
+      expect(result.contentShift, Offset.zero);
+      expect(result.frame.hasOutpaintChanges, isTrue);
+    });
+
+    test('materializes a virtual right expansion like resizeFrame', () async {
+      final sourceImage = _sourcePng(128, 96);
+      final frame = OutpaintVirtualFrame.fromSource(
+        sourceWidth: 128,
+        sourceHeight: 96,
+      );
+      final applied = frame.applyDelta(const OutpaintFrameDelta(right: 33));
+
+      final virtualResult =
+          await InpaintOutpaintUtils.materializeVirtualFrameAsync(
+        sourceImage: sourceImage,
+        frame: applied.frame,
+      );
+      final resizeResult = await InpaintOutpaintUtils.resizeFrameAsync(
+        sourceImage: sourceImage,
+        delta: const OutpaintFrameDelta(right: 33),
+      );
+
+      expect(virtualResult.sourceImage, equals(resizeResult.sourceImage));
+      expect(virtualResult.width, equals(resizeResult.width));
+      expect(virtualResult.height, equals(resizeResult.height));
+    });
+
+    test('materializes a virtual left crop like resizeFrame', () async {
+      final sourceImage = _horizontalGradientPng(128, 128);
+      final frame = OutpaintVirtualFrame.fromSource(
+        sourceWidth: 128,
+        sourceHeight: 128,
+      );
+      final applied = frame.applyDelta(
+        const OutpaintFrameDelta(left: -33),
+        horizontalSnapTarget: OutpaintHorizontalSnapTarget.left,
+      );
+
+      final virtualResult =
+          await InpaintOutpaintUtils.materializeVirtualFrameAsync(
+        sourceImage: sourceImage,
+        frame: applied.frame,
+      );
+      final resizeResult = await InpaintOutpaintUtils.resizeFrameAsync(
+        sourceImage: sourceImage,
+        delta: const OutpaintFrameDelta(left: -33),
+        horizontalSnapTarget: OutpaintHorizontalSnapTarget.left,
+      );
+
+      expect(virtualResult.sourceImage, equals(resizeResult.sourceImage));
+      expect(virtualResult.width, equals(64));
+      expect(virtualResult.height, equals(128));
+    });
+
+    test('rejects malformed virtual frame dimensions before materializing', () {
+      final sourceImage = _sourcePng(128, 128);
+      final malformedFrames = [
+        const OutpaintVirtualFrame(
+          sourceWidth: 128,
+          sourceHeight: 128,
+          frameLeft: 32,
+          frameTop: 0,
+          frameRight: 32,
+          frameBottom: 128,
+        ),
+        const OutpaintVirtualFrame(
+          sourceWidth: 128,
+          sourceHeight: 128,
+          frameLeft: 0,
+          frameTop: 96,
+          frameRight: 128,
+          frameBottom: 64,
+        ),
+      ];
+
+      for (final frame in malformedFrames) {
+        expect(
+          () => InpaintOutpaintUtils.materializeVirtualFrame(
+            sourceImage: sourceImage,
+            frame: frame,
+          ),
+          throwsA(
+            isA<ArgumentError>().having(
+              (error) => error.message,
+              'message',
+              'Virtual frame dimensions must be positive',
+            ),
+          ),
+        );
+      }
     });
   });
 }

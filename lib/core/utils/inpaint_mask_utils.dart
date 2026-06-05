@@ -3,6 +3,26 @@ import 'dart:isolate';
 import 'dart:typed_data';
 import 'package:image/image.dart' as img;
 
+enum MaskFillRegionStatus {
+  emptyMask,
+  outOfBounds,
+  clickedMaskedPixel,
+  openRegion,
+  filled,
+}
+
+class MaskFillRegionResult {
+  const MaskFillRegionResult({
+    required this.status,
+    this.filledMaskBytes,
+    this.overlayBytes,
+  });
+
+  final MaskFillRegionStatus status;
+  final Uint8List? filledMaskBytes;
+  final Uint8List? overlayBytes;
+}
+
 /// Inpaint 蒙版处理工具
 class InpaintMaskUtils {
   InpaintMaskUtils._();
@@ -171,6 +191,116 @@ class InpaintMaskUtils {
       binaryMask[index] = 1;
     }
     return _encodeBinaryMask(binaryMask, width, height);
+  }
+
+  static Future<MaskFillRegionResult> fillEditorMaskRegionAtPointAsync(
+    Uint8List bytes, {
+    required int x,
+    required int y,
+    int overlayAlpha = 140,
+  }) {
+    return Isolate.run(
+      () => fillEditorMaskRegionAtPoint(
+        bytes,
+        x: x,
+        y: y,
+        overlayAlpha: overlayAlpha,
+      ),
+    );
+  }
+
+  /// 编辑器点击填充专用路径：一次解码内完成校验、封闭区域填充与 overlay 生成。
+  static MaskFillRegionResult fillEditorMaskRegionAtPoint(
+    Uint8List bytes, {
+    required int x,
+    required int y,
+    int overlayAlpha = 140,
+  }) {
+    img.Image? decoded;
+    try {
+      decoded = img.decodeImage(bytes);
+    } catch (_) {
+      return const MaskFillRegionResult(
+        status: MaskFillRegionStatus.emptyMask,
+      );
+    }
+    if (decoded == null) {
+      return const MaskFillRegionResult(
+        status: MaskFillRegionStatus.emptyMask,
+      );
+    }
+
+    final width = decoded.width;
+    final height = decoded.height;
+    final binaryMask = _createBinaryMask(decoded);
+    if (!binaryMask.any((value) => value == 1)) {
+      return const MaskFillRegionResult(
+        status: MaskFillRegionStatus.emptyMask,
+      );
+    }
+    if (x < 0 || x >= width || y < 0 || y >= height) {
+      return const MaskFillRegionResult(
+        status: MaskFillRegionStatus.outOfBounds,
+      );
+    }
+
+    final startIndex = y * width + x;
+    if (binaryMask[startIndex] == 1) {
+      return const MaskFillRegionResult(
+        status: MaskFillRegionStatus.clickedMaskedPixel,
+      );
+    }
+
+    final visited = Uint8List(width * height);
+    final queue = Queue<int>()..add(startIndex);
+    final region = <int>[];
+    visited[startIndex] = 1;
+
+    while (queue.isNotEmpty) {
+      final index = queue.removeFirst();
+      final currentX = index % width;
+      final currentY = index ~/ width;
+
+      if (currentX == 0 ||
+          currentX == width - 1 ||
+          currentY == 0 ||
+          currentY == height - 1) {
+        return const MaskFillRegionResult(
+          status: MaskFillRegionStatus.openRegion,
+        );
+      }
+
+      region.add(index);
+
+      void visit(int nextX, int nextY) {
+        final nextIndex = nextY * width + nextX;
+        if (visited[nextIndex] == 1 || binaryMask[nextIndex] == 1) {
+          return;
+        }
+        visited[nextIndex] = 1;
+        queue.add(nextIndex);
+      }
+
+      visit(currentX - 1, currentY);
+      visit(currentX + 1, currentY);
+      visit(currentX, currentY - 1);
+      visit(currentX, currentY + 1);
+    }
+
+    for (final index in region) {
+      binaryMask[index] = 1;
+    }
+
+    return MaskFillRegionResult(
+      status: MaskFillRegionStatus.filled,
+      filledMaskBytes: _encodeBinaryMask(binaryMask, width, height),
+      overlayBytes: _encodeEditorOverlay(
+        binaryMask,
+        width,
+        height,
+        overlayAlpha,
+      ),
+    );
   }
 
   /// 提取填充操作新补出的区域，避免把原有蒙版重复叠进新图层。
@@ -463,6 +593,32 @@ class InpaintMaskUtils {
     }
 
     return Uint8List.fromList(img.encodePng(normalized));
+  }
+
+  static Uint8List _encodeEditorOverlay(
+    Uint8List binaryMask,
+    int width,
+    int height,
+    int overlayAlpha,
+  ) {
+    final overlay = img.Image(
+      width: width,
+      height: height,
+      numChannels: 4,
+    );
+
+    var index = 0;
+    for (var y = 0; y < height; y++) {
+      for (var x = 0; x < width; x++) {
+        if (binaryMask[index++] == 1) {
+          overlay.setPixelRgba(x, y, 96, 170, 255, overlayAlpha);
+        } else {
+          overlay.setPixelRgba(x, y, 0, 0, 0, 0);
+        }
+      }
+    }
+
+    return Uint8List.fromList(img.encodePng(overlay));
   }
 
   static Uint8List _closeMask(

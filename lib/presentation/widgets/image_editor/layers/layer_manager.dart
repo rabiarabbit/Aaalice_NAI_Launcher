@@ -536,6 +536,27 @@ class LayerManager extends ChangeNotifier {
     }
   }
 
+  void translateLayersContent(Iterable<String> layerIds, Offset delta) {
+    if (delta == Offset.zero) return;
+
+    final targetLayerIds = layerIds.toSet();
+    if (targetLayerIds.isEmpty) return;
+
+    runBatch(() {
+      var translatedAny = false;
+      for (final layer in _layers) {
+        if (!targetLayerIds.contains(layer.id)) {
+          continue;
+        }
+        layer.translateContent(delta);
+        translatedAny = true;
+      }
+      if (translatedAny) {
+        _markContentChanged();
+      }
+    });
+  }
+
   /// 更新所有缩略图
   Future<void> updateAllThumbnails(Size canvasSize) async {
     if (_isUpdatingThumbnails) return;

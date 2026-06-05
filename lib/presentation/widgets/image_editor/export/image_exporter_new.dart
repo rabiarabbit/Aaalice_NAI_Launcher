@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/utils/hard_edge_mask_exporter.dart';
 import '../../../../core/utils/inpaint_mask_utils.dart';
 import '../core/history_manager.dart';
 import '../layers/layer.dart';
@@ -47,7 +48,24 @@ class ImageExporterNew {
     Path? selectionPath,
     Set<String> excludedBaseImageLayerIds = const {},
     bool forceHardEdges = false,
+    List<Rect> additionalMaskRects = const [],
+    bool preferCpuHardEdgeExport = false,
   }) async {
+    if (preferCpuHardEdgeExport &&
+        forceHardEdges &&
+        selectionPath == null &&
+        layerManager != null) {
+      final input = _tryBuildHardEdgeMaskInput(
+        layerManager,
+        canvasSize,
+        excludedBaseImageLayerIds,
+        additionalMaskRects,
+      );
+      if (input != null) {
+        return HardEdgeMaskExporter.exportAsync(input);
+      }
+    }
+
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
     final bounds = Rect.fromLTWH(0, 0, canvasSize.width, canvasSize.height);
@@ -75,6 +93,10 @@ class ImageExporterNew {
       );
     }
 
+    for (final rect in additionalMaskRects) {
+      canvas.drawRect(rect, Paint()..color = Colors.white);
+    }
+
     canvas.restore();
 
     final picture = recorder.endRecording();
@@ -92,6 +114,47 @@ class ImageExporterNew {
     }
 
     return InpaintMaskUtils.normalizeMaskBytes(byteData.buffer.asUint8List());
+  }
+
+  static HardEdgeMaskExportInput? _tryBuildHardEdgeMaskInput(
+    LayerManager layerManager,
+    Size canvasSize,
+    Set<String> excludedBaseImageLayerIds,
+    List<Rect> additionalMaskRects,
+  ) {
+    final width = canvasSize.width.round();
+    final height = canvasSize.height.round();
+    if (width <= 0 || height <= 0) {
+      return null;
+    }
+
+    final operations = <HardEdgeMaskOperation>[];
+    for (final layer in layerManager.layers) {
+      if (!layer.visible) {
+        continue;
+      }
+
+      final shouldIncludeBaseImage =
+          !excludedBaseImageLayerIds.contains(layer.id);
+      final includeBaseImage =
+          shouldIncludeBaseImage && layer.baseImage != null;
+      if (includeBaseImage && layer.toHardEdgeBaseMask() == null) {
+        return null;
+      }
+
+      operations.addAll(
+        layer.toHardEdgeMaskOperations(includeBaseImage: includeBaseImage),
+      );
+    }
+
+    return HardEdgeMaskExportInput(
+      width: width,
+      height: height,
+      strokes: const [],
+      baseMasks: const [],
+      additionalRects: List<Rect>.from(additionalMaskRects),
+      orderedOperations: operations,
+    );
   }
 
   /// 导出单个图层
@@ -115,7 +178,7 @@ class ImageExporterNew {
     if (includeBaseImage && layer.baseImage != null) {
       canvas.drawImage(
         layer.baseImage!,
-        Offset.zero,
+        layer.baseImageOffset,
         Paint(),
       );
     }

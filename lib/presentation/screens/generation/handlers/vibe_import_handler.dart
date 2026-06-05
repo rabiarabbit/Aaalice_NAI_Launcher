@@ -168,6 +168,89 @@ class VibeImportHandler {
     }
   }
 
+  /// 导入已经由拖拽读取到的单个 Vibe/图片文件。
+  ///
+  /// 用于局部 DropRegion，保留与“从文件添加”一致的解析和编码确认行为。
+  Future<int> importDroppedFile({
+    required String fileName,
+    required Uint8List bytes,
+  }) async {
+    final span = VibePerformanceDiagnostics.start(
+      'importHandler.importDroppedFile',
+      details: {'fileName': fileName},
+    );
+    var parsedVibes = 0;
+    var addedVibes = 0;
+    var encoded = false;
+    try {
+      final notifier = ref.read(generationParamsNotifierProvider.notifier);
+      var vibes = await VibeFileParser.parseFile(fileName, bytes);
+      parsedVibes = vibes.length;
+
+      final needsEncoding = vibes.any(
+        (v) => v.sourceType == VibeSourceType.rawImage,
+      );
+
+      if (needsEncoding && context.mounted) {
+        final dialogResult = await _showEncodingConfirmDialog(fileName);
+        if (dialogResult == null || !dialogResult.$1) {
+          return 0;
+        }
+
+        final encodeNow = dialogResult.$2;
+        final autoSaveToLibrary = dialogResult.$3;
+        if (encodeNow && context.mounted) {
+          final encodedVibes = await _encodeVibesNow(vibes);
+          if (!context.mounted) {
+            return 0;
+          }
+
+          if (encodedVibes != null) {
+            vibes = encodedVibes;
+            encoded = true;
+            if (autoSaveToLibrary && context.mounted) {
+              await _saveEncodedVibesToLibrary(encodedVibes, fileName);
+            }
+          } else {
+            final continueAnyway = await _showEncodingFailedDialog();
+            if (continueAnyway != true) {
+              return 0;
+            }
+          }
+        }
+      }
+
+      final beforeCount =
+          ref.read(generationParamsNotifierProvider).vibeReferencesV4.length;
+      notifier.addVibeReferences(vibes);
+      await notifier.saveGenerationState();
+
+      final afterCount =
+          ref.read(generationParamsNotifierProvider).vibeReferencesV4.length;
+      if (afterCount > beforeCount) {
+        addedVibes = afterCount - beforeCount;
+      }
+      return addedVibes;
+    } catch (e) {
+      AppLogger.e('Failed to parse dropped file: $fileName', e, null, _tag);
+      if (context.mounted) {
+        AppToast.error(
+          context,
+          context.l10n.vibe_import_fileParseFailed,
+        );
+      }
+      return 0;
+    } finally {
+      span.finish(
+        details: {
+          'parsedVibes': parsedVibes,
+          'addedVibes': addedVibes,
+          'encoded': encoded,
+        },
+      );
+    }
+  }
+
   /// 显示编码确认对话框
   Future<(bool confirmed, bool encode, bool autoSave)?>
       _showEncodingConfirmDialog(
