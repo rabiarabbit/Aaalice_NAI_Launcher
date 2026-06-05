@@ -2038,30 +2038,38 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
           if (_sourceLayerId != null) _sourceLayerId!,
         },
         forceHardEdges: true,
+        preferCpuHardEdgeExport: true,
       );
       if (!mounted) {
         return;
       }
-      if (!InpaintMaskUtils.hasMaskedPixels(originalMask)) {
-        AppToast.warning(context, '请先绘制封闭的蒙版轮廓。');
-        return;
-      }
 
-      final filledMask = InpaintMaskUtils.fillMaskRegionAtPoint(
+      final fillResult =
+          await InpaintMaskUtils.fillEditorMaskRegionAtPointAsync(
         originalMask,
         x: canvasPoint.dx.floor(),
         y: canvasPoint.dy.floor(),
       );
-      final deltaMask = InpaintMaskUtils.extractFilledMaskDelta(
-        originalMask,
-        filledMask,
-      );
-      if (!InpaintMaskUtils.hasMaskedPixels(deltaMask)) {
-        AppToast.info(context, '该位置没有可填充的封闭区域。');
+      if (!mounted) {
         return;
       }
+      switch (fillResult.status) {
+        case MaskFillRegionStatus.emptyMask:
+          AppToast.warning(context, '请先绘制封闭的蒙版轮廓。');
+          return;
+        case MaskFillRegionStatus.outOfBounds:
+        case MaskFillRegionStatus.clickedMaskedPixel:
+        case MaskFillRegionStatus.openRegion:
+          AppToast.info(context, '该位置没有可填充的封闭区域。');
+          return;
+        case MaskFillRegionStatus.filled:
+          break;
+      }
 
-      final overlayBytes = InpaintMaskUtils.maskToEditorOverlay(filledMask);
+      final overlayBytes = fillResult.overlayBytes;
+      if (overlayBytes == null) {
+        throw Exception('无法生成蒙版覆盖层');
+      }
       _removeAllMaskLayers();
       final layer = await _addMaskLayerAboveSource(
         overlayBytes,

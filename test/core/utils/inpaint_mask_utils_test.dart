@@ -207,6 +207,86 @@ void main() {
       expect(decoded.getPixel(12, 12).r.toInt(), equals(0));
     });
 
+    test(
+        'fillEditorMaskRegionAtPointAsync should fill a closed region and produce editor overlay',
+        () async {
+      final source = img.Image(width: 32, height: 24);
+      img.fill(source, color: img.ColorRgba8(0, 0, 0, 255));
+      img.drawRect(
+        source,
+        x1: 2,
+        y1: 4,
+        x2: 12,
+        y2: 18,
+        color: img.ColorRgba8(255, 255, 255, 255),
+      );
+      img.drawRect(
+        source,
+        x1: 18,
+        y1: 4,
+        x2: 28,
+        y2: 18,
+        color: img.ColorRgba8(255, 255, 255, 255),
+      );
+
+      final originalBytes = Uint8List.fromList(img.encodePng(source));
+      final expectedMask = InpaintMaskUtils.fillMaskRegionAtPoint(
+        originalBytes,
+        x: 7,
+        y: 11,
+      );
+      final expectedOverlay = InpaintMaskUtils.maskToEditorOverlay(
+        expectedMask,
+        overlayAlpha: 160,
+      );
+
+      final result = await InpaintMaskUtils.fillEditorMaskRegionAtPointAsync(
+        originalBytes,
+        x: 7,
+        y: 11,
+        overlayAlpha: 160,
+      );
+
+      expect(result.status, MaskFillRegionStatus.filled);
+      expect(result.filledMaskBytes, expectedMask);
+      expect(result.overlayBytes, expectedOverlay);
+
+      final decodedMask = img.decodeImage(result.filledMaskBytes!)!;
+      final decodedOverlay = img.decodeImage(result.overlayBytes!)!;
+      expect(decodedMask.getPixel(7, 11).r.toInt(), equals(255));
+      expect(decodedMask.getPixel(23, 11).r.toInt(), equals(0));
+      expect(decodedOverlay.getPixel(7, 11).a.toInt(), equals(160));
+      expect(decodedOverlay.getPixel(0, 0).a.toInt(), equals(0));
+    });
+
+    test(
+        'fillEditorMaskRegionAtPointAsync should report open regions without producing overlay',
+        () async {
+      final source = img.Image(width: 24, height: 24);
+      img.fill(source, color: img.ColorRgba8(0, 0, 0, 255));
+      img.drawRect(
+        source,
+        x1: 4,
+        y1: 4,
+        x2: 19,
+        y2: 19,
+        color: img.ColorRgba8(255, 255, 255, 255),
+      );
+      for (var y = 10; y <= 13; y++) {
+        source.setPixelRgba(4, y, 0, 0, 0, 255);
+      }
+
+      final result = await InpaintMaskUtils.fillEditorMaskRegionAtPointAsync(
+        Uint8List.fromList(img.encodePng(source)),
+        x: 12,
+        y: 12,
+      );
+
+      expect(result.status, MaskFillRegionStatus.openRegion);
+      expect(result.filledMaskBytes, isNull);
+      expect(result.overlayBytes, isNull);
+    });
+
     test('extractFilledMaskDelta should only keep newly filled regions', () {
       final source = img.Image(width: 24, height: 24);
       img.fill(source, color: img.ColorRgba8(0, 0, 0, 255));

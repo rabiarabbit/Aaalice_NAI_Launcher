@@ -175,6 +175,7 @@ logs/security/
 .playwright-mcp/
 .spec-workflow/
 .qoder/
+.codex_tmp/
 .codex/
 .kiro
 .claude/
