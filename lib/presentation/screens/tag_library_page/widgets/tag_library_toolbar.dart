@@ -152,63 +152,95 @@ class _TagLibraryToolbarState extends ConsumerState<TagLibraryToolbar> {
               ),
             ),
           ),
-          child: Row(
-            children: [
-              // 添加条目按钮
-              FilledButton.icon(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final compact = constraints.maxWidth < 900;
+              final addButton = FilledButton.icon(
                 onPressed: widget.onAddEntry,
                 icon: const Icon(Icons.add, size: 18),
                 label: Text(context.l10n.tagLibrary_addEntry),
-              ),
-              const SizedBox(width: 12),
+              );
 
-              // 搜索框
-              Expanded(
-                child: _buildSearchField(theme, state),
-              ),
+              Widget buildActions() {
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // 排序下拉菜单
+                    _buildSortDropdown(theme, state),
+                    const SizedBox(width: 8),
 
-              const SizedBox(width: 12),
+                    // 视图切换
+                    _buildViewModeToggle(theme, state),
 
-              // 排序下拉菜单
-              _buildSortDropdown(theme, state),
-              const SizedBox(width: 8),
+                    const SizedBox(width: 8),
 
-              // 视图切换
-              _buildViewModeToggle(theme, state),
+                    // 分隔线
+                    Container(
+                      width: 1,
+                      height: 24,
+                      color: theme.dividerColor.withValues(alpha: 0.3),
+                    ),
+                    const SizedBox(width: 8),
 
-              const SizedBox(width: 8),
+                    // 多选按钮
+                    _CompactIconButton(
+                      icon: Icons.checklist,
+                      label: context.l10n.common_multiSelect,
+                      onPressed: widget.onEnterSelectionMode,
+                    ),
+                    const SizedBox(width: 6),
 
-              // 分隔线
-              Container(
-                width: 1,
-                height: 24,
-                color: theme.dividerColor.withValues(alpha: 0.3),
-              ),
-              const SizedBox(width: 8),
+                    // 导入按钮
+                    _CompactIconButton(
+                      icon: Icons.file_upload_outlined,
+                      label: context.l10n.common_import,
+                      onPressed: widget.onImport,
+                    ),
+                    const SizedBox(width: 6),
 
-              // 多选按钮
-              _CompactIconButton(
-                icon: Icons.checklist,
-                label: context.l10n.common_multiSelect,
-                onPressed: widget.onEnterSelectionMode,
-              ),
-              const SizedBox(width: 6),
+                    // 导出按钮
+                    _CompactIconButton(
+                      icon: Icons.file_download_outlined,
+                      label: context.l10n.common_export,
+                      onPressed: state.entries.isEmpty ? null : widget.onExport,
+                    ),
+                  ],
+                );
+              }
 
-              // 导入按钮
-              _CompactIconButton(
-                icon: Icons.file_upload_outlined,
-                label: context.l10n.common_import,
-                onPressed: widget.onImport,
-              ),
-              const SizedBox(width: 6),
+              if (compact) {
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: [
+                        addButton,
+                        const SizedBox(width: 12),
+                        Expanded(child: _buildSearchField(theme, state)),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: buildActions(),
+                      ),
+                    ),
+                  ],
+                );
+              }
 
-              // 导出按钮
-              _CompactIconButton(
-                icon: Icons.file_download_outlined,
-                label: context.l10n.common_export,
-                onPressed: state.entries.isEmpty ? null : widget.onExport,
-              ),
-            ],
+              return Row(
+                children: [
+                  addButton,
+                  const SizedBox(width: 12),
+                  Expanded(child: _buildSearchField(theme, state)),
+                  const SizedBox(width: 12),
+                  buildActions(),
+                ],
+              );
+            },
           ),
         ),
       ),

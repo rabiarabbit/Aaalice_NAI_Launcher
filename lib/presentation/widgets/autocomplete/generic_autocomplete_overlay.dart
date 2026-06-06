@@ -100,37 +100,45 @@ class GenericAutocompleteOverlay extends StatelessWidget {
                     ),
                   ),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        context.l10n.autocomplete_resultsCount(
-                          suggestions.length,
-                        ),
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
+                      Expanded(
+                        child: Text(
+                          context.l10n.autocomplete_resultsCount(
+                            suggestions.length,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
                         ),
                       ),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          _buildShortcutHint(
-                            theme,
-                            context.l10n.autocomplete_keyNavigate,
-                            context.l10n.autocomplete_actionSelect,
+                      const SizedBox(width: 8),
+                      Flexible(
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              _buildShortcutHint(
+                                theme,
+                                context.l10n.autocomplete_keyNavigate,
+                                context.l10n.autocomplete_actionSelect,
+                              ),
+                              const SizedBox(width: 12),
+                              _buildShortcutHint(
+                                theme,
+                                'Enter/Tab',
+                                context.l10n.autocomplete_actionConfirm,
+                              ),
+                              const SizedBox(width: 12),
+                              _buildShortcutHint(
+                                theme,
+                                'Esc',
+                                context.l10n.autocomplete_actionClose,
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 12),
-                          _buildShortcutHint(
-                            theme,
-                            'Enter/Tab',
-                            context.l10n.autocomplete_actionConfirm,
-                          ),
-                          const SizedBox(width: 12),
-                          _buildShortcutHint(
-                            theme,
-                            'Esc',
-                            context.l10n.autocomplete_actionClose,
-                          ),
-                        ],
+                        ),
                       ),
                     ],
                   ),

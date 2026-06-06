@@ -380,30 +380,48 @@ class _OnlineGalleryScreenState extends ConsumerState<OnlineGalleryScreen>
           bottom: BorderSide(color: theme.dividerColor.withValues(alpha: 0.3)),
         ),
       ),
-      child: Column(
-        children: [
-          // 第一行：模式切换 + 搜索框 + 用户
-          Row(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final compact = constraints.maxWidth < 1440;
+
+          return Column(
             children: [
-              // 模式切换（紧凑设计）
-              _buildModeSelector(theme, state, authState),
-              const SizedBox(width: 16),
-              // 搜索框
-              if (state.viewMode == GalleryViewMode.search)
-                Expanded(child: _buildSearchField(theme))
-              else
-                const Spacer(),
-              const SizedBox(width: 12),
-              // 筛选和操作
-              _buildFilterAndActions(theme, state, authState),
+              // 第一行：模式切换 + 搜索框 + 用户
+              Row(
+                children: [
+                  // 模式切换（紧凑设计）
+                  _buildModeSelector(theme, state, authState),
+                  const SizedBox(width: 16),
+                  // 搜索框
+                  if (state.viewMode == GalleryViewMode.search)
+                    Expanded(child: _buildSearchField(theme))
+                  else
+                    const Spacer(),
+                  if (!compact) ...[
+                    const SizedBox(width: 12),
+                    // 筛选和操作
+                    _buildFilterAndActions(theme, state, authState),
+                  ],
+                ],
+              ),
+              if (compact) ...[
+                const SizedBox(height: 8),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: _buildFilterAndActions(theme, state, authState),
+                  ),
+                ),
+              ],
+              // 第二行：排行榜选项（仅排行榜模式）
+              if (state.viewMode == GalleryViewMode.popular) ...[
+                const SizedBox(height: 8),
+                _buildPopularOptions(theme, state),
+              ],
             ],
-          ),
-          // 第二行：排行榜选项（仅排行榜模式）
-          if (state.viewMode == GalleryViewMode.popular) ...[
-            const SizedBox(height: 8),
-            _buildPopularOptions(theme, state),
-          ],
-        ],
+          );
+        },
       ),
     );
   }
@@ -1555,23 +1573,27 @@ class _DateRangePopupState extends State<_DateRangePopup> {
                 onDateSaved: (date) => _end = _clampDate(date),
               ),
               const SizedBox(height: 12),
-              Row(
-                children: [
-                  TextButton(
-                    onPressed: _setLast30Days,
-                    child: Text(context.l10n.onlineGallery_last30Days),
-                  ),
-                  const Spacer(),
-                  TextButton(
-                    onPressed: widget.onClear,
-                    child: Text(context.l10n.onlineGallery_clear),
-                  ),
-                  const SizedBox(width: 8),
-                  FilledButton(
-                    onPressed: _apply,
-                    child: Text(context.l10n.common_apply),
-                  ),
-                ],
+              Align(
+                alignment: Alignment.centerRight,
+                child: Wrap(
+                  alignment: WrapAlignment.end,
+                  spacing: 8,
+                  runSpacing: 4,
+                  children: [
+                    TextButton(
+                      onPressed: _setLast30Days,
+                      child: Text(context.l10n.onlineGallery_last30Days),
+                    ),
+                    TextButton(
+                      onPressed: widget.onClear,
+                      child: Text(context.l10n.onlineGallery_clear),
+                    ),
+                    FilledButton(
+                      onPressed: _apply,
+                      child: Text(context.l10n.common_apply),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),

@@ -55,50 +55,52 @@ class ImageSendDestinationDialog extends StatelessWidget {
       title: Text(context.l10n.gallery_send_to),
       content: SizedBox(
         width: 320,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // 发送到图生图
-            _buildOption(
-              context,
-              icon: Icons.image,
-              title: context.l10n.gallery_sendToImg2Img,
-              subtitle: context.l10n.gallery_useImageForGeneration,
-              onTap: () => Navigator.of(context).pop(SendDestination.img2img),
-            ),
-            const SizedBox(height: 8),
-            _buildOption(
-              context,
-              icon: Icons.manage_search_rounded,
-              title: context.l10n.gallery_sendToReversePromptTitle,
-              subtitle: context.l10n.gallery_addToReversePromptModule,
-              onTap: () =>
-                  Navigator.of(context).pop(SendDestination.reversePrompt),
-            ),
-            const SizedBox(height: 8),
-            // 发送到 Vibe Transfer
-            _buildOption(
-              context,
-              icon: Icons.style,
-              title: 'Vibe Transfer',
-              subtitle: hasVibeData
-                  ? context.l10n.gallery_applyVibeFromImage
-                  : context.l10n.gallery_noVibeData,
-              enabled: hasVibeData,
-              onTap: hasVibeData
-                  ? () =>
-                      Navigator.of(context).pop(SendDestination.vibeTransfer)
-                  : null,
-            ),
-            const SizedBox(height: 8),
-            _buildOption(
-              context,
-              icon: Icons.brush_outlined,
-              title: context.l10n.gallery_sendToKrita,
-              subtitle: context.l10n.gallery_sendToConnectedKrita,
-              onTap: () => Navigator.of(context).pop(SendDestination.krita),
-            ),
-          ],
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // 发送到图生图
+              _buildOption(
+                context,
+                icon: Icons.image,
+                title: context.l10n.gallery_sendToImg2Img,
+                subtitle: context.l10n.gallery_useImageForGeneration,
+                onTap: () => Navigator.of(context).pop(SendDestination.img2img),
+              ),
+              const SizedBox(height: 8),
+              _buildOption(
+                context,
+                icon: Icons.manage_search_rounded,
+                title: context.l10n.gallery_sendToReversePromptTitle,
+                subtitle: context.l10n.gallery_addToReversePromptModule,
+                onTap: () =>
+                    Navigator.of(context).pop(SendDestination.reversePrompt),
+              ),
+              const SizedBox(height: 8),
+              // 发送到 Vibe Transfer
+              _buildOption(
+                context,
+                icon: Icons.style,
+                title: 'Vibe Transfer',
+                subtitle: hasVibeData
+                    ? context.l10n.gallery_applyVibeFromImage
+                    : context.l10n.gallery_noVibeData,
+                enabled: hasVibeData,
+                onTap: hasVibeData
+                    ? () =>
+                        Navigator.of(context).pop(SendDestination.vibeTransfer)
+                    : null,
+              ),
+              const SizedBox(height: 8),
+              _buildOption(
+                context,
+                icon: Icons.brush_outlined,
+                title: context.l10n.gallery_sendToKrita,
+                subtitle: context.l10n.gallery_sendToConnectedKrita,
+                onTap: () => Navigator.of(context).pop(SendDestination.krita),
+              ),
+            ],
+          ),
         ),
       ),
       actions: [

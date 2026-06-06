@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nai_launcher/core/services/prompt_token_counter_service.dart';
+import 'package:nai_launcher/l10n/app_localizations.dart';
 import 'package:nai_launcher/presentation/widgets/prompt/prompt_token_count_bar.dart';
 
 void main() {
@@ -9,6 +10,9 @@ void main() {
     testWidgets('shows current token usage', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
+          locale: Locale('zh'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(
             body: PromptTokenCountBar(
               usage: PromptTokenUsage(
@@ -28,6 +32,9 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
+          locale: const Locale('zh'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           theme: theme,
           home: const Scaffold(
             body: PromptTokenCountBar(
@@ -48,6 +55,9 @@ void main() {
         (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
+          locale: Locale('zh'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(
             body: PromptTokenCountBar(
               usage: PromptTokenUsage(
@@ -75,6 +85,9 @@ void main() {
         (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
+          locale: Locale('zh'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(
             body: PromptTokenCountBar(
               usage: PromptTokenUsage(
@@ -112,6 +125,9 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
+          locale: const Locale('zh'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(
             body: PromptTokenCountAsyncBar(usage: reloadingUsage),
           ),

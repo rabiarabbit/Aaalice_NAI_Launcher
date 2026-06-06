@@ -12,6 +12,7 @@ void main() {
 
     await tester.pumpWidget(
       MaterialApp(
+        locale: const Locale('en'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: Builder(
@@ -34,7 +35,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Krita'), findsOneWidget);
-    expect(find.text('发送到已连接的 Krita 插件'), findsOneWidget);
+    expect(find.text('Send to the connected Krita plugin'), findsOneWidget);
 
     await tester.tap(find.text('Krita'));
     await tester.pumpAndSettle();
