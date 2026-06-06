@@ -352,19 +352,19 @@ class _OnlineGalleryScreenState extends ConsumerState<OnlineGalleryScreen>
         actions: [
           BulkActionItem(
             icon: Icons.playlist_add,
-            label: '加入队列',
+            label: context.l10n.onlineGallery_addToQueue,
             onPressed: _addSelectedToQueue,
             color: theme.colorScheme.primary,
           ),
           BulkActionItem(
             icon: Icons.favorite_border,
-            label: '批量收藏',
+            label: context.l10n.onlineGallery_bulkFavorite,
             onPressed: _favoriteSelected,
             color: theme.colorScheme.secondary,
           ),
           BulkActionItem(
             icon: Icons.download,
-            label: '批量下载',
+            label: context.l10n.onlineGallery_bulkDownload,
             onPressed: _downloadSelected,
             color: theme.colorScheme.tertiary,
           ),
@@ -380,30 +380,48 @@ class _OnlineGalleryScreenState extends ConsumerState<OnlineGalleryScreen>
           bottom: BorderSide(color: theme.dividerColor.withValues(alpha: 0.3)),
         ),
       ),
-      child: Column(
-        children: [
-          // 第一行：模式切换 + 搜索框 + 用户
-          Row(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final compact = constraints.maxWidth < 1440;
+
+          return Column(
             children: [
-              // 模式切换（紧凑设计）
-              _buildModeSelector(theme, state, authState),
-              const SizedBox(width: 16),
-              // 搜索框
-              if (state.viewMode == GalleryViewMode.search)
-                Expanded(child: _buildSearchField(theme))
-              else
-                const Spacer(),
-              const SizedBox(width: 12),
-              // 筛选和操作
-              _buildFilterAndActions(theme, state, authState),
+              // 第一行：模式切换 + 搜索框 + 用户
+              Row(
+                children: [
+                  // 模式切换（紧凑设计）
+                  _buildModeSelector(theme, state, authState),
+                  const SizedBox(width: 16),
+                  // 搜索框
+                  if (state.viewMode == GalleryViewMode.search)
+                    Expanded(child: _buildSearchField(theme))
+                  else
+                    const Spacer(),
+                  if (!compact) ...[
+                    const SizedBox(width: 12),
+                    // 筛选和操作
+                    _buildFilterAndActions(theme, state, authState),
+                  ],
+                ],
+              ),
+              if (compact) ...[
+                const SizedBox(height: 8),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: _buildFilterAndActions(theme, state, authState),
+                  ),
+                ),
+              ],
+              // 第二行：排行榜选项（仅排行榜模式）
+              if (state.viewMode == GalleryViewMode.popular) ...[
+                const SizedBox(height: 8),
+                _buildPopularOptions(theme, state),
+              ],
             ],
-          ),
-          // 第二行：排行榜选项（仅排行榜模式）
-          if (state.viewMode == GalleryViewMode.popular) ...[
-            const SizedBox(height: 8),
-            _buildPopularOptions(theme, state),
-          ],
-        ],
+          );
+        },
       ),
     );
   }
@@ -560,7 +578,7 @@ class _OnlineGalleryScreenState extends ConsumerState<OnlineGalleryScreen>
         const SizedBox(width: 8),
         IconButton(
           icon: const Icon(Icons.block),
-          tooltip: '黑名单标签',
+          tooltip: context.l10n.onlineGallery_blacklistTags,
           onPressed: () => showOnlineGalleryBlacklistDialog(context, ref),
         ),
         const SizedBox(width: 8),
@@ -587,7 +605,7 @@ class _OnlineGalleryScreenState extends ConsumerState<OnlineGalleryScreen>
         // 多选模式切换
         IconButton(
           icon: const Icon(Icons.checklist),
-          tooltip: '多选模式',
+          tooltip: context.l10n.common_multiSelect,
           onPressed: _selectionNotifier.enter,
         ),
         const SizedBox(width: 8),
@@ -983,7 +1001,7 @@ class _OnlineGalleryScreenState extends ConsumerState<OnlineGalleryScreen>
         child: TextButton(
           onPressed: _galleryNotifier.loadMore,
           child: Text(
-            '加载失败，点击重试',
+            context.l10n.onlineGallery_loadFailed,
             style: TextStyle(color: theme.colorScheme.error),
           ),
         ),
@@ -1055,7 +1073,12 @@ class _OnlineGalleryScreenState extends ConsumerState<OnlineGalleryScreen>
     final success = await _galleryNotifier.toggleFavorite(post.id);
 
     if (context.mounted && success) {
-      AppToast.info(context, wasFavorited ? '已取消收藏' : '已收藏');
+      AppToast.info(
+        context,
+        wasFavorited
+            ? context.l10n.onlineGallery_unfavorited
+            : context.l10n.onlineGallery_favorited,
+      );
     }
   }
 
@@ -1082,7 +1105,7 @@ class _OnlineGalleryScreenState extends ConsumerState<OnlineGalleryScreen>
         .toList();
 
     if (tasks.isEmpty) {
-      AppToast.info(context, '选中的图片没有标签信息');
+      AppToast.info(context, context.l10n.onlineGallery_noTagInfo);
       return;
     }
 
@@ -1090,7 +1113,10 @@ class _OnlineGalleryScreenState extends ConsumerState<OnlineGalleryScreen>
         await ref.read(replicationQueueNotifierProvider.notifier).addAll(tasks);
 
     if (mounted) {
-      AppToast.success(context, '已添加 $addedCount 个任务到队列');
+      AppToast.success(
+        context,
+        context.l10n.onlineGallery_addedTasksToQueue(addedCount),
+      );
       _selectionNotifier.exit();
     }
   }
@@ -1126,7 +1152,7 @@ class _OnlineGalleryScreenState extends ConsumerState<OnlineGalleryScreen>
     }
 
     if (mounted) {
-      AppToast.info(context, '已收藏 $count 张图片');
+      AppToast.info(context, context.l10n.onlineGallery_favoritedImages(count));
       _selectionNotifier.exit();
     }
   }
@@ -1145,18 +1171,26 @@ class _OnlineGalleryScreenState extends ConsumerState<OnlineGalleryScreen>
     String? result;
     try {
       result = await FilePickerUtils.pickDirectoryModal(
-        dialogTitle: '选择下载目录',
+        dialogTitle: context.l10n.onlineGallery_chooseDownloadDirectory,
       );
     } catch (e) {
       if (mounted) {
-        AppToast.error(context, '选择下载目录失败: $e');
+        AppToast.error(
+          context,
+          context.l10n.onlineGallery_selectDownloadDirectoryFailed('$e'),
+        );
       }
       return;
     }
     if (result == null) return;
 
     if (mounted) {
-      AppToast.info(context, '开始下载 ${selectedPosts.length} 张图片...');
+      AppToast.info(
+        context,
+        context.l10n.onlineGallery_downloadSelectedStarted(
+          selectedPosts.length,
+        ),
+      );
       _selectionNotifier.exit();
     }
 
@@ -1164,7 +1198,13 @@ class _OnlineGalleryScreenState extends ConsumerState<OnlineGalleryScreen>
         await _downloadPosts(selectedPosts, result);
 
     if (mounted) {
-      AppToast.success(context, '下载完成: 成功 $successCount, 失败 $failCount');
+      AppToast.success(
+        context,
+        context.l10n.onlineGallery_downloadSelectedCompleted(
+          successCount,
+          failCount,
+        ),
+      );
     }
   }
 
@@ -1381,11 +1421,11 @@ class _FuzzySearchToggle extends StatelessWidget {
     return FilterChip(
       selected: enabled,
       showCheckmark: false,
-      label: const Text(
-        '模糊匹配',
-        style: TextStyle(fontSize: 12),
+      label: Text(
+        context.l10n.onlineGallery_fuzzySearch,
+        style: const TextStyle(fontSize: 12),
       ),
-      tooltip: '开启后使用 *tag* 匹配相近标签；关闭时按 Danbooru 精确标签搜索',
+      tooltip: context.l10n.onlineGallery_fuzzySearchTooltip,
       onSelected: onChanged,
       visualDensity: VisualDensity.compact,
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -1494,7 +1534,7 @@ class _DateRangePopupState extends State<_DateRangePopup> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    '日期范围',
+                    context.l10n.onlineGallery_dateRange,
                     style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.w700,
                     ),
@@ -1504,7 +1544,7 @@ class _DateRangePopupState extends State<_DateRangePopup> {
                     onPressed: widget.onClose,
                     icon: const Icon(Icons.close, size: 18),
                     visualDensity: VisualDensity.compact,
-                    tooltip: context.l10n.onlineGallery_clear,
+                    tooltip: context.l10n.common_close,
                   ),
                 ],
               ),
@@ -1514,10 +1554,10 @@ class _DateRangePopupState extends State<_DateRangePopup> {
                 initialDate: _start,
                 firstDate: widget.firstDate,
                 lastDate: widget.lastDate,
-                fieldLabelText: '开始日期',
+                fieldLabelText: context.l10n.onlineGallery_startDate,
                 fieldHintText: 'yyyy-mm-dd',
-                errorFormatText: '日期格式无效',
-                errorInvalidText: '日期超出范围',
+                errorFormatText: context.l10n.onlineGallery_invalidDateFormat,
+                errorInvalidText: context.l10n.onlineGallery_dateOutOfRange,
                 onDateSaved: (date) => _start = _clampDate(date),
               ),
               const SizedBox(height: 10),
@@ -1526,30 +1566,34 @@ class _DateRangePopupState extends State<_DateRangePopup> {
                 initialDate: _end,
                 firstDate: widget.firstDate,
                 lastDate: widget.lastDate,
-                fieldLabelText: '结束日期',
+                fieldLabelText: context.l10n.onlineGallery_endDate,
                 fieldHintText: 'yyyy-mm-dd',
-                errorFormatText: '日期格式无效',
-                errorInvalidText: '日期超出范围',
+                errorFormatText: context.l10n.onlineGallery_invalidDateFormat,
+                errorInvalidText: context.l10n.onlineGallery_dateOutOfRange,
                 onDateSaved: (date) => _end = _clampDate(date),
               ),
               const SizedBox(height: 12),
-              Row(
-                children: [
-                  TextButton(
-                    onPressed: _setLast30Days,
-                    child: const Text('最近30天'),
-                  ),
-                  const Spacer(),
-                  TextButton(
-                    onPressed: widget.onClear,
-                    child: Text(context.l10n.onlineGallery_clear),
-                  ),
-                  const SizedBox(width: 8),
-                  FilledButton(
-                    onPressed: _apply,
-                    child: const Text('应用'),
-                  ),
-                ],
+              Align(
+                alignment: Alignment.centerRight,
+                child: Wrap(
+                  alignment: WrapAlignment.end,
+                  spacing: 8,
+                  runSpacing: 4,
+                  children: [
+                    TextButton(
+                      onPressed: _setLast30Days,
+                      child: Text(context.l10n.onlineGallery_last30Days),
+                    ),
+                    TextButton(
+                      onPressed: widget.onClear,
+                      child: Text(context.l10n.onlineGallery_clear),
+                    ),
+                    FilledButton(
+                      onPressed: _apply,
+                      child: Text(context.l10n.common_apply),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),

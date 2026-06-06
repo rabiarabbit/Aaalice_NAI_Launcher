@@ -142,13 +142,13 @@ extension SelectionModeExtension on SelectionMode {
   String get label {
     switch (this) {
       case SelectionMode.replace:
-        return '新建';
+        return 'Replace';
       case SelectionMode.add:
-        return '添加';
+        return 'Add';
       case SelectionMode.subtract:
-        return '减去';
+        return 'Subtract';
       case SelectionMode.intersect:
-        return '交叉';
+        return 'Intersect';
     }
   }
 

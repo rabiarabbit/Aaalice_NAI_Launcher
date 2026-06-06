@@ -1001,7 +1001,7 @@ class _VibeExportDialogAdvancedState
       // 显示成功提示
       if (mounted) {
         Navigator.of(context).pop();
-        AppToast.success(context, '导出成功');
+        AppToast.success(context, context.l10n.toast_exportSuccess);
       }
     } catch (e, stack) {
       AppLogger.e('导出 Vibe 失败', e, stack, 'VibeExportDialogAdvanced');

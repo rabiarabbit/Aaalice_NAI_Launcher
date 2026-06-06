@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../widgets/common/app_toast.dart';
+import '../../../core/utils/localization_extension.dart';
 import '../../../data/models/character/character_prompt.dart';
 import '../../../data/models/tag_library/tag_library_entry.dart';
 import '../../providers/fixed_tags_provider.dart';
@@ -73,7 +74,7 @@ class _PromptAssistantOverlayState extends ConsumerState<PromptAssistantOverlay>
   Future<void> _runTranslate() async {
     final inputText = _assistantInputText();
     await _runAction(
-      '翻译中',
+      context.l10n.promptAssistant_translateProcessing,
       inputText,
       (service, input) => service.translatePrompt(
         input,
@@ -85,7 +86,7 @@ class _PromptAssistantOverlayState extends ConsumerState<PromptAssistantOverlay>
   Future<void> _runOptimize() async {
     final inputText = _assistantInputText();
     await _runAction(
-      '优化中',
+      context.l10n.promptAssistant_optimizeProcessing,
       inputText,
       (service, input) => service.optimizePrompt(
         input,
@@ -109,7 +110,10 @@ class _PromptAssistantOverlayState extends ConsumerState<PromptAssistantOverlay>
     }
     if (result.images.isNotEmpty && provider?.allowImageInput != true) {
       if (mounted) {
-        AppToast.warning(context, '当前自定义任务服务商未启用图片输入');
+        AppToast.warning(
+          context,
+          context.l10n.promptAssistant_imageInputDisabled,
+        );
       }
       return;
     }
@@ -128,6 +132,8 @@ class _PromptAssistantOverlayState extends ConsumerState<PromptAssistantOverlay>
   }
 
   Future<void> _runCharacterReplace() async {
+    final processingLabel =
+        context.l10n.promptAssistant_characterReplaceProcessing;
     final character = await _selectCharacterForReplacement();
     if (character == null) {
       return;
@@ -135,7 +141,7 @@ class _PromptAssistantOverlayState extends ConsumerState<PromptAssistantOverlay>
 
     final inputText = _assistantInputText();
     await _runAction(
-      '角色替换中',
+      processingLabel,
       inputText,
       (service, input) => service.replaceCharacterPrompt(
         input,
@@ -158,11 +164,13 @@ class _PromptAssistantOverlayState extends ConsumerState<PromptAssistantOverlay>
   Future<CharacterPrompt?> _pickReplacementCharacterFromLibrary() async {
     final entry = await showDialog<TagLibraryEntry>(
       context: context,
-      builder: (context) => const TagLibraryPickerDialog(title: '选择替换目标角色'),
+      builder: (context) => TagLibraryPickerDialog(
+        title: context.l10n.reversePrompt_selectReplacementTargetTitle,
+      ),
     );
     if (entry == null) {
       if (mounted) {
-        AppToast.warning(context, '请先在反推角色库中添加有效角色');
+        AppToast.warning(context, context.l10n.promptAssistant_needCharacter);
       }
       return null;
     }
@@ -187,7 +195,9 @@ class _PromptAssistantOverlayState extends ConsumerState<PromptAssistantOverlay>
   ) async {
     final text = inputText.trim();
     if (text.isEmpty) {
-      if (mounted) AppToast.warning(context, '请输入提示词后再操作');
+      if (mounted) {
+        AppToast.warning(context, context.l10n.promptAssistant_needPrompt);
+      }
       return;
     }
 
@@ -212,7 +222,12 @@ class _PromptAssistantOverlayState extends ConsumerState<PromptAssistantOverlay>
       },
       onError: (e) {
         stateNotifier.setError(widget.sessionId, e.toString());
-        if (mounted) AppToast.error(context, '助手请求失败: $e');
+        if (mounted) {
+          AppToast.error(
+            context,
+            context.l10n.promptAssistant_requestFailed(e),
+          );
+        }
       },
       onDone: () {
         if (buffer.isNotEmpty) {
@@ -247,7 +262,10 @@ class _PromptAssistantOverlayState extends ConsumerState<PromptAssistantOverlay>
         .push(widget.sessionId, beforeText);
 
     final stateNotifier = ref.read(promptAssistantStateProvider.notifier);
-    stateNotifier.startProcessing(widget.sessionId, '自定义处理中');
+    stateNotifier.startProcessing(
+      widget.sessionId,
+      context.l10n.promptAssistant_customProcessing,
+    );
 
     final service = ref.read(promptAssistantServiceProvider);
     final buffer = StringBuffer();
@@ -269,7 +287,12 @@ class _PromptAssistantOverlayState extends ConsumerState<PromptAssistantOverlay>
       },
       onError: (e) {
         stateNotifier.setError(widget.sessionId, e.toString());
-        if (mounted) AppToast.error(context, '助手请求失败: $e');
+        if (mounted) {
+          AppToast.error(
+            context,
+            context.l10n.promptAssistant_requestFailed(e),
+          );
+        }
       },
       onDone: () {
         if (buffer.isNotEmpty) {
@@ -362,12 +385,24 @@ class _PromptAssistantOverlayState extends ConsumerState<PromptAssistantOverlay>
           position.dx,
           position.dy,
         ),
-        items: const [
-          PopupMenuItem(value: 'assistant_settings', child: Text('助手设置')),
-          PopupMenuItem(value: 'service_settings', child: Text('服务设置')),
-          PopupMenuItem(value: 'rule_settings', child: Text('规则设置')),
-          PopupMenuDivider(),
-          PopupMenuItem(value: 'cancel', child: Text('取消当前任务')),
+        items: [
+          PopupMenuItem(
+            value: 'assistant_settings',
+            child: Text(context.l10n.promptAssistant_assistantSettings),
+          ),
+          PopupMenuItem(
+            value: 'service_settings',
+            child: Text(context.l10n.promptAssistant_serviceSettings),
+          ),
+          PopupMenuItem(
+            value: 'rule_settings',
+            child: Text(context.l10n.promptAssistant_ruleSettings),
+          ),
+          const PopupMenuDivider(),
+          PopupMenuItem(
+            value: 'cancel',
+            child: Text(context.l10n.promptAssistant_cancelCurrentTask),
+          ),
         ],
       ).then((value) async {
         if (value == 'cancel') {
@@ -393,7 +428,7 @@ class _PromptAssistantOverlayState extends ConsumerState<PromptAssistantOverlay>
           children: [
             ListTile(
               leading: const Icon(Icons.settings),
-              title: const Text('助手设置'),
+              title: Text(context.l10n.promptAssistant_assistantSettings),
               onTap: () {
                 Navigator.pop(context);
                 widget.onOpenSettings?.call();
@@ -401,7 +436,7 @@ class _PromptAssistantOverlayState extends ConsumerState<PromptAssistantOverlay>
             ),
             ListTile(
               leading: const Icon(Icons.cloud),
-              title: const Text('服务设置'),
+              title: Text(context.l10n.promptAssistant_serviceSettings),
               onTap: () {
                 Navigator.pop(context);
                 widget.onOpenSettings?.call();
@@ -409,7 +444,7 @@ class _PromptAssistantOverlayState extends ConsumerState<PromptAssistantOverlay>
             ),
             ListTile(
               leading: const Icon(Icons.rule),
-              title: const Text('规则设置'),
+              title: Text(context.l10n.promptAssistant_ruleSettings),
               onTap: () {
                 Navigator.pop(context);
                 widget.onOpenSettings?.call();
@@ -417,7 +452,7 @@ class _PromptAssistantOverlayState extends ConsumerState<PromptAssistantOverlay>
             ),
             ListTile(
               leading: const Icon(Icons.stop_circle),
-              title: const Text('取消当前任务'),
+              title: Text(context.l10n.promptAssistant_cancelCurrentTask),
               onTap: () async {
                 Navigator.pop(context);
                 await ref
@@ -530,7 +565,9 @@ class _PromptAssistantOverlayState extends ConsumerState<PromptAssistantOverlay>
                   icon: isExpanded
                       ? Icons.close_rounded
                       : Icons.auto_awesome_rounded,
-                  tooltip: isExpanded ? '收起助手' : '展开助手',
+                  tooltip: isExpanded
+                      ? context.l10n.promptAssistant_collapseAssistant
+                      : context.l10n.promptAssistant_expandAssistant,
                   onPressed: () =>
                       notifier.setExpanded(widget.sessionId, !isExpanded),
                   iconColor: isExpanded
@@ -545,42 +582,44 @@ class _PromptAssistantOverlayState extends ConsumerState<PromptAssistantOverlay>
                 if (isExpanded) ...[
                   _miniButton(
                     icon: Icons.history,
-                    tooltip: '历史',
+                    tooltip: context.l10n.promptAssistant_history,
                     onPressed: _showHistory,
                   ),
                   _miniButton(
                     icon: Icons.undo,
-                    tooltip: '撤销',
+                    tooltip: context.l10n.promptAssistant_undo,
                     onPressed: history.canUndo ? _undo : null,
                   ),
                   _miniButton(
                     icon: Icons.redo,
-                    tooltip: '重做',
+                    tooltip: context.l10n.promptAssistant_redo,
                     onPressed: history.canRedo ? _redo : null,
                   ),
                   _miniButton(
                     icon: Icons.translate,
-                    tooltip: '翻译',
+                    tooltip: context.l10n.promptAssistant_translate,
                     onPressed: isProcessing ? null : _runTranslate,
                   ),
                   _miniButton(
                     icon: Icons.auto_fix_high,
-                    tooltip: '优化',
+                    tooltip: context.l10n.promptAssistant_optimize,
                     onPressed: isProcessing ? null : _runOptimize,
                   ),
                   _miniButton(
                     icon: Icons.tune_rounded,
-                    tooltip: '自定义',
+                    tooltip: context.l10n.promptAssistant_custom,
                     onPressed: isProcessing ? null : _runCustom,
                   ),
                   _miniButton(
                     icon: Icons.manage_accounts_rounded,
-                    tooltip: '角色替换',
+                    tooltip: context.l10n.promptAssistant_characterReplace,
                     onPressed: isProcessing ? null : _runCharacterReplace,
                   ),
                   _miniButton(
                     icon: isProcessing ? Icons.stop_circle : Icons.more_horiz,
-                    tooltip: isProcessing ? '取消任务' : '菜单',
+                    tooltip: isProcessing
+                        ? context.l10n.promptAssistant_cancelTask
+                        : context.l10n.promptAssistant_menu,
                     onPressed: isProcessing
                         ? () async {
                             await ref

@@ -139,7 +139,6 @@ class UnifiedPromptConfig {
     enableComfyuiImport: true,
     compact: false,
     readOnly: false,
-    hintText: "输入提示词描述画面，输入 < 引用词库，支持自动补全标签",
     autocompleteConfig: AutocompleteConfig(
       maxSuggestions: 15,
       showTranslation: true,

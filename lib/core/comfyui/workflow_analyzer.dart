@@ -76,7 +76,7 @@ class WorkflowAnalyzer {
                     : SlotDataType.image,
                 nodeId: nodeId,
                 field: imageField,
-                label: '$title (节点 $nodeId)',
+                label: '$title (Node $nodeId)',
                 required: true,
               ),
             );
@@ -96,7 +96,7 @@ class WorkflowAnalyzer {
             dataType: SlotDataType.image,
             nodeId: nodeId,
             field: null,
-            label: '$title (节点 $nodeId)',
+            label: '$title (Node $nodeId)',
             outputMethod: method,
             nodeClass: classType,
           ),

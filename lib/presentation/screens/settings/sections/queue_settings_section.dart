@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/storage_keys.dart';
 import '../../../../core/storage/local_storage_service.dart';
+import '../../../../core/utils/localization_extension.dart';
 import '../../../widgets/common/themed_input.dart';
 import '../widgets/settings_card.dart';
 
@@ -131,6 +132,7 @@ class _QueueSettingsSectionState extends ConsumerState<QueueSettingsSection> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     final storage = ref.watch(localStorageServiceProvider);
     final retryCount = storage.getSetting<int>(
           StorageKeys.queueRetryCount,
@@ -155,7 +157,7 @@ class _QueueSettingsSectionState extends ConsumerState<QueueSettingsSection> {
       children: [
         // 重试次数设置
         SettingsCard(
-          title: '重试次数',
+          title: l10n.settings_queueRetryCount,
           icon: Icons.replay_outlined,
           child: Row(
             children: [
@@ -166,9 +168,9 @@ class _QueueSettingsSectionState extends ConsumerState<QueueSettingsSection> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text('重试次数'),
+                    Text(l10n.settings_queueRetryCount),
                     Text(
-                      '最多 $retryCount 次',
+                      l10n.settings_queueRetryCountMax(retryCount.toString()),
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.outline,
                       ),
@@ -225,14 +227,14 @@ class _QueueSettingsSectionState extends ConsumerState<QueueSettingsSection> {
                 ),
               ),
               const SizedBox(width: 4),
-              const Text('次'),
+              Text(l10n.unit_times),
             ],
           ),
         ),
 
         // 重试间隔设置
         SettingsCard(
-          title: '重试间隔',
+          title: l10n.settings_queueRetryInterval,
           icon: Icons.timer_outlined,
           child: Row(
             children: [
@@ -243,9 +245,11 @@ class _QueueSettingsSectionState extends ConsumerState<QueueSettingsSection> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text('重试间隔'),
+                    Text(l10n.settings_queueRetryInterval),
                     Text(
-                      '${retryInterval.toStringAsFixed(1)} 秒',
+                      l10n.settings_queueRetryIntervalValue(
+                        retryInterval.toStringAsFixed(1),
+                      ),
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.outline,
                       ),
@@ -305,14 +309,14 @@ class _QueueSettingsSectionState extends ConsumerState<QueueSettingsSection> {
                 ),
               ),
               const SizedBox(width: 4),
-              const Text('秒'),
+              Text(l10n.unit_seconds),
             ],
           ),
         ),
 
         // 悬浮球背景图片设置
         SettingsCard(
-          title: '悬浮球背景',
+          title: l10n.settings_floatingButtonBackground,
           icon: Icons.image_outlined,
           child: Row(
             children: [
@@ -322,7 +326,9 @@ class _QueueSettingsSectionState extends ConsumerState<QueueSettingsSection> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      _backgroundImagePath != null ? '已设置自定义背景' : '默认样式',
+                      _backgroundImagePath != null
+                          ? l10n.settings_floatingButtonBackgroundCustom
+                          : l10n.settings_floatingButtonBackgroundDefault,
                       style: theme.textTheme.bodyMedium,
                     ),
                     if (_backgroundImagePath != null)
@@ -365,13 +371,13 @@ class _QueueSettingsSectionState extends ConsumerState<QueueSettingsSection> {
               if (_backgroundImagePath != null)
                 IconButton(
                   icon: const Icon(Icons.clear),
-                  tooltip: '清除背景',
+                  tooltip: l10n.settings_clearBackground,
                   onPressed: _clearBackgroundImage,
                 ),
               // 选择按钮
               FilledButton.tonalIcon(
                 icon: const Icon(Icons.folder_open, size: 18),
-                label: const Text('选择图片'),
+                label: Text(l10n.settings_selectImage),
                 onPressed: _selectBackgroundImage,
               ),
             ],

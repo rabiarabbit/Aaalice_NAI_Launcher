@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart' as p;
 
+import '../../../../core/utils/localization_extension.dart';
 import '../../../../core/utils/image_save_utils.dart';
 import '../../../../data/models/gallery/nai_image_metadata.dart';
 import '../../../../data/repositories/gallery_folder_repository.dart';
@@ -120,11 +121,11 @@ class GenerationSaveService {
       ref.read(localGalleryNotifierProvider.notifier).refresh();
 
       if (context.mounted) {
-        AppToast.success(context, '图像已保存到: $saveDirPath');
+        AppToast.success(context, context.l10n.image_imageSaved(saveDirPath));
       }
     } catch (e) {
       if (context.mounted) {
-        AppToast.error(context, '保存图像失败: $e');
+        AppToast.error(context, context.l10n.image_saveFailed(e.toString()));
       }
     }
   }

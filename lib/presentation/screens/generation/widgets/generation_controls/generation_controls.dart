@@ -248,7 +248,7 @@ class _GenerationControlsState extends ConsumerState<GenerationControls> {
   ) {
     final params = ref.read(generationParamsNotifierProvider);
     if (ref.read(kritaBridgeNotifierProvider).isBridgeGenerating) {
-      AppToast.warning(context, 'Krita Bridge 正在生成，请等待当前任务结束');
+      AppToast.warning(context, context.l10n.toast_kritaBusy);
       return;
     }
     if (params.prompt.isEmpty) {

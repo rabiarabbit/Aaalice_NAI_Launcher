@@ -82,6 +82,9 @@ void main() {
           localStorageServiceProvider.overrideWith((ref) => storage),
         ],
         child: const MaterialApp(
+          locale: Locale('zh'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(
             body: SizedBox(
               width: 340,
@@ -159,6 +162,9 @@ void main() {
           localStorageServiceProvider.overrideWith((ref) => storage),
         ],
         child: const MaterialApp(
+          locale: Locale('zh'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(
             body: SizedBox(
               width: 260,
@@ -196,6 +202,7 @@ void main() {
           localStorageServiceProvider.overrideWith((ref) => storage),
         ],
         child: const MaterialApp(
+          locale: Locale('zh'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(
@@ -257,6 +264,7 @@ void main() {
           localStorageServiceProvider.overrideWith((ref) => storage),
         ],
         child: const MaterialApp(
+          locale: Locale('zh'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(
@@ -292,6 +300,9 @@ void main() {
           localStorageServiceProvider.overrideWith((ref) => storage),
         ],
         child: const MaterialApp(
+          locale: Locale('zh'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(
             body: SizedBox(
               width: 340,
@@ -361,6 +372,9 @@ void main() {
           localStorageServiceProvider.overrideWith((ref) => storage),
         ],
         child: const MaterialApp(
+          locale: Locale('zh'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(
             body: SizedBox(
               width: 340,
@@ -421,6 +435,9 @@ void main() {
           localStorageServiceProvider.overrideWith((ref) => storage),
         ],
         child: const MaterialApp(
+          locale: Locale('zh'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(
             body: SizedBox(
               width: 340,
@@ -477,6 +494,9 @@ void main() {
             localStorageServiceProvider.overrideWith((ref) => storage),
           ],
           child: const MaterialApp(
+            locale: Locale('zh'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             home: Scaffold(
               body: SizedBox(
                 width: 340,
@@ -536,6 +556,9 @@ void main() {
             localStorageServiceProvider.overrideWith((ref) => storage),
           ],
           child: const MaterialApp(
+            locale: Locale('zh'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             home: Scaffold(
               body: SizedBox(
                 width: 340,
@@ -607,6 +630,9 @@ void main() {
           localStorageServiceProvider.overrideWith((ref) => storage),
         ],
         child: const MaterialApp(
+          locale: Locale('zh'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(
             body: SizedBox(
               width: 360,

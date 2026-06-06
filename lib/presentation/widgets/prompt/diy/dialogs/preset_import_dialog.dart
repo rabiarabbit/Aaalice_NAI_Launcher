@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:nai_launcher/core/utils/localization_extension.dart';
 import 'package:nai_launcher/data/models/prompt/random_preset.dart';
 import '../../../../widgets/common/app_toast.dart';
 import 'package:nai_launcher/presentation/widgets/common/themed_input.dart';
@@ -104,7 +105,7 @@ class _PresetImportDialogState extends State<PresetImportDialog> {
   void _copyToClipboard() {
     Clipboard.setData(ClipboardData(text: _controller.text)).then((_) {
       if (mounted) {
-        AppToast.success(context, '已复制到剪贴板');
+        AppToast.success(context, context.l10n.image_copiedToClipboard);
       }
     });
   }

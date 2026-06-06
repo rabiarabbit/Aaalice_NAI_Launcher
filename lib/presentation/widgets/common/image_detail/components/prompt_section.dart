@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nai_launcher/core/utils/localization_extension.dart';
 
 import '../../../../../data/services/tag_translation_service.dart';
 import '../../app_toast.dart';
@@ -53,12 +54,12 @@ class _PromptSectionState extends State<PromptSection> {
   void _copyContent() {
     if (widget.content.isEmpty) return;
     Clipboard.setData(ClipboardData(text: widget.content));
-    AppToast.success(context, '${widget.title}已复制');
+    AppToast.success(context, context.l10n.toast_copiedTitle(widget.title));
   }
 
   void _copyTag(String tag) {
     Clipboard.setData(ClipboardData(text: tag));
-    AppToast.success(context, '标签已复制');
+    AppToast.success(context, context.l10n.toast_tagCopied);
   }
 
   List<String> get _displayTags {
@@ -474,7 +475,7 @@ class CharacterPromptCard extends StatelessWidget {
                 ? '正向: $prompt\n负向: $negativePrompt'
                 : prompt;
             Clipboard.setData(ClipboardData(text: textToCopy));
-            AppToast.success(context, '角色提示词已复制');
+            AppToast.success(context, context.l10n.toast_characterPromptCopied);
             onCopy?.call();
           },
           icon: Icon(Icons.copy, size: 16, color: colorScheme.onSurfaceVariant),

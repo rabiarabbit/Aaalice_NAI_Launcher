@@ -9,7 +9,7 @@ class RectSelectionTool extends ShapeSelectionTool {
   String get id => 'rect_selection';
 
   @override
-  String get name => '矩形选区';
+  String get name => 'Rectangle Selection';
 
   @override
   IconData get icon => Icons.crop_square;

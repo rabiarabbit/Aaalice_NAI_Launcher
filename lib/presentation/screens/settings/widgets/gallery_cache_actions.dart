@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/database/datasources/gallery_data_source.dart';
 import '../../../../core/utils/app_logger.dart';
+import '../../../../core/utils/localization_extension.dart';
 import '../../../../data/repositories/gallery_folder_repository.dart';
 import '../../../../data/services/gallery/index.dart';
 import '../../../providers/local_gallery_provider.dart';
@@ -71,23 +72,17 @@ class _GalleryCacheActionsState extends ConsumerState<GalleryCacheActions>
           color: Colors.green,
           size: 48,
         ),
-        title: const Text('重新扫描画廊'),
-        content: const Text(
-          '这将执行以下操作：\n\n'
-          '1. 检查数据一致性（标记不存在的文件）\n'
-          '2. 扫描新文件和变更的文件\n'
-          '3. 重新尝试历史上未提取成功的元数据（含失败记录）\n\n'
-          '此操作不会清空已有数据，也不会删除图片文件。',
-        ),
+        title: Text(context.l10n.galleryCache_rescanTitle),
+        content: Text(context.l10n.galleryCache_rescanContent),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('取消'),
+            child: Text(context.l10n.common_cancel),
           ),
           FilledButton.icon(
             onPressed: () => Navigator.of(dialogContext).pop(true),
             icon: const Icon(Icons.refresh),
-            label: const Text('开始扫描'),
+            label: Text(context.l10n.galleryCache_startScan),
           ),
         ],
       ),
@@ -99,14 +94,14 @@ class _GalleryCacheActionsState extends ConsumerState<GalleryCacheActions>
 
     // 检查是否已有扫描在进行中
     if (ScanStateManager.instance.isScanning) {
-      AppToast.warning(context, '已有扫描任务在进行中，请等待完成后再试');
+      AppToast.warning(context, context.l10n.galleryCache_scanAlreadyRunning);
       return;
     }
 
     setState(() {
       _isScanning = true;
       _scanProgress = 0.0;
-      _scanPhase = '准备中...';
+      _scanPhase = context.l10n.galleryCache_preparing;
       _processedCount = 0;
       _totalCount = 0;
     });
@@ -118,14 +113,14 @@ class _GalleryCacheActionsState extends ConsumerState<GalleryCacheActions>
       if (!mounted) return;
 
       if (rootPath == null) {
-        AppToast.error(context, '未设置画廊目录');
+        AppToast.error(context, context.l10n.galleryCache_noGalleryFolder);
         return;
       }
 
       final dir = Directory(rootPath);
       if (!await dir.exists()) {
         if (!mounted) return;
-        AppToast.error(context, '画廊目录不存在');
+        AppToast.error(context, context.l10n.galleryCache_galleryFolderMissing);
         return;
       }
 
@@ -141,8 +136,10 @@ class _GalleryCacheActionsState extends ConsumerState<GalleryCacheActions>
           _totalCount = stats.totalDiscovered;
           _processedCount = stats.processed + stats.skipped;
           _scanProgress = stats.progress;
-          _scanPhase =
-              '正在扫描 ${stats.processed + stats.skipped}/${stats.totalDiscovered}...';
+          _scanPhase = context.l10n.galleryCache_scanningPhase(
+            stats.processed + stats.skipped,
+            stats.totalDiscovered,
+          );
         });
       });
 
@@ -167,11 +164,11 @@ class _GalleryCacheActionsState extends ConsumerState<GalleryCacheActions>
       ref.invalidate(localGalleryNotifierProvider);
       ref.invalidate(cacheStatisticsProvider);
 
-      AppToast.success(context, '扫描完成！');
+      AppToast.success(context, context.l10n.galleryCache_scanComplete);
     } catch (e, stack) {
       AppLogger.e('Rescan failed', e, stack, 'RescanGallery');
       if (!mounted) return;
-      AppToast.error(context, '扫描失败: $e');
+      AppToast.error(context, context.l10n.galleryCache_scanFailed(e));
     } finally {
       _scanController.stop();
       _scanController.reset();
@@ -233,7 +230,7 @@ class _GalleryCacheActionsState extends ConsumerState<GalleryCacheActions>
             },
           ),
           title: Text(
-            '重新扫描',
+            context.l10n.galleryCache_rescan,
             style: theme.textTheme.bodyLarge?.copyWith(
               fontWeight: FontWeight.w500,
             ),
@@ -242,7 +239,9 @@ class _GalleryCacheActionsState extends ConsumerState<GalleryCacheActions>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                _isScanning ? (_scanPhase ?? '正在扫描...') : '检查数据一致性、查漏补缺、提取元数据',
+                _isScanning
+                    ? (_scanPhase ?? context.l10n.galleryCache_scanning)
+                    : context.l10n.galleryCache_rescanSubtitle,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
@@ -303,7 +302,7 @@ class _GalleryCacheActionsState extends ConsumerState<GalleryCacheActions>
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        '扫描',
+                        context.l10n.galleryCache_scanAction,
                         style: theme.textTheme.labelSmall?.copyWith(
                           color: colorScheme.primary,
                           fontWeight: FontWeight.w600,

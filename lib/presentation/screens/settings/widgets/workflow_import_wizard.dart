@@ -7,7 +7,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/comfyui/workflow_analyzer.dart';
 import '../../../../core/comfyui/workflow_template.dart';
+import '../../../../core/utils/localization_extension.dart';
 import '../../../providers/comfyui/comfyui_provider.dart';
+import '../../../utils/comfyui_workflow_l10n.dart';
 import '../../../widgets/common/app_toast.dart';
 
 /// 工作流导入向导（多步对话框）
@@ -78,7 +80,12 @@ class _WorkflowImportWizardState extends ConsumerState<WorkflowImportWizard> {
   }
 
   Widget _buildHeader(ThemeData theme) {
-    final titles = ['选择工作流文件', '工作流信息', '确认槽位配置', '完成导入'];
+    final titles = [
+      context.l10n.workflowImport_stepFile,
+      context.l10n.workflowImport_stepInfo,
+      context.l10n.workflowImport_stepSlots,
+      context.l10n.workflowImport_stepDone,
+    ];
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -94,12 +101,12 @@ class _WorkflowImportWizardState extends ConsumerState<WorkflowImportWizard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '导入 ComfyUI 工作流',
+                  context.l10n.workflowImport_title,
                   style: theme.textTheme.titleMedium,
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '步骤 ${_step + 1}/4: ${titles[_step]}',
+                  context.l10n.workflowImport_step(_step + 1, titles[_step]),
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
@@ -147,7 +154,7 @@ class _WorkflowImportWizardState extends ConsumerState<WorkflowImportWizard> {
           if (_step > 0)
             TextButton(
               onPressed: () => setState(() => _step--),
-              child: const Text('上一步'),
+              child: Text(context.l10n.workflowImport_previous),
             )
           else
             const SizedBox.shrink(),
@@ -155,19 +162,19 @@ class _WorkflowImportWizardState extends ConsumerState<WorkflowImportWizard> {
             children: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('取消'),
+                child: Text(context.l10n.common_cancel),
               ),
               const SizedBox(width: 8),
               if (_step < 3)
                 FilledButton(
                   onPressed: _canProceed ? _nextStep : null,
-                  child: const Text('下一步'),
+                  child: Text(context.l10n.workflowImport_next),
                 )
               else
                 FilledButton.icon(
                   onPressed: _saveWorkflow,
                   icon: const Icon(Icons.check, size: 18),
-                  label: const Text('完成导入'),
+                  label: Text(context.l10n.workflowImport_finish),
                 ),
             ],
           ),
@@ -204,7 +211,8 @@ class _WorkflowImportWizardState extends ConsumerState<WorkflowImportWizard> {
       _enabledSlotIds.add(slot.id);
     }
     if (_nameController.text.isEmpty) {
-      _nameController.text = _fileName?.replaceAll('.json', '') ?? '自定义工作流';
+      _nameController.text = _fileName?.replaceAll('.json', '') ??
+          context.l10n.workflowImport_defaultName;
     }
   }
 
@@ -215,8 +223,7 @@ class _WorkflowImportWizardState extends ConsumerState<WorkflowImportWizard> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          '请选择 ComfyUI 导出的 workflow_api.json 文件。\n\n'
-          '在 ComfyUI 中，点击菜单 → 导出 (API格式) 即可获得此文件。',
+          context.l10n.workflowImport_fileInstructions,
           style: theme.textTheme.bodyMedium,
         ),
         const SizedBox(height: 20),
@@ -253,7 +260,9 @@ class _WorkflowImportWizardState extends ConsumerState<WorkflowImportWizard> {
                           style: theme.textTheme.titleSmall,
                         ),
                         Text(
-                          '${_workflowJson!.length} 个节点',
+                          context.l10n.workflowImport_nodeCount(
+                            _workflowJson!.length,
+                          ),
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.onSurface
                                 .withValues(alpha: 0.6),
@@ -261,7 +270,7 @@ class _WorkflowImportWizardState extends ConsumerState<WorkflowImportWizard> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          '点击重新选择',
+                          context.l10n.workflowImport_reselect,
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.primary,
                           ),
@@ -279,7 +288,7 @@ class _WorkflowImportWizardState extends ConsumerState<WorkflowImportWizard> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          '点击选择 workflow_api.json',
+                          context.l10n.workflowImport_selectWorkflowApi,
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: theme.colorScheme.onSurface
                                 .withValues(alpha: 0.5),
@@ -315,7 +324,9 @@ class _WorkflowImportWizardState extends ConsumerState<WorkflowImportWizard> {
 
       final parsed = json.decode(content);
       if (parsed is! Map<String, dynamic>) {
-        if (mounted) AppToast.error(context, '文件格式无效：顶层应为 JSON 对象');
+        if (mounted) {
+          AppToast.error(context, context.l10n.workflowImport_invalidTopLevel);
+        }
         return;
       }
 
@@ -325,7 +336,7 @@ class _WorkflowImportWizardState extends ConsumerState<WorkflowImportWizard> {
       );
       if (!hasNodes) {
         if (mounted) {
-          AppToast.error(context, '未检测到 ComfyUI 节点，请确认是 API 格式导出');
+          AppToast.error(context, context.l10n.workflowImport_noComfyNodes);
         }
         return;
       }
@@ -336,7 +347,9 @@ class _WorkflowImportWizardState extends ConsumerState<WorkflowImportWizard> {
         _analysis = null;
       });
     } catch (e) {
-      if (mounted) AppToast.error(context, '读取文件失败: $e');
+      if (mounted) {
+        AppToast.error(context, context.l10n.workflowImport_readFailed(e));
+      }
     }
   }
 
@@ -357,31 +370,34 @@ class _WorkflowImportWizardState extends ConsumerState<WorkflowImportWizard> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('自动分析结果', style: theme.textTheme.titleSmall),
+              Text(
+                context.l10n.workflowImport_analysisResult,
+                style: theme.textTheme.titleSmall,
+              ),
               const SizedBox(height: 8),
               _infoRow(
                 theme,
                 Icons.input,
-                '输入图像节点',
-                '${a.inputSlots.length} 个',
+                context.l10n.workflowImport_inputImageNodes,
+                context.l10n.workflowImport_countUnit(a.inputSlots.length),
               ),
               _infoRow(
                 theme,
                 Icons.tune,
-                '可调参数',
-                '${a.parameterSlots.length} 个',
+                context.l10n.workflowImport_adjustableParams,
+                context.l10n.workflowImport_countUnit(a.parameterSlots.length),
               ),
               _infoRow(
                 theme,
                 Icons.output,
-                '输出节点',
-                '${a.outputSlots.length} 个',
+                context.l10n.workflowImport_outputNodes,
+                context.l10n.workflowImport_countUnit(a.outputSlots.length),
               ),
               _infoRow(
                 theme,
                 Icons.widgets_outlined,
-                '总节点数',
-                '${a.nodes.length} 个',
+                context.l10n.workflowImport_totalNodes,
+                context.l10n.workflowImport_countUnit(a.nodes.length),
               ),
             ],
           ),
@@ -391,9 +407,9 @@ class _WorkflowImportWizardState extends ConsumerState<WorkflowImportWizard> {
         // 名称
         TextField(
           controller: _nameController,
-          decoration: const InputDecoration(
-            labelText: '工作流名称 *',
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            labelText: context.l10n.workflowImport_workflowName,
+            border: const OutlineInputBorder(),
             isDense: true,
           ),
         ),
@@ -402,9 +418,9 @@ class _WorkflowImportWizardState extends ConsumerState<WorkflowImportWizard> {
         // 描述
         TextField(
           controller: _descController,
-          decoration: const InputDecoration(
-            labelText: '描述',
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            labelText: context.l10n.workflowImport_description,
+            border: const OutlineInputBorder(),
             isDense: true,
           ),
           maxLines: 2,
@@ -412,13 +428,16 @@ class _WorkflowImportWizardState extends ConsumerState<WorkflowImportWizard> {
         const SizedBox(height: 12),
 
         // 分类
-        Text('分类', style: theme.textTheme.titleSmall),
+        Text(
+          context.l10n.workflowImport_category,
+          style: theme.textTheme.titleSmall,
+        ),
         const SizedBox(height: 8),
         Wrap(
           spacing: 8,
           children: WorkflowCategory.values.map((cat) {
             return ChoiceChip(
-              label: Text(_categoryLabel(cat)),
+              label: Text(cat.localizedLabel(context)),
               selected: _category == cat,
               onSelected: (selected) {
                 if (selected) setState(() => _category = cat);
@@ -457,24 +476,36 @@ class _WorkflowImportWizardState extends ConsumerState<WorkflowImportWizard> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          '勾选需要暴露给 UI 的槽位。输入/输出槽位建议保留；不需要用户调整的参数可以取消勾选。',
+          context.l10n.workflowImport_slotsHint,
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
           ),
         ),
         const SizedBox(height: 16),
         if (a.inputSlots.isNotEmpty) ...[
-          _sectionHeader(theme, '输入', Icons.input),
+          _sectionHeader(
+            theme,
+            context.l10n.workflowImport_inputSection,
+            Icons.input,
+          ),
           ...a.inputSlots.map((s) => _slotTile(theme, s)),
           const SizedBox(height: 12),
         ],
         if (a.outputSlots.isNotEmpty) ...[
-          _sectionHeader(theme, '输出', Icons.output),
+          _sectionHeader(
+            theme,
+            context.l10n.workflowImport_outputSection,
+            Icons.output,
+          ),
           ...a.outputSlots.map((s) => _slotTile(theme, s)),
           const SizedBox(height: 12),
         ],
         if (a.parameterSlots.isNotEmpty) ...[
-          _sectionHeader(theme, '参数', Icons.tune),
+          _sectionHeader(
+            theme,
+            context.l10n.workflowImport_parameterSection,
+            Icons.tune,
+          ),
           ...a.parameterSlots.map((s) => _slotTile(theme, s)),
         ],
         if (a.allSlots.isEmpty)
@@ -484,9 +515,8 @@ class _WorkflowImportWizardState extends ConsumerState<WorkflowImportWizard> {
               color: theme.colorScheme.errorContainer.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Text(
-              '未检测到任何可用槽位。该工作流可能无法正常集成。\n'
-              '请确认工作流中包含 LoadImage 和 SaveImage/SaveImageWebsocket 节点。',
+            child: Text(
+              context.l10n.workflowImport_noSlotsWarning,
             ),
           ),
       ],
@@ -518,7 +548,8 @@ class _WorkflowImportWizardState extends ConsumerState<WorkflowImportWizard> {
       title: Text(slot.label, style: theme.textTheme.bodyMedium),
       subtitle: Text(
         '${slot.direction.name} · ${slot.dataType.name} · '
-        '节点 ${slot.nodeId}${slot.field != null ? ".${slot.field}" : ""}',
+        '${context.l10n.workflowImport_nodeRef(slot.nodeId)}'
+        '${slot.field != null ? ".${slot.field}" : ""}',
         style: theme.textTheme.bodySmall?.copyWith(
           color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
         ),
@@ -560,22 +591,50 @@ class _WorkflowImportWizardState extends ConsumerState<WorkflowImportWizard> {
         ),
         const SizedBox(height: 16),
         Text(
-          '即将导入以下工作流',
+          context.l10n.workflowImport_confirmTitle,
           textAlign: TextAlign.center,
           style: theme.textTheme.titleMedium,
         ),
         const SizedBox(height: 16),
-        _confirmRow(theme, '名称', _nameController.text.trim()),
+        _confirmRow(
+          theme,
+          context.l10n.workflowImport_name,
+          _nameController.text.trim(),
+        ),
         if (_descController.text.trim().isNotEmpty)
-          _confirmRow(theme, '描述', _descController.text.trim()),
-        _confirmRow(theme, '分类', _categoryLabel(_category)),
-        _confirmRow(theme, '输入槽位', '$inputs 个'),
-        _confirmRow(theme, '参数槽位', '$params 个'),
-        _confirmRow(theme, '输出槽位', '$outputs 个'),
-        _confirmRow(theme, '总节点数', '${_workflowJson!.length}'),
+          _confirmRow(
+            theme,
+            context.l10n.workflowImport_description,
+            _descController.text.trim(),
+          ),
+        _confirmRow(
+          theme,
+          context.l10n.workflowImport_category,
+          _category.localizedLabel(context),
+        ),
+        _confirmRow(
+          theme,
+          context.l10n.workflowImport_inputSlots,
+          context.l10n.workflowImport_countUnit(inputs),
+        ),
+        _confirmRow(
+          theme,
+          context.l10n.workflowImport_parameterSlots,
+          context.l10n.workflowImport_countUnit(params),
+        ),
+        _confirmRow(
+          theme,
+          context.l10n.workflowImport_outputSlots,
+          context.l10n.workflowImport_countUnit(outputs),
+        ),
+        _confirmRow(
+          theme,
+          context.l10n.workflowImport_totalNodes,
+          '${_workflowJson!.length}',
+        ),
         const SizedBox(height: 16),
         Text(
-          '导入后可在生成界面的 ComfyUI 工作流列表中使用。',
+          context.l10n.workflowImport_afterImportHint,
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
           ),
@@ -638,18 +697,8 @@ class _WorkflowImportWizardState extends ConsumerState<WorkflowImportWizard> {
         .addCustomTemplate(template);
 
     if (mounted) {
-      AppToast.success(context, '工作流 "$name" 导入成功');
+      AppToast.success(context, context.l10n.workflowImport_success(name));
       Navigator.of(context).pop();
     }
-  }
-
-  String _categoryLabel(WorkflowCategory cat) {
-    return switch (cat) {
-      WorkflowCategory.enhance => '增强/超分',
-      WorkflowCategory.img2img => '图生图',
-      WorkflowCategory.inpaint => '重绘',
-      WorkflowCategory.txt2img => '文生图',
-      WorkflowCategory.custom => '自定义',
-    };
   }
 }

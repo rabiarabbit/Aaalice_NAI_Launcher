@@ -4,16 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:nai_launcher/presentation/widgets/common/themed_input.dart';
 
+import '../../../../../core/utils/localization_extension.dart';
+
 /// 内容处理模式
 enum ContentHandlingMode {
   /// 裁剪 - 保持比例，裁剪多余部分
-  crop('裁剪'),
+  crop('Crop'),
 
   /// 填充 - 保持比例，填充空白区域
-  pad('填充'),
+  pad('Pad'),
 
   /// 拉伸 - 拉伸至填满画布
-  stretch('拉伸');
+  stretch('Stretch');
 
   final String label;
   const ContentHandlingMode(this.label);
@@ -47,16 +49,16 @@ class CanvasSizePreset {
 
 /// 预设尺寸列表
 const canvasPresets = [
-  CanvasSizePreset(512, 512, '方形 512'),
-  CanvasSizePreset(768, 768, '方形 768'),
-  CanvasSizePreset(1024, 1024, '方形 1024'),
-  CanvasSizePreset(768, 512, '横向 3:2'),
-  CanvasSizePreset(512, 768, '纵向 2:3'),
-  CanvasSizePreset(832, 1216, 'NAI 纵向'),
-  CanvasSizePreset(1216, 832, 'NAI 横向'),
-  CanvasSizePreset(1024, 768, '横向 4:3'),
-  CanvasSizePreset(768, 1024, '纵向 3:4'),
-  CanvasSizePreset(1920, 1080, '全高清 16:9'),
+  CanvasSizePreset(512, 512, 'Square 512'),
+  CanvasSizePreset(768, 768, 'Square 768'),
+  CanvasSizePreset(1024, 1024, 'Square 1024'),
+  CanvasSizePreset(768, 512, 'Landscape 3:2'),
+  CanvasSizePreset(512, 768, 'Portrait 2:3'),
+  CanvasSizePreset(832, 1216, 'NAI Portrait'),
+  CanvasSizePreset(1216, 832, 'NAI Landscape'),
+  CanvasSizePreset(1024, 768, 'Landscape 4:3'),
+  CanvasSizePreset(768, 1024, 'Portrait 3:4'),
+  CanvasSizePreset(1920, 1080, 'Full HD 16:9'),
 ];
 
 /// 画布尺寸对话框
@@ -70,8 +72,8 @@ class CanvasSizeDialog extends StatefulWidget {
     super.key,
     this.initialSize,
     this.initialMode,
-    this.title = '画布尺寸',
-    this.confirmText = '确定',
+    this.title = 'Canvas Size',
+    this.confirmText = 'Confirm',
   });
 
   /// 显示对话框
@@ -79,16 +81,16 @@ class CanvasSizeDialog extends StatefulWidget {
     BuildContext context, {
     Size? initialSize,
     ContentHandlingMode? initialMode,
-    String title = '画布尺寸',
-    String confirmText = '确定',
+    String? title,
+    String? confirmText,
   }) {
     return showDialog<CanvasSizeResult>(
       context: context,
       builder: (context) => CanvasSizeDialog(
         initialSize: initialSize,
         initialMode: initialMode,
-        title: title,
-        confirmText: confirmText,
+        title: title ?? context.l10n.editor_canvasSizeTitle,
+        confirmText: confirmText ?? context.l10n.common_confirm,
       ),
     );
   }
@@ -146,19 +148,19 @@ class _CanvasSizeDialogState extends State<CanvasSizeDialog> {
             // 预设选择
             DropdownButtonFormField<CanvasSizePreset>(
               initialValue: _selectedPreset,
-              decoration: const InputDecoration(
-                labelText: '预设尺寸',
+              decoration: InputDecoration(
+                labelText: context.l10n.editor_presetSize,
                 isDense: true,
               ),
               items: [
-                const DropdownMenuItem(
+                DropdownMenuItem(
                   value: null,
-                  child: Text('自定义'),
+                  child: Text(context.l10n.editor_customSize),
                 ),
                 ...canvasPresets.map(
                   (preset) => DropdownMenuItem(
                     value: preset,
-                    child: Text(preset.toString()),
+                    child: Text(_presetLabel(context, preset)),
                   ),
                 ),
               ],
@@ -179,15 +181,15 @@ class _CanvasSizeDialogState extends State<CanvasSizeDialog> {
             // 内容处理模式选择
             DropdownButtonFormField<ContentHandlingMode>(
               initialValue: _selectedMode,
-              decoration: const InputDecoration(
-                labelText: '内容处理',
+              decoration: InputDecoration(
+                labelText: context.l10n.editor_contentHandling,
                 isDense: true,
               ),
               items: ContentHandlingMode.values
                   .map(
                     (mode) => DropdownMenuItem(
                       value: mode,
-                      child: Text(mode.toString()),
+                      child: Text(_modeLabel(context, mode)),
                     ),
                   )
                   .toList(),
@@ -209,8 +211,8 @@ class _CanvasSizeDialogState extends State<CanvasSizeDialog> {
                 Expanded(
                   child: ThemedInput(
                     controller: _widthController,
-                    decoration: const InputDecoration(
-                      labelText: '宽度',
+                    decoration: InputDecoration(
+                      labelText: context.l10n.editor_width,
                       suffixText: 'px',
                       isDense: true,
                     ),
@@ -242,7 +244,9 @@ class _CanvasSizeDialogState extends State<CanvasSizeDialog> {
                           ? theme.colorScheme.primary
                           : theme.colorScheme.onSurfaceVariant,
                     ),
-                    tooltip: _linkDimensions ? '取消锁定比例' : '锁定比例',
+                    tooltip: _linkDimensions
+                        ? context.l10n.editor_unlockAspectRatio
+                        : context.l10n.editor_lockAspectRatio,
                     onPressed: () {
                       setState(() {
                         _linkDimensions = !_linkDimensions;
@@ -262,8 +266,8 @@ class _CanvasSizeDialogState extends State<CanvasSizeDialog> {
                 Expanded(
                   child: ThemedInput(
                     controller: _heightController,
-                    decoration: const InputDecoration(
-                      labelText: '高度',
+                    decoration: InputDecoration(
+                      labelText: context.l10n.editor_height,
                       suffixText: 'px',
                       isDense: true,
                     ),
@@ -317,7 +321,7 @@ class _CanvasSizeDialogState extends State<CanvasSizeDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('取消'),
+          child: Text(context.l10n.common_cancel),
         ),
         FilledButton(
           onPressed: _isValid() ? _confirm : null,
@@ -336,6 +340,52 @@ class _CanvasSizeDialogState extends State<CanvasSizeDialog> {
       _aspectRatio = widthRatio / heightRatio;
       _selectedPreset = null;
     });
+  }
+
+  String _modeLabel(BuildContext context, ContentHandlingMode mode) {
+    switch (mode) {
+      case ContentHandlingMode.crop:
+        return context.l10n.editor_contentCrop;
+      case ContentHandlingMode.pad:
+        return context.l10n.editor_contentPad;
+      case ContentHandlingMode.stretch:
+        return context.l10n.editor_contentStretch;
+    }
+  }
+
+  String _presetLabel(BuildContext context, CanvasSizePreset preset) {
+    if (preset.width == preset.height) {
+      return context.l10n.editor_canvasPresetSquare(preset.width);
+    }
+    if (preset.width == 832 && preset.height == 1216) {
+      return context.l10n.editor_canvasPresetNaiPortrait;
+    }
+    if (preset.width == 1216 && preset.height == 832) {
+      return context.l10n.editor_canvasPresetNaiLandscape;
+    }
+    if (preset.width == 1920 && preset.height == 1080) {
+      return context.l10n.editor_canvasPresetFullHd;
+    }
+    if (preset.width > preset.height) {
+      return context.l10n.editor_canvasPresetLandscape(
+        _aspectRatioLabel(preset),
+      );
+    }
+    return context.l10n.editor_canvasPresetPortrait(_aspectRatioLabel(preset));
+  }
+
+  String _aspectRatioLabel(CanvasSizePreset preset) {
+    final divisor = _gcd(preset.width, preset.height);
+    return '${preset.width ~/ divisor}:${preset.height ~/ divisor}';
+  }
+
+  int _gcd(int a, int b) {
+    while (b != 0) {
+      final t = b;
+      b = a % b;
+      a = t;
+    }
+    return a.abs();
   }
 
   bool _isValid() {
@@ -427,7 +477,7 @@ class _CanvasSizePreview extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                '尺寸预览',
+                context.l10n.editor_sizePreview,
                 style: theme.textTheme.titleSmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -775,7 +825,7 @@ class _SizeInfo extends StatelessWidget {
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  '原始',
+                  context.l10n.editor_originalSize,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
@@ -807,7 +857,7 @@ class _SizeInfo extends StatelessWidget {
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  '新尺寸',
+                  context.l10n.editor_newSize,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
@@ -860,7 +910,7 @@ class _SizeInfo extends StatelessWidget {
               ),
               const SizedBox(width: 4),
               Text(
-                _getModeDescription(mode),
+                _getModeDescription(context, mode),
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSecondaryContainer,
                 ),
@@ -883,14 +933,14 @@ class _SizeInfo extends StatelessWidget {
     }
   }
 
-  String _getModeDescription(ContentHandlingMode mode) {
+  String _getModeDescription(BuildContext context, ContentHandlingMode mode) {
     switch (mode) {
       case ContentHandlingMode.crop:
-        return '裁剪模式 - 保持比例裁剪';
+        return context.l10n.editor_cropModeDescription;
       case ContentHandlingMode.pad:
-        return '填充模式 - 保持比例填充';
+        return context.l10n.editor_padModeDescription;
       case ContentHandlingMode.stretch:
-        return '拉伸模式 - 拉伸至填满';
+        return context.l10n.editor_stretchModeDescription;
     }
   }
 }

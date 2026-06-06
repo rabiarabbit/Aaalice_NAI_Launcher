@@ -13,6 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/constants/storage_keys.dart';
 import '../../../core/shortcuts/default_shortcuts.dart';
 import '../../../core/utils/app_logger.dart';
+import '../../../core/utils/file_explorer_utils.dart';
 import '../../../data/models/gallery/nai_image_metadata.dart';
 import '../../../core/utils/nai_prompt_formatter.dart';
 import '../../../core/utils/permission_utils.dart';
@@ -298,16 +299,21 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              '分类',
+              context.l10n.localGallery_categoryPanelTitle,
               style: theme.textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.w600,
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
           FilledButton.tonalIcon(
             onPressed: _createCategory,
             icon: const Icon(Icons.add, size: 18),
-            label: const Text('新建', style: TextStyle(fontSize: 13)),
+            label: Text(
+              context.l10n.common_new,
+              style: const TextStyle(fontSize: 13),
+            ),
             style: FilledButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             ),
@@ -320,10 +326,10 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
   Future<void> _createCategory() async {
     final name = await ThemedInputDialog.show(
       context: context,
-      title: '新建分类',
-      hintText: '请输入分类名称',
-      confirmText: '创建',
-      cancelText: '取消',
+      title: context.l10n.localGallery_createCategoryTitle,
+      hintText: context.l10n.localGallery_createCategoryHint,
+      confirmText: context.l10n.localGallery_createCategoryConfirm,
+      cancelText: context.l10n.common_cancel,
     );
     if (name != null && name.isNotEmpty) {
       await ref
@@ -369,10 +375,10 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
   Future<void> _handleCategoryDelete(String id) async {
     final confirmed = await ThemedConfirmDialog.show(
       context: context,
-      title: '确认删除',
-      content: '确定要删除此分类吗？文件夹及其内容将被保留。',
-      confirmText: '删除',
-      cancelText: '取消',
+      title: context.l10n.common_confirmDelete,
+      content: context.l10n.localGallery_categoryDeleteContent,
+      confirmText: context.l10n.common_delete,
+      cancelText: context.l10n.common_cancel,
       type: ThemedConfirmDialogType.danger,
       icon: Icons.delete_outline,
     );
@@ -381,9 +387,9 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
       final protected = await AssetProtectionGuard.confirmDangerousAction(
         context: context,
         ref: ref,
-        title: '保护模式：确认删除分类',
-        content: '将删除此分类记录，文件夹及内容会保留。请再次确认。',
-        confirmText: '确认删除',
+        title: context.l10n.localGallery_protectedDeleteCategoryTitle,
+        content: context.l10n.localGallery_protectedDeleteCategoryContent,
+        confirmText: context.l10n.localGallery_confirmDelete,
         icon: Icons.delete_outline,
       );
       if (!protected || !mounted) return;
@@ -396,10 +402,12 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
   Future<void> _handleAddSubCategory(String? parentId) async {
     final name = await ThemedInputDialog.show(
       context: context,
-      title: parentId == null ? '新建分类' : '新建子分类',
-      hintText: '请输入分类名称',
-      confirmText: '创建',
-      cancelText: '取消',
+      title: parentId == null
+          ? context.l10n.localGallery_createCategoryTitle
+          : context.l10n.localGallery_createSubCategoryTitle,
+      hintText: context.l10n.localGallery_createCategoryHint,
+      confirmText: context.l10n.localGallery_createCategoryConfirm,
+      cancelText: context.l10n.common_cancel,
     );
     if (name != null && name.isNotEmpty) {
       await ref
@@ -412,9 +420,9 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
     final protected = await AssetProtectionGuard.confirmDangerousAction(
       context: context,
       ref: ref,
-      title: '保护模式：确认移动图片',
-      content: '将把图片移动到目标分类文件夹。请确认不是误拖拽。',
-      confirmText: '确认移动',
+      title: context.l10n.localGallery_confirmMoveImageTitle,
+      content: context.l10n.localGallery_confirmMoveImageContent,
+      confirmText: context.l10n.localGallery_confirmMove,
       icon: Icons.drive_file_move_outline,
     );
     if (!protected || !mounted) return;
@@ -424,7 +432,12 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
         .moveImageToCategory(imagePath, categoryId);
     if (newPath != null) {
       ref.read(localGalleryNotifierProvider.notifier).refresh();
-      if (mounted) AppToast.success(context, '图片已移动到分类');
+      if (mounted) {
+        AppToast.success(
+          context,
+          context.l10n.localGallery_imageMovedToCategory,
+        );
+      }
     }
   }
 
@@ -432,7 +445,9 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
     await ref
         .read(galleryCategoryNotifierProvider.notifier)
         .syncWithFileSystem();
-    if (mounted) AppToast.success(context, '分类已与文件夹同步');
+    if (mounted) {
+      AppToast.success(context, context.l10n.localGallery_categoriesSynced);
+    }
   }
 
   Future<void> _autoRefresh() async {
@@ -630,13 +645,17 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
     try {
       final rootPath = await GalleryFolderRepository.instance.getRootPath();
       if (rootPath == null || rootPath.isEmpty) {
-        if (mounted) AppToast.info(context, '未设置保存目录');
+        if (mounted) {
+          AppToast.info(context, context.l10n.localGallery_saveDirectoryNotSet);
+        }
         return;
       }
 
       final dir = Directory(rootPath);
       if (!await dir.exists()) {
-        if (mounted) AppToast.info(context, '文件夹不存在');
+        if (mounted) {
+          AppToast.info(context, context.l10n.localGallery_folderNotFound);
+        }
         return;
       }
 
@@ -648,7 +667,12 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
         await Process.start('xdg-open', [rootPath]);
       }
     } catch (e) {
-      if (mounted) AppToast.error(context, '打开文件夹失败: $e');
+      if (mounted) {
+        AppToast.error(
+          context,
+          context.l10n.localGallery_openFolderFailed('$e'),
+        );
+      }
     }
   }
 
@@ -695,8 +719,10 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
     final protected = await AssetProtectionGuard.confirmDangerousAction(
       context: context,
       ref: ref,
-      title: '保护模式：再次确认删除',
-      content: '将永久删除 ${selectedImages.length} 张本地图片文件。此操作无法撤销。',
+      title: l10n.localGallery_protectedDeleteTitle,
+      content: l10n.localGallery_protectedDeleteImagesContent(
+        selectedImages.length,
+      ),
       confirmText: l10n.common_delete,
       icon: Icons.delete_forever_outlined,
     );
@@ -740,7 +766,7 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
 
     final defaultName = 'images_${DateTime.now().millisecondsSinceEpoch}';
     final outputPath = await FilePicker.platform.saveFile(
-      dialogTitle: '保存压缩包',
+      dialogTitle: context.l10n.localGallery_saveZipArchive,
       fileName: '$defaultName.zip',
       type: FileType.custom,
       allowedExtensions: ['zip'],
@@ -755,17 +781,23 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
         : requestedPath;
 
     if (!mounted) return;
-    AppToast.info(context, '正在打包 ${selectedImages.length} 张图片...');
+    AppToast.info(
+      context,
+      context.l10n.localGallery_packingImages(selectedImages.length),
+    );
 
     final imagePaths = selectedImages.map((img) => img.path).toList();
     final success = await ZipUtils.createZipFromImages(imagePaths, finalPath);
 
     if (mounted) {
       if (success) {
-        AppToast.success(context, '已打包 ${selectedImages.length} 张图片');
+        AppToast.success(
+          context,
+          context.l10n.localGallery_packedImages(selectedImages.length),
+        );
         ref.read(localGallerySelectionNotifierProvider.notifier).exit();
       } else {
-        AppToast.error(context, '打包失败');
+        AppToast.error(context, context.l10n.localGallery_packFailed);
       }
     }
   }
@@ -836,9 +868,11 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
     final protected = await AssetProtectionGuard.confirmDangerousAction(
       context: context,
       ref: ref,
-      title: '保护模式：确认批量移动',
-      content: '将移动 ${selectedImages.length} 张本地图片文件到目标文件夹。请确认不是误操作。',
-      confirmText: '确认移动',
+      title: l10n.localGallery_protectedBulkMoveTitle,
+      content: l10n.localGallery_protectedBulkMoveContent(
+        selectedImages.length,
+      ),
+      confirmText: l10n.localGallery_confirmMove,
       icon: Icons.drive_file_move_outline,
     );
     if (!protected || !mounted) return;
@@ -909,7 +943,7 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
     try {
       final metadata = record.metadata;
       if (metadata == null || !metadata.hasData) {
-        AppToast.warning(context, '此图片没有元数据');
+        AppToast.warning(context, context.l10n.localGallery_noMetadata);
         return;
       }
 
@@ -980,7 +1014,10 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
     } catch (e, stack) {
       AppLogger.e('导入参数失败', e, stack, 'LocalGallery');
       if (mounted) {
-        AppToast.error(context, '导入参数失败: $e');
+        AppToast.error(
+          context,
+          context.l10n.localGallery_importParamsFailed('$e'),
+        );
       }
     }
   }
@@ -1035,7 +1072,9 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
     try {
       final file = File(record.path);
       if (!await file.exists()) {
-        if (mounted) AppToast.info(context, '图片文件不存在');
+        if (mounted) {
+          AppToast.info(context, context.l10n.localGallery_imageFileMissing);
+        }
         return;
       }
 
@@ -1044,10 +1083,12 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
 
       if (mounted) {
         context.go(AppRoutes.home);
-        AppToast.success(context, '图片已发送到图生图');
+        AppToast.success(context, context.l10n.localGallery_sentToImageToImage);
       }
     } catch (e) {
-      if (mounted) AppToast.error(context, '发送失败: $e');
+      if (mounted) {
+        AppToast.error(context, context.l10n.localGallery_sendFailed('$e'));
+      }
     }
   }
 
@@ -1055,7 +1096,9 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
     try {
       final vibeData = record.vibeData;
       if (vibeData == null) {
-        if (mounted) AppToast.warning(context, '此图片不包含 Vibe 数据');
+        if (mounted) {
+          AppToast.warning(context, context.l10n.localGallery_noVibeData);
+        }
         return;
       }
 
@@ -1064,10 +1107,15 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
       paramsNotifier.addVibeReferences([vibeData]);
 
       if (mounted) {
-        AppToast.success(context, 'Vibe "${vibeData.displayName}" 已添加到生成参数');
+        AppToast.success(
+          context,
+          context.l10n.localGallery_vibeAddedToParams(vibeData.displayName),
+        );
       }
     } catch (e) {
-      if (mounted) AppToast.error(context, '添加 Vibe 失败: $e');
+      if (mounted) {
+        AppToast.error(context, context.l10n.localGallery_addVibeFailed('$e'));
+      }
     }
   }
 
@@ -1075,7 +1123,9 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
     try {
       final file = File(record.path);
       if (!await file.exists()) {
-        if (mounted) AppToast.info(context, '图片文件不存在');
+        if (mounted) {
+          AppToast.info(context, context.l10n.localGallery_imageFileMissing);
+        }
         return;
       }
 
@@ -1085,10 +1135,15 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
 
       if (mounted) {
         context.go(AppRoutes.home);
-        AppToast.success(context, '图片已发送到反推模块');
+        AppToast.success(
+          context,
+          context.l10n.localGallery_sentToReversePrompt,
+        );
       }
     } catch (e) {
-      if (mounted) AppToast.error(context, '发送失败: $e');
+      if (mounted) {
+        AppToast.error(context, context.l10n.localGallery_sendFailed('$e'));
+      }
     }
   }
 
@@ -1096,7 +1151,9 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
     try {
       final file = File(record.path);
       if (!await file.exists()) {
-        if (mounted) AppToast.info(context, '图片文件不存在');
+        if (mounted) {
+          AppToast.info(context, context.l10n.localGallery_imageFileMissing);
+        }
         return;
       }
 
@@ -1109,7 +1166,12 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
         name: path.basename(record.path),
       );
     } catch (e) {
-      if (mounted) AppToast.error(context, '发送到 Krita 失败: $e');
+      if (mounted) {
+        AppToast.error(
+          context,
+          context.l10n.localGallery_sendToKritaFailed('$e'),
+        );
+      }
     }
   }
 
@@ -1144,56 +1206,59 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
         position.dy + 1,
       ),
       items: [
-        const PopupMenuItem(
+        PopupMenuItem(
           value: 'send_to',
           child: Row(
             children: [
-              Icon(Icons.send, size: 18),
-              SizedBox(width: 8),
-              Text('发送到...'),
+              const Icon(Icons.send, size: 18),
+              const SizedBox(width: 8),
+              Text(context.l10n.localGallery_sendTo),
             ],
           ),
         ),
         const PopupMenuDivider(),
         if (metadata?.prompt.isNotEmpty == true)
-          const PopupMenuItem(
+          PopupMenuItem(
             value: 'copy_prompt',
             child: Row(
               children: [
-                Icon(Icons.content_copy, size: 18),
-                SizedBox(width: 8),
-                Text('复制 Prompt'),
+                const Icon(Icons.content_copy, size: 18),
+                const SizedBox(width: 8),
+                Text(context.l10n.localGallery_copyPrompt),
               ],
             ),
           ),
         if (metadata?.seed != null)
-          const PopupMenuItem(
+          PopupMenuItem(
             value: 'copy_seed',
             child: Row(
               children: [
-                Icon(Icons.tag, size: 18),
-                SizedBox(width: 8),
-                Text('复制 Seed'),
+                const Icon(Icons.tag, size: 18),
+                const SizedBox(width: 8),
+                Text(context.l10n.localGallery_copySeed),
               ],
             ),
           ),
-        const PopupMenuItem(
+        PopupMenuItem(
           value: 'open_folder',
           child: Row(
             children: [
-              Icon(Icons.folder_open, size: 18),
-              SizedBox(width: 8),
-              Text('在文件夹中显示'),
+              const Icon(Icons.folder_open, size: 18),
+              const SizedBox(width: 8),
+              Text(context.l10n.localGallery_showInFolder),
             ],
           ),
         ),
-        const PopupMenuItem(
+        PopupMenuItem(
           value: 'delete',
           child: Row(
             children: [
-              Icon(Icons.delete_outline, size: 18, color: Colors.red),
-              SizedBox(width: 8),
-              Text('删除', style: TextStyle(color: Colors.red)),
+              const Icon(Icons.delete_outline, size: 18, color: Colors.red),
+              const SizedBox(width: 8),
+              Text(
+                context.l10n.common_delete,
+                style: const TextStyle(color: Colors.red),
+              ),
             ],
           ),
         ),
@@ -1208,14 +1273,18 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
       case 'copy_prompt':
         if (metadata?.fullPrompt.isNotEmpty == true) {
           await Clipboard.setData(ClipboardData(text: metadata!.fullPrompt));
-          if (mounted) AppToast.success(context, 'Prompt 已复制');
+          if (mounted) {
+            AppToast.success(context, context.l10n.localGallery_promptCopied);
+          }
         }
       case 'copy_seed':
         if (metadata?.seed != null) {
           await Clipboard.setData(
             ClipboardData(text: metadata!.seed.toString()),
           );
-          if (mounted) AppToast.success(context, 'Seed 已复制');
+          if (mounted) {
+            AppToast.success(context, context.l10n.localGallery_seedCopied);
+          }
         }
       case 'open_folder':
         await _openFileInFolder(record.path);
@@ -1226,15 +1295,14 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
 
   Future<void> _openFileInFolder(String filePath) async {
     try {
-      if (Platform.isWindows) {
-        await Process.start('explorer', ['/select,', filePath]);
-      } else if (Platform.isMacOS) {
-        await Process.start('open', ['-R', filePath]);
-      } else if (Platform.isLinux) {
-        await Process.start('xdg-open', [path.dirname(filePath)]);
-      }
+      await FileExplorerUtils.revealFile(filePath);
     } catch (e) {
-      if (mounted) AppToast.error(context, '无法打开文件夹: $e');
+      if (mounted) {
+        AppToast.error(
+          context,
+          context.l10n.localGallery_cannotOpenFolder('$e'),
+        );
+      }
     }
   }
 
@@ -1242,14 +1310,16 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('确认删除'),
+        title: Text(context.l10n.common_confirmDelete),
         content: Text(
-          '确定要删除图片「${path.basename(record.path)}」吗？\n\n此操作无法撤销。',
+          context.l10n.localGallery_confirmDeleteImageContent(
+            path.basename(record.path),
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('取消'),
+            child: Text(context.l10n.common_cancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(context).pop(true),
@@ -1257,7 +1327,7 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
               backgroundColor: Theme.of(context).colorScheme.error,
               foregroundColor: Theme.of(context).colorScheme.onError,
             ),
-            child: const Text('删除'),
+            child: Text(context.l10n.common_delete),
           ),
         ],
       ),
@@ -1267,9 +1337,11 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
       final protected = await AssetProtectionGuard.confirmDangerousAction(
         context: context,
         ref: ref,
-        title: '保护模式：再次确认删除',
-        content: '将永久删除图片「${path.basename(record.path)}」。此操作无法撤销。',
-        confirmText: '确认删除',
+        title: context.l10n.localGallery_protectedDeleteTitle,
+        content: context.l10n.localGallery_protectedDeleteImageContent(
+          path.basename(record.path),
+        ),
+        confirmText: context.l10n.localGallery_confirmDelete,
         icon: Icons.delete_outline,
       );
       if (!protected || !mounted) return;
@@ -1278,10 +1350,14 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
         if (await file.exists()) {
           await file.delete();
           await ref.read(localGalleryNotifierProvider.notifier).refresh();
-          if (mounted) AppToast.success(context, '图片已删除');
+          if (mounted) {
+            AppToast.success(context, context.l10n.localGallery_imageDeleted);
+          }
         }
       } catch (e) {
-        if (mounted) AppToast.error(context, '删除失败: $e');
+        if (mounted) {
+          AppToast.error(context, context.l10n.localGallery_deleteFailed('$e'));
+        }
       }
     }
   }
@@ -1336,9 +1412,10 @@ class _LocalGalleryScreenState extends ConsumerState<LocalGalleryScreen> {
     _groupedGridViewKey.currentState?.scrollToGroup(targetGroup);
 
     if (context.mounted) {
+      final month = picked.month.toString().padLeft(2, '0');
       AppToast.info(
         context,
-        '已跳转到 ${picked.year}-${picked.month.toString().padLeft(2, '0')}',
+        context.l10n.localGallery_jumpedToMonth(picked.year, month),
       );
     }
   }

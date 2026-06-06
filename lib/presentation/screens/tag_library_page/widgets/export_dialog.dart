@@ -123,8 +123,10 @@ class _ExportDialogState extends ConsumerState<ExportDialog> {
 
                 // 选项
                 CheckboxListTile(
-                  title: const Text('包含预览图'),
-                  subtitle: const Text('将增加文件大小'),
+                  title: Text(context.l10n.tagLibrary_includeThumbnails),
+                  subtitle: Text(
+                    context.l10n.tagLibrary_includeThumbnailsSubtitle,
+                  ),
                   value: _includeThumbnails,
                   onChanged: (value) {
                     setState(() => _includeThumbnails = value ?? true);
@@ -151,7 +153,10 @@ class _ExportDialogState extends ConsumerState<ExportDialog> {
                           : null,
                       icon: const Icon(Icons.file_download),
                       label: Text(
-                        '导出 (${_selectedEntryIds.length + _selectedCategoryIds.length} 项)',
+                        context.l10n.tagLibrary_selectedExportCount(
+                          _selectedEntryIds.length +
+                              _selectedCategoryIds.length,
+                        ),
                       ),
                     ),
                   ],
@@ -175,13 +180,13 @@ class _ExportDialogState extends ConsumerState<ExportDialog> {
       child: Row(
         children: [
           _StatItem(
-            label: '条目',
+            label: context.l10n.tagLibrary_entriesLabel,
             value: '${_selectedEntryIds.length}/${widget.entries.length}',
             icon: Icons.article_outlined,
           ),
           const SizedBox(width: 24),
           _StatItem(
-            label: '分类',
+            label: context.l10n.tagLibrary_categoriesLabel,
             value: '${_selectedCategoryIds.length}/${widget.categories.length}',
             icon: Icons.folder_outlined,
           ),
@@ -200,12 +205,15 @@ class _ExportDialogState extends ConsumerState<ExportDialog> {
 
     return Row(
       children: [
-        Text('选择要导出的内容', style: theme.textTheme.titleSmall),
+        Text(
+          context.l10n.tagLibrary_selectExportContent,
+          style: theme.textTheme.titleSmall,
+        ),
         const Spacer(),
         TextButton.icon(
           onPressed: allSelected ? null : _selectAll,
           icon: const Icon(Icons.select_all, size: 18),
-          label: const Text('全选'),
+          label: Text(context.l10n.common_selectAll),
           style: TextButton.styleFrom(
             padding: const EdgeInsets.symmetric(horizontal: 8),
           ),
@@ -215,7 +223,7 @@ class _ExportDialogState extends ConsumerState<ExportDialog> {
               ? null
               : _selectNone,
           icon: const Icon(Icons.deselect, size: 18),
-          label: const Text('全不选'),
+          label: Text(context.l10n.common_deselectAll),
           style: TextButton.styleFrom(
             padding: const EdgeInsets.symmetric(horizontal: 8),
           ),
@@ -332,7 +340,7 @@ class _ExportDialogState extends ConsumerState<ExportDialog> {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  '未分类',
+                  context.l10n.tagLibrary_uncategorized,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w500,
                     color: theme.colorScheme.outline,
@@ -606,7 +614,7 @@ class _ExportDialogState extends ConsumerState<ExportDialog> {
 
     // 选择保存位置
     final result = await FilePicker.platform.saveFile(
-      dialogTitle: '选择保存位置',
+      dialogTitle: context.l10n.tagLibrary_selectSaveLocation,
       fileName: TagLibraryIOService().generateExportFileName(),
       type: FileType.custom,
       allowedExtensions: ['zip'],
@@ -617,7 +625,7 @@ class _ExportDialogState extends ConsumerState<ExportDialog> {
     setState(() {
       _isExporting = true;
       _progress = 0;
-      _progressMessage = '准备导出...';
+      _progressMessage = context.l10n.tagLibrary_preparingExport;
     });
 
     try {
@@ -637,12 +645,15 @@ class _ExportDialogState extends ConsumerState<ExportDialog> {
 
       if (mounted) {
         Navigator.of(context).pop();
-        AppToast.info(context, '导出成功');
+        AppToast.info(context, context.l10n.tagLibrary_exportSuccess);
       }
     } catch (e) {
       if (mounted) {
         setState(() => _isExporting = false);
-        AppToast.info(context, '导出失败: $e');
+        AppToast.info(
+          context,
+          context.l10n.tagLibrary_exportFailedWithError('$e'),
+        );
       }
     }
   }

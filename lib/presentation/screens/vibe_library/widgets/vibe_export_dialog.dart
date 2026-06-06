@@ -1069,7 +1069,7 @@ class _VibeExportDialogState extends ConsumerState<VibeExportDialog> {
         widget.entries.where((e) => _selectedEntryIds.contains(e.id)).toList();
 
     if (selectedEntries.isEmpty) {
-      AppToast.warning(context, '请先选择要导出的 Vibe');
+      AppToast.warning(context, context.l10n.toast_selectVibeToExport);
       return;
     }
 
@@ -1093,13 +1093,13 @@ class _VibeExportDialogState extends ConsumerState<VibeExportDialog> {
 
       if (mounted) {
         Navigator.of(context).pop();
-        AppToast.success(context, '导出成功');
+        AppToast.success(context, context.l10n.toast_exportSuccess);
       }
     } catch (e, stack) {
       AppLogger.e('导出 Vibe 失败', e, stack, 'VibeExportDialog');
       if (mounted) {
         setState(() => _isExporting = false);
-        AppToast.error(context, '导出失败: $e');
+        AppToast.error(context, context.l10n.toast_exportFailed(e.toString()));
       }
     }
   }
@@ -1180,7 +1180,7 @@ class _VibeExportDialogState extends ConsumerState<VibeExportDialog> {
     if (entries.length != 1) {
       setState(() => _isExporting = false);
       if (mounted) {
-        AppToast.warning(context, '嵌入 PNG 仅支持单个 Vibe 导出');
+        AppToast.warning(context, context.l10n.toast_embedPngSingleVibeOnly);
       }
       return false;
     }
@@ -1190,7 +1190,7 @@ class _VibeExportDialogState extends ConsumerState<VibeExportDialog> {
     if (carrierImageBytes == null) {
       setState(() => _isExporting = false);
       if (mounted) {
-        AppToast.warning(context, '请选择一个 PNG 载体图用于导出');
+        AppToast.warning(context, context.l10n.toast_selectPngCarrier);
       }
       return false;
     }

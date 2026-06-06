@@ -54,7 +54,7 @@ class _StorageSettingsSectionState
   Future<void> _selectLocalOnnxTaggerDirectory() async {
     try {
       final result = await FilePicker.platform.getDirectoryPath(
-        dialogTitle: '选择 ONNX tagger 模型文件夹',
+        dialogTitle: context.l10n.settings_selectLocalOnnxTaggerFolder,
       );
       if (result == null) {
         return;
@@ -63,10 +63,18 @@ class _StorageSettingsSectionState
       await service.setTaggerDirectory(result);
       if (mounted) {
         setState(() {});
-        AppToast.success(context, 'ONNX tagger 模型文件夹已保存');
+        AppToast.success(
+          context,
+          context.l10n.settings_localOnnxTaggerFolderSaved,
+        );
       }
     } catch (e) {
-      if (mounted) AppToast.error(context, '选择文件夹失败: $e');
+      if (mounted) {
+        AppToast.error(
+          context,
+          '${context.l10n.settings_selectFolderFailed}: $e',
+        );
+      }
     }
   }
 
@@ -78,22 +86,22 @@ class _StorageSettingsSectionState
     final result = await showDialog<int>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('设置 Anlas 警告阈值'),
+        title: Text(context.l10n.settings_setHighAnlasCostThresholdTitle),
         content: TextField(
           controller: controller,
           keyboardType: TextInputType.number,
           autofocus: true,
-          decoration: const InputDecoration(
-            labelText: '阈值',
+          decoration: InputDecoration(
+            labelText: context.l10n.settings_threshold,
             suffixText: 'Anlas',
-            helperText: '当单次生成预计消耗达到或超过该值时弹出确认。',
-            border: OutlineInputBorder(),
+            helperText: context.l10n.settings_highAnlasCostThresholdHelper,
+            border: const OutlineInputBorder(),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('取消'),
+            child: Text(context.l10n.common_cancel),
           ),
           FilledButton(
             onPressed: () {
@@ -102,7 +110,7 @@ class _StorageSettingsSectionState
                 Navigator.of(dialogContext).pop(value);
               }
             },
-            child: const Text('保存'),
+            child: Text(context.l10n.common_save),
           ),
         ],
       ),
@@ -133,8 +141,9 @@ class _StorageSettingsSectionState
             leading: const Icon(Icons.folder_outlined),
             title: Text(context.l10n.settings_imageSavePath),
             subtitle: Text(
-              saveSettings
-                  .getDisplayPath('默认 (Documents/NAI_Launcher/images/)'),
+              saveSettings.getDisplayPath(
+                context.l10n.settings_defaultImagesPath,
+              ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -143,8 +152,10 @@ class _StorageSettingsSectionState
               children: [
                 IconButton(
                   icon: const Icon(Icons.folder_open, size: 20),
-                  tooltip: '打开文件夹',
+                  tooltip: context.l10n.settings_openFolder,
                   onPressed: () async {
+                    final openFolderFailed =
+                        context.l10n.settings_openFolderFailed;
                     try {
                       String path;
                       if (saveSettings.hasCustomPath) {
@@ -159,7 +170,7 @@ class _StorageSettingsSectionState
                         mode: LaunchMode.externalApplication,
                       );
                     } catch (e) {
-                      AppLogger.e('打开文件夹失败', e);
+                      AppLogger.e(openFolderFailed, e);
                     }
                   },
                 ),
@@ -198,10 +209,8 @@ class _StorageSettingsSectionState
           ),
           SwitchListTile(
             secondary: const Icon(Icons.shield_outlined),
-            title: const Text('保护模式'),
-            subtitle: const Text(
-              '开启后按下方子项保护本地资产、分享副本和高消耗操作；关闭时保留子项配置但不生效。',
-            ),
+            title: Text(context.l10n.settings_protectionMode),
+            subtitle: Text(context.l10n.settings_protectionModeSubtitle),
             value: shareSettings.protectionMode,
             onChanged: (value) async {
               await ref
@@ -212,7 +221,7 @@ class _StorageSettingsSectionState
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
             child: Text(
-              '保护功能',
+              context.l10n.settings_protectionFeatures,
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
                     color: Theme.of(context).colorScheme.primary,
                     fontWeight: FontWeight.w700,
@@ -221,10 +230,8 @@ class _StorageSettingsSectionState
           ),
           SwitchListTile(
             secondary: const Icon(Icons.cleaning_services_outlined),
-            title: const Text('复制/拖拽时移除全部元数据'),
-            subtitle: const Text(
-              '生成净化副本，清除 PNG 文本块、EXIF 与 NAI 隐写水印，并避免拖拽暴露原始路径。',
-            ),
+            title: Text(context.l10n.settings_stripMetadataTitle),
+            subtitle: Text(context.l10n.settings_stripMetadataSubtitle),
             value: shareSettings.stripMetadataForCopyAndDrag,
             onChanged: shareSettings.protectionMode
                 ? (value) async {
@@ -236,8 +243,9 @@ class _StorageSettingsSectionState
           ),
           SwitchListTile(
             secondary: const Icon(Icons.warning_amber_rounded),
-            title: const Text('危险资产操作二次确认'),
-            subtitle: const Text('删除、移动、批量移动等本地资产操作会额外弹出保护确认。'),
+            title: Text(context.l10n.settings_confirmDangerousActionsTitle),
+            subtitle:
+                Text(context.l10n.settings_confirmDangerousActionsSubtitle),
             value: shareSettings.confirmDangerousActions,
             onChanged: shareSettings.protectionMode
                 ? (value) async {
@@ -249,8 +257,8 @@ class _StorageSettingsSectionState
           ),
           SwitchListTile(
             secondary: const Icon(Icons.cloud_upload_outlined),
-            title: const Text('发送到外部服务前提示'),
-            subtitle: const Text('把本地图片发送到 LLM、NovelAI、ComfyUI 等外部边界前进行确认。'),
+            title: Text(context.l10n.settings_warnExternalImageSendTitle),
+            subtitle: Text(context.l10n.settings_warnExternalImageSendSubtitle),
             value: shareSettings.warnExternalImageSend,
             onChanged: shareSettings.protectionMode
                 ? (value) async {
@@ -262,8 +270,8 @@ class _StorageSettingsSectionState
           ),
           SwitchListTile(
             secondary: const Icon(Icons.file_copy_outlined),
-            title: const Text('导出时避免覆盖已有文件'),
-            subtitle: const Text('导出/打包路径重名时自动编号，避免误覆盖原有资产。'),
+            title: Text(context.l10n.settings_preventOverwriteTitle),
+            subtitle: Text(context.l10n.settings_preventOverwriteSubtitle),
             value: shareSettings.preventOverwrite,
             onChanged: shareSettings.protectionMode
                 ? (value) async {
@@ -275,9 +283,11 @@ class _StorageSettingsSectionState
           ),
           SwitchListTile(
             secondary: const Icon(Icons.toll_outlined),
-            title: const Text('Anlas 高消耗警告'),
+            title: Text(context.l10n.settings_warnHighAnlasCostTitle),
             subtitle: Text(
-              '单次生成预计消耗达到 ${shareSettings.highAnlasCostThreshold} Anlas 时，生成前弹出确认。',
+              context.l10n.settings_warnHighAnlasCostSubtitle(
+                shareSettings.highAnlasCostThreshold,
+              ),
             ),
             value: shareSettings.warnHighAnlasCost,
             onChanged: shareSettings.protectionMode
@@ -292,7 +302,7 @@ class _StorageSettingsSectionState
             enabled:
                 shareSettings.protectionMode && shareSettings.warnHighAnlasCost,
             leading: const Icon(Icons.speed_outlined),
-            title: const Text('Anlas 警告阈值'),
+            title: Text(context.l10n.settings_highAnlasCostThresholdTitle),
             subtitle: Text('${shareSettings.highAnlasCostThreshold} Anlas'),
             trailing: const Icon(Icons.chevron_right),
             onTap:
@@ -303,10 +313,10 @@ class _StorageSettingsSectionState
           const Divider(height: 24),
           ListTile(
             leading: const Icon(Icons.sell_outlined),
-            title: const Text('本地 ONNX tagger 模型文件夹'),
+            title: Text(context.l10n.settings_localOnnxTaggerFolder),
             subtitle: Text(
               localOnnxService.taggerDirectory.isEmpty
-                  ? '未配置'
+                  ? context.l10n.settings_notConfigured
                   : localOnnxService.taggerDirectory,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -344,7 +354,7 @@ class _VibeLibraryPathTileState extends State<VibeLibraryPathTile> {
   Future<void> _selectVibeLibraryDirectory(BuildContext context) async {
     try {
       final result = await FilePicker.platform.getDirectoryPath(
-        dialogTitle: '选择Vibe库保存文件夹',
+        dialogTitle: context.l10n.settings_selectVibeLibraryFolder,
       );
 
       if (result != null && context.mounted) {
@@ -353,12 +363,15 @@ class _VibeLibraryPathTileState extends State<VibeLibraryPathTile> {
         setState(() {});
 
         if (context.mounted) {
-          AppToast.success(context, 'Vibe库路径已保存');
+          AppToast.success(context, context.l10n.settings_vibePathSaved);
         }
       }
     } catch (e) {
       if (context.mounted) {
-        AppToast.error(context, '选择文件夹失败: ${e.toString()}');
+        AppToast.error(
+          context,
+          '${context.l10n.settings_selectFolderFailed}: ${e.toString()}',
+        );
       }
     }
   }
@@ -368,7 +381,7 @@ class _VibeLibraryPathTileState extends State<VibeLibraryPathTile> {
     setState(() {});
 
     if (context.mounted) {
-      AppToast.success(context, '已重置为默认路径');
+      AppToast.success(context, context.l10n.settings_pathReset);
     }
   }
 
@@ -379,15 +392,17 @@ class _VibeLibraryPathTileState extends State<VibeLibraryPathTile> {
 
     return ListTile(
       leading: const Icon(Icons.style_outlined),
-      title: const Text('Vibe 库保存路径'),
+      title: Text(context.l10n.settings_vibeLibraryPath),
       subtitle: FutureBuilder<String>(
         future: _pathHelper.getPath(),
         builder: (context, snapshot) {
           final displayPath = hasCustomPath
               ? (customPath ?? '')
               : (snapshot.data != null
-                  ? '${snapshot.data!} (默认)'
-                  : '默认 (Documents/NAI_Launcher/vibes/)');
+                  ? context.l10n.settings_defaultVibePath(snapshot.data!)
+                  : context.l10n.settings_defaultVibePath(
+                      'Documents/NAI_Launcher/vibes/',
+                    ));
           return Text(
             displayPath,
             maxLines: 1,
@@ -400,8 +415,9 @@ class _VibeLibraryPathTileState extends State<VibeLibraryPathTile> {
         children: [
           IconButton(
             icon: const Icon(Icons.folder_open, size: 20),
-            tooltip: '打开文件夹',
+            tooltip: context.l10n.settings_openFolder,
             onPressed: () async {
+              final openFolderFailed = context.l10n.settings_openFolderFailed;
               try {
                 final path = await _pathHelper.getPath();
                 await launchUrl(
@@ -409,14 +425,14 @@ class _VibeLibraryPathTileState extends State<VibeLibraryPathTile> {
                   mode: LaunchMode.externalApplication,
                 );
               } catch (e) {
-                AppLogger.e('打开文件夹失败', e);
+                AppLogger.e(openFolderFailed, e);
               }
             },
           ),
           if (hasCustomPath)
             IconButton(
               icon: const Icon(Icons.close, size: 20),
-              tooltip: '重置为默认',
+              tooltip: context.l10n.common_reset,
               onPressed: () => _resetToDefault(context),
             ),
           const Icon(Icons.chevron_right),
@@ -441,7 +457,7 @@ class _HiveStoragePathTileState extends State<HiveStoragePathTile> {
   Future<void> _selectHiveStorageDirectory(BuildContext context) async {
     try {
       final result = await FilePicker.platform.getDirectoryPath(
-        dialogTitle: '选择 Hive 数据存储文件夹',
+        dialogTitle: context.l10n.settings_selectHiveFolder,
       );
 
       if (result != null && context.mounted) {
@@ -450,19 +466,16 @@ class _HiveStoragePathTileState extends State<HiveStoragePathTile> {
           context: context,
           builder: (dialogContext) => AlertDialog(
             icon: const Icon(Icons.warning_amber_rounded, color: Colors.orange),
-            title: const Text('需要重启应用'),
-            content: const Text(
-              '更改 Hive 数据存储路径后，需要重启应用才能生效。\n\n'
-              '新路径将在下次启动时生效。是否继续？',
-            ),
+            title: Text(context.l10n.settings_restartRequiredTitle),
+            content: Text(context.l10n.settings_changePathConfirm),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(dialogContext).pop(false),
-                child: const Text('取消'),
+                child: Text(context.l10n.common_cancel),
               ),
               FilledButton(
                 onPressed: () => Navigator.of(dialogContext).pop(true),
-                child: const Text('确认'),
+                child: Text(context.l10n.common_confirm),
               ),
             ],
           ),
@@ -473,13 +486,16 @@ class _HiveStoragePathTileState extends State<HiveStoragePathTile> {
           setState(() {});
 
           if (context.mounted) {
-            AppToast.success(context, 'Hive 存储路径已保存，重启后生效');
+            AppToast.success(context, context.l10n.settings_hivePathSaved);
           }
         }
       }
     } catch (e) {
       if (context.mounted) {
-        AppToast.error(context, '选择文件夹失败: ${e.toString()}');
+        AppToast.error(
+          context,
+          '${context.l10n.settings_selectFolderFailed}: ${e.toString()}',
+        );
       }
     }
   }
@@ -489,19 +505,16 @@ class _HiveStoragePathTileState extends State<HiveStoragePathTile> {
       context: context,
       builder: (dialogContext) => AlertDialog(
         icon: const Icon(Icons.warning_amber_rounded, color: Colors.orange),
-        title: const Text('需要重启应用'),
-        content: const Text(
-          '重置 Hive 数据存储路径后，需要重启应用才能生效。\n\n'
-          '默认路径将在下次启动时生效。是否继续？',
-        ),
+        title: Text(context.l10n.settings_restartRequiredTitle),
+        content: Text(context.l10n.settings_resetPathConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('取消'),
+            child: Text(context.l10n.common_cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text('确认'),
+            child: Text(context.l10n.common_confirm),
           ),
         ],
       ),
@@ -512,7 +525,10 @@ class _HiveStoragePathTileState extends State<HiveStoragePathTile> {
       setState(() {});
 
       if (context.mounted) {
-        AppToast.success(context, '已重置为默认路径，重启后生效');
+        AppToast.success(
+          context,
+          context.l10n.settings_pathSavedRestartRequired,
+        );
       }
     }
   }
@@ -523,9 +539,11 @@ class _HiveStoragePathTileState extends State<HiveStoragePathTile> {
 
     return ListTile(
       leading: const Icon(Icons.storage_outlined),
-      title: const Text('数据存储路径'),
+      title: Text(context.l10n.settings_hiveStoragePath),
       subtitle: Text(
-        _hiveHelper.getDisplayPath(),
+        hasCustomPath
+            ? (_hiveHelper.getCustomPath() ?? '')
+            : context.l10n.settings_defaultHivePath,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
@@ -534,8 +552,9 @@ class _HiveStoragePathTileState extends State<HiveStoragePathTile> {
         children: [
           IconButton(
             icon: const Icon(Icons.folder_open, size: 20),
-            tooltip: '打开文件夹',
+            tooltip: context.l10n.settings_openFolder,
             onPressed: () async {
+              final openFolderFailed = context.l10n.settings_openFolderFailed;
               try {
                 final path = await _hiveHelper.getPath();
                 await launchUrl(
@@ -543,14 +562,14 @@ class _HiveStoragePathTileState extends State<HiveStoragePathTile> {
                   mode: LaunchMode.externalApplication,
                 );
               } catch (e) {
-                AppLogger.e('打开文件夹失败', e);
+                AppLogger.e(openFolderFailed, e);
               }
             },
           ),
           if (hasCustomPath)
             IconButton(
               icon: const Icon(Icons.close, size: 20),
-              tooltip: '重置为默认',
+              tooltip: context.l10n.common_reset,
               onPressed: () => _resetToDefault(context),
             ),
           const Icon(Icons.chevron_right),

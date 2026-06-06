@@ -358,6 +358,7 @@ class _AddTagGroupCardState extends State<AddTagGroupCard> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isEnabled = widget.enabled;
+    final l10n = AppLocalizations.of(context)!;
 
     return MouseRegion(
       cursor:
@@ -396,7 +397,9 @@ class _AddTagGroupCardState extends State<AddTagGroupCard> {
                   const SizedBox(height: 8),
                   // 文字
                   Text(
-                    isEnabled ? '添加词组' : '已锁定',
+                    isEnabled
+                        ? l10n.randomManager_addTagGroup
+                        : l10n.randomManager_locked,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: (_isHovered && isEnabled)
                           ? colorScheme.primary
@@ -432,6 +435,7 @@ class _AddCategoryButtonState extends State<AddCategoryButton> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
@@ -475,7 +479,7 @@ class _AddCategoryButtonState extends State<AddCategoryButton> {
               ),
               const SizedBox(width: 6),
               Text(
-                '新增类别',
+                l10n.randomManager_addCategory,
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
@@ -500,6 +504,7 @@ class EmptyCategoryPlaceholder extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return Center(
       child: Padding(
@@ -521,7 +526,7 @@ class EmptyCategoryPlaceholder extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              '暂无类别',
+              l10n.randomManager_noCategories,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.w500,
@@ -529,7 +534,7 @@ class EmptyCategoryPlaceholder extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              '点击"新增类别"开始配置',
+              l10n.randomManager_noCategoriesHint,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
               ),
@@ -558,27 +563,28 @@ class CategoryStats extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         _StatBadge(
           icon: Icons.category_outlined,
-          label: '类别',
+          label: l10n.randomManager_categories,
           value: '$categoryCount',
           color: colorScheme.primary,
         ),
         const SizedBox(width: 12),
         _StatBadge(
           icon: Icons.layers_outlined,
-          label: '词组',
+          label: l10n.randomManager_tagGroups,
           value: '$groupCount',
           color: colorScheme.secondary,
         ),
         const SizedBox(width: 12),
         _StatBadge(
           icon: Icons.label_outlined,
-          label: '标签',
+          label: l10n.randomManager_tags,
           value: '$tagCount',
           color: colorScheme.tertiary,
         ),

@@ -89,6 +89,19 @@ class ReversePromptImage {
   final String? name;
 }
 
+enum ReversePromptProcessingStage {
+  preparing,
+  onnxTagger,
+  llmReverse,
+  characterReplace,
+}
+
+class _ReversePromptUiError implements Exception {
+  const _ReversePromptUiError(this.key);
+
+  final String key;
+}
+
 class ReversePromptState {
   const ReversePromptState({
     this.images = const [],
@@ -104,7 +117,7 @@ class ReversePromptState {
     this.characterReplacePrompt = '',
     this.finalPrompt = '',
     this.isProcessing = false,
-    this.processingLabel,
+    this.processingStage,
     this.error,
   });
 
@@ -121,7 +134,7 @@ class ReversePromptState {
   final String characterReplacePrompt;
   final String finalPrompt;
   final bool isProcessing;
-  final String? processingLabel;
+  final ReversePromptProcessingStage? processingStage;
   final String? error;
 
   bool get canRun => images.isNotEmpty && (useOnnxTagger || useLlmReverse);
@@ -142,8 +155,8 @@ class ReversePromptState {
     String? characterReplacePrompt,
     String? finalPrompt,
     bool? isProcessing,
-    String? processingLabel,
-    bool clearProcessingLabel = false,
+    ReversePromptProcessingStage? processingStage,
+    bool clearProcessingStage = false,
     String? error,
     bool clearError = false,
   }) {
@@ -168,8 +181,8 @@ class ReversePromptState {
           characterReplacePrompt ?? this.characterReplacePrompt,
       finalPrompt: finalPrompt ?? this.finalPrompt,
       isProcessing: isProcessing ?? this.isProcessing,
-      processingLabel:
-          clearProcessingLabel ? null : processingLabel ?? this.processingLabel,
+      processingStage:
+          clearProcessingStage ? null : processingStage ?? this.processingStage,
       error: clearError ? null : error ?? this.error,
     );
   }
@@ -310,13 +323,13 @@ class ReversePromptNotifier extends StateNotifier<ReversePromptState> {
 
   Future<void> runChain() async {
     if (!state.canRun) {
-      state = state.copyWith(error: '请先添加图片，并至少启用 ONNX tagger 或 LLM 反推');
+      state = state.copyWith(error: 'reversePrompt_needImageAndMethod');
       return;
     }
 
     state = state.copyWith(
       isProcessing: true,
-      processingLabel: '准备反推',
+      processingStage: ReversePromptProcessingStage.preparing,
       taggerPrompt: '',
       llmPrompt: '',
       characterReplacePrompt: '',
@@ -328,7 +341,9 @@ class ReversePromptNotifier extends StateNotifier<ReversePromptState> {
       var currentPrompt = '';
       final image = state.images.first;
       if (state.useOnnxTagger) {
-        state = state.copyWith(processingLabel: 'ONNX tagger 反推中');
+        state = state.copyWith(
+          processingStage: ReversePromptProcessingStage.onnxTagger,
+        );
         final model = await _resolveSelectedTaggerModel();
         final result = await _ref.read(localOnnxTaggerServiceProvider).tagImage(
               imageBytes: image.bytes,
@@ -346,7 +361,9 @@ class ReversePromptNotifier extends StateNotifier<ReversePromptState> {
       }
 
       if (state.useLlmReverse) {
-        state = state.copyWith(processingLabel: 'LLM 读图反推中');
+        state = state.copyWith(
+          processingStage: ReversePromptProcessingStage.llmReverse,
+        );
         currentPrompt = await _collectStream(
           _ref.read(promptAssistantServiceProvider).reverseImagePrompt(
                 image.bytes,
@@ -363,12 +380,18 @@ class ReversePromptNotifier extends StateNotifier<ReversePromptState> {
       if (state.useCharacterReplace) {
         final character = _resolveSelectedCharacter();
         if (character == null || character.prompt.trim().isEmpty) {
-          throw StateError('请先在反推角色库中选择一个有效角色');
+          throw const _ReversePromptUiError(
+            'reversePrompt_needReplacementCharacter',
+          );
         }
         if (currentPrompt.trim().isEmpty) {
-          throw StateError('角色替换需要先获得反推提示词');
+          throw const _ReversePromptUiError(
+            'reversePrompt_needPromptForCharacterReplace',
+          );
         }
-        state = state.copyWith(processingLabel: '角色替换中');
+        state = state.copyWith(
+          processingStage: ReversePromptProcessingStage.characterReplace,
+        );
         currentPrompt = await _runCharacterReplace(
           inputPrompt: currentPrompt,
           character: character,
@@ -381,14 +404,14 @@ class ReversePromptNotifier extends StateNotifier<ReversePromptState> {
 
       state = state.copyWith(
         isProcessing: false,
-        clearProcessingLabel: true,
+        clearProcessingStage: true,
         finalPrompt: currentPrompt,
       );
     } catch (e) {
       state = state.copyWith(
         isProcessing: false,
-        clearProcessingLabel: true,
-        error: e.toString(),
+        clearProcessingStage: true,
+        error: e is _ReversePromptUiError ? e.key : e.toString(),
       );
     }
   }
@@ -397,7 +420,7 @@ class ReversePromptNotifier extends StateNotifier<ReversePromptState> {
     final models =
         await _ref.read(localOnnxModelServiceProvider).scanTaggerModels();
     if (models.isEmpty) {
-      throw StateError('未找到 ONNX tagger 模型，请先在设置中配置模型文件夹');
+      throw const _ReversePromptUiError('reversePrompt_noOnnxModel');
     }
     final selectedPath = state.selectedTaggerModelPath;
     if (selectedPath != null) {

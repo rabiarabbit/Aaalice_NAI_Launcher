@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/utils/localization_extension.dart';
 import '../../providers/local_gallery_provider.dart';
 
 /// Error state view for gallery
@@ -35,7 +36,9 @@ class GalleryErrorView extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            '加载失败: ${error ?? '未知错误'}',
+            context.l10n.localGallery_loadFailed(
+              error ?? context.l10n.localGallery_unknownError,
+            ),
             style: TextStyle(
               color: theme.colorScheme.onSurface,
             ),
@@ -44,7 +47,7 @@ class GalleryErrorView extends StatelessWidget {
           ElevatedButton(
             onPressed: onRetry,
             child: Text(
-              '重试',
+              context.l10n.common_retry,
               style: TextStyle(
                 color: theme.colorScheme.onPrimary,
               ),
@@ -61,11 +64,11 @@ class GalleryErrorView extends StatelessWidget {
 class GalleryLoadingView extends StatelessWidget {
   /// Loading message to display
   /// 显示的加载信息
-  final String message;
+  final String? message;
 
   const GalleryLoadingView({
     super.key,
-    this.message = '索引本地图片中...',
+    this.message,
   });
 
   @override
@@ -81,7 +84,7 @@ class GalleryLoadingView extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            message,
+            message ?? context.l10n.localGallery_indexingLocalImages,
             style: TextStyle(
               color: theme.colorScheme.onSurface,
             ),
@@ -97,11 +100,11 @@ class GalleryLoadingView extends StatelessWidget {
 class GalleryEmptyView extends StatelessWidget {
   /// Title text
   /// 标题文本
-  final String title;
+  final String? title;
 
   /// Subtitle text
   /// 副标题文本
-  final String subtitle;
+  final String? subtitle;
 
   /// Icon to display
   /// 显示的图标
@@ -109,8 +112,8 @@ class GalleryEmptyView extends StatelessWidget {
 
   const GalleryEmptyView({
     super.key,
-    this.title = '暂无本地图片',
-    this.subtitle = '生成的图片将保存在此处',
+    this.title,
+    this.subtitle,
     this.icon = Icons.image_not_supported,
   });
 
@@ -131,14 +134,14 @@ class GalleryEmptyView extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            title,
+            title ?? context.l10n.localGallery_emptyTitle,
             style: TextStyle(
               color: theme.colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            subtitle,
+            subtitle ?? context.l10n.localGallery_emptySubtitle,
             style: TextStyle(
               color: theme.colorScheme.onSurfaceVariant
                   .withValues(alpha: isDark ? 0.7 : 1.0),
@@ -194,7 +197,7 @@ class GalleryNoResultsView extends ConsumerWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            title ?? '无匹配结果',
+            title ?? context.l10n.localGallery_noMatchingResults,
             style: theme.textTheme.titleMedium?.copyWith(
               color: theme.colorScheme.onSurface,
             ),
@@ -217,7 +220,7 @@ class GalleryNoResultsView extends ConsumerWidget {
                       .clearAllFilters();
                 },
             icon: const Icon(Icons.filter_alt_off, size: 16),
-            label: const Text('清除过滤'),
+            label: Text(context.l10n.localGallery_clearFilters),
             style: TextButton.styleFrom(
               foregroundColor: theme.colorScheme.primary,
             ),
@@ -246,7 +249,7 @@ class GalleryGroupedLoadingView extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            '加载分组图片中...',
+            context.l10n.localGallery_loadingGroupedImages,
             style: TextStyle(
               color: theme.colorScheme.onSurface,
             ),

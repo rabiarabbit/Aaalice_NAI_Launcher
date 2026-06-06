@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
+import '../../../core/utils/localization_extension.dart';
 import '../services/provider_adapters/prompt_assistant_adapter.dart';
 
 class PromptAssistantCustomDialogResult {
@@ -47,12 +48,15 @@ class _PromptAssistantCustomDialogState
 
   Future<void> _pickImages() async {
     if (!widget.allowImages) {
-      setState(() => _error = '当前自定义任务服务商未启用图片输入');
+      setState(() => _error = context.l10n.promptAssistant_imageInputDisabled);
       return;
     }
     final remaining = _maxImages - _images.length;
     if (remaining <= 0) {
-      setState(() => _error = '最多添加 $_maxImages 张参考图片');
+      setState(
+        () => _error =
+            context.l10n.promptAssistant_maxReferenceImages(_maxImages),
+      );
       return;
     }
 
@@ -69,7 +73,10 @@ class _PromptAssistantCustomDialogState
       if (bytes == null) continue;
       final mimeType = detectImageMime(bytes);
       if (mimeType == null) {
-        setState(() => _error = '不支持的图片格式: ${file.name}');
+        setState(
+          () => _error =
+              context.l10n.promptAssistant_unsupportedImageFormat(file.name),
+        );
         continue;
       }
       next.add(
@@ -99,7 +106,9 @@ class _PromptAssistantCustomDialogState
   void _submit() {
     final request = _requestController.text.trim();
     if (request.isEmpty && _images.isEmpty) {
-      setState(() => _error = '请输入自定义需求或添加参考图片');
+      setState(
+        () => _error = context.l10n.promptAssistant_needCustomRequestOrImage,
+      );
       return;
     }
     Navigator.pop(
@@ -114,7 +123,7 @@ class _PromptAssistantCustomDialogState
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('自定义提示词助手'),
+      title: Text(context.l10n.promptAssistant_customDialogTitle),
       content: SizedBox(
         width: 560,
         child: SingleChildScrollView(
@@ -123,7 +132,7 @@ class _PromptAssistantCustomDialogState
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '当前提示词',
+                context.l10n.promptAssistant_currentPrompt,
                 style: Theme.of(context).textTheme.titleSmall,
               ),
               const SizedBox(height: 6),
@@ -138,7 +147,7 @@ class _PromptAssistantCustomDialogState
                 child: SingleChildScrollView(
                   child: Text(
                     widget.currentPrompt.trim().isEmpty
-                        ? '（当前提示词为空）'
+                        ? context.l10n.promptAssistant_currentPromptEmpty
                         : widget.currentPrompt.trim(),
                   ),
                 ),
@@ -148,9 +157,9 @@ class _PromptAssistantCustomDialogState
                 controller: _requestController,
                 maxLines: 6,
                 autofocus: true,
-                decoration: const InputDecoration(
-                  labelText: '你的修改需求',
-                  hintText: '例如：更阴森、增加雨夜街道背景、让动作更有张力，只返回最终提示词',
+                decoration: InputDecoration(
+                  labelText: context.l10n.promptAssistant_customRequestLabel,
+                  hintText: context.l10n.promptAssistant_customRequestHint,
                   alignLabelWithHint: true,
                 ),
               ),
@@ -160,14 +169,16 @@ class _PromptAssistantCustomDialogState
                   FilledButton.icon(
                     onPressed: widget.allowImages ? _pickImages : null,
                     icon: const Icon(Icons.image_outlined),
-                    label: const Text('添加参考图'),
+                    label: Text(context.l10n.promptAssistant_addReferenceImage),
                   ),
                   const SizedBox(width: 8),
                   Text('${_images.length}/$_maxImages'),
                   if (!widget.allowImages) ...[
                     const SizedBox(width: 8),
-                    const Expanded(
-                      child: Text('当前服务商未启用图片输入'),
+                    Expanded(
+                      child: Text(
+                        context.l10n.promptAssistant_imageInputDisabled,
+                      ),
                     ),
                   ],
                 ],
@@ -202,11 +213,11 @@ class _PromptAssistantCustomDialogState
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('取消'),
+          child: Text(context.l10n.common_cancel),
         ),
         FilledButton(
           onPressed: _submit,
-          child: const Text('执行'),
+          child: Text(context.l10n.promptAssistant_execute),
         ),
       ],
     );

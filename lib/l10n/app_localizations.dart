@@ -284,6 +284,12 @@ abstract class AppLocalizations {
   /// **'Added'**
   String get common_added;
 
+  /// No description provided for @common_new.
+  ///
+  /// In en, this message translates to:
+  /// **'New'**
+  String get common_new;
+
   /// No description provided for @common_confirmDelete.
   ///
   /// In en, this message translates to:
@@ -475,6 +481,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No'**
   String get common_no;
+
+  /// No description provided for @common_exit.
+  ///
+  /// In en, this message translates to:
+  /// **'Exit'**
+  String get common_exit;
+
+  /// No description provided for @common_folder.
+  ///
+  /// In en, this message translates to:
+  /// **'Folder'**
+  String get common_folder;
+
+  /// No description provided for @common_filter.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter'**
+  String get common_filter;
+
+  /// No description provided for @common_grid.
+  ///
+  /// In en, this message translates to:
+  /// **'Grid'**
+  String get common_grid;
+
+  /// No description provided for @common_date.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get common_date;
+
+  /// No description provided for @common_pack.
+  ///
+  /// In en, this message translates to:
+  /// **'Pack'**
+  String get common_pack;
+
+  /// No description provided for @common_multiSelect.
+  ///
+  /// In en, this message translates to:
+  /// **'Multi-select'**
+  String get common_multiSelect;
+
+  /// No description provided for @common_category.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get common_category;
+
+  /// No description provided for @common_categories.
+  ///
+  /// In en, this message translates to:
+  /// **'Categories'**
+  String get common_categories;
+
+  /// No description provided for @common_items.
+  ///
+  /// In en, this message translates to:
+  /// **'items'**
+  String get common_items;
 
   /// No description provided for @nav_canvas.
   ///
@@ -1058,6 +1124,36 @@ abstract class AppLocalizations {
   /// **'English'**
   String get settings_languageEnglish;
 
+  /// No description provided for @settings_shortcuts.
+  ///
+  /// In en, this message translates to:
+  /// **'Shortcuts'**
+  String get settings_shortcuts;
+
+  /// No description provided for @settings_dataSource.
+  ///
+  /// In en, this message translates to:
+  /// **'Data Source'**
+  String get settings_dataSource;
+
+  /// No description provided for @settings_queue.
+  ///
+  /// In en, this message translates to:
+  /// **'Queue'**
+  String get settings_queue;
+
+  /// No description provided for @settings_notifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get settings_notifications;
+
+  /// No description provided for @settings_promptAssistant.
+  ///
+  /// In en, this message translates to:
+  /// **'Assistant'**
+  String get settings_promptAssistant;
+
   /// No description provided for @settings_selectStyle.
   ///
   /// In en, this message translates to:
@@ -1141,6 +1237,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'View source code and documentation'**
   String get settings_openSourceSubtitle;
+
+  /// No description provided for @settings_fileLogging.
+  ///
+  /// In en, this message translates to:
+  /// **'Record application logs'**
+  String get settings_fileLogging;
+
+  /// No description provided for @settings_fileLoggingSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Off by default; enable only for troubleshooting. When enabled, logs are written to Documents/NAI_Launcher/logs. When disabled, log files are no longer created or written.'**
+  String get settings_fileLoggingSubtitle;
 
   /// No description provided for @settings_pathReset.
   ///
@@ -1688,6 +1796,30 @@ abstract class AppLocalizations {
   /// **'Imported {count} character(s)'**
   String prompt_importedCharacters(int count);
 
+  /// No description provided for @prompt_characterPromptReplaced.
+  ///
+  /// In en, this message translates to:
+  /// **'Replaced character prompts'**
+  String get prompt_characterPromptReplaced;
+
+  /// No description provided for @prompt_characterPromptAppended.
+  ///
+  /// In en, this message translates to:
+  /// **'Appended character prompts ({count} character(s))'**
+  String prompt_characterPromptAppended(Object count);
+
+  /// No description provided for @prompt_smartDecomposedWithCharacters.
+  ///
+  /// In en, this message translates to:
+  /// **'Decomposed into main prompt + {count} character(s)'**
+  String prompt_smartDecomposedWithCharacters(Object count);
+
+  /// No description provided for @prompt_appliedToMainPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Applied to main prompt'**
+  String get prompt_appliedToMainPrompt;
+
   /// No description provided for @prompt_editPrompt.
   ///
   /// In en, this message translates to:
@@ -1717,6 +1849,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enter prompt to describe image, type < to reference library, supports tag autocomplete'**
   String get prompt_describeImageWithHint;
+
+  /// No description provided for @promptAssistant_needPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a prompt before using the assistant'**
+  String get promptAssistant_needPrompt;
+
+  /// No description provided for @promptAssistant_requestFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Assistant request failed: {error}'**
+  String promptAssistant_requestFailed(Object error);
+
+  /// No description provided for @promptAssistant_enableAssistant.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Prompt Assistant'**
+  String get promptAssistant_enableAssistant;
+
+  /// No description provided for @promptAssistant_desktopOverlay.
+  ///
+  /// In en, this message translates to:
+  /// **'Desktop bottom-right overlay'**
+  String get promptAssistant_desktopOverlay;
+
+  /// No description provided for @kritaBridge_busyGenerating.
+  ///
+  /// In en, this message translates to:
+  /// **'Krita Bridge is generating. Wait for the current task to finish.'**
+  String get kritaBridge_busyGenerating;
+
+  /// No description provided for @prompt_negativeFixedTagPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Negative Fixed Tag Prefix'**
+  String get prompt_negativeFixedTagPrefix;
+
+  /// No description provided for @prompt_negativeFixedTagSuffix.
+  ///
+  /// In en, this message translates to:
+  /// **'Negative Fixed Tag Suffix'**
+  String get prompt_negativeFixedTagSuffix;
 
   /// No description provided for @prompt_unwantedContent.
   ///
@@ -2660,6 +2834,210 @@ abstract class AppLocalizations {
   /// **'Upscale Amount'**
   String get img2img_enhanceUpscaleAmount;
 
+  /// No description provided for @img2img_focusedInpaint.
+  ///
+  /// In en, this message translates to:
+  /// **'Focused Inpainting'**
+  String get img2img_focusedInpaint;
+
+  /// No description provided for @img2img_focusedInpaintEnabledHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enabled. Adjust the focus area and Minimum Context Area from the top-left control in the inpaint editor.'**
+  String get img2img_focusedInpaintEnabledHint;
+
+  /// No description provided for @img2img_focusedInpaintDisabledHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Regular inpaint is the default. To use Focused Inpaint, enable it from the top-left control in the inpaint editor and draw a focus area.'**
+  String get img2img_focusedInpaintDisabledHint;
+
+  /// No description provided for @img2img_disabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Disabled'**
+  String get img2img_disabled;
+
+  /// No description provided for @img2img_novelAiCloudUpscale.
+  ///
+  /// In en, this message translates to:
+  /// **'NovelAI cloud upscale (fixed 4x)'**
+  String get img2img_novelAiCloudUpscale;
+
+  /// No description provided for @img2img_comfyuiEnableHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable and connect ComfyUI in Settings > ComfyUI first.'**
+  String get img2img_comfyuiEnableHint;
+
+  /// No description provided for @img2img_upscaleMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Upscale Mode'**
+  String get img2img_upscaleMode;
+
+  /// No description provided for @img2img_upscaleRegularModel.
+  ///
+  /// In en, this message translates to:
+  /// **'Regular Model'**
+  String get img2img_upscaleRegularModel;
+
+  /// No description provided for @img2img_upscaleModel.
+  ///
+  /// In en, this message translates to:
+  /// **'Upscale Model'**
+  String get img2img_upscaleModel;
+
+  /// No description provided for @img2img_noSeedvr2Models.
+  ///
+  /// In en, this message translates to:
+  /// **'No SeedVR2 model found. Refresh the model list or check the SeedVR2 node/model files.'**
+  String get img2img_noSeedvr2Models;
+
+  /// No description provided for @img2img_noRegularUpscaleModels.
+  ///
+  /// In en, this message translates to:
+  /// **'No regular upscale model found. Refresh the model list or check models/upscale_models.'**
+  String get img2img_noRegularUpscaleModels;
+
+  /// No description provided for @img2img_useSeedvr2TiledWorkflow.
+  ///
+  /// In en, this message translates to:
+  /// **'Using the SeedVR2TilingUpscaler tiled upscale workflow.'**
+  String get img2img_useSeedvr2TiledWorkflow;
+
+  /// No description provided for @img2img_useSeedvr2Workflow.
+  ///
+  /// In en, this message translates to:
+  /// **'Using the SeedVR2VideoUpscaler workflow.'**
+  String get img2img_useSeedvr2Workflow;
+
+  /// No description provided for @img2img_useRegularUpscaleWorkflow.
+  ///
+  /// In en, this message translates to:
+  /// **'Using UpscaleModelLoader + ImageUpscaleWithModel, then correcting to the target scale with Lanczos.'**
+  String get img2img_useRegularUpscaleWorkflow;
+
+  /// No description provided for @img2img_useRtxUpscaleWorkflow.
+  ///
+  /// In en, this message translates to:
+  /// **'Using RTX Video Super Resolution. No model selection is required.'**
+  String get img2img_useRtxUpscaleWorkflow;
+
+  /// No description provided for @img2img_refreshModelList.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh model list'**
+  String get img2img_refreshModelList;
+
+  /// No description provided for @img2img_startUpscale.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Upscale'**
+  String get img2img_startUpscale;
+
+  /// No description provided for @img2img_novelAiUpscaleComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'NovelAI upscale complete'**
+  String get img2img_novelAiUpscaleComplete;
+
+  /// No description provided for @img2img_upscaleCompleteAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Upscale complete ({width}x{height}); added to preview list'**
+  String img2img_upscaleCompleteAdded(Object width, Object height);
+
+  /// No description provided for @img2img_regularUpscaleCompleteAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Regular model upscale complete ({width}x{height}); added to preview list'**
+  String img2img_regularUpscaleCompleteAdded(Object width, Object height);
+
+  /// No description provided for @img2img_rtxUpscaleCompleteAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'RTX upscale complete ({width}x{height}); added to preview list'**
+  String img2img_rtxUpscaleCompleteAdded(Object width, Object height);
+
+  /// No description provided for @img2img_noAvailableSeedvr2Model.
+  ///
+  /// In en, this message translates to:
+  /// **'No available SeedVR2 model selected'**
+  String get img2img_noAvailableSeedvr2Model;
+
+  /// No description provided for @img2img_noAvailableRegularUpscaleModel.
+  ///
+  /// In en, this message translates to:
+  /// **'No available regular upscale model selected'**
+  String get img2img_noAvailableRegularUpscaleModel;
+
+  /// No description provided for @img2img_decodeSourceFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to decode source image'**
+  String get img2img_decodeSourceFailed;
+
+  /// No description provided for @img2img_metricSpeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Speed'**
+  String get img2img_metricSpeed;
+
+  /// No description provided for @img2img_metricVram.
+  ///
+  /// In en, this message translates to:
+  /// **'VRAM'**
+  String get img2img_metricVram;
+
+  /// No description provided for @img2img_metricQuality.
+  ///
+  /// In en, this message translates to:
+  /// **'Quality'**
+  String get img2img_metricQuality;
+
+  /// No description provided for @img2img_seedvr2VaeTileHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Also writes the SeedVR2 VAE MODEL encode/decode tile size.'**
+  String get img2img_seedvr2VaeTileHint;
+
+  /// No description provided for @img2img_seedvr2UseTiledUpscale.
+  ///
+  /// In en, this message translates to:
+  /// **'Use tiled upscale'**
+  String get img2img_seedvr2UseTiledUpscale;
+
+  /// No description provided for @img2img_seedvr2UseTiledUpscaleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'When enabled, uses SeedVR2TilingUpscaler. Recommended for large images or high VRAM pressure.'**
+  String get img2img_seedvr2UseTiledUpscaleHint;
+
+  /// No description provided for @img2img_seedvr2TileSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Tile Size'**
+  String get img2img_seedvr2TileSize;
+
+  /// No description provided for @img2img_seedvr2TileSizeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Also controls SeedVR2TilingUpscaler tile_width / tile_height.'**
+  String get img2img_seedvr2TileSizeHint;
+
+  /// No description provided for @img2img_regularModelDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Regular Model · {name}'**
+  String img2img_regularModelDescription(Object name);
+
+  /// No description provided for @img2img_upscalePanelOpened.
+  ///
+  /// In en, this message translates to:
+  /// **'Opened the image-to-image upscale panel'**
+  String get img2img_upscalePanelOpened;
+
   /// No description provided for @editor_title.
   ///
   /// In en, this message translates to:
@@ -2882,11 +3260,29 @@ abstract class AppLocalizations {
   /// **'Ellipse'**
   String get editor_toolEllipseSelect;
 
+  /// No description provided for @editor_toolLassoSelect.
+  ///
+  /// In en, this message translates to:
+  /// **'Lasso'**
+  String get editor_toolLassoSelect;
+
   /// No description provided for @editor_toolColorPicker.
   ///
   /// In en, this message translates to:
   /// **'Color Picker'**
   String get editor_toolColorPicker;
+
+  /// No description provided for @editor_toolCloneStamp.
+  ///
+  /// In en, this message translates to:
+  /// **'Clone Stamp'**
+  String get editor_toolCloneStamp;
+
+  /// No description provided for @editor_toolBlur.
+  ///
+  /// In en, this message translates to:
+  /// **'Blur'**
+  String get editor_toolBlur;
 
   /// No description provided for @editor_presetDefault.
   ///
@@ -3007,6 +3403,918 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Draw selection for inpaint mask'**
   String get editor_selectionHint;
+
+  /// No description provided for @editor_back.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get editor_back;
+
+  /// No description provided for @editor_layers.
+  ///
+  /// In en, this message translates to:
+  /// **'Layers'**
+  String get editor_layers;
+
+  /// No description provided for @editor_loadMask.
+  ///
+  /// In en, this message translates to:
+  /// **'Load Mask'**
+  String get editor_loadMask;
+
+  /// No description provided for @editor_togglePanels.
+  ///
+  /// In en, this message translates to:
+  /// **'Toggle Panels'**
+  String get editor_togglePanels;
+
+  /// No description provided for @editor_fillClosedRegion.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill Closed Region'**
+  String get editor_fillClosedRegion;
+
+  /// No description provided for @editor_resetMask.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Mask'**
+  String get editor_resetMask;
+
+  /// No description provided for @editor_zoomIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Zoom In'**
+  String get editor_zoomIn;
+
+  /// No description provided for @editor_zoomOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Zoom Out'**
+  String get editor_zoomOut;
+
+  /// No description provided for @editor_fitToWindow.
+  ///
+  /// In en, this message translates to:
+  /// **'Fit to Window'**
+  String get editor_fitToWindow;
+
+  /// No description provided for @editor_tempColorPickerShortcut.
+  ///
+  /// In en, this message translates to:
+  /// **'Alt+Click: temporary color picker'**
+  String get editor_tempColorPickerShortcut;
+
+  /// No description provided for @editor_shortcutHelpTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Shortcut Help'**
+  String get editor_shortcutHelpTitle;
+
+  /// No description provided for @editor_shortcutPaintTools.
+  ///
+  /// In en, this message translates to:
+  /// **'Paint Tools'**
+  String get editor_shortcutPaintTools;
+
+  /// No description provided for @editor_shortcutSelectionTools.
+  ///
+  /// In en, this message translates to:
+  /// **'Selection Tools'**
+  String get editor_shortcutSelectionTools;
+
+  /// No description provided for @editor_shortcutCanvasView.
+  ///
+  /// In en, this message translates to:
+  /// **'Canvas View'**
+  String get editor_shortcutCanvasView;
+
+  /// No description provided for @editor_shortcutBrushAdjust.
+  ///
+  /// In en, this message translates to:
+  /// **'Brush Adjustments'**
+  String get editor_shortcutBrushAdjust;
+
+  /// No description provided for @editor_shortcutColors.
+  ///
+  /// In en, this message translates to:
+  /// **'Colors'**
+  String get editor_shortcutColors;
+
+  /// No description provided for @editor_shortcutCanvasActions.
+  ///
+  /// In en, this message translates to:
+  /// **'Canvas Actions'**
+  String get editor_shortcutCanvasActions;
+
+  /// No description provided for @editor_shortcutHistoryActions.
+  ///
+  /// In en, this message translates to:
+  /// **'History Actions'**
+  String get editor_shortcutHistoryActions;
+
+  /// No description provided for @editor_shortcutSelectionActions.
+  ///
+  /// In en, this message translates to:
+  /// **'Selection Actions'**
+  String get editor_shortcutSelectionActions;
+
+  /// No description provided for @editor_shortcutTemporaryColorPicker.
+  ///
+  /// In en, this message translates to:
+  /// **'Temporary Color Picker'**
+  String get editor_shortcutTemporaryColorPicker;
+
+  /// No description provided for @editor_shortcutRectSelection.
+  ///
+  /// In en, this message translates to:
+  /// **'Rectangle Selection'**
+  String get editor_shortcutRectSelection;
+
+  /// No description provided for @editor_shortcutEllipseSelection.
+  ///
+  /// In en, this message translates to:
+  /// **'Ellipse Selection'**
+  String get editor_shortcutEllipseSelection;
+
+  /// No description provided for @editor_shortcutLassoSelection.
+  ///
+  /// In en, this message translates to:
+  /// **'Lasso Selection'**
+  String get editor_shortcutLassoSelection;
+
+  /// No description provided for @editor_shortcut100Zoom.
+  ///
+  /// In en, this message translates to:
+  /// **'100% Zoom'**
+  String get editor_shortcut100Zoom;
+
+  /// No description provided for @editor_shortcutFitHeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Fit Height'**
+  String get editor_shortcutFitHeight;
+
+  /// No description provided for @editor_shortcutFitWidth.
+  ///
+  /// In en, this message translates to:
+  /// **'Fit Width'**
+  String get editor_shortcutFitWidth;
+
+  /// No description provided for @editor_shortcutRotateLeft15.
+  ///
+  /// In en, this message translates to:
+  /// **'Rotate Left 15°'**
+  String get editor_shortcutRotateLeft15;
+
+  /// No description provided for @editor_shortcutResetRotation.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Rotation'**
+  String get editor_shortcutResetRotation;
+
+  /// No description provided for @editor_shortcutRotateRight15.
+  ///
+  /// In en, this message translates to:
+  /// **'Rotate Right 15°'**
+  String get editor_shortcutRotateRight15;
+
+  /// No description provided for @editor_shortcutFlipHorizontal.
+  ///
+  /// In en, this message translates to:
+  /// **'Flip Horizontal'**
+  String get editor_shortcutFlipHorizontal;
+
+  /// No description provided for @editor_shortcutWheel.
+  ///
+  /// In en, this message translates to:
+  /// **'Mouse Wheel'**
+  String get editor_shortcutWheel;
+
+  /// No description provided for @editor_shortcutBrushSmaller.
+  ///
+  /// In en, this message translates to:
+  /// **'Decrease Brush Size'**
+  String get editor_shortcutBrushSmaller;
+
+  /// No description provided for @editor_shortcutBrushLarger.
+  ///
+  /// In en, this message translates to:
+  /// **'Increase Brush Size'**
+  String get editor_shortcutBrushLarger;
+
+  /// No description provided for @editor_shortcutOpacityLower.
+  ///
+  /// In en, this message translates to:
+  /// **'Decrease Opacity'**
+  String get editor_shortcutOpacityLower;
+
+  /// No description provided for @editor_shortcutOpacityHigher.
+  ///
+  /// In en, this message translates to:
+  /// **'Increase Opacity'**
+  String get editor_shortcutOpacityHigher;
+
+  /// No description provided for @editor_shortcutDragBrushSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjust Brush Size'**
+  String get editor_shortcutDragBrushSize;
+
+  /// No description provided for @editor_shortcutSwapColors.
+  ///
+  /// In en, this message translates to:
+  /// **'Swap Foreground/Background Colors'**
+  String get editor_shortcutSwapColors;
+
+  /// No description provided for @editor_shortcutPanCanvas.
+  ///
+  /// In en, this message translates to:
+  /// **'Pan Canvas'**
+  String get editor_shortcutPanCanvas;
+
+  /// No description provided for @editor_shortcutClearSelectionContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Selection Content'**
+  String get editor_shortcutClearSelectionContent;
+
+  /// No description provided for @editor_shortcutCancelCurrentAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel Current Action'**
+  String get editor_shortcutCancelCurrentAction;
+
+  /// No description provided for @editor_selectUnlockedLayerWithContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Select an unlocked layer with content'**
+  String get editor_selectUnlockedLayerWithContent;
+
+  /// No description provided for @editor_readCurrentLayerFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to read the current layer'**
+  String get editor_readCurrentLayerFailed;
+
+  /// No description provided for @editor_localEffects.
+  ///
+  /// In en, this message translates to:
+  /// **'Local Post-processing / Effects'**
+  String get editor_localEffects;
+
+  /// No description provided for @editor_basicAdjustments.
+  ///
+  /// In en, this message translates to:
+  /// **'Basic Adjustments'**
+  String get editor_basicAdjustments;
+
+  /// No description provided for @editor_styleAndRepair.
+  ///
+  /// In en, this message translates to:
+  /// **'Style & Repair'**
+  String get editor_styleAndRepair;
+
+  /// No description provided for @editor_transformCrop.
+  ///
+  /// In en, this message translates to:
+  /// **'Rotate / Flip / Crop'**
+  String get editor_transformCrop;
+
+  /// No description provided for @editor_transformCropDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Geometry operations are separate. They generate a preview first and write back only after confirmation.'**
+  String get editor_transformCropDescription;
+
+  /// No description provided for @editor_effectPreviewHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview does not modify the original image. Click Apply to write the result to the active layer and undo history.'**
+  String get editor_effectPreviewHint;
+
+  /// No description provided for @editor_applyToCurrentLayer.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply to Current Layer'**
+  String get editor_applyToCurrentLayer;
+
+  /// No description provided for @editor_oneShotEffectHint.
+  ///
+  /// In en, this message translates to:
+  /// **'{effect} is a one-shot operation and has no intensity slider.'**
+  String editor_oneShotEffectHint(Object effect);
+
+  /// No description provided for @editor_effectIntensity.
+  ///
+  /// In en, this message translates to:
+  /// **'{effect} Intensity'**
+  String editor_effectIntensity(Object effect);
+
+  /// No description provided for @editor_original.
+  ///
+  /// In en, this message translates to:
+  /// **'Original'**
+  String get editor_original;
+
+  /// No description provided for @editor_effectPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Effect Preview'**
+  String get editor_effectPreview;
+
+  /// No description provided for @editor_effectBrightness.
+  ///
+  /// In en, this message translates to:
+  /// **'Brightness'**
+  String get editor_effectBrightness;
+
+  /// No description provided for @editor_effectContrast.
+  ///
+  /// In en, this message translates to:
+  /// **'Contrast'**
+  String get editor_effectContrast;
+
+  /// No description provided for @editor_effectSaturation.
+  ///
+  /// In en, this message translates to:
+  /// **'Saturation'**
+  String get editor_effectSaturation;
+
+  /// No description provided for @editor_effectTemperature.
+  ///
+  /// In en, this message translates to:
+  /// **'Temperature'**
+  String get editor_effectTemperature;
+
+  /// No description provided for @editor_effectGamma.
+  ///
+  /// In en, this message translates to:
+  /// **'Gamma'**
+  String get editor_effectGamma;
+
+  /// No description provided for @editor_effectGrayscale.
+  ///
+  /// In en, this message translates to:
+  /// **'Grayscale'**
+  String get editor_effectGrayscale;
+
+  /// No description provided for @editor_effectInvert.
+  ///
+  /// In en, this message translates to:
+  /// **'Invert'**
+  String get editor_effectInvert;
+
+  /// No description provided for @editor_effectSepia.
+  ///
+  /// In en, this message translates to:
+  /// **'Sepia'**
+  String get editor_effectSepia;
+
+  /// No description provided for @editor_effectDenoise.
+  ///
+  /// In en, this message translates to:
+  /// **'Denoise'**
+  String get editor_effectDenoise;
+
+  /// No description provided for @editor_effectBlur.
+  ///
+  /// In en, this message translates to:
+  /// **'Gaussian Blur'**
+  String get editor_effectBlur;
+
+  /// No description provided for @editor_effectSharpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Sharpen'**
+  String get editor_effectSharpen;
+
+  /// No description provided for @editor_effectCropToSelection.
+  ///
+  /// In en, this message translates to:
+  /// **'Crop to Selection'**
+  String get editor_effectCropToSelection;
+
+  /// No description provided for @editor_effectRotateLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'Rotate Left 90°'**
+  String get editor_effectRotateLeft;
+
+  /// No description provided for @editor_effectRotateRight.
+  ///
+  /// In en, this message translates to:
+  /// **'Rotate Right 90°'**
+  String get editor_effectRotateRight;
+
+  /// No description provided for @editor_effectFlipHorizontal.
+  ///
+  /// In en, this message translates to:
+  /// **'Flip Horizontal'**
+  String get editor_effectFlipHorizontal;
+
+  /// No description provided for @editor_effectFlipVertical.
+  ///
+  /// In en, this message translates to:
+  /// **'Flip Vertical'**
+  String get editor_effectFlipVertical;
+
+  /// No description provided for @editor_effectApplied.
+  ///
+  /// In en, this message translates to:
+  /// **'Applied {effect}'**
+  String editor_effectApplied(Object effect);
+
+  /// No description provided for @editor_applyEffectFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to apply effect: {error}'**
+  String editor_applyEffectFailed(Object error);
+
+  /// No description provided for @editor_changeCanvasSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Canvas Size'**
+  String get editor_changeCanvasSize;
+
+  /// No description provided for @editor_canvasTooSmall.
+  ///
+  /// In en, this message translates to:
+  /// **'Canvas size is too small. Minimum size is {width} x {height} pixels'**
+  String editor_canvasTooSmall(Object width, Object height);
+
+  /// No description provided for @editor_canvasTooLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'Canvas size is too large. Maximum size is {width} x {height} pixels'**
+  String editor_canvasTooLarge(Object width, Object height);
+
+  /// No description provided for @editor_canvasResized.
+  ///
+  /// In en, this message translates to:
+  /// **'Canvas resized to {width} x {height}'**
+  String editor_canvasResized(Object width, Object height);
+
+  /// No description provided for @editor_canvasResizeFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to resize canvas: {error}'**
+  String editor_canvasResizeFailed(Object error);
+
+  /// No description provided for @editor_confirmExitTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Exit'**
+  String get editor_confirmExitTitle;
+
+  /// No description provided for @editor_confirmExitContent.
+  ///
+  /// In en, this message translates to:
+  /// **'There are unsaved changes. Are you sure you want to exit?'**
+  String get editor_confirmExitContent;
+
+  /// No description provided for @editor_exit.
+  ///
+  /// In en, this message translates to:
+  /// **'Exit'**
+  String get editor_exit;
+
+  /// No description provided for @editor_saveAndExit.
+  ///
+  /// In en, this message translates to:
+  /// **'Save and Exit'**
+  String get editor_saveAndExit;
+
+  /// No description provided for @editor_exportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Export failed: {error}'**
+  String editor_exportFailed(Object error);
+
+  /// No description provided for @editor_clickInsideClosedRegion.
+  ///
+  /// In en, this message translates to:
+  /// **'Click inside a closed region to fill it.'**
+  String get editor_clickInsideClosedRegion;
+
+  /// No description provided for @editor_drawClosedMaskOutlineFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Draw a closed mask outline first.'**
+  String get editor_drawClosedMaskOutlineFirst;
+
+  /// No description provided for @editor_noClosedRegionAtPosition.
+  ///
+  /// In en, this message translates to:
+  /// **'No fillable closed region at this position.'**
+  String get editor_noClosedRegionAtPosition;
+
+  /// No description provided for @editor_generateMaskOverlayFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to generate mask overlay'**
+  String get editor_generateMaskOverlayFailed;
+
+  /// No description provided for @editor_maskLayerName.
+  ///
+  /// In en, this message translates to:
+  /// **'Mask'**
+  String get editor_maskLayerName;
+
+  /// No description provided for @editor_updateMaskLayerFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update mask layer'**
+  String get editor_updateMaskLayerFailed;
+
+  /// No description provided for @editor_closedRegionFilled.
+  ///
+  /// In en, this message translates to:
+  /// **'Closed region filled as mask.'**
+  String get editor_closedRegionFilled;
+
+  /// No description provided for @editor_fillMaskFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to fill mask: {error}'**
+  String editor_fillMaskFailed(Object error);
+
+  /// No description provided for @editor_focusInactiveHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Click the button to enter focus mode, then draw a focus area and paint the mask.'**
+  String get editor_focusInactiveHint;
+
+  /// No description provided for @editor_focusReadyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Focus area selected. You can continue editing the mask with the brush.'**
+  String get editor_focusReadyHint;
+
+  /// No description provided for @editor_focusNeedsSelectionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Draw a focus area first, then switch to the brush and paint the mask.'**
+  String get editor_focusNeedsSelectionHint;
+
+  /// No description provided for @editor_focusSelection.
+  ///
+  /// In en, this message translates to:
+  /// **'Selection'**
+  String get editor_focusSelection;
+
+  /// No description provided for @editor_focusBrush.
+  ///
+  /// In en, this message translates to:
+  /// **'Brush'**
+  String get editor_focusBrush;
+
+  /// No description provided for @editor_focusContextHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The outer rectangle is the area sent to Focused Inpaint. The inner rectangle is the main repaint area. The band between them is the Minimum Context Area.'**
+  String get editor_focusContextHint;
+
+  /// No description provided for @editor_unsupportedImageFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'Unsupported file format: .{extension}\nPlease choose an image file (PNG, JPG, WEBP, etc.)'**
+  String editor_unsupportedImageFormat(Object extension);
+
+  /// No description provided for @editor_readFileFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to read file: {error}'**
+  String editor_readFileFailed(Object error);
+
+  /// No description provided for @editor_noFileData.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to get file data'**
+  String get editor_noFileData;
+
+  /// No description provided for @editor_emptyImageFile.
+  ///
+  /// In en, this message translates to:
+  /// **'File is empty. Choose a valid image file'**
+  String get editor_emptyImageFile;
+
+  /// No description provided for @editor_fileTooLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'File is too large ({sizeMB} MB). Choose an image under 50 MB'**
+  String editor_fileTooLarge(Object sizeMB);
+
+  /// No description provided for @editor_maskLayerAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Mask layer added'**
+  String get editor_maskLayerAdded;
+
+  /// No description provided for @editor_parseImageFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to parse image file\nMake sure the file is not corrupted and the format is supported'**
+  String get editor_parseImageFailed;
+
+  /// No description provided for @editor_loadMaskFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load mask: {error}'**
+  String editor_loadMaskFailed(Object error);
+
+  /// No description provided for @editor_defaultTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Canvas'**
+  String get editor_defaultTitle;
+
+  /// No description provided for @editor_baseLayerName.
+  ///
+  /// In en, this message translates to:
+  /// **'Base Image'**
+  String get editor_baseLayerName;
+
+  /// No description provided for @editor_existingMaskLayerName.
+  ///
+  /// In en, this message translates to:
+  /// **'Existing Mask'**
+  String get editor_existingMaskLayerName;
+
+  /// No description provided for @editor_defaultDrawingLayerName.
+  ///
+  /// In en, this message translates to:
+  /// **'Layer 1'**
+  String get editor_defaultDrawingLayerName;
+
+  /// No description provided for @editor_layerName.
+  ///
+  /// In en, this message translates to:
+  /// **'Layer {count}'**
+  String editor_layerName(Object count);
+
+  /// No description provided for @editor_statusZoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Zoom: {value}%'**
+  String editor_statusZoom(Object value);
+
+  /// No description provided for @editor_statusCanvas.
+  ///
+  /// In en, this message translates to:
+  /// **'Canvas: {width} x {height}'**
+  String editor_statusCanvas(Object width, Object height);
+
+  /// No description provided for @editor_statusLayers.
+  ///
+  /// In en, this message translates to:
+  /// **'Layers: {count}'**
+  String editor_statusLayers(Object count);
+
+  /// No description provided for @editor_statusHasSelection.
+  ///
+  /// In en, this message translates to:
+  /// **'Selection active'**
+  String get editor_statusHasSelection;
+
+  /// No description provided for @editor_statusRotation.
+  ///
+  /// In en, this message translates to:
+  /// **'Rotation: {degrees}°'**
+  String editor_statusRotation(Object degrees);
+
+  /// No description provided for @editor_statusMirrored.
+  ///
+  /// In en, this message translates to:
+  /// **'Mirrored'**
+  String get editor_statusMirrored;
+
+  /// No description provided for @editor_focusMinimumContextArea.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum Context Area: {value}'**
+  String editor_focusMinimumContextArea(Object value);
+
+  /// No description provided for @editor_canvasSizeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Canvas Size'**
+  String get editor_canvasSizeTitle;
+
+  /// No description provided for @editor_presetSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Preset Size'**
+  String get editor_presetSize;
+
+  /// No description provided for @editor_customSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get editor_customSize;
+
+  /// No description provided for @editor_contentHandling.
+  ///
+  /// In en, this message translates to:
+  /// **'Content Handling'**
+  String get editor_contentHandling;
+
+  /// No description provided for @editor_contentCrop.
+  ///
+  /// In en, this message translates to:
+  /// **'Crop'**
+  String get editor_contentCrop;
+
+  /// No description provided for @editor_contentPad.
+  ///
+  /// In en, this message translates to:
+  /// **'Pad'**
+  String get editor_contentPad;
+
+  /// No description provided for @editor_contentStretch.
+  ///
+  /// In en, this message translates to:
+  /// **'Stretch'**
+  String get editor_contentStretch;
+
+  /// No description provided for @editor_width.
+  ///
+  /// In en, this message translates to:
+  /// **'Width'**
+  String get editor_width;
+
+  /// No description provided for @editor_height.
+  ///
+  /// In en, this message translates to:
+  /// **'Height'**
+  String get editor_height;
+
+  /// No description provided for @editor_lockAspectRatio.
+  ///
+  /// In en, this message translates to:
+  /// **'Lock aspect ratio'**
+  String get editor_lockAspectRatio;
+
+  /// No description provided for @editor_unlockAspectRatio.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock aspect ratio'**
+  String get editor_unlockAspectRatio;
+
+  /// No description provided for @editor_sizePreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Size Preview'**
+  String get editor_sizePreview;
+
+  /// No description provided for @editor_originalSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Original'**
+  String get editor_originalSize;
+
+  /// No description provided for @editor_newSize.
+  ///
+  /// In en, this message translates to:
+  /// **'New Size'**
+  String get editor_newSize;
+
+  /// No description provided for @editor_cropModeDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Crop mode - keep aspect ratio and crop'**
+  String get editor_cropModeDescription;
+
+  /// No description provided for @editor_padModeDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Pad mode - keep aspect ratio and pad'**
+  String get editor_padModeDescription;
+
+  /// No description provided for @editor_stretchModeDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Stretch mode - stretch to fill'**
+  String get editor_stretchModeDescription;
+
+  /// No description provided for @editor_canvasPresetSquare.
+  ///
+  /// In en, this message translates to:
+  /// **'Square {size}'**
+  String editor_canvasPresetSquare(Object size);
+
+  /// No description provided for @editor_canvasPresetLandscape.
+  ///
+  /// In en, this message translates to:
+  /// **'Landscape {ratio}'**
+  String editor_canvasPresetLandscape(Object ratio);
+
+  /// No description provided for @editor_canvasPresetPortrait.
+  ///
+  /// In en, this message translates to:
+  /// **'Portrait {ratio}'**
+  String editor_canvasPresetPortrait(Object ratio);
+
+  /// No description provided for @editor_canvasPresetNaiPortrait.
+  ///
+  /// In en, this message translates to:
+  /// **'NAI Portrait'**
+  String get editor_canvasPresetNaiPortrait;
+
+  /// No description provided for @editor_canvasPresetNaiLandscape.
+  ///
+  /// In en, this message translates to:
+  /// **'NAI Landscape'**
+  String get editor_canvasPresetNaiLandscape;
+
+  /// No description provided for @editor_canvasPresetFullHd.
+  ///
+  /// In en, this message translates to:
+  /// **'Full HD 16:9'**
+  String get editor_canvasPresetFullHd;
+
+  /// No description provided for @editor_colorPanelTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Color'**
+  String get editor_colorPanelTitle;
+
+  /// No description provided for @editor_colorPickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose Color'**
+  String get editor_colorPickerTitle;
+
+  /// No description provided for @editor_eraserSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Eraser Settings'**
+  String get editor_eraserSettings;
+
+  /// No description provided for @editor_colorPickerHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Click anywhere on the canvas to pick a color. Release to switch back to the previous tool.'**
+  String get editor_colorPickerHint;
+
+  /// No description provided for @editor_sample.
+  ///
+  /// In en, this message translates to:
+  /// **'Sample'**
+  String get editor_sample;
+
+  /// No description provided for @editor_samplePoint.
+  ///
+  /// In en, this message translates to:
+  /// **'Point'**
+  String get editor_samplePoint;
+
+  /// No description provided for @editor_sampleArea.
+  ///
+  /// In en, this message translates to:
+  /// **'Area'**
+  String get editor_sampleArea;
+
+  /// No description provided for @editor_source.
+  ///
+  /// In en, this message translates to:
+  /// **'Source'**
+  String get editor_source;
+
+  /// No description provided for @editor_sourceCurrentLayer.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Layer'**
+  String get editor_sourceCurrentLayer;
+
+  /// No description provided for @editor_sourceAllLayers.
+  ///
+  /// In en, this message translates to:
+  /// **'All Layers'**
+  String get editor_sourceAllLayers;
+
+  /// No description provided for @editor_lassoSelectionHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold and drag to draw a freeform selection. Release to close it automatically.'**
+  String get editor_lassoSelectionHelp;
+
+  /// No description provided for @layer_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'No layers'**
+  String get layer_empty;
+
+  /// No description provided for @layer_add.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Layer'**
+  String get layer_add;
+
+  /// No description provided for @layer_mergeDown.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge Down'**
+  String get layer_mergeDown;
 
   /// No description provided for @layer_duplicate.
   ///
@@ -3584,6 +4892,138 @@ abstract class AppLocalizations {
   /// **'Seed copied'**
   String get gallery_seedCopied;
 
+  /// No description provided for @gallery_sendToImg2Img.
+  ///
+  /// In en, this message translates to:
+  /// **'Image to Image'**
+  String get gallery_sendToImg2Img;
+
+  /// No description provided for @gallery_useImageForGeneration.
+  ///
+  /// In en, this message translates to:
+  /// **'Use this image for image generation'**
+  String get gallery_useImageForGeneration;
+
+  /// No description provided for @gallery_sendToReversePromptTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reverse Prompt'**
+  String get gallery_sendToReversePromptTitle;
+
+  /// No description provided for @gallery_addToReversePromptModule.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to the canvas reverse-prompt module'**
+  String get gallery_addToReversePromptModule;
+
+  /// No description provided for @gallery_applyVibeFromImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Extract and apply the image style / character'**
+  String get gallery_applyVibeFromImage;
+
+  /// No description provided for @gallery_noVibeData.
+  ///
+  /// In en, this message translates to:
+  /// **'This image does not contain Vibe data'**
+  String get gallery_noVibeData;
+
+  /// No description provided for @gallery_sendToKrita.
+  ///
+  /// In en, this message translates to:
+  /// **'Krita'**
+  String get gallery_sendToKrita;
+
+  /// No description provided for @gallery_sendToConnectedKrita.
+  ///
+  /// In en, this message translates to:
+  /// **'Send to the connected Krita plugin'**
+  String get gallery_sendToConnectedKrita;
+
+  /// No description provided for @gallery_upscalePanelLoaded.
+  ///
+  /// In en, this message translates to:
+  /// **'Loaded the image-to-image upscale panel'**
+  String get gallery_upscalePanelLoaded;
+
+  /// No description provided for @gallery_readImageFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to read image: {error}'**
+  String gallery_readImageFailed(Object error);
+
+  /// No description provided for @gallery_fileMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'File does not exist'**
+  String get gallery_fileMissing;
+
+  /// No description provided for @gallery_copiedToClipboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied to clipboard'**
+  String get gallery_copiedToClipboard;
+
+  /// No description provided for @gallery_copyFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy failed: {error}'**
+  String gallery_copyFailed(Object error);
+
+  /// No description provided for @gallery_textToImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Text to Image'**
+  String get gallery_textToImage;
+
+  /// No description provided for @gallery_applyParams.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply parameters'**
+  String get gallery_applyParams;
+
+  /// No description provided for @gallery_unavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Unavailable'**
+  String get gallery_unavailable;
+
+  /// No description provided for @gallery_loadSourceImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Load source image'**
+  String get gallery_loadSourceImage;
+
+  /// No description provided for @gallery_upscale.
+  ///
+  /// In en, this message translates to:
+  /// **'Upscale'**
+  String get gallery_upscale;
+
+  /// No description provided for @gallery_superResolutionUpscale.
+  ///
+  /// In en, this message translates to:
+  /// **'Super-resolution upscale'**
+  String get gallery_superResolutionUpscale;
+
+  /// No description provided for @gallery_sentToImg2Img.
+  ///
+  /// In en, this message translates to:
+  /// **'Image sent to image-to-image'**
+  String get gallery_sentToImg2Img;
+
+  /// No description provided for @gallery_sentToReversePrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Image sent to reverse-prompt module'**
+  String get gallery_sentToReversePrompt;
+
+  /// No description provided for @gallery_sendFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Send failed: {error}'**
+  String gallery_sendFailed(Object error);
+
   /// No description provided for @preset_noPresets.
   ///
   /// In en, this message translates to:
@@ -4136,6 +5576,126 @@ abstract class AppLocalizations {
   /// **'Open'**
   String get onlineGallery_open;
 
+  /// No description provided for @onlineGallery_send.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get onlineGallery_send;
+
+  /// No description provided for @onlineGallery_addToQueue.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to Queue'**
+  String get onlineGallery_addToQueue;
+
+  /// No description provided for @onlineGallery_sendToTextToImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Send to Text to Image'**
+  String get onlineGallery_sendToTextToImage;
+
+  /// No description provided for @onlineGallery_sentToTextToImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent to text-to-image'**
+  String get onlineGallery_sentToTextToImage;
+
+  /// No description provided for @onlineGallery_sendToReversePrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Send to Reverse Prompt'**
+  String get onlineGallery_sendToReversePrompt;
+
+  /// No description provided for @onlineGallery_sentToReversePrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent to reverse-prompt module'**
+  String get onlineGallery_sentToReversePrompt;
+
+  /// No description provided for @onlineGallery_reversePromptSendFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to send to reverse prompt: {error}'**
+  String onlineGallery_reversePromptSendFailed(Object error);
+
+  /// No description provided for @onlineGallery_noTagInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'This image has no tag information'**
+  String get onlineGallery_noTagInfo;
+
+  /// No description provided for @onlineGallery_promptSentToGeneration.
+  ///
+  /// In en, this message translates to:
+  /// **'Prompt sent to generation page'**
+  String get onlineGallery_promptSentToGeneration;
+
+  /// No description provided for @onlineGallery_noImageUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'This image has no available URL'**
+  String get onlineGallery_noImageUrl;
+
+  /// No description provided for @onlineGallery_gifLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load GIF'**
+  String get onlineGallery_gifLoadFailed;
+
+  /// No description provided for @onlineGallery_pinchToZoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Pinch to zoom'**
+  String get onlineGallery_pinchToZoom;
+
+  /// No description provided for @onlineGallery_metadata.
+  ///
+  /// In en, this message translates to:
+  /// **'Metadata'**
+  String get onlineGallery_metadata;
+
+  /// No description provided for @onlineGallery_addedToQueue.
+  ///
+  /// In en, this message translates to:
+  /// **'Added to queue'**
+  String get onlineGallery_addedToQueue;
+
+  /// No description provided for @onlineGallery_queueFullMax.
+  ///
+  /// In en, this message translates to:
+  /// **'Queue is full (maximum 50 items)'**
+  String get onlineGallery_queueFullMax;
+
+  /// No description provided for @onlineGallery_chooseDownloadDirectory.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose Download Directory'**
+  String get onlineGallery_chooseDownloadDirectory;
+
+  /// No description provided for @onlineGallery_downloadStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'Download started...'**
+  String get onlineGallery_downloadStarted;
+
+  /// No description provided for @onlineGallery_savedToPath.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to: {path}'**
+  String onlineGallery_savedToPath(Object path);
+
+  /// No description provided for @onlineGallery_downloadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Download failed: {error}'**
+  String onlineGallery_downloadFailed(Object error);
+
+  /// No description provided for @onlineGallery_downloadOriginal.
+  ///
+  /// In en, this message translates to:
+  /// **'Download original image'**
+  String get onlineGallery_downloadOriginal;
+
   /// No description provided for @onlineGallery_all.
   ///
   /// In en, this message translates to:
@@ -4195,6 +5755,174 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Date Range'**
   String get onlineGallery_dateRange;
+
+  /// No description provided for @onlineGallery_fuzzySearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuzzy Match'**
+  String get onlineGallery_fuzzySearch;
+
+  /// No description provided for @onlineGallery_fuzzySearchTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Use *tag* matching for related tags when enabled; search exact Danbooru tags when disabled'**
+  String get onlineGallery_fuzzySearchTooltip;
+
+  /// No description provided for @onlineGallery_blacklistTags.
+  ///
+  /// In en, this message translates to:
+  /// **'Blacklist Tags'**
+  String get onlineGallery_blacklistTags;
+
+  /// No description provided for @onlineGallery_blacklistTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Online Gallery Blacklist'**
+  String get onlineGallery_blacklistTitle;
+
+  /// No description provided for @onlineGallery_blacklistSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Images containing blacklisted tags will be hidden directly in the online gallery.'**
+  String get onlineGallery_blacklistSubtitle;
+
+  /// No description provided for @onlineGallery_addBlacklistTagHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add blacklist tag'**
+  String get onlineGallery_addBlacklistTagHint;
+
+  /// No description provided for @onlineGallery_noLocalBlacklistTags.
+  ///
+  /// In en, this message translates to:
+  /// **'No local blacklist tags'**
+  String get onlineGallery_noLocalBlacklistTags;
+
+  /// No description provided for @onlineGallery_autoSyncOnStartup.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-sync on startup'**
+  String get onlineGallery_autoSyncOnStartup;
+
+  /// No description provided for @onlineGallery_autoSyncOnStartupSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enabled by default; you can turn it off at any time'**
+  String get onlineGallery_autoSyncOnStartupSubtitle;
+
+  /// No description provided for @onlineGallery_lastSyncFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Last sync failed: {error}'**
+  String onlineGallery_lastSyncFailed(Object error);
+
+  /// No description provided for @onlineGallery_neverSyncedBlacklist.
+  ///
+  /// In en, this message translates to:
+  /// **'Danbooru blacklist has not been synced yet'**
+  String get onlineGallery_neverSyncedBlacklist;
+
+  /// No description provided for @onlineGallery_lastSync.
+  ///
+  /// In en, this message translates to:
+  /// **'Last sync: {time}'**
+  String onlineGallery_lastSync(Object time);
+
+  /// No description provided for @onlineGallery_blacklistSettingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Online Gallery Blacklist Settings'**
+  String get onlineGallery_blacklistSettingsTitle;
+
+  /// No description provided for @onlineGallery_blacklistLoginHint.
+  ///
+  /// In en, this message translates to:
+  /// **'You are not logged in to Danbooru. The local blacklist still works, but syncing requires login.'**
+  String get onlineGallery_blacklistLoginHint;
+
+  /// No description provided for @onlineGallery_bulkFavorite.
+  ///
+  /// In en, this message translates to:
+  /// **'Favorite Selected'**
+  String get onlineGallery_bulkFavorite;
+
+  /// No description provided for @onlineGallery_bulkDownload.
+  ///
+  /// In en, this message translates to:
+  /// **'Download Selected'**
+  String get onlineGallery_bulkDownload;
+
+  /// No description provided for @onlineGallery_addedTasksToQueue.
+  ///
+  /// In en, this message translates to:
+  /// **'Added {count} tasks to queue'**
+  String onlineGallery_addedTasksToQueue(Object count);
+
+  /// No description provided for @onlineGallery_unfavorited.
+  ///
+  /// In en, this message translates to:
+  /// **'Unfavorited'**
+  String get onlineGallery_unfavorited;
+
+  /// No description provided for @onlineGallery_favorited.
+  ///
+  /// In en, this message translates to:
+  /// **'Favorited'**
+  String get onlineGallery_favorited;
+
+  /// No description provided for @onlineGallery_favoritedImages.
+  ///
+  /// In en, this message translates to:
+  /// **'Favorited {count} images'**
+  String onlineGallery_favoritedImages(Object count);
+
+  /// No description provided for @onlineGallery_selectDownloadDirectoryFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to choose download directory: {error}'**
+  String onlineGallery_selectDownloadDirectoryFailed(Object error);
+
+  /// No description provided for @onlineGallery_downloadSelectedStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading {count} images...'**
+  String onlineGallery_downloadSelectedStarted(Object count);
+
+  /// No description provided for @onlineGallery_downloadSelectedCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Download complete: {success} succeeded, {failed} failed'**
+  String onlineGallery_downloadSelectedCompleted(Object success, Object failed);
+
+  /// No description provided for @onlineGallery_startDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Date'**
+  String get onlineGallery_startDate;
+
+  /// No description provided for @onlineGallery_endDate.
+  ///
+  /// In en, this message translates to:
+  /// **'End Date'**
+  String get onlineGallery_endDate;
+
+  /// No description provided for @onlineGallery_invalidDateFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid date format'**
+  String get onlineGallery_invalidDateFormat;
+
+  /// No description provided for @onlineGallery_dateOutOfRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Date out of range'**
+  String get onlineGallery_dateOutOfRange;
+
+  /// No description provided for @onlineGallery_last30Days.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 30 Days'**
+  String get onlineGallery_last30Days;
 
   /// No description provided for @tooltip_randomPrompt.
   ///
@@ -5683,6 +7411,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Report exported successfully'**
   String get performanceReport_exportSuccess;
+
+  /// No description provided for @performanceReport_noDataTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No performance data'**
+  String get performanceReport_noDataTitle;
+
+  /// No description provided for @performanceReport_noDataSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Statistics will appear here after warmup completes'**
+  String get performanceReport_noDataSubtitle;
+
+  /// No description provided for @performanceReport_overallStats.
+  ///
+  /// In en, this message translates to:
+  /// **'Overall Statistics'**
+  String get performanceReport_overallStats;
+
+  /// No description provided for @performanceReport_warmupCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Warmup Runs'**
+  String get performanceReport_warmupCount;
+
+  /// No description provided for @performanceReport_totalTasks.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Tasks'**
+  String get performanceReport_totalTasks;
+
+  /// No description provided for @performanceReport_averageTotalDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'Average Total Duration'**
+  String get performanceReport_averageTotalDuration;
 
   /// No description provided for @copyName.
   ///
@@ -9129,6 +10893,936 @@ abstract class AppLocalizations {
   /// **'Cannot delete built-in slot'**
   String get characterCountConfig_cannotDeleteBuiltin;
 
+  /// No description provided for @randomManager_algorithmConfig.
+  ///
+  /// In en, this message translates to:
+  /// **'Algorithm Config'**
+  String get randomManager_algorithmConfig;
+
+  /// No description provided for @randomManager_characterCountWeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Character Count Weight'**
+  String get randomManager_characterCountWeight;
+
+  /// No description provided for @randomManager_genderWeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Gender Weight'**
+  String get randomManager_genderWeight;
+
+  /// No description provided for @randomManager_globalSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Global Settings'**
+  String get randomManager_globalSettings;
+
+  /// No description provided for @randomManager_enableSeasonalWordlists.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Seasonal Wordlists'**
+  String get randomManager_enableSeasonalWordlists;
+
+  /// No description provided for @randomManager_enableSeasonalWordlistsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Wordlists for Christmas, Halloween, and other special dates'**
+  String get randomManager_enableSeasonalWordlistsDesc;
+
+  /// No description provided for @randomManager_globalEmphasisProbability.
+  ///
+  /// In en, this message translates to:
+  /// **'Global Emphasis Probability'**
+  String get randomManager_globalEmphasisProbability;
+
+  /// No description provided for @randomManager_soloGenderOptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Solo Gender Options'**
+  String get randomManager_soloGenderOptions;
+
+  /// No description provided for @randomManager_femaleShort.
+  ///
+  /// In en, this message translates to:
+  /// **'F'**
+  String get randomManager_femaleShort;
+
+  /// No description provided for @randomManager_maleShort.
+  ///
+  /// In en, this message translates to:
+  /// **'M'**
+  String get randomManager_maleShort;
+
+  /// No description provided for @randomManager_other.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get randomManager_other;
+
+  /// No description provided for @randomManager_tagGroupList.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag Groups'**
+  String get randomManager_tagGroupList;
+
+  /// No description provided for @randomManager_deleteTagGroupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Tag Group'**
+  String get randomManager_deleteTagGroupTitle;
+
+  /// No description provided for @randomManager_deleteTagGroupConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete tag group \"{name}\"? This action cannot be undone.'**
+  String randomManager_deleteTagGroupConfirm(Object name);
+
+  /// No description provided for @randomManager_tagGroupCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} tag groups'**
+  String randomManager_tagGroupCount(Object count);
+
+  /// No description provided for @randomManager_categories.
+  ///
+  /// In en, this message translates to:
+  /// **'Categories'**
+  String get randomManager_categories;
+
+  /// No description provided for @randomManager_tagGroups.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag Groups'**
+  String get randomManager_tagGroups;
+
+  /// No description provided for @randomManager_tags.
+  ///
+  /// In en, this message translates to:
+  /// **'Tags'**
+  String get randomManager_tags;
+
+  /// No description provided for @randomManager_addTagGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Tag Group'**
+  String get randomManager_addTagGroup;
+
+  /// No description provided for @randomManager_locked.
+  ///
+  /// In en, this message translates to:
+  /// **'Locked'**
+  String get randomManager_locked;
+
+  /// No description provided for @randomManager_addCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Category'**
+  String get randomManager_addCategory;
+
+  /// No description provided for @randomManager_noCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'No categories'**
+  String get randomManager_noCategories;
+
+  /// No description provided for @randomManager_noCategoriesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Click \"Add Category\" to start configuring'**
+  String get randomManager_noCategoriesHint;
+
+  /// No description provided for @randomManager_globalPeopleSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Global Character Settings'**
+  String get randomManager_globalPeopleSettings;
+
+  /// No description provided for @randomManager_closePreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Close preview'**
+  String get randomManager_closePreview;
+
+  /// No description provided for @randomManager_importPreset.
+  ///
+  /// In en, this message translates to:
+  /// **'Import Preset'**
+  String get randomManager_importPreset;
+
+  /// No description provided for @randomManager_importPresetSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Import random config preset from JSON text'**
+  String get randomManager_importPresetSubtitle;
+
+  /// No description provided for @randomManager_exportCurrentPreset.
+  ///
+  /// In en, this message translates to:
+  /// **'Export Current Preset'**
+  String get randomManager_exportCurrentPreset;
+
+  /// No description provided for @randomManager_noPresetSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'No preset selected'**
+  String get randomManager_noPresetSelected;
+
+  /// No description provided for @randomManager_selectPresetFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a preset first'**
+  String get randomManager_selectPresetFirst;
+
+  /// No description provided for @randomManager_defaultPresetReadonly.
+  ///
+  /// In en, this message translates to:
+  /// **'Default presets are read-only. Create or copy a custom preset first.'**
+  String get randomManager_defaultPresetReadonly;
+
+  /// No description provided for @randomManager_presetImported.
+  ///
+  /// In en, this message translates to:
+  /// **'Imported preset \"{name}\"'**
+  String randomManager_presetImported(Object name);
+
+  /// No description provided for @randomManager_defaultPresetV4.
+  ///
+  /// In en, this message translates to:
+  /// **'Default Mode (V4)'**
+  String get randomManager_defaultPresetV4;
+
+  /// No description provided for @randomManager_defaultPresetLegacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Default Mode (Legacy)'**
+  String get randomManager_defaultPresetLegacy;
+
+  /// No description provided for @randomManager_defaultPresetFurry.
+  ///
+  /// In en, this message translates to:
+  /// **'Default Mode (Furry)'**
+  String get randomManager_defaultPresetFurry;
+
+  /// No description provided for @randomManager_defaultPresetV4Description.
+  ///
+  /// In en, this message translates to:
+  /// **'Random algorithm configuration based on the NAI V4 model, with multi-character support'**
+  String get randomManager_defaultPresetV4Description;
+
+  /// No description provided for @randomManager_defaultPresetLegacyDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Random algorithm configuration based on the NAI Legacy model'**
+  String get randomManager_defaultPresetLegacyDescription;
+
+  /// No description provided for @randomManager_defaultPresetFurryDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Random algorithm configuration based on the NAI Furry model'**
+  String get randomManager_defaultPresetFurryDescription;
+
+  /// No description provided for @randomManager_defaultPresetOfficialDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Random algorithm configuration based on the NAI official setup'**
+  String get randomManager_defaultPresetOfficialDescription;
+
+  /// No description provided for @randomManager_femaleClothing.
+  ///
+  /// In en, this message translates to:
+  /// **'Female Clothing'**
+  String get randomManager_femaleClothing;
+
+  /// No description provided for @randomManager_maleClothing.
+  ///
+  /// In en, this message translates to:
+  /// **'Male Clothing'**
+  String get randomManager_maleClothing;
+
+  /// No description provided for @randomManager_generalClothing.
+  ///
+  /// In en, this message translates to:
+  /// **'General Clothing'**
+  String get randomManager_generalClothing;
+
+  /// No description provided for @randomManager_femaleBodyType.
+  ///
+  /// In en, this message translates to:
+  /// **'Female Body Type'**
+  String get randomManager_femaleBodyType;
+
+  /// No description provided for @randomManager_maleBodyType.
+  ///
+  /// In en, this message translates to:
+  /// **'Male Body Type'**
+  String get randomManager_maleBodyType;
+
+  /// No description provided for @randomManager_generalBodyType.
+  ///
+  /// In en, this message translates to:
+  /// **'General Body Type'**
+  String get randomManager_generalBodyType;
+
+  /// No description provided for @randomManager_soloFemale.
+  ///
+  /// In en, this message translates to:
+  /// **'Female'**
+  String get randomManager_soloFemale;
+
+  /// No description provided for @randomManager_soloMale.
+  ///
+  /// In en, this message translates to:
+  /// **'Male'**
+  String get randomManager_soloMale;
+
+  /// No description provided for @randomManager_duoGirls.
+  ///
+  /// In en, this message translates to:
+  /// **'Two Girls'**
+  String get randomManager_duoGirls;
+
+  /// No description provided for @randomManager_duoMixed.
+  ///
+  /// In en, this message translates to:
+  /// **'Girl and Boy'**
+  String get randomManager_duoMixed;
+
+  /// No description provided for @randomManager_duoBoys.
+  ///
+  /// In en, this message translates to:
+  /// **'Two Boys'**
+  String get randomManager_duoBoys;
+
+  /// No description provided for @randomManager_trioGirls.
+  ///
+  /// In en, this message translates to:
+  /// **'Three Girls'**
+  String get randomManager_trioGirls;
+
+  /// No description provided for @randomManager_trioTwoGirlsOneBoy.
+  ///
+  /// In en, this message translates to:
+  /// **'Two Girls and One Boy'**
+  String get randomManager_trioTwoGirlsOneBoy;
+
+  /// No description provided for @randomManager_trioOneGirlTwoBoys.
+  ///
+  /// In en, this message translates to:
+  /// **'One Girl and Two Boys'**
+  String get randomManager_trioOneGirlTwoBoys;
+
+  /// No description provided for @randomManager_trioBoys.
+  ///
+  /// In en, this message translates to:
+  /// **'Three Boys'**
+  String get randomManager_trioBoys;
+
+  /// No description provided for @randomManager_noHumanScene.
+  ///
+  /// In en, this message translates to:
+  /// **'No-Human Scene'**
+  String get randomManager_noHumanScene;
+
+  /// No description provided for @randomManager_presetCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Created preset \"{name}\"'**
+  String randomManager_presetCreated(Object name);
+
+  /// No description provided for @randomManager_deletePresetConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete \"{name}\"? This cannot be undone.'**
+  String randomManager_deletePresetConfirm(Object name);
+
+  /// No description provided for @randomManager_syncCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Danbooru tags synced'**
+  String get randomManager_syncCompleted;
+
+  /// No description provided for @randomManager_syncFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync failed: {error}'**
+  String randomManager_syncFailed(Object error);
+
+  /// No description provided for @randomManager_resetDefaultTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset to Default'**
+  String get randomManager_resetDefaultTitle;
+
+  /// No description provided for @randomManager_resetDefaultContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore the official default configuration.\nCustom tag groups will be kept but disabled.'**
+  String get randomManager_resetDefaultContent;
+
+  /// No description provided for @randomManager_resetDefaultConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get randomManager_resetDefaultConfirm;
+
+  /// No description provided for @randomManager_resetDefaultDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset to default configuration'**
+  String get randomManager_resetDefaultDone;
+
+  /// No description provided for @randomManager_generatePreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate Preview'**
+  String get randomManager_generatePreview;
+
+  /// No description provided for @randomManager_importExport.
+  ///
+  /// In en, this message translates to:
+  /// **'Import / Export'**
+  String get randomManager_importExport;
+
+  /// No description provided for @randomManager_syncing.
+  ///
+  /// In en, this message translates to:
+  /// **'Syncing'**
+  String get randomManager_syncing;
+
+  /// No description provided for @randomManager_syncingWithEllipsis.
+  ///
+  /// In en, this message translates to:
+  /// **'Syncing...'**
+  String get randomManager_syncingWithEllipsis;
+
+  /// No description provided for @randomManager_syncDanbooruTags.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync Danbooru Tags'**
+  String get randomManager_syncDanbooruTags;
+
+  /// No description provided for @randomManager_unknownError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown error'**
+  String get randomManager_unknownError;
+
+  /// No description provided for @randomManager_readOnlyMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Read-only Mode'**
+  String get randomManager_readOnlyMode;
+
+  /// No description provided for @randomManager_readOnlyTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'The current preset is a default preset, so all configuration items are locked'**
+  String get randomManager_readOnlyTooltip;
+
+  /// No description provided for @randomManager_searchCategoryOrTagGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Search categories or tag groups...'**
+  String get randomManager_searchCategoryOrTagGroup;
+
+  /// No description provided for @randomManager_scope.
+  ///
+  /// In en, this message translates to:
+  /// **'Scope'**
+  String get randomManager_scope;
+
+  /// No description provided for @randomManager_global.
+  ///
+  /// In en, this message translates to:
+  /// **'Global'**
+  String get randomManager_global;
+
+  /// No description provided for @randomManager_private.
+  ///
+  /// In en, this message translates to:
+  /// **'Private'**
+  String get randomManager_private;
+
+  /// No description provided for @randomManager_status.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get randomManager_status;
+
+  /// No description provided for @randomManager_enabledOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Enabled only'**
+  String get randomManager_enabledOnly;
+
+  /// No description provided for @randomManager_diyCapable.
+  ///
+  /// In en, this message translates to:
+  /// **'Has DIY capabilities'**
+  String get randomManager_diyCapable;
+
+  /// No description provided for @randomManager_addTagGroupSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to \"{category}\"'**
+  String randomManager_addTagGroupSubtitle(Object category);
+
+  /// No description provided for @randomManager_tagGroupName.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag Group Name'**
+  String get randomManager_tagGroupName;
+
+  /// No description provided for @randomManager_tagGroupNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter tag group name'**
+  String get randomManager_tagGroupNameHint;
+
+  /// No description provided for @randomManager_tagGroupNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a tag group name'**
+  String get randomManager_tagGroupNameRequired;
+
+  /// No description provided for @randomManager_customTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get randomManager_customTab;
+
+  /// No description provided for @randomManager_tagList.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag List'**
+  String get randomManager_tagList;
+
+  /// No description provided for @randomManager_tagListHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'One tag per line. Supports tag or tag:weight.'**
+  String get randomManager_tagListHelp;
+
+  /// No description provided for @randomManager_searchTagGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Search Tag Group...'**
+  String get randomManager_searchTagGroup;
+
+  /// No description provided for @randomManager_searchPool.
+  ///
+  /// In en, this message translates to:
+  /// **'Search Pool...'**
+  String get randomManager_searchPool;
+
+  /// No description provided for @randomManager_itemCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} items'**
+  String randomManager_itemCount(Object count);
+
+  /// No description provided for @randomManager_noMatchingTagGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching Tag Groups found'**
+  String get randomManager_noMatchingTagGroup;
+
+  /// No description provided for @randomManager_noMatchingPool.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching Pools found'**
+  String get randomManager_noMatchingPool;
+
+  /// No description provided for @randomManager_cannotLoadPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load preview'**
+  String get randomManager_cannotLoadPreview;
+
+  /// No description provided for @randomManager_openInDanbooru.
+  ///
+  /// In en, this message translates to:
+  /// **'View in Danbooru'**
+  String get randomManager_openInDanbooru;
+
+  /// No description provided for @randomManager_editTagGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Tag Group'**
+  String get randomManager_editTagGroup;
+
+  /// No description provided for @randomManager_basicTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Basic'**
+  String get randomManager_basicTab;
+
+  /// No description provided for @randomManager_tagsTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Tags ({count})'**
+  String randomManager_tagsTab(Object count);
+
+  /// No description provided for @randomManager_diyAbilitiesTab.
+  ///
+  /// In en, this message translates to:
+  /// **'DIY Capabilities'**
+  String get randomManager_diyAbilitiesTab;
+
+  /// No description provided for @randomManager_selectionSingle.
+  ///
+  /// In en, this message translates to:
+  /// **'Single'**
+  String get randomManager_selectionSingle;
+
+  /// No description provided for @randomManager_selectionSingleDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Weighted random single pick'**
+  String get randomManager_selectionSingleDesc;
+
+  /// No description provided for @randomManager_selectionAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get randomManager_selectionAll;
+
+  /// No description provided for @randomManager_selectionAllDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Select all tags'**
+  String get randomManager_selectionAllDesc;
+
+  /// No description provided for @randomManager_selectionMultipleCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Multiple Count'**
+  String get randomManager_selectionMultipleCount;
+
+  /// No description provided for @randomManager_selectionMultipleCountDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a specified count'**
+  String get randomManager_selectionMultipleCountDesc;
+
+  /// No description provided for @randomManager_selectionMultipleProbability.
+  ///
+  /// In en, this message translates to:
+  /// **'Multiple Probability'**
+  String get randomManager_selectionMultipleProbability;
+
+  /// No description provided for @randomManager_selectionMultipleProbabilityDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Evaluate each tag independently'**
+  String get randomManager_selectionMultipleProbabilityDesc;
+
+  /// No description provided for @randomManager_selectionSequential.
+  ///
+  /// In en, this message translates to:
+  /// **'Sequential'**
+  String get randomManager_selectionSequential;
+
+  /// No description provided for @randomManager_selectionSequentialDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep state across batches'**
+  String get randomManager_selectionSequentialDesc;
+
+  /// No description provided for @randomManager_noTags.
+  ///
+  /// In en, this message translates to:
+  /// **'No tags'**
+  String get randomManager_noTags;
+
+  /// No description provided for @randomManager_conditionalBranch.
+  ///
+  /// In en, this message translates to:
+  /// **'Conditional Branch'**
+  String get randomManager_conditionalBranch;
+
+  /// No description provided for @randomManager_conditionalBranchDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose different tag subsets based on variable values'**
+  String get randomManager_conditionalBranchDesc;
+
+  /// No description provided for @randomManager_dependencyConfig.
+  ///
+  /// In en, this message translates to:
+  /// **'Dependency Config'**
+  String get randomManager_dependencyConfig;
+
+  /// No description provided for @randomManager_dependencyConfigDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Make count selection depend on other category values'**
+  String get randomManager_dependencyConfigDesc;
+
+  /// No description provided for @randomManager_visibilityRules.
+  ///
+  /// In en, this message translates to:
+  /// **'Visibility Rules'**
+  String get randomManager_visibilityRules;
+
+  /// No description provided for @randomManager_visibilityRulesDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Decide whether to generate based on composition'**
+  String get randomManager_visibilityRulesDesc;
+
+  /// No description provided for @randomManager_timeCondition.
+  ///
+  /// In en, this message translates to:
+  /// **'Time Condition'**
+  String get randomManager_timeCondition;
+
+  /// No description provided for @randomManager_timeConditionDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable within a specific date range'**
+  String get randomManager_timeConditionDesc;
+
+  /// No description provided for @randomManager_postProcessRules.
+  ///
+  /// In en, this message translates to:
+  /// **'Post-process Rules'**
+  String get randomManager_postProcessRules;
+
+  /// No description provided for @randomManager_postProcessRulesDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove conflicts based on selected tags'**
+  String get randomManager_postProcessRulesDesc;
+
+  /// No description provided for @randomManager_emphasisProbability.
+  ///
+  /// In en, this message translates to:
+  /// **'Emphasis Probability'**
+  String get randomManager_emphasisProbability;
+
+  /// No description provided for @randomManager_probability.
+  ///
+  /// In en, this message translates to:
+  /// **'Probability'**
+  String get randomManager_probability;
+
+  /// No description provided for @randomManager_selectionMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Selection Mode'**
+  String get randomManager_selectionMode;
+
+  /// No description provided for @randomManager_editHint.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} (click to edit)'**
+  String randomManager_editHint(Object name);
+
+  /// No description provided for @randomManager_emphasisProbabilityValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Emphasis probability: {percent}%'**
+  String randomManager_emphasisProbabilityValue(Object percent);
+
+  /// No description provided for @randomManager_previewGeneration.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview Generation'**
+  String get randomManager_previewGeneration;
+
+  /// No description provided for @randomManager_generating.
+  ///
+  /// In en, this message translates to:
+  /// **'Generating'**
+  String get randomManager_generating;
+
+  /// No description provided for @randomManager_generate.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate'**
+  String get randomManager_generate;
+
+  /// No description provided for @randomManager_generationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Generation Failed'**
+  String get randomManager_generationFailed;
+
+  /// No description provided for @randomManager_copy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get randomManager_copy;
+
+  /// No description provided for @randomManager_regenerate.
+  ///
+  /// In en, this message translates to:
+  /// **'Regenerate'**
+  String get randomManager_regenerate;
+
+  /// No description provided for @randomManager_copiedToClipboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied to clipboard'**
+  String get randomManager_copiedToClipboard;
+
+  /// No description provided for @randomManager_selectPresetRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a preset'**
+  String get randomManager_selectPresetRequired;
+
+  /// No description provided for @randomManager_characterCountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} characters'**
+  String randomManager_characterCountLabel(Object count);
+
+  /// No description provided for @randomManager_tagCountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} tags'**
+  String randomManager_tagCountLabel(Object count);
+
+  /// No description provided for @randomManager_previewHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Click \"Generate\" to preview random tags'**
+  String get randomManager_previewHint;
+
+  /// No description provided for @randomManager_generateNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate Now'**
+  String get randomManager_generateNow;
+
+  /// No description provided for @randomManager_batchOperations.
+  ///
+  /// In en, this message translates to:
+  /// **'Batch Operations'**
+  String get randomManager_batchOperations;
+
+  /// No description provided for @randomManager_selectedItems.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} selected'**
+  String randomManager_selectedItems(Object count);
+
+  /// No description provided for @randomManager_totalItems.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} total'**
+  String randomManager_totalItems(Object count);
+
+  /// No description provided for @randomManager_enabledItems.
+  ///
+  /// In en, this message translates to:
+  /// **'Enabled {count} items'**
+  String randomManager_enabledItems(Object count);
+
+  /// No description provided for @randomManager_disabledItems.
+  ///
+  /// In en, this message translates to:
+  /// **'Disabled {count} items'**
+  String randomManager_disabledItems(Object count);
+
+  /// No description provided for @randomManager_batchDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Batch Delete'**
+  String get randomManager_batchDeleteTitle;
+
+  /// No description provided for @randomManager_batchDeleteContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {count} selected items? This action cannot be undone.'**
+  String randomManager_batchDeleteContent(Object count);
+
+  /// No description provided for @randomManager_deletedItems.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted {count} items'**
+  String randomManager_deletedItems(Object count);
+
+  /// No description provided for @randomManager_invertSelection.
+  ///
+  /// In en, this message translates to:
+  /// **'Invert Selection'**
+  String get randomManager_invertSelection;
+
+  /// No description provided for @randomManager_moreActions.
+  ///
+  /// In en, this message translates to:
+  /// **'More Actions'**
+  String get randomManager_moreActions;
+
+  /// No description provided for @randomManager_enableSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Selected'**
+  String get randomManager_enableSelected;
+
+  /// No description provided for @randomManager_disableSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Disable Selected'**
+  String get randomManager_disableSelected;
+
+  /// No description provided for @randomManager_deleteSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Selected'**
+  String get randomManager_deleteSelected;
+
+  /// No description provided for @randomManager_noHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'No history'**
+  String get randomManager_noHistory;
+
+  /// No description provided for @randomManager_operationHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Operation History'**
+  String get randomManager_operationHistory;
+
+  /// No description provided for @randomManager_keyboardShortcuts.
+  ///
+  /// In en, this message translates to:
+  /// **'Keyboard Shortcuts'**
+  String get randomManager_keyboardShortcuts;
+
+  /// No description provided for @randomManager_generalShortcuts.
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get randomManager_generalShortcuts;
+
+  /// No description provided for @randomManager_presetActions.
+  ///
+  /// In en, this message translates to:
+  /// **'Preset Actions'**
+  String get randomManager_presetActions;
+
+  /// No description provided for @randomManager_selectionActions.
+  ///
+  /// In en, this message translates to:
+  /// **'Selection Actions'**
+  String get randomManager_selectionActions;
+
+  /// No description provided for @randomManager_closeWindow.
+  ///
+  /// In en, this message translates to:
+  /// **'Close Window'**
+  String get randomManager_closeWindow;
+
+  /// No description provided for @randomManager_refreshOrSync.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh / Sync'**
+  String get randomManager_refreshOrSync;
+
   /// No description provided for @genderRestriction_enabled.
   ///
   /// In en, this message translates to:
@@ -9615,11 +12309,683 @@ abstract class AppLocalizations {
   /// **'No images found'**
   String get localGallery_noImagesFound;
 
+  /// No description provided for @localGallery_unknownError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown error'**
+  String get localGallery_unknownError;
+
+  /// No description provided for @localGallery_loadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Load failed: {error}'**
+  String localGallery_loadFailed(Object error);
+
+  /// No description provided for @localGallery_indexingLocalImages.
+  ///
+  /// In en, this message translates to:
+  /// **'Indexing local images...'**
+  String get localGallery_indexingLocalImages;
+
+  /// No description provided for @localGallery_emptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No local images'**
+  String get localGallery_emptyTitle;
+
+  /// No description provided for @localGallery_emptySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Generated images will be saved here'**
+  String get localGallery_emptySubtitle;
+
+  /// No description provided for @localGallery_noMatchingResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching results'**
+  String get localGallery_noMatchingResults;
+
+  /// No description provided for @localGallery_loadingGroupedImages.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading grouped images...'**
+  String get localGallery_loadingGroupedImages;
+
+  /// No description provided for @localGallery_jumpedToMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Jumped to {year}-{month}'**
+  String localGallery_jumpedToMonth(Object year, Object month);
+
   /// No description provided for @localGallery_searchPlaceholder.
   ///
   /// In en, this message translates to:
   /// **'Search prompts, models, samplers...'**
   String get localGallery_searchPlaceholder;
+
+  /// No description provided for @localGallery_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Local Gallery'**
+  String get localGallery_title;
+
+  /// No description provided for @localGallery_allImages.
+  ///
+  /// In en, this message translates to:
+  /// **'All Images'**
+  String get localGallery_allImages;
+
+  /// No description provided for @localGallery_categoryPanelTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Categories'**
+  String get localGallery_categoryPanelTitle;
+
+  /// No description provided for @localGallery_searchFilenamePromptPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Search filename/Prompt; comma-separated terms are matched together...'**
+  String get localGallery_searchFilenamePromptPlaceholder;
+
+  /// No description provided for @localGallery_selectCurrentPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Page'**
+  String get localGallery_selectCurrentPage;
+
+  /// No description provided for @localGallery_deselectCurrentPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Deselect Page'**
+  String get localGallery_deselectCurrentPage;
+
+  /// No description provided for @localGallery_selectAllResults.
+  ///
+  /// In en, this message translates to:
+  /// **'Select All'**
+  String get localGallery_selectAllResults;
+
+  /// No description provided for @localGallery_deselectAllResults.
+  ///
+  /// In en, this message translates to:
+  /// **'Deselect All'**
+  String get localGallery_deselectAllResults;
+
+  /// No description provided for @localGallery_moveSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Move'**
+  String get localGallery_moveSelected;
+
+  /// No description provided for @localGallery_packSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Pack'**
+  String get localGallery_packSelected;
+
+  /// No description provided for @localGallery_editMetadata.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get localGallery_editMetadata;
+
+  /// No description provided for @localGallery_addToCollection.
+  ///
+  /// In en, this message translates to:
+  /// **'Collect'**
+  String get localGallery_addToCollection;
+
+  /// No description provided for @localGallery_switchToGridView.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to grid view'**
+  String get localGallery_switchToGridView;
+
+  /// No description provided for @localGallery_switchToDateGroupedView.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to date grouped view'**
+  String get localGallery_switchToDateGroupedView;
+
+  /// No description provided for @localGallery_openFilterPanel.
+  ///
+  /// In en, this message translates to:
+  /// **'Open filter panel'**
+  String get localGallery_openFilterPanel;
+
+  /// No description provided for @localGallery_hideCategoryPanel.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide category panel'**
+  String get localGallery_hideCategoryPanel;
+
+  /// No description provided for @localGallery_showCategoryPanel.
+  ///
+  /// In en, this message translates to:
+  /// **'Show category panel'**
+  String get localGallery_showCategoryPanel;
+
+  /// No description provided for @localGallery_enterSelectionMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter selection mode'**
+  String get localGallery_enterSelectionMode;
+
+  /// No description provided for @localGallery_refreshTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh gallery\n\nAutomatically detects new or changed images and updates the index'**
+  String get localGallery_refreshTooltip;
+
+  /// No description provided for @localGallery_tagIntersection.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag Intersection'**
+  String get localGallery_tagIntersection;
+
+  /// No description provided for @localGallery_createCategoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New Category'**
+  String get localGallery_createCategoryTitle;
+
+  /// No description provided for @localGallery_createCategoryHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter category name'**
+  String get localGallery_createCategoryHint;
+
+  /// No description provided for @localGallery_createCategoryConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get localGallery_createCategoryConfirm;
+
+  /// No description provided for @localGallery_createSubCategoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New Subcategory'**
+  String get localGallery_createSubCategoryTitle;
+
+  /// No description provided for @localGallery_showInFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'Show in Folder'**
+  String get localGallery_showInFolder;
+
+  /// No description provided for @localGallery_promptCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Prompt copied'**
+  String get localGallery_promptCopied;
+
+  /// No description provided for @localGallery_seedCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Seed copied'**
+  String get localGallery_seedCopied;
+
+  /// No description provided for @localGallery_confirmDeleteImageContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete image \"{name}\"?\n\nThis cannot be undone.'**
+  String localGallery_confirmDeleteImageContent(Object name);
+
+  /// No description provided for @localGallery_imageDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Image deleted'**
+  String get localGallery_imageDeleted;
+
+  /// No description provided for @localGallery_deleteFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete failed: {error}'**
+  String localGallery_deleteFailed(Object error);
+
+  /// No description provided for @localGallery_categoryDeleteContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this category? The folder and its contents will be kept.'**
+  String get localGallery_categoryDeleteContent;
+
+  /// No description provided for @localGallery_protectedDeleteCategoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Protected Mode: Confirm Category Deletion'**
+  String get localGallery_protectedDeleteCategoryTitle;
+
+  /// No description provided for @localGallery_protectedDeleteCategoryContent.
+  ///
+  /// In en, this message translates to:
+  /// **'This will delete the category record. The folder and its contents will be kept. Confirm again.'**
+  String get localGallery_protectedDeleteCategoryContent;
+
+  /// No description provided for @localGallery_confirmDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Delete'**
+  String get localGallery_confirmDelete;
+
+  /// No description provided for @localGallery_confirmMoveImageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Protected Mode: Confirm Image Move'**
+  String get localGallery_confirmMoveImageTitle;
+
+  /// No description provided for @localGallery_confirmMoveImageContent.
+  ///
+  /// In en, this message translates to:
+  /// **'This will move the image to the target category folder. Confirm this was not an accidental drag.'**
+  String get localGallery_confirmMoveImageContent;
+
+  /// No description provided for @localGallery_confirmMove.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Move'**
+  String get localGallery_confirmMove;
+
+  /// No description provided for @localGallery_imageMovedToCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Image moved to category'**
+  String get localGallery_imageMovedToCategory;
+
+  /// No description provided for @localGallery_categoriesSynced.
+  ///
+  /// In en, this message translates to:
+  /// **'Categories synced with folders'**
+  String get localGallery_categoriesSynced;
+
+  /// No description provided for @localGallery_saveDirectoryNotSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Save directory is not set'**
+  String get localGallery_saveDirectoryNotSet;
+
+  /// No description provided for @localGallery_folderNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Folder not found'**
+  String get localGallery_folderNotFound;
+
+  /// No description provided for @localGallery_openFolderFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to open folder: {error}'**
+  String localGallery_openFolderFailed(Object error);
+
+  /// No description provided for @localGallery_protectedDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Protected Mode: Confirm Delete Again'**
+  String get localGallery_protectedDeleteTitle;
+
+  /// No description provided for @localGallery_protectedDeleteImagesContent.
+  ///
+  /// In en, this message translates to:
+  /// **'This will permanently delete {count} local image files. This cannot be undone.'**
+  String localGallery_protectedDeleteImagesContent(Object count);
+
+  /// No description provided for @localGallery_protectedBulkMoveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Protected Mode: Confirm Bulk Move'**
+  String get localGallery_protectedBulkMoveTitle;
+
+  /// No description provided for @localGallery_protectedBulkMoveContent.
+  ///
+  /// In en, this message translates to:
+  /// **'This will move {count} local image files to the target folder. Confirm this is not a mistake.'**
+  String localGallery_protectedBulkMoveContent(Object count);
+
+  /// No description provided for @localGallery_importParamsFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to import parameters: {error}'**
+  String localGallery_importParamsFailed(Object error);
+
+  /// No description provided for @localGallery_protectedDeleteImageContent.
+  ///
+  /// In en, this message translates to:
+  /// **'This will permanently delete image \"{name}\". This cannot be undone.'**
+  String localGallery_protectedDeleteImageContent(Object name);
+
+  /// No description provided for @localGallery_saveZipArchive.
+  ///
+  /// In en, this message translates to:
+  /// **'Save ZIP Archive'**
+  String get localGallery_saveZipArchive;
+
+  /// No description provided for @localGallery_packingImages.
+  ///
+  /// In en, this message translates to:
+  /// **'Packing {count} images...'**
+  String localGallery_packingImages(Object count);
+
+  /// No description provided for @localGallery_packedImages.
+  ///
+  /// In en, this message translates to:
+  /// **'Packed {count} images'**
+  String localGallery_packedImages(Object count);
+
+  /// No description provided for @localGallery_packFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to pack images'**
+  String get localGallery_packFailed;
+
+  /// No description provided for @localGallery_noMetadata.
+  ///
+  /// In en, this message translates to:
+  /// **'This image has no metadata'**
+  String get localGallery_noMetadata;
+
+  /// No description provided for @localGallery_imageFileMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Image file does not exist'**
+  String get localGallery_imageFileMissing;
+
+  /// No description provided for @localGallery_sentToImageToImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Image sent to image-to-image'**
+  String get localGallery_sentToImageToImage;
+
+  /// No description provided for @localGallery_sendFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Send failed: {error}'**
+  String localGallery_sendFailed(Object error);
+
+  /// No description provided for @localGallery_noVibeData.
+  ///
+  /// In en, this message translates to:
+  /// **'This image does not contain Vibe data'**
+  String get localGallery_noVibeData;
+
+  /// No description provided for @localGallery_vibeAddedToParams.
+  ///
+  /// In en, this message translates to:
+  /// **'Vibe \"{name}\" added to generation parameters'**
+  String localGallery_vibeAddedToParams(Object name);
+
+  /// No description provided for @localGallery_addVibeFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to add Vibe: {error}'**
+  String localGallery_addVibeFailed(Object error);
+
+  /// No description provided for @localGallery_sentToReversePrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Image sent to reverse prompt'**
+  String get localGallery_sentToReversePrompt;
+
+  /// No description provided for @localGallery_sendToKritaFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to send to Krita: {error}'**
+  String localGallery_sendToKritaFailed(Object error);
+
+  /// No description provided for @localGallery_sendTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Send to...'**
+  String get localGallery_sendTo;
+
+  /// No description provided for @localGallery_copyPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy Prompt'**
+  String get localGallery_copyPrompt;
+
+  /// No description provided for @localGallery_copySeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy Seed'**
+  String get localGallery_copySeed;
+
+  /// No description provided for @localGallery_dragToShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag to share'**
+  String get localGallery_dragToShare;
+
+  /// No description provided for @localGallery_moveToRoot.
+  ///
+  /// In en, this message translates to:
+  /// **'Move to Root'**
+  String get localGallery_moveToRoot;
+
+  /// No description provided for @localGallery_folderName.
+  ///
+  /// In en, this message translates to:
+  /// **'Folder Name'**
+  String get localGallery_folderName;
+
+  /// No description provided for @localGallery_newFolderName.
+  ///
+  /// In en, this message translates to:
+  /// **'New Name'**
+  String get localGallery_newFolderName;
+
+  /// No description provided for @localGallery_folderNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter folder name'**
+  String get localGallery_folderNameHint;
+
+  /// No description provided for @localGallery_folderCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Folder created'**
+  String get localGallery_folderCreated;
+
+  /// No description provided for @localGallery_folderCreateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to create folder'**
+  String get localGallery_folderCreateFailed;
+
+  /// No description provided for @localGallery_renameFolderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename Folder'**
+  String get localGallery_renameFolderTitle;
+
+  /// No description provided for @localGallery_renameSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Renamed'**
+  String get localGallery_renameSuccess;
+
+  /// No description provided for @localGallery_renameFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename failed'**
+  String get localGallery_renameFailed;
+
+  /// No description provided for @localGallery_deleteFolderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Folder'**
+  String get localGallery_deleteFolderTitle;
+
+  /// No description provided for @localGallery_deleteFolderWithImagesContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Folder \"{name}\" contains {count} images. Delete it?\n\nNote: this will delete the folder and all images in it. This cannot be undone.'**
+  String localGallery_deleteFolderWithImagesContent(Object name, Object count);
+
+  /// No description provided for @localGallery_deleteEmptyFolderContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete empty folder \"{name}\"?'**
+  String localGallery_deleteEmptyFolderContent(Object name);
+
+  /// No description provided for @localGallery_folderDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Folder deleted'**
+  String get localGallery_folderDeleted;
+
+  /// No description provided for @localGallery_folderDeleteFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete folder'**
+  String get localGallery_folderDeleteFailed;
+
+  /// No description provided for @localGallery_cachingMetadata.
+  ///
+  /// In en, this message translates to:
+  /// **'Caching metadata...'**
+  String get localGallery_cachingMetadata;
+
+  /// No description provided for @localGallery_metadataCacheStats.
+  ///
+  /// In en, this message translates to:
+  /// **'Metadata Cache Stats'**
+  String get localGallery_metadataCacheStats;
+
+  /// No description provided for @localGallery_totalImages.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Images'**
+  String get localGallery_totalImages;
+
+  /// No description provided for @localGallery_withMetadata.
+  ///
+  /// In en, this message translates to:
+  /// **'With Metadata'**
+  String get localGallery_withMetadata;
+
+  /// No description provided for @localGallery_skipped.
+  ///
+  /// In en, this message translates to:
+  /// **'Skipped'**
+  String get localGallery_skipped;
+
+  /// No description provided for @localGallery_remaining.
+  ///
+  /// In en, this message translates to:
+  /// **'Remaining'**
+  String get localGallery_remaining;
+
+  /// No description provided for @localGallery_cacheMonitor.
+  ///
+  /// In en, this message translates to:
+  /// **'Cache Monitor'**
+  String get localGallery_cacheMonitor;
+
+  /// No description provided for @localGallery_threeLayerCacheStats.
+  ///
+  /// In en, this message translates to:
+  /// **'Three-layer Cache Stats'**
+  String get localGallery_threeLayerCacheStats;
+
+  /// No description provided for @localGallery_updatedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated: {time}'**
+  String localGallery_updatedAt(Object time);
+
+  /// No description provided for @localGallery_memoryCache.
+  ///
+  /// In en, this message translates to:
+  /// **'Memory Cache'**
+  String get localGallery_memoryCache;
+
+  /// No description provided for @localGallery_hiveCache.
+  ///
+  /// In en, this message translates to:
+  /// **'Hive Cache'**
+  String get localGallery_hiveCache;
+
+  /// No description provided for @localGallery_sqliteDatabase.
+  ///
+  /// In en, this message translates to:
+  /// **'SQLite Database'**
+  String get localGallery_sqliteDatabase;
+
+  /// No description provided for @localGallery_imageUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'images'**
+  String get localGallery_imageUnit;
+
+  /// No description provided for @localGallery_metadataUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'metadata'**
+  String get localGallery_metadataUnit;
+
+  /// No description provided for @localGallery_entriesUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'entries'**
+  String get localGallery_entriesUnit;
+
+  /// No description provided for @localGallery_hitRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Hit Rate'**
+  String get localGallery_hitRate;
+
+  /// No description provided for @localGallery_performanceStats.
+  ///
+  /// In en, this message translates to:
+  /// **'Performance Stats'**
+  String get localGallery_performanceStats;
+
+  /// No description provided for @localGallery_cacheHit.
+  ///
+  /// In en, this message translates to:
+  /// **'Hit'**
+  String get localGallery_cacheHit;
+
+  /// No description provided for @localGallery_cacheMiss.
+  ///
+  /// In en, this message translates to:
+  /// **'Miss'**
+  String get localGallery_cacheMiss;
+
+  /// No description provided for @localGallery_clearL1.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear L1'**
+  String get localGallery_clearL1;
+
+  /// No description provided for @localGallery_clearL2.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear L2'**
+  String get localGallery_clearL2;
+
+  /// No description provided for @localGallery_clearAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear All'**
+  String get localGallery_clearAll;
+
+  /// No description provided for @localGallery_resetStats.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Stats'**
+  String get localGallery_resetStats;
+
+  /// No description provided for @localGallery_confirmClearCache.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Clear'**
+  String get localGallery_confirmClearCache;
+
+  /// No description provided for @localGallery_confirmClearCacheContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear all caches? This will rescan all images.'**
+  String get localGallery_confirmClearCacheContent;
 
   /// No description provided for @localGallery_filterByDate.
   ///
@@ -10959,6 +14325,12 @@ abstract class AppLocalizations {
   /// **'Fixed Tags'**
   String get fixedTags_label;
 
+  /// No description provided for @fixedTags_enabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Enabled'**
+  String get fixedTags_enabled;
+
   /// No description provided for @fixedTags_empty.
   ///
   /// In en, this message translates to:
@@ -11073,6 +14445,30 @@ abstract class AppLocalizations {
   /// **'Supports NAI syntax for weight enhancement/reduction and tag alternation'**
   String get fixedTags_syntaxHelp;
 
+  /// No description provided for @fixedTags_linkedFromLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Linked from library (two-way sync)'**
+  String get fixedTags_linkedFromLibrary;
+
+  /// No description provided for @fixedTags_scope.
+  ///
+  /// In en, this message translates to:
+  /// **'Scope'**
+  String get fixedTags_scope;
+
+  /// No description provided for @fixedTags_positive.
+  ///
+  /// In en, this message translates to:
+  /// **'Positive'**
+  String get fixedTags_positive;
+
+  /// No description provided for @fixedTags_negative.
+  ///
+  /// In en, this message translates to:
+  /// **'Negative'**
+  String get fixedTags_negative;
+
   /// No description provided for @fixedTags_resetWeight.
   ///
   /// In en, this message translates to:
@@ -11145,6 +14541,1087 @@ abstract class AppLocalizations {
   /// **'All fixed tags cleared'**
   String get fixedTags_clearedSuccess;
 
+  /// No description provided for @fixedTags_sidebarTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Fixed Tags Sidebar'**
+  String get fixedTags_sidebarTitle;
+
+  /// No description provided for @fixedTags_switchGridView.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to Grid View'**
+  String get fixedTags_switchGridView;
+
+  /// No description provided for @fixedTags_switchListView.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to List View'**
+  String get fixedTags_switchListView;
+
+  /// No description provided for @fixedTags_addPositive.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Positive Fixed Tag'**
+  String get fixedTags_addPositive;
+
+  /// No description provided for @fixedTags_addNegative.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Negative Fixed Tag'**
+  String get fixedTags_addNegative;
+
+  /// No description provided for @fixedTags_addPositiveFromLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Positive from Library'**
+  String get fixedTags_addPositiveFromLibrary;
+
+  /// No description provided for @fixedTags_addNegativeFromLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Negative from Library'**
+  String get fixedTags_addNegativeFromLibrary;
+
+  /// No description provided for @fixedTags_searchNameOrContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Search name or content'**
+  String get fixedTags_searchNameOrContent;
+
+  /// No description provided for @fixedTags_clearSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Search'**
+  String get fixedTags_clearSearch;
+
+  /// No description provided for @fixedTags_enabledPositive.
+  ///
+  /// In en, this message translates to:
+  /// **'Enabled Positive'**
+  String get fixedTags_enabledPositive;
+
+  /// No description provided for @fixedTags_emptyEnabledPositive.
+  ///
+  /// In en, this message translates to:
+  /// **'No enabled positive fixed tags'**
+  String get fixedTags_emptyEnabledPositive;
+
+  /// No description provided for @fixedTags_noMatchingEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching enabled fixed tags'**
+  String get fixedTags_noMatchingEnabled;
+
+  /// No description provided for @fixedTags_negativeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Negative Fixed Tags'**
+  String get fixedTags_negativeTitle;
+
+  /// No description provided for @fixedTags_emptyNegative.
+  ///
+  /// In en, this message translates to:
+  /// **'No negative fixed tags'**
+  String get fixedTags_emptyNegative;
+
+  /// No description provided for @fixedTags_noMatchingNegative.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching negative fixed tags'**
+  String get fixedTags_noMatchingNegative;
+
+  /// No description provided for @fixedTags_addedToSidebar.
+  ///
+  /// In en, this message translates to:
+  /// **'Added to fixed tags sidebar'**
+  String get fixedTags_addedToSidebar;
+
+  /// No description provided for @fixedTags_unknownCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown Category'**
+  String get fixedTags_unknownCategory;
+
+  /// No description provided for @fixedTags_uncategorized.
+  ///
+  /// In en, this message translates to:
+  /// **'Uncategorized'**
+  String get fixedTags_uncategorized;
+
+  /// No description provided for @fixedTags_clickManageLongPressSidebar.
+  ///
+  /// In en, this message translates to:
+  /// **'Click to manage, long-press to open sidebar'**
+  String get fixedTags_clickManageLongPressSidebar;
+
+  /// No description provided for @fixedTags_clickManageLongPressCompact.
+  ///
+  /// In en, this message translates to:
+  /// **'Click to manage, long-press sidebar'**
+  String get fixedTags_clickManageLongPressCompact;
+
+  /// No description provided for @fixedTags_linked.
+  ///
+  /// In en, this message translates to:
+  /// **'Linked'**
+  String get fixedTags_linked;
+
+  /// No description provided for @fixedTags_linkCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} linked'**
+  String fixedTags_linkCount(Object count);
+
+  /// No description provided for @fixedTags_expandNegative.
+  ///
+  /// In en, this message translates to:
+  /// **'Expand Negative'**
+  String get fixedTags_expandNegative;
+
+  /// No description provided for @fixedTags_collapseNegative.
+  ///
+  /// In en, this message translates to:
+  /// **'Collapse Negative'**
+  String get fixedTags_collapseNegative;
+
+  /// No description provided for @fixedTags_undoTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo fixed tag operation'**
+  String get fixedTags_undoTooltip;
+
+  /// No description provided for @fixedTags_redoTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Redo fixed tag operation'**
+  String get fixedTags_redoTooltip;
+
+  /// No description provided for @fixedTags_positiveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Positive Fixed Tags'**
+  String get fixedTags_positiveTitle;
+
+  /// No description provided for @fixedTags_columnCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{enabled}/{total}'**
+  String fixedTags_columnCount(Object enabled, Object total);
+
+  /// No description provided for @fixedTags_columnFilteredCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{enabled}/{total} · showing {shown}'**
+  String fixedTags_columnFilteredCount(
+      Object enabled, Object total, Object shown);
+
+  /// No description provided for @fixedTags_new.
+  ///
+  /// In en, this message translates to:
+  /// **'New'**
+  String get fixedTags_new;
+
+  /// No description provided for @fixedTags_newTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'New {target}'**
+  String fixedTags_newTarget(Object target);
+
+  /// No description provided for @fixedTags_library.
+  ///
+  /// In en, this message translates to:
+  /// **'Library'**
+  String get fixedTags_library;
+
+  /// No description provided for @fixedTags_addFromLibraryToTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'Add from library to {target}'**
+  String fixedTags_addFromLibraryToTarget(Object target);
+
+  /// No description provided for @fixedTags_enableAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable All'**
+  String get fixedTags_enableAll;
+
+  /// No description provided for @fixedTags_disableAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Disable All'**
+  String get fixedTags_disableAll;
+
+  /// No description provided for @fixedTags_searchTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'Search {target}...'**
+  String fixedTags_searchTarget(Object target);
+
+  /// No description provided for @fixedTags_noMatching.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching fixed tags'**
+  String get fixedTags_noMatching;
+
+  /// No description provided for @fixedTags_emptyTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'No {target}'**
+  String fixedTags_emptyTarget(Object target);
+
+  /// No description provided for @fixedTags_dragToLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag to create link'**
+  String get fixedTags_dragToLink;
+
+  /// No description provided for @fixedTags_linkedToNames.
+  ///
+  /// In en, this message translates to:
+  /// **'Linked: {names}'**
+  String fixedTags_linkedToNames(Object names);
+
+  /// No description provided for @fixedTags_linkInstruction.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag the link icon from a positive fixed tag to a negative fixed tag to create a link'**
+  String get fixedTags_linkInstruction;
+
+  /// No description provided for @fixedTags_manageLinks.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Links'**
+  String get fixedTags_manageLinks;
+
+  /// No description provided for @fixedTags_removeLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove link: {name}'**
+  String fixedTags_removeLink(Object name);
+
+  /// No description provided for @fixedTags_footerExpandedHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Create or add from the library at the top of each column'**
+  String get fixedTags_footerExpandedHint;
+
+  /// No description provided for @fixedTags_newPositive.
+  ///
+  /// In en, this message translates to:
+  /// **'New Positive'**
+  String get fixedTags_newPositive;
+
+  /// No description provided for @fixedTags_addPositiveFromLibraryShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Positive from Library'**
+  String get fixedTags_addPositiveFromLibraryShort;
+
+  /// No description provided for @fixedTags_libraryEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Library is empty. Add entries first'**
+  String get fixedTags_libraryEmpty;
+
+  /// No description provided for @fixedTags_addFromLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Add from Library'**
+  String get fixedTags_addFromLibrary;
+
+  /// No description provided for @fixedTags_searchLibraryEntries.
+  ///
+  /// In en, this message translates to:
+  /// **'Search library entries...'**
+  String get fixedTags_searchLibraryEntries;
+
+  /// No description provided for @fixedTags_noMatchingResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching results'**
+  String get fixedTags_noMatchingResults;
+
+  /// No description provided for @reversePrompt_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Reverse Prompt'**
+  String get reversePrompt_title;
+
+  /// No description provided for @reversePrompt_pending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get reversePrompt_pending;
+
+  /// No description provided for @reversePrompt_imageCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} image(s)'**
+  String reversePrompt_imageCount(Object count);
+
+  /// No description provided for @reversePrompt_llmReverse.
+  ///
+  /// In en, this message translates to:
+  /// **'LLM Reverse'**
+  String get reversePrompt_llmReverse;
+
+  /// No description provided for @reversePrompt_characterReplace.
+  ///
+  /// In en, this message translates to:
+  /// **'Character Replace'**
+  String get reversePrompt_characterReplace;
+
+  /// No description provided for @reversePrompt_finalResult.
+  ///
+  /// In en, this message translates to:
+  /// **'Final Result'**
+  String get reversePrompt_finalResult;
+
+  /// No description provided for @reversePrompt_dropToAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Release to add to reverse prompt'**
+  String get reversePrompt_dropToAdd;
+
+  /// No description provided for @reversePrompt_addOrDropImages.
+  ///
+  /// In en, this message translates to:
+  /// **'Add images / drop images'**
+  String get reversePrompt_addOrDropImages;
+
+  /// No description provided for @reversePrompt_localTaggerModel.
+  ///
+  /// In en, this message translates to:
+  /// **'Local tagger model'**
+  String get reversePrompt_localTaggerModel;
+
+  /// No description provided for @reversePrompt_localTaggerModelHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Configure model folder in Settings'**
+  String get reversePrompt_localTaggerModelHint;
+
+  /// No description provided for @reversePrompt_generalThreshold.
+  ///
+  /// In en, this message translates to:
+  /// **'General tag threshold'**
+  String get reversePrompt_generalThreshold;
+
+  /// No description provided for @reversePrompt_characterThreshold.
+  ///
+  /// In en, this message translates to:
+  /// **'Character tag threshold'**
+  String get reversePrompt_characterThreshold;
+
+  /// No description provided for @reversePrompt_taggerFilterHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Only General / Character tags are output. Rating, Artist, Copyright, Meta, and other categories are filtered.'**
+  String get reversePrompt_taggerFilterHint;
+
+  /// No description provided for @reversePrompt_replacementEmptyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'No replacement target character selected. Choose a character from the tag library here; it will not be injected into the positive prompt.'**
+  String get reversePrompt_replacementEmptyHint;
+
+  /// No description provided for @reversePrompt_selectReplacementCharacter.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose replacement target character from library'**
+  String get reversePrompt_selectReplacementCharacter;
+
+  /// No description provided for @reversePrompt_selectReplacementTargetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose Replacement Target Character'**
+  String get reversePrompt_selectReplacementTargetTitle;
+
+  /// No description provided for @reversePrompt_change.
+  ///
+  /// In en, this message translates to:
+  /// **'Change'**
+  String get reversePrompt_change;
+
+  /// No description provided for @reversePrompt_start.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Reverse Prompt'**
+  String get reversePrompt_start;
+
+  /// No description provided for @reversePrompt_sentToPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent to prompt'**
+  String get reversePrompt_sentToPrompt;
+
+  /// No description provided for @reversePrompt_sendToPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Send to Prompt'**
+  String get reversePrompt_sendToPrompt;
+
+  /// No description provided for @reversePrompt_externalTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'multimodal LLM reverse prompt service'**
+  String get reversePrompt_externalTarget;
+
+  /// No description provided for @reversePrompt_dropUnreadable.
+  ///
+  /// In en, this message translates to:
+  /// **'The dropped source did not provide a readable image file or image URL'**
+  String get reversePrompt_dropUnreadable;
+
+  /// No description provided for @reversePrompt_needImageAndMethod.
+  ///
+  /// In en, this message translates to:
+  /// **'Add an image and enable at least ONNX tagger or LLM reverse prompt'**
+  String get reversePrompt_needImageAndMethod;
+
+  /// No description provided for @reversePrompt_stagePreparing.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing reverse prompt'**
+  String get reversePrompt_stagePreparing;
+
+  /// No description provided for @reversePrompt_stageOnnxTagger.
+  ///
+  /// In en, this message translates to:
+  /// **'ONNX tagger reverse prompting'**
+  String get reversePrompt_stageOnnxTagger;
+
+  /// No description provided for @reversePrompt_stageLlmReverse.
+  ///
+  /// In en, this message translates to:
+  /// **'LLM image reverse prompting'**
+  String get reversePrompt_stageLlmReverse;
+
+  /// No description provided for @reversePrompt_stageCharacterReplace.
+  ///
+  /// In en, this message translates to:
+  /// **'Replacing character'**
+  String get reversePrompt_stageCharacterReplace;
+
+  /// No description provided for @reversePrompt_needReplacementCharacter.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a valid character from the reverse-prompt character library first'**
+  String get reversePrompt_needReplacementCharacter;
+
+  /// No description provided for @reversePrompt_needPromptForCharacterReplace.
+  ///
+  /// In en, this message translates to:
+  /// **'Character replacement requires a reverse-prompt result first'**
+  String get reversePrompt_needPromptForCharacterReplace;
+
+  /// No description provided for @reversePrompt_noOnnxModel.
+  ///
+  /// In en, this message translates to:
+  /// **'No ONNX tagger model found. Configure the model folder in Settings first'**
+  String get reversePrompt_noOnnxModel;
+
+  /// No description provided for @promptAssistant_translateProcessing.
+  ///
+  /// In en, this message translates to:
+  /// **'Translating'**
+  String get promptAssistant_translateProcessing;
+
+  /// No description provided for @promptAssistant_optimizeProcessing.
+  ///
+  /// In en, this message translates to:
+  /// **'Optimizing'**
+  String get promptAssistant_optimizeProcessing;
+
+  /// No description provided for @promptAssistant_characterReplaceProcessing.
+  ///
+  /// In en, this message translates to:
+  /// **'Replacing character'**
+  String get promptAssistant_characterReplaceProcessing;
+
+  /// No description provided for @promptAssistant_customProcessing.
+  ///
+  /// In en, this message translates to:
+  /// **'Processing custom request'**
+  String get promptAssistant_customProcessing;
+
+  /// No description provided for @promptAssistant_imageInputDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'The current custom-task provider does not have image input enabled'**
+  String get promptAssistant_imageInputDisabled;
+
+  /// No description provided for @promptAssistant_needCharacter.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a valid character in the reverse-prompt character library first'**
+  String get promptAssistant_needCharacter;
+
+  /// No description provided for @promptAssistant_assistantSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Assistant Settings'**
+  String get promptAssistant_assistantSettings;
+
+  /// No description provided for @promptAssistant_serviceSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Service Settings'**
+  String get promptAssistant_serviceSettings;
+
+  /// No description provided for @promptAssistant_ruleSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Rule Settings'**
+  String get promptAssistant_ruleSettings;
+
+  /// No description provided for @promptAssistant_cancelCurrentTask.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel Current Task'**
+  String get promptAssistant_cancelCurrentTask;
+
+  /// No description provided for @promptAssistant_collapseAssistant.
+  ///
+  /// In en, this message translates to:
+  /// **'Collapse Assistant'**
+  String get promptAssistant_collapseAssistant;
+
+  /// No description provided for @promptAssistant_expandAssistant.
+  ///
+  /// In en, this message translates to:
+  /// **'Expand Assistant'**
+  String get promptAssistant_expandAssistant;
+
+  /// No description provided for @promptAssistant_history.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get promptAssistant_history;
+
+  /// No description provided for @promptAssistant_undo.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get promptAssistant_undo;
+
+  /// No description provided for @promptAssistant_redo.
+  ///
+  /// In en, this message translates to:
+  /// **'Redo'**
+  String get promptAssistant_redo;
+
+  /// No description provided for @promptAssistant_translate.
+  ///
+  /// In en, this message translates to:
+  /// **'Translate'**
+  String get promptAssistant_translate;
+
+  /// No description provided for @promptAssistant_optimize.
+  ///
+  /// In en, this message translates to:
+  /// **'Optimize'**
+  String get promptAssistant_optimize;
+
+  /// No description provided for @promptAssistant_custom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get promptAssistant_custom;
+
+  /// No description provided for @promptAssistant_characterReplace.
+  ///
+  /// In en, this message translates to:
+  /// **'Character Replace'**
+  String get promptAssistant_characterReplace;
+
+  /// No description provided for @promptAssistant_cancelTask.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel Task'**
+  String get promptAssistant_cancelTask;
+
+  /// No description provided for @promptAssistant_menu.
+  ///
+  /// In en, this message translates to:
+  /// **'Menu'**
+  String get promptAssistant_menu;
+
+  /// No description provided for @promptAssistant_customDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom Prompt Assistant'**
+  String get promptAssistant_customDialogTitle;
+
+  /// No description provided for @promptAssistant_currentPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Prompt'**
+  String get promptAssistant_currentPrompt;
+
+  /// No description provided for @promptAssistant_currentPromptEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'(current prompt is empty)'**
+  String get promptAssistant_currentPromptEmpty;
+
+  /// No description provided for @promptAssistant_customRequestLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Your modification request'**
+  String get promptAssistant_customRequestLabel;
+
+  /// No description provided for @promptAssistant_customRequestHint.
+  ///
+  /// In en, this message translates to:
+  /// **'For example: make it more ominous, add a rainy night street background, make the action more dynamic, return only the final prompt'**
+  String get promptAssistant_customRequestHint;
+
+  /// No description provided for @promptAssistant_addReferenceImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Reference Image'**
+  String get promptAssistant_addReferenceImage;
+
+  /// No description provided for @promptAssistant_execute.
+  ///
+  /// In en, this message translates to:
+  /// **'Run'**
+  String get promptAssistant_execute;
+
+  /// No description provided for @promptAssistant_maxReferenceImages.
+  ///
+  /// In en, this message translates to:
+  /// **'Add up to {count} reference images'**
+  String promptAssistant_maxReferenceImages(Object count);
+
+  /// No description provided for @promptAssistant_unsupportedImageFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'Unsupported image format: {fileName}'**
+  String promptAssistant_unsupportedImageFormat(Object fileName);
+
+  /// No description provided for @promptAssistant_needCustomRequestOrImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a custom request or add a reference image'**
+  String get promptAssistant_needCustomRequestOrImage;
+
+  /// No description provided for @promptAssistant_taskOptimize.
+  ///
+  /// In en, this message translates to:
+  /// **'Optimize'**
+  String get promptAssistant_taskOptimize;
+
+  /// No description provided for @promptAssistant_taskTranslate.
+  ///
+  /// In en, this message translates to:
+  /// **'Translate'**
+  String get promptAssistant_taskTranslate;
+
+  /// No description provided for @promptAssistant_taskReverse.
+  ///
+  /// In en, this message translates to:
+  /// **'Reverse Prompt'**
+  String get promptAssistant_taskReverse;
+
+  /// No description provided for @promptAssistant_taskCharacterReplace.
+  ///
+  /// In en, this message translates to:
+  /// **'Character Replace'**
+  String get promptAssistant_taskCharacterReplace;
+
+  /// No description provided for @promptAssistant_taskCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get promptAssistant_taskCustom;
+
+  /// No description provided for @promptAssistant_settingsInputSwitchSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Assistant switch in the bottom-right of the prompt input'**
+  String get promptAssistant_settingsInputSwitchSubtitle;
+
+  /// No description provided for @promptAssistant_desktopOverlayTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Desktop Overlay Interaction'**
+  String get promptAssistant_desktopOverlayTitle;
+
+  /// No description provided for @promptAssistant_desktopOverlaySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable hover, right-click, and shortcut behavior'**
+  String get promptAssistant_desktopOverlaySubtitle;
+
+  /// No description provided for @promptAssistant_taskRouting.
+  ///
+  /// In en, this message translates to:
+  /// **'Task Routing'**
+  String get promptAssistant_taskRouting;
+
+  /// No description provided for @promptAssistant_taskRoutingSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Bind optimize, translate, reverse prompt, and character replacement to different providers and models'**
+  String get promptAssistant_taskRoutingSubtitle;
+
+  /// No description provided for @promptAssistant_taskRouteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{title} Task'**
+  String promptAssistant_taskRouteTitle(Object title);
+
+  /// No description provided for @promptAssistant_provider.
+  ///
+  /// In en, this message translates to:
+  /// **'Provider'**
+  String get promptAssistant_provider;
+
+  /// No description provided for @promptAssistant_model.
+  ///
+  /// In en, this message translates to:
+  /// **'Model'**
+  String get promptAssistant_model;
+
+  /// No description provided for @promptAssistant_noModelsPullFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'No models yet. Pull the model list first'**
+  String get promptAssistant_noModelsPullFirst;
+
+  /// No description provided for @promptAssistant_providerManagement.
+  ///
+  /// In en, this message translates to:
+  /// **'Provider Management'**
+  String get promptAssistant_providerManagement;
+
+  /// No description provided for @promptAssistant_providerManagementSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Supports OpenAI Chat / Responses, Anthropic, Gemini, DeepSeek, LM Studio, Ollama, Pollinations, and custom compatible endpoints'**
+  String get promptAssistant_providerManagementSubtitle;
+
+  /// No description provided for @promptAssistant_apiKeyConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'API Key: configured'**
+  String get promptAssistant_apiKeyConfigured;
+
+  /// No description provided for @promptAssistant_apiKeyNotConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'API Key: not configured'**
+  String get promptAssistant_apiKeyNotConfigured;
+
+  /// No description provided for @promptAssistant_supportsImageInput.
+  ///
+  /// In en, this message translates to:
+  /// **'Supports image input'**
+  String get promptAssistant_supportsImageInput;
+
+  /// No description provided for @promptAssistant_textOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Text only'**
+  String get promptAssistant_textOnly;
+
+  /// No description provided for @promptAssistant_connectionConfig.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection Config'**
+  String get promptAssistant_connectionConfig;
+
+  /// No description provided for @promptAssistant_pullModelList.
+  ///
+  /// In en, this message translates to:
+  /// **'Pull model list'**
+  String get promptAssistant_pullModelList;
+
+  /// No description provided for @promptAssistant_editProvider.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit provider'**
+  String get promptAssistant_editProvider;
+
+  /// No description provided for @promptAssistant_deleteProvider.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete provider'**
+  String get promptAssistant_deleteProvider;
+
+  /// No description provided for @promptAssistant_pullingModels.
+  ///
+  /// In en, this message translates to:
+  /// **'Pulling model list...'**
+  String get promptAssistant_pullingModels;
+
+  /// No description provided for @promptAssistant_emptyModelList.
+  ///
+  /// In en, this message translates to:
+  /// **'Provider returned an empty model list'**
+  String get promptAssistant_emptyModelList;
+
+  /// No description provided for @promptAssistant_modelsSynced.
+  ///
+  /// In en, this message translates to:
+  /// **'Synced {count} models'**
+  String promptAssistant_modelsSynced(Object count);
+
+  /// No description provided for @promptAssistant_pullModelsFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to pull models: {error}'**
+  String promptAssistant_pullModelsFailed(Object error);
+
+  /// No description provided for @promptAssistant_ruleTemplates.
+  ///
+  /// In en, this message translates to:
+  /// **'Rule Templates'**
+  String get promptAssistant_ruleTemplates;
+
+  /// No description provided for @promptAssistant_ruleTemplatesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'System prompts are assembled as rules + user input + task parameters'**
+  String get promptAssistant_ruleTemplatesSubtitle;
+
+  /// No description provided for @promptAssistant_addRule.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Rule'**
+  String get promptAssistant_addRule;
+
+  /// No description provided for @promptAssistant_addProvider.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Provider'**
+  String get promptAssistant_addProvider;
+
+  /// No description provided for @promptAssistant_editProviderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Provider'**
+  String get promptAssistant_editProviderTitle;
+
+  /// No description provided for @promptAssistant_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get promptAssistant_name;
+
+  /// No description provided for @promptAssistant_protocol.
+  ///
+  /// In en, this message translates to:
+  /// **'Protocol'**
+  String get promptAssistant_protocol;
+
+  /// No description provided for @promptAssistant_allowImageInput.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow image input'**
+  String get promptAssistant_allowImageInput;
+
+  /// No description provided for @promptAssistant_allowImageInputSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable only when the model and provider actually support vision input'**
+  String get promptAssistant_allowImageInputSubtitle;
+
+  /// No description provided for @promptAssistant_apiKeyLeaveEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'API Key (leave empty to keep unchanged)'**
+  String get promptAssistant_apiKeyLeaveEmpty;
+
+  /// No description provided for @promptAssistant_connectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} Connection Config'**
+  String promptAssistant_connectionTitle(Object name);
+
+  /// No description provided for @promptAssistant_baseUrlHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Example: https://api.openai.com/v1'**
+  String get promptAssistant_baseUrlHint;
+
+  /// No description provided for @promptAssistant_clearCurrentApiKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear current API Key'**
+  String get promptAssistant_clearCurrentApiKey;
+
+  /// No description provided for @promptAssistant_protocolSupportsImagePayload.
+  ///
+  /// In en, this message translates to:
+  /// **'The current protocol supports image payloads; the model itself must still support vision input'**
+  String get promptAssistant_protocolSupportsImagePayload;
+
+  /// No description provided for @promptAssistant_protocolTextOnlyWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'The current protocol is text-only by default; enabling this may still be rejected by the server'**
+  String get promptAssistant_protocolTextOnlyWarning;
+
+  /// No description provided for @promptAssistant_addRuleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Rule'**
+  String get promptAssistant_addRuleTitle;
+
+  /// No description provided for @promptAssistant_editRuleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Rule'**
+  String get promptAssistant_editRuleTitle;
+
+  /// No description provided for @promptAssistant_taskType.
+  ///
+  /// In en, this message translates to:
+  /// **'Task Type'**
+  String get promptAssistant_taskType;
+
+  /// No description provided for @promptAssistant_ruleContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Rule Content'**
+  String get promptAssistant_ruleContent;
+
+  /// No description provided for @promptAssistant_newRule.
+  ///
+  /// In en, this message translates to:
+  /// **'New Rule'**
+  String get promptAssistant_newRule;
+
+  /// No description provided for @autocomplete_resultsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} results'**
+  String autocomplete_resultsCount(Object count);
+
+  /// No description provided for @autocomplete_keyNavigate.
+  ///
+  /// In en, this message translates to:
+  /// **'↑↓/Scroll'**
+  String get autocomplete_keyNavigate;
+
+  /// No description provided for @autocomplete_actionSelect.
+  ///
+  /// In en, this message translates to:
+  /// **'Select'**
+  String get autocomplete_actionSelect;
+
+  /// No description provided for @autocomplete_actionConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get autocomplete_actionConfirm;
+
+  /// No description provided for @autocomplete_actionClose.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get autocomplete_actionClose;
+
+  /// No description provided for @autocomplete_categoryRecommended.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommended'**
+  String get autocomplete_categoryRecommended;
+
+  /// No description provided for @autocomplete_categoryCharacter.
+  ///
+  /// In en, this message translates to:
+  /// **'Character'**
+  String get autocomplete_categoryCharacter;
+
+  /// No description provided for @autocomplete_categoryCopyright.
+  ///
+  /// In en, this message translates to:
+  /// **'Copyright'**
+  String get autocomplete_categoryCopyright;
+
+  /// No description provided for @autocomplete_categoryArtist.
+  ///
+  /// In en, this message translates to:
+  /// **'Artist'**
+  String get autocomplete_categoryArtist;
+
+  /// No description provided for @autocomplete_categoryMeta.
+  ///
+  /// In en, this message translates to:
+  /// **'Meta'**
+  String get autocomplete_categoryMeta;
+
+  /// No description provided for @autocomplete_categoryLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Library'**
+  String get autocomplete_categoryLibrary;
+
+  /// No description provided for @autocomplete_categoryGeneral.
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get autocomplete_categoryGeneral;
+
+  /// No description provided for @promptToken_webCalibration.
+  ///
+  /// In en, this message translates to:
+  /// **'Web calibration'**
+  String get promptToken_webCalibration;
+
+  /// No description provided for @promptToken_prompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Prompt'**
+  String get promptToken_prompt;
+
+  /// No description provided for @promptToken_fixedTags.
+  ///
+  /// In en, this message translates to:
+  /// **'Fixed Tags'**
+  String get promptToken_fixedTags;
+
+  /// No description provided for @promptToken_qualityPreset.
+  ///
+  /// In en, this message translates to:
+  /// **'Quality Preset'**
+  String get promptToken_qualityPreset;
+
+  /// No description provided for @promptToken_character.
+  ///
+  /// In en, this message translates to:
+  /// **'Character'**
+  String get promptToken_character;
+
+  /// No description provided for @promptToken_negativePrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Negative Prompt'**
+  String get promptToken_negativePrompt;
+
+  /// No description provided for @promptToken_negativeFixedTags.
+  ///
+  /// In en, this message translates to:
+  /// **'Negative Fixed Tags'**
+  String get promptToken_negativeFixedTags;
+
+  /// No description provided for @promptToken_negativePreset.
+  ///
+  /// In en, this message translates to:
+  /// **'Negative Preset'**
+  String get promptToken_negativePreset;
+
+  /// No description provided for @promptToken_characterNegative.
+  ///
+  /// In en, this message translates to:
+  /// **'Character Negative'**
+  String get promptToken_characterNegative;
+
   /// No description provided for @common_rename.
   ///
   /// In en, this message translates to:
@@ -11210,6 +15687,378 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Export'**
   String get tagLibrary_export;
+
+  /// No description provided for @tagLibrary_sortCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom Sort'**
+  String get tagLibrary_sortCustom;
+
+  /// No description provided for @tagLibrary_sortName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get tagLibrary_sortName;
+
+  /// No description provided for @tagLibrary_sortUseCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Usage'**
+  String get tagLibrary_sortUseCount;
+
+  /// No description provided for @tagLibrary_sortUpdatedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated'**
+  String get tagLibrary_sortUpdatedAt;
+
+  /// No description provided for @tagLibrary_transferCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Move Category'**
+  String get tagLibrary_transferCategory;
+
+  /// No description provided for @tagLibrary_copyContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy Content'**
+  String get tagLibrary_copyContent;
+
+  /// No description provided for @tagLibrary_moveToCategoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Move to Category'**
+  String get tagLibrary_moveToCategoryTitle;
+
+  /// No description provided for @tagLibrary_selectTargetCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Select target category:'**
+  String get tagLibrary_selectTargetCategory;
+
+  /// No description provided for @tagLibrary_includeThumbnails.
+  ///
+  /// In en, this message translates to:
+  /// **'Include thumbnails'**
+  String get tagLibrary_includeThumbnails;
+
+  /// No description provided for @tagLibrary_includeThumbnailsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Increases file size'**
+  String get tagLibrary_includeThumbnailsSubtitle;
+
+  /// No description provided for @tagLibrary_selectedExportCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Export ({count} items)'**
+  String tagLibrary_selectedExportCount(Object count);
+
+  /// No description provided for @tagLibrary_selectedImportCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Import ({count} items)'**
+  String tagLibrary_selectedImportCount(Object count);
+
+  /// No description provided for @tagLibrary_entriesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Entries'**
+  String get tagLibrary_entriesLabel;
+
+  /// No description provided for @tagLibrary_categoriesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Categories'**
+  String get tagLibrary_categoriesLabel;
+
+  /// No description provided for @tagLibrary_selectExportContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Select content to export'**
+  String get tagLibrary_selectExportContent;
+
+  /// No description provided for @tagLibrary_selectImportContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Select content to import'**
+  String get tagLibrary_selectImportContent;
+
+  /// No description provided for @tagLibrary_selectSaveLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Select save location'**
+  String get tagLibrary_selectSaveLocation;
+
+  /// No description provided for @tagLibrary_preparingExport.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing export...'**
+  String get tagLibrary_preparingExport;
+
+  /// No description provided for @tagLibrary_exportSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Export successful'**
+  String get tagLibrary_exportSuccess;
+
+  /// No description provided for @tagLibrary_exportFailedWithError.
+  ///
+  /// In en, this message translates to:
+  /// **'Export failed: {error}'**
+  String tagLibrary_exportFailedWithError(Object error);
+
+  /// No description provided for @tagLibrary_selectZipFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Click to select ZIP file'**
+  String get tagLibrary_selectZipFile;
+
+  /// No description provided for @tagLibrary_zipFileHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Supports library files exported from this app'**
+  String get tagLibrary_zipFileHint;
+
+  /// No description provided for @tagLibrary_reselect.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Again'**
+  String get tagLibrary_reselect;
+
+  /// No description provided for @tagLibrary_fileInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'File Info'**
+  String get tagLibrary_fileInfo;
+
+  /// No description provided for @tagLibrary_entryCountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Entries'**
+  String get tagLibrary_entryCountLabel;
+
+  /// No description provided for @tagLibrary_categoryCountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Categories'**
+  String get tagLibrary_categoryCountLabel;
+
+  /// No description provided for @tagLibrary_exportDateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Export Date'**
+  String get tagLibrary_exportDateLabel;
+
+  /// No description provided for @tagLibrary_importConflictsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} conflicts found. Click a conflicted item below to choose how to handle it.'**
+  String tagLibrary_importConflictsHint(Object count);
+
+  /// No description provided for @tagLibrary_categoriesSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Categories ({count})'**
+  String tagLibrary_categoriesSection(Object count);
+
+  /// No description provided for @tagLibrary_entriesSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Entries ({count})'**
+  String tagLibrary_entriesSection(Object count);
+
+  /// No description provided for @tagLibrary_conflictResolutionTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose conflict handling'**
+  String get tagLibrary_conflictResolutionTooltip;
+
+  /// No description provided for @tagLibrary_conflictSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Conflict - will skip'**
+  String get tagLibrary_conflictSkip;
+
+  /// No description provided for @tagLibrary_conflictRename.
+  ///
+  /// In en, this message translates to:
+  /// **'Conflict - will import with renamed name'**
+  String get tagLibrary_conflictRename;
+
+  /// No description provided for @tagLibrary_conflictOverwrite.
+  ///
+  /// In en, this message translates to:
+  /// **'Conflict - will replace existing'**
+  String get tagLibrary_conflictOverwrite;
+
+  /// No description provided for @tagLibrary_parseFileFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to parse file: {error}'**
+  String tagLibrary_parseFileFailed(Object error);
+
+  /// No description provided for @tagLibrary_preparingImport.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing import...'**
+  String get tagLibrary_preparingImport;
+
+  /// No description provided for @tagLibrary_importCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Import complete'**
+  String get tagLibrary_importCompleted;
+
+  /// No description provided for @tagLibrary_importSuccessSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Import successful: {summary}'**
+  String tagLibrary_importSuccessSummary(Object summary);
+
+  /// No description provided for @tagLibrary_importFailedWithError.
+  ///
+  /// In en, this message translates to:
+  /// **'Import failed: {error}'**
+  String tagLibrary_importFailedWithError(Object error);
+
+  /// No description provided for @tagLibrary_importedEntriesCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} entries'**
+  String tagLibrary_importedEntriesCount(Object count);
+
+  /// No description provided for @tagLibrary_importedCategoriesCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} categories'**
+  String tagLibrary_importedCategoriesCount(Object count);
+
+  /// No description provided for @tagLibrary_renamedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} renamed'**
+  String tagLibrary_renamedCount(Object count);
+
+  /// No description provided for @tagLibrary_overwrittenCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} replaced'**
+  String tagLibrary_overwrittenCount(Object count);
+
+  /// No description provided for @tagLibrary_skippedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} skipped'**
+  String tagLibrary_skippedCount(Object count);
+
+  /// No description provided for @tagLibrary_dragToCategoryHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag to the category panel to file'**
+  String get tagLibrary_dragToCategoryHint;
+
+  /// No description provided for @tagLibrary_unknownCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown Category'**
+  String get tagLibrary_unknownCategory;
+
+  /// No description provided for @tagLibrary_selectEntryToUpdate.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Entry to Update'**
+  String get tagLibrary_selectEntryToUpdate;
+
+  /// No description provided for @tagLibrary_updatePreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Preview'**
+  String get tagLibrary_updatePreview;
+
+  /// No description provided for @tagLibrary_replaceThumbnailHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Will replace existing thumbnail'**
+  String get tagLibrary_replaceThumbnailHint;
+
+  /// No description provided for @tagLibrary_sentEntriesToMainPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent {count} entries to main prompt'**
+  String tagLibrary_sentEntriesToMainPrompt(Object count);
+
+  /// No description provided for @tagLibrary_confirmDeleteSelectedEntries.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {count} selected entries? This action cannot be undone.'**
+  String tagLibrary_confirmDeleteSelectedEntries(Object count);
+
+  /// No description provided for @tagLibrary_deletedEntries.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted {count} entries'**
+  String tagLibrary_deletedEntries(Object count);
+
+  /// No description provided for @tagLibrary_movedEntries.
+  ///
+  /// In en, this message translates to:
+  /// **'Moved {count} entries'**
+  String tagLibrary_movedEntries(Object count);
+
+  /// No description provided for @tagLibrary_favoritedEntries.
+  ///
+  /// In en, this message translates to:
+  /// **'Favorited {count} entries'**
+  String tagLibrary_favoritedEntries(Object count);
+
+  /// No description provided for @tagLibrary_unfavoritedEntries.
+  ///
+  /// In en, this message translates to:
+  /// **'Unfavorited {count} entries'**
+  String tagLibrary_unfavoritedEntries(Object count);
+
+  /// No description provided for @tagLibrary_copiedEntriesContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied content from {count} entries'**
+  String tagLibrary_copiedEntriesContent(Object count);
+
+  /// No description provided for @tagLibrary_droppedImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Dropped Image'**
+  String get tagLibrary_droppedImage;
+
+  /// No description provided for @tagLibrary_createEntryFromImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Create New Entry'**
+  String get tagLibrary_createEntryFromImage;
+
+  /// No description provided for @tagLibrary_promptExtracted.
+  ///
+  /// In en, this message translates to:
+  /// **'Prompt extracted: \"{prompt}\"'**
+  String tagLibrary_promptExtracted(Object prompt);
+
+  /// No description provided for @tagLibrary_createEntryFromImageSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a new entry from this image'**
+  String get tagLibrary_createEntryFromImageSubtitle;
+
+  /// No description provided for @tagLibrary_updateExistingThumbnail.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Existing Entry Thumbnail'**
+  String get tagLibrary_updateExistingThumbnail;
+
+  /// No description provided for @tagLibrary_updateExistingThumbnailSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Select an entry and replace its thumbnail'**
+  String get tagLibrary_updateExistingThumbnailSubtitle;
 
   /// No description provided for @tagLibrary_allEntries.
   ///
@@ -12285,6 +17134,18 @@ abstract class AppLocalizations {
   /// **'Time to wait between retries'**
   String get settings_queueRetryIntervalSubtitle;
 
+  /// No description provided for @settings_queueRetryCountMax.
+  ///
+  /// In en, this message translates to:
+  /// **'Max {count} times'**
+  String settings_queueRetryCountMax(Object count);
+
+  /// No description provided for @settings_queueRetryIntervalValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{seconds} seconds'**
+  String settings_queueRetryIntervalValue(Object seconds);
+
   /// No description provided for @unit_times.
   ///
   /// In en, this message translates to:
@@ -12591,6 +17452,12 @@ abstract class AppLocalizations {
   /// **'Send to Home'**
   String get sendToHome_dialogTitle;
 
+  /// No description provided for @sendToHome_send.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get sendToHome_send;
+
   /// No description provided for @sendToHome_mainPrompt.
   ///
   /// In en, this message translates to:
@@ -12602,6 +17469,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Fill into the main prompt input field'**
   String get sendToHome_mainPromptSubtitle;
+
+  /// No description provided for @sendToHome_mainPromptPipeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Send the full content to the main prompt (including pipes)'**
+  String get sendToHome_mainPromptPipeSubtitle;
+
+  /// No description provided for @sendToHome_smartDecompose.
+  ///
+  /// In en, this message translates to:
+  /// **'Smart Decompose'**
+  String get sendToHome_smartDecompose;
+
+  /// No description provided for @sendToHome_smartDecomposeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Main prompt + {count} characters'**
+  String sendToHome_smartDecomposeSubtitle(Object count);
 
   /// No description provided for @sendToHome_replaceCharacter.
   ///
@@ -12626,6 +17511,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Keep existing characters and append new'**
   String get sendToHome_appendCharacterSubtitle;
+
+  /// No description provided for @sendToHome_fixedTags.
+  ///
+  /// In en, this message translates to:
+  /// **'Send to Fixed Tags'**
+  String get sendToHome_fixedTags;
+
+  /// No description provided for @sendToHome_fixedTagsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Append to the fixed tag list'**
+  String get sendToHome_fixedTagsSubtitle;
+
+  /// No description provided for @sendToHome_sendAsAlias.
+  ///
+  /// In en, this message translates to:
+  /// **'Send as Alias'**
+  String get sendToHome_sendAsAlias;
+
+  /// No description provided for @sendToHome_sendAsAliasSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Wrap as <{name}> when sending to home'**
+  String sendToHome_sendAsAliasSubtitle(Object name);
+
+  /// No description provided for @sendToHome_preview.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Preview'**
+  String get sendToHome_preview;
+
+  /// No description provided for @sendToHome_characterPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Character Prompt'**
+  String get sendToHome_characterPrompt;
+
+  /// No description provided for @sendToHome_characterPromptCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Character Prompt ({count})'**
+  String sendToHome_characterPromptCount(Object count);
+
+  /// No description provided for @sendToHome_characterIndex.
+  ///
+  /// In en, this message translates to:
+  /// **'Character {index}'**
+  String sendToHome_characterIndex(Object index);
+
+  /// No description provided for @sendToHome_recommended.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommended'**
+  String get sendToHome_recommended;
 
   /// No description provided for @sendToHome_successMainPrompt.
   ///
@@ -12690,14 +17629,62 @@ abstract class AppLocalizations {
   /// No description provided for @metadataImport_generationOnly.
   ///
   /// In en, this message translates to:
-  /// **'Generation Only'**
+  /// **'Parameters Only'**
   String get metadataImport_generationOnly;
+
+  /// No description provided for @metadataImport_clear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get metadataImport_clear;
 
   /// No description provided for @metadataImport_prompt.
   ///
   /// In en, this message translates to:
   /// **'Positive Prompt'**
   String get metadataImport_prompt;
+
+  /// No description provided for @metadataImport_mainPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Main Prompt'**
+  String get metadataImport_mainPrompt;
+
+  /// No description provided for @metadataImport_fixedTags.
+  ///
+  /// In en, this message translates to:
+  /// **'Fixed Tags'**
+  String get metadataImport_fixedTags;
+
+  /// No description provided for @metadataImport_fixedPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Prefix: {text}'**
+  String metadataImport_fixedPrefix(Object text);
+
+  /// No description provided for @metadataImport_fixedSuffix.
+  ///
+  /// In en, this message translates to:
+  /// **'Suffix: {text}'**
+  String metadataImport_fixedSuffix(Object text);
+
+  /// No description provided for @metadataImport_negativeFixedPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Negative Prefix: {text}'**
+  String metadataImport_negativeFixedPrefix(Object text);
+
+  /// No description provided for @metadataImport_negativeFixedSuffix.
+  ///
+  /// In en, this message translates to:
+  /// **'Negative Suffix: {text}'**
+  String metadataImport_negativeFixedSuffix(Object text);
+
+  /// No description provided for @metadataImport_qualityTagsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Quality Tags ({count})'**
+  String metadataImport_qualityTagsCount(int count);
 
   /// No description provided for @metadataImport_negativePrompt.
   ///
@@ -12710,6 +17697,49 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Character Prompts'**
   String get metadataImport_characterPrompts;
+
+  /// No description provided for @metadataImport_characterPromptsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Character Prompts ({count})'**
+  String metadataImport_characterPromptsCount(int count);
+
+  /// No description provided for @metadataImport_characterIndex.
+  ///
+  /// In en, this message translates to:
+  /// **'Character {index}: {text}'**
+  String metadataImport_characterIndex(int index, Object text);
+
+  /// No description provided for @metadataImport_referenceSection.
+  ///
+  /// In en, this message translates to:
+  /// **'References'**
+  String get metadataImport_referenceSection;
+
+  /// No description provided for @metadataImport_countUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'{count}'**
+  String metadataImport_countUnit(int count);
+
+  /// No description provided for @metadataImport_preciseReferenceCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Precise Reference ({count})'**
+  String metadataImport_preciseReferenceCount(int count);
+
+  /// No description provided for @metadataImport_vibeDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} (strength {strength}%, info extraction {info}%)'**
+  String metadataImport_vibeDetail(Object name, Object strength, Object info);
+
+  /// No description provided for @metadataImport_preciseReferenceDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Reference {index}: {type} (strength {strength}%, fidelity {fidelity}%)'**
+  String metadataImport_preciseReferenceDetail(
+      int index, Object type, Object strength, Object fidelity);
 
   /// No description provided for @metadataImport_seed.
   ///
@@ -13425,6 +18455,12 @@ abstract class AppLocalizations {
   /// **'Re-encode (costs 2 Anlas)'**
   String get drop_useAsRawImageSubtitle;
 
+  /// No description provided for @drop_dragToImg2ImgOrOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag to image-to-image or another target'**
+  String get drop_dragToImg2ImgOrOther;
+
   /// No description provided for @preciseRef_title.
   ///
   /// In en, this message translates to:
@@ -13503,11 +18539,311 @@ abstract class AppLocalizations {
   /// **'Using precise reference consumes extra points'**
   String get preciseRef_costHint;
 
+  /// No description provided for @preciseRef_costBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Uses points'**
+  String get preciseRef_costBadge;
+
+  /// No description provided for @preciseRef_dropToAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Release to add precise reference'**
+  String get preciseRef_dropToAdd;
+
+  /// No description provided for @preciseRef_dropNoReadableImage.
+  ///
+  /// In en, this message translates to:
+  /// **'The drop source did not provide a readable image file or image link'**
+  String get preciseRef_dropNoReadableImage;
+
+  /// No description provided for @preciseRef_addedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Added {count} precise references'**
+  String preciseRef_addedCount(int count);
+
+  /// No description provided for @preciseRef_removedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Removed {count} precise references'**
+  String preciseRef_removedCount(int count);
+
   /// No description provided for @vibeLibrary_title.
   ///
   /// In en, this message translates to:
   /// **'Vibe Library'**
   String get vibeLibrary_title;
+
+  /// No description provided for @vibeLibrary_categories.
+  ///
+  /// In en, this message translates to:
+  /// **'Categories'**
+  String get vibeLibrary_categories;
+
+  /// No description provided for @vibeLibrary_newCategoryShort.
+  ///
+  /// In en, this message translates to:
+  /// **'New'**
+  String get vibeLibrary_newCategoryShort;
+
+  /// No description provided for @vibeLibrary_createCategoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New Category'**
+  String get vibeLibrary_createCategoryTitle;
+
+  /// No description provided for @vibeLibrary_createSubCategoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New Subcategory'**
+  String get vibeLibrary_createSubCategoryTitle;
+
+  /// No description provided for @vibeLibrary_categoryNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter category name'**
+  String get vibeLibrary_categoryNameHint;
+
+  /// No description provided for @vibeLibrary_createCategoryConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get vibeLibrary_createCategoryConfirm;
+
+  /// No description provided for @vibeLibrary_deleteCategoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Delete'**
+  String get vibeLibrary_deleteCategoryTitle;
+
+  /// No description provided for @vibeLibrary_deleteCategoryContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this category? Vibes in it will be moved to Uncategorized.'**
+  String get vibeLibrary_deleteCategoryContent;
+
+  /// No description provided for @vibeLibrary_sortTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort by'**
+  String get vibeLibrary_sortTooltip;
+
+  /// No description provided for @vibeLibrary_hideCategoryPanel.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide category panel'**
+  String get vibeLibrary_hideCategoryPanel;
+
+  /// No description provided for @vibeLibrary_showCategoryPanel.
+  ///
+  /// In en, this message translates to:
+  /// **'Show category panel'**
+  String get vibeLibrary_showCategoryPanel;
+
+  /// No description provided for @vibeLibrary_enterSelectionMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter selection mode'**
+  String get vibeLibrary_enterSelectionMode;
+
+  /// No description provided for @vibeLibrary_importTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Import Vibe files or PNG/JPG/JPEG/WEBP images (right-click for more options)'**
+  String get vibeLibrary_importTooltip;
+
+  /// No description provided for @vibeLibrary_exportTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Export Vibe to file'**
+  String get vibeLibrary_exportTooltip;
+
+  /// No description provided for @vibeLibrary_openFolderTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Vibe library folder'**
+  String get vibeLibrary_openFolderTooltip;
+
+  /// No description provided for @vibeLibrary_refresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh'**
+  String get vibeLibrary_refresh;
+
+  /// No description provided for @vibeLibrary_loading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading...'**
+  String get vibeLibrary_loading;
+
+  /// No description provided for @vibeLibrary_totalCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} Vibes'**
+  String vibeLibrary_totalCount(Object count);
+
+  /// No description provided for @vibeLibrary_noCategoriesAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No categories available'**
+  String get vibeLibrary_noCategoriesAvailable;
+
+  /// No description provided for @vibeLibrary_moveToCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Move to Category'**
+  String get vibeLibrary_moveToCategory;
+
+  /// No description provided for @vibeLibrary_uncategorized.
+  ///
+  /// In en, this message translates to:
+  /// **'Uncategorized'**
+  String get vibeLibrary_uncategorized;
+
+  /// No description provided for @vibeLibrary_movedToCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Moved {count} Vibes'**
+  String vibeLibrary_movedToCategory(Object count);
+
+  /// No description provided for @vibeLibrary_favoriteStatusUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Favorite status updated'**
+  String get vibeLibrary_favoriteStatusUpdated;
+
+  /// No description provided for @vibeLibrary_importFromFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Import from File'**
+  String get vibeLibrary_importFromFile;
+
+  /// No description provided for @vibeLibrary_importFromImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Import from Image'**
+  String get vibeLibrary_importFromImage;
+
+  /// No description provided for @vibeLibrary_importFromClipboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Import Encoded Data from Clipboard'**
+  String get vibeLibrary_importFromClipboard;
+
+  /// No description provided for @vibeLibrary_openFolderFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to open folder: {error}'**
+  String vibeLibrary_openFolderFailed(Object error);
+
+  /// No description provided for @vibeLibrary_importFileDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Vibe files to import'**
+  String get vibeLibrary_importFileDialogTitle;
+
+  /// No description provided for @vibeLibrary_preparingImport.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing import...'**
+  String get vibeLibrary_preparingImport;
+
+  /// No description provided for @vibeLibrary_importSuccessCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Imported {count} Vibes'**
+  String vibeLibrary_importSuccessCount(Object count);
+
+  /// No description provided for @vibeLibrary_importSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Import complete: {success} succeeded, {failed} failed'**
+  String vibeLibrary_importSummary(Object success, Object failed);
+
+  /// No description provided for @vibeLibrary_dropImportHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Drop .naiv4vibe/.naiv4vibebundle/.png/.jpg/.jpeg/.webp files or folders here to import'**
+  String get vibeLibrary_dropImportHint;
+
+  /// No description provided for @vibeLibrary_importing.
+  ///
+  /// In en, this message translates to:
+  /// **'Importing...'**
+  String get vibeLibrary_importing;
+
+  /// No description provided for @vibeLibrary_pageIndicator.
+  ///
+  /// In en, this message translates to:
+  /// **'{current} / {total} pages'**
+  String vibeLibrary_pageIndicator(Object current, Object total);
+
+  /// No description provided for @vibeLibrary_itemsPerPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Per page:'**
+  String get vibeLibrary_itemsPerPage;
+
+  /// No description provided for @vibeLibrary_tooManyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Too Many Vibes'**
+  String get vibeLibrary_tooManyTitle;
+
+  /// No description provided for @vibeLibrary_tooManySelectedContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected {count} Vibes, but at most 16 can be used at once.\n\nPlease reduce the selection and try again.'**
+  String vibeLibrary_tooManySelectedContent(Object count);
+
+  /// No description provided for @vibeLibrary_tooManyExistingContent.
+  ///
+  /// In en, this message translates to:
+  /// **'The generation page already has {current} Vibes. You can add {remaining} more.\n\nPlease reduce the selection and try again.'**
+  String vibeLibrary_tooManyExistingContent(Object current, Object remaining);
+
+  /// No description provided for @vibeLibrary_sentToGenerationCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent {count} Vibes to generation'**
+  String vibeLibrary_sentToGenerationCount(Object count);
+
+  /// No description provided for @vibeLibrary_deleteSelectedContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {count} selected Vibes? This action cannot be undone.'**
+  String vibeLibrary_deleteSelectedContent(Object count);
+
+  /// No description provided for @vibeLibrary_deletedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted {count} Vibes'**
+  String vibeLibrary_deletedCount(Object count);
+
+  /// No description provided for @vibeLibrary_importImageDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Select images containing Vibe data'**
+  String get vibeLibrary_importImageDialogTitle;
+
+  /// No description provided for @vibeLibrary_clipboardEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Clipboard is empty'**
+  String get vibeLibrary_clipboardEmpty;
+
+  /// No description provided for @vibeLibrary_encodeTimeout.
+  ///
+  /// In en, this message translates to:
+  /// **'Encoding timed out. Please check your network connection.'**
+  String get vibeLibrary_encodeTimeout;
+
+  /// No description provided for @vibeLibrary_unknownError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown error'**
+  String get vibeLibrary_unknownError;
 
   /// No description provided for @vibeLibrary_save.
   ///
@@ -13875,6 +19211,12 @@ abstract class AppLocalizations {
   /// **'Import failed'**
   String get vibe_import_importFailed;
 
+  /// No description provided for @vibe_import_failedWithError.
+  ///
+  /// In en, this message translates to:
+  /// **'Import failed: {error}'**
+  String vibe_import_failedWithError(String error);
+
   /// No description provided for @vibe_saveToLibrary_title.
   ///
   /// In en, this message translates to:
@@ -13946,6 +19288,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Maximum 16 vibes reached'**
   String get vibe_maxReached;
+
+  /// No description provided for @vibe_maxReachedRemoveSome.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum 16 vibes reached. Remove some vibes first.'**
+  String get vibe_maxReachedRemoveSome;
+
+  /// No description provided for @vibe_addedNamed.
+  ///
+  /// In en, this message translates to:
+  /// **'Added Vibe: {name}'**
+  String vibe_addedNamed(String name);
 
   /// No description provided for @vibe_addedCount.
   ///
@@ -14313,6 +19667,102 @@ abstract class AppLocalizations {
   /// **'After resetting the data storage path, the app needs to restart to take effect.\\n\\nThe default path will take effect on the next startup. Continue?'**
   String get settings_resetPathConfirm;
 
+  /// No description provided for @settings_kritaBridgeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Krita Bridge'**
+  String get settings_kritaBridgeTitle;
+
+  /// No description provided for @settings_kritaBridgeEnable.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Krita local bridge'**
+  String get settings_kritaBridgeEnable;
+
+  /// No description provided for @settings_kritaBridgeDisabledText.
+  ///
+  /// In en, this message translates to:
+  /// **'Off by default; listens only on local 127.0.0.1 when enabled'**
+  String get settings_kritaBridgeDisabledText;
+
+  /// No description provided for @settings_kritaBridgeStartingText.
+  ///
+  /// In en, this message translates to:
+  /// **'Starting local bridge service...'**
+  String get settings_kritaBridgeStartingText;
+
+  /// No description provided for @settings_kritaBridgeListeningText.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for Krita plugin connection'**
+  String get settings_kritaBridgeListeningText;
+
+  /// No description provided for @settings_kritaBridgeConnectedText.
+  ///
+  /// In en, this message translates to:
+  /// **'Krita plugin connected'**
+  String get settings_kritaBridgeConnectedText;
+
+  /// No description provided for @settings_kritaBridgeErrorText.
+  ///
+  /// In en, this message translates to:
+  /// **'Startup failed, check the error message'**
+  String get settings_kritaBridgeErrorText;
+
+  /// No description provided for @settings_kritaBridgeDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Disabled'**
+  String get settings_kritaBridgeDisabled;
+
+  /// No description provided for @settings_kritaBridgeStarting.
+  ///
+  /// In en, this message translates to:
+  /// **'Starting'**
+  String get settings_kritaBridgeStarting;
+
+  /// No description provided for @settings_kritaBridgeListening.
+  ///
+  /// In en, this message translates to:
+  /// **'Listening'**
+  String get settings_kritaBridgeListening;
+
+  /// No description provided for @settings_kritaBridgeConnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected'**
+  String get settings_kritaBridgeConnected;
+
+  /// No description provided for @settings_kritaBridgeError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error'**
+  String get settings_kritaBridgeError;
+
+  /// No description provided for @settings_kritaBridgeRegenerateSession.
+  ///
+  /// In en, this message translates to:
+  /// **'Regenerate Session'**
+  String get settings_kritaBridgeRegenerateSession;
+
+  /// No description provided for @settings_kritaBridgeDiscoveryFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Discovery File'**
+  String get settings_kritaBridgeDiscoveryFile;
+
+  /// No description provided for @settings_kritaBridgeWaitingEndpoint.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for local WebSocket listener'**
+  String get settings_kritaBridgeWaitingEndpoint;
+
+  /// No description provided for @settings_kritaBridgeClient.
+  ///
+  /// In en, this message translates to:
+  /// **'Client: {client}'**
+  String settings_kritaBridgeClient(Object client);
+
   /// No description provided for @settings_fontScale.
   ///
   /// In en, this message translates to:
@@ -14354,6 +19804,1747 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Done'**
   String get settings_fontScale_done;
+
+  /// No description provided for @settings_defaultImagesPath.
+  ///
+  /// In en, this message translates to:
+  /// **'Default (Documents/NAI_Launcher/images/)'**
+  String get settings_defaultImagesPath;
+
+  /// No description provided for @settings_defaultVibePath.
+  ///
+  /// In en, this message translates to:
+  /// **'{path} (Default)'**
+  String settings_defaultVibePath(Object path);
+
+  /// No description provided for @settings_defaultHivePath.
+  ///
+  /// In en, this message translates to:
+  /// **'Default (%APPDATA%/NAI_Launcher/hive/)'**
+  String get settings_defaultHivePath;
+
+  /// No description provided for @settings_protectionMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Protection Mode'**
+  String get settings_protectionMode;
+
+  /// No description provided for @settings_protectionModeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Protect local assets, shared copies, and high-cost operations through the options below. Turning this off keeps the option values but disables them.'**
+  String get settings_protectionModeSubtitle;
+
+  /// No description provided for @settings_protectionFeatures.
+  ///
+  /// In en, this message translates to:
+  /// **'Protection Features'**
+  String get settings_protectionFeatures;
+
+  /// No description provided for @settings_stripMetadataTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove all metadata when copying or dragging'**
+  String get settings_stripMetadataTitle;
+
+  /// No description provided for @settings_stripMetadataSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a sanitized copy, remove PNG text chunks, EXIF, and NAI steganographic watermark data, and avoid exposing the original path while dragging.'**
+  String get settings_stripMetadataSubtitle;
+
+  /// No description provided for @settings_confirmDangerousActionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Double-confirm dangerous asset actions'**
+  String get settings_confirmDangerousActionsTitle;
+
+  /// No description provided for @settings_confirmDangerousActionsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleting, moving, or batch-moving local assets will show an additional protection confirmation.'**
+  String get settings_confirmDangerousActionsSubtitle;
+
+  /// No description provided for @settings_warnExternalImageSendTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm before sending to external services'**
+  String get settings_warnExternalImageSendTitle;
+
+  /// No description provided for @settings_warnExternalImageSendSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm before local images cross the app boundary to LLMs, NovelAI, ComfyUI, or similar services.'**
+  String get settings_warnExternalImageSendSubtitle;
+
+  /// No description provided for @settings_preventOverwriteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Avoid overwriting existing files on export'**
+  String get settings_preventOverwriteTitle;
+
+  /// No description provided for @settings_preventOverwriteSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatically number duplicate export or package paths to avoid replacing existing assets by mistake.'**
+  String get settings_preventOverwriteSubtitle;
+
+  /// No description provided for @settings_warnHighAnlasCostTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'High Anlas cost warning'**
+  String get settings_warnHighAnlasCostTitle;
+
+  /// No description provided for @settings_warnHighAnlasCostSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Show a confirmation before generation when the estimated single request cost reaches {threshold} Anlas.'**
+  String settings_warnHighAnlasCostSubtitle(Object threshold);
+
+  /// No description provided for @settings_highAnlasCostThresholdTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Anlas Warning Threshold'**
+  String get settings_highAnlasCostThresholdTitle;
+
+  /// No description provided for @settings_setHighAnlasCostThresholdTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set Anlas Warning Threshold'**
+  String get settings_setHighAnlasCostThresholdTitle;
+
+  /// No description provided for @settings_threshold.
+  ///
+  /// In en, this message translates to:
+  /// **'Threshold'**
+  String get settings_threshold;
+
+  /// No description provided for @settings_highAnlasCostThresholdHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Show a confirmation when the estimated single generation cost reaches or exceeds this value.'**
+  String get settings_highAnlasCostThresholdHelper;
+
+  /// No description provided for @settings_selectLocalOnnxTaggerFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'Select ONNX tagger model folder'**
+  String get settings_selectLocalOnnxTaggerFolder;
+
+  /// No description provided for @settings_localOnnxTaggerFolderSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'ONNX tagger model folder saved'**
+  String get settings_localOnnxTaggerFolderSaved;
+
+  /// No description provided for @settings_localOnnxTaggerFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'Local ONNX tagger model folder'**
+  String get settings_localOnnxTaggerFolder;
+
+  /// No description provided for @settings_notConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'Not configured'**
+  String get settings_notConfigured;
+
+  /// No description provided for @settings_confirmExternalSendTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Protection Mode: Confirm External Send'**
+  String get settings_confirmExternalSendTitle;
+
+  /// No description provided for @settings_confirmExternalSendContent.
+  ///
+  /// In en, this message translates to:
+  /// **'About to send {count} local image(s) to {target}. The image data will leave the local app boundary. Confirm this is expected.'**
+  String settings_confirmExternalSendContent(Object count, Object target);
+
+  /// No description provided for @settings_confirmExternalSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get settings_confirmExternalSend;
+
+  /// No description provided for @settings_highAnlasCostTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Protection Mode: High Anlas Cost'**
+  String get settings_highAnlasCostTitle;
+
+  /// No description provided for @settings_highAnlasCostContent.
+  ///
+  /// In en, this message translates to:
+  /// **'This request is estimated to cost {cost} Anlas, which reaches or exceeds your {threshold} Anlas warning threshold. Continue generation?'**
+  String settings_highAnlasCostContent(Object cost, Object threshold);
+
+  /// No description provided for @settings_continueGeneration.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue Generation'**
+  String get settings_continueGeneration;
+
+  /// No description provided for @dataSource_clearingData.
+  ///
+  /// In en, this message translates to:
+  /// **'Clearing data...'**
+  String get dataSource_clearingData;
+
+  /// No description provided for @dataSource_clearTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Tag Data Source'**
+  String get dataSource_clearTitle;
+
+  /// No description provided for @dataSource_clearContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Danbooru tag autocomplete data?\n\nThis will clear:\n- Danbooru tag autocomplete data\n\nThis will be preserved:\n- Chinese/English tag translations\n- Tag co-occurrence data\n\nTag data will be loaded again automatically on the next startup.'**
+  String get dataSource_clearContent;
+
+  /// No description provided for @dataSource_confirmClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get dataSource_confirmClear;
+
+  /// No description provided for @dataSource_clearSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Cleared {count} rows. Data will be restored automatically on the next startup.'**
+  String dataSource_clearSuccess(Object count);
+
+  /// No description provided for @dataSource_clearFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear failed'**
+  String get dataSource_clearFailed;
+
+  /// No description provided for @dataSource_clearFailedWithError.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear failed: {error}'**
+  String dataSource_clearFailedWithError(Object error);
+
+  /// No description provided for @dataSource_clearTagAutocompleteData.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear tag autocomplete data'**
+  String get dataSource_clearTagAutocompleteData;
+
+  /// No description provided for @dataSource_ready.
+  ///
+  /// In en, this message translates to:
+  /// **'Data Source Ready'**
+  String get dataSource_ready;
+
+  /// No description provided for @dataSource_notLoaded.
+  ///
+  /// In en, this message translates to:
+  /// **'Data Source Not Loaded'**
+  String get dataSource_notLoaded;
+
+  /// No description provided for @dataSource_cachedTagCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Cached {count} tags'**
+  String dataSource_cachedTagCount(Object count);
+
+  /// No description provided for @dataSource_clickSyncToDownload.
+  ///
+  /// In en, this message translates to:
+  /// **'Click \"Sync Now\" to download tag data'**
+  String get dataSource_clickSyncToDownload;
+
+  /// No description provided for @dataSource_translationCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} translations'**
+  String dataSource_translationCount(Object count);
+
+  /// No description provided for @dataSource_cooccurrenceCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} co-occurrences'**
+  String dataSource_cooccurrenceCount(Object count);
+
+  /// No description provided for @dataSource_lastUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Last updated: {time}'**
+  String dataSource_lastUpdated(Object time);
+
+  /// No description provided for @dataSource_heatThresholdTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Heat Threshold'**
+  String get dataSource_heatThresholdTitle;
+
+  /// No description provided for @dataSource_heatThresholdSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose heat thresholds for each tag category'**
+  String get dataSource_heatThresholdSubtitle;
+
+  /// No description provided for @dataSource_autoRefreshInterval.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto Refresh Interval'**
+  String get dataSource_autoRefreshInterval;
+
+  /// No description provided for @dataSource_syncNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync Now'**
+  String get dataSource_syncNow;
+
+  /// No description provided for @dataSource_cancelSync.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel Sync'**
+  String get dataSource_cancelSync;
+
+  /// No description provided for @dataSource_syncingTags.
+  ///
+  /// In en, this message translates to:
+  /// **'Syncing tag data...'**
+  String get dataSource_syncingTags;
+
+  /// No description provided for @dataSource_loadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Load failed: {error}'**
+  String dataSource_loadFailed(Object error);
+
+  /// No description provided for @dataSource_hotAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get dataSource_hotAll;
+
+  /// No description provided for @dataSource_hot10k.
+  ///
+  /// In en, this message translates to:
+  /// **'Hot >10K'**
+  String get dataSource_hot10k;
+
+  /// No description provided for @dataSource_common1k.
+  ///
+  /// In en, this message translates to:
+  /// **'Common >1K'**
+  String get dataSource_common1k;
+
+  /// No description provided for @dataSource_common500.
+  ///
+  /// In en, this message translates to:
+  /// **'Common >500'**
+  String get dataSource_common500;
+
+  /// No description provided for @dataSource_normal100.
+  ///
+  /// In en, this message translates to:
+  /// **'Normal >100'**
+  String get dataSource_normal100;
+
+  /// No description provided for @dataSource_minimal50.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimal >50'**
+  String get dataSource_minimal50;
+
+  /// No description provided for @dataSource_custom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get dataSource_custom;
+
+  /// No description provided for @dataSource_refresh7Days.
+  ///
+  /// In en, this message translates to:
+  /// **'7 days'**
+  String get dataSource_refresh7Days;
+
+  /// No description provided for @dataSource_refresh15Days.
+  ///
+  /// In en, this message translates to:
+  /// **'15 days'**
+  String get dataSource_refresh15Days;
+
+  /// No description provided for @dataSource_refresh30Days.
+  ///
+  /// In en, this message translates to:
+  /// **'30 days'**
+  String get dataSource_refresh30Days;
+
+  /// No description provided for @dataSource_refreshNever.
+  ///
+  /// In en, this message translates to:
+  /// **'Never'**
+  String get dataSource_refreshNever;
+
+  /// No description provided for @settings_comfyUiEnable.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable ComfyUI Integration'**
+  String get settings_comfyUiEnable;
+
+  /// No description provided for @settings_comfyUiDisabledSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'When disabled, local upscale and other ComfyUI features are hidden'**
+  String get settings_comfyUiDisabledSubtitle;
+
+  /// No description provided for @settings_comfyUiServerUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Server URL'**
+  String get settings_comfyUiServerUrl;
+
+  /// No description provided for @settings_comfyUiConnectionSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection successful'**
+  String get settings_comfyUiConnectionSuccess;
+
+  /// No description provided for @settings_comfyUiConnectionFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection failed: {error}'**
+  String settings_comfyUiConnectionFailed(Object error);
+
+  /// No description provided for @settings_comfyUiConnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected'**
+  String get settings_comfyUiConnected;
+
+  /// No description provided for @settings_comfyUiDisconnect.
+  ///
+  /// In en, this message translates to:
+  /// **'Disconnect'**
+  String get settings_comfyUiDisconnect;
+
+  /// No description provided for @settings_comfyUiWorkflowManagement.
+  ///
+  /// In en, this message translates to:
+  /// **'Workflow Management'**
+  String get settings_comfyUiWorkflowManagement;
+
+  /// No description provided for @settings_comfyUiBuiltinWorkflows.
+  ///
+  /// In en, this message translates to:
+  /// **'Built-in Workflows'**
+  String get settings_comfyUiBuiltinWorkflows;
+
+  /// No description provided for @settings_comfyUiCustomWorkflows.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom Workflows'**
+  String get settings_comfyUiCustomWorkflows;
+
+  /// No description provided for @settings_comfyUiNoCustomWorkflows.
+  ///
+  /// In en, this message translates to:
+  /// **'No custom workflows yet. Click \"Import\" to add a ComfyUI workflow.'**
+  String get settings_comfyUiNoCustomWorkflows;
+
+  /// No description provided for @settings_comfyUiSlotCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} slots'**
+  String settings_comfyUiSlotCount(Object count);
+
+  /// No description provided for @settings_comfyUiBuiltin.
+  ///
+  /// In en, this message translates to:
+  /// **'Built-in'**
+  String get settings_comfyUiBuiltin;
+
+  /// No description provided for @settings_comfyUiDeleteWorkflowTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Workflow'**
+  String get settings_comfyUiDeleteWorkflowTitle;
+
+  /// No description provided for @settings_comfyUiDeleteWorkflowContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete workflow \"{name}\"? This cannot be undone.'**
+  String settings_comfyUiDeleteWorkflowContent(Object name);
+
+  /// No description provided for @settings_comfyUiDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted: {name}'**
+  String settings_comfyUiDeleted(Object name);
+
+  /// No description provided for @settings_comfyUiNoResponse.
+  ///
+  /// In en, this message translates to:
+  /// **'Server did not respond'**
+  String get settings_comfyUiNoResponse;
+
+  /// No description provided for @settings_comfyUiStatusDisconnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Disconnected'**
+  String get settings_comfyUiStatusDisconnected;
+
+  /// No description provided for @settings_comfyUiStatusConnecting.
+  ///
+  /// In en, this message translates to:
+  /// **'Connecting...'**
+  String get settings_comfyUiStatusConnecting;
+
+  /// No description provided for @settings_comfyUiStatusConnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected'**
+  String get settings_comfyUiStatusConnected;
+
+  /// No description provided for @settings_comfyUiStatusError.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection error'**
+  String get settings_comfyUiStatusError;
+
+  /// No description provided for @settings_comfyUiCategoryEnhance.
+  ///
+  /// In en, this message translates to:
+  /// **'Enhance/Upscale'**
+  String get settings_comfyUiCategoryEnhance;
+
+  /// No description provided for @settings_comfyUiCategoryImg2Img.
+  ///
+  /// In en, this message translates to:
+  /// **'Image-to-Image'**
+  String get settings_comfyUiCategoryImg2Img;
+
+  /// No description provided for @settings_comfyUiCategoryInpaint.
+  ///
+  /// In en, this message translates to:
+  /// **'Inpaint'**
+  String get settings_comfyUiCategoryInpaint;
+
+  /// No description provided for @settings_comfyUiCategoryTxt2Img.
+  ///
+  /// In en, this message translates to:
+  /// **'Text-to-Image'**
+  String get settings_comfyUiCategoryTxt2Img;
+
+  /// No description provided for @settings_comfyUiCategoryCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get settings_comfyUiCategoryCustom;
+
+  /// No description provided for @comfyWorkflow_seedvr2UpscaleName.
+  ///
+  /// In en, this message translates to:
+  /// **'SeedVR2 Upscale'**
+  String get comfyWorkflow_seedvr2UpscaleName;
+
+  /// No description provided for @comfyWorkflow_seedvr2UpscaleDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Upscale with the SeedVR2 AI model. Produces high-quality results.'**
+  String get comfyWorkflow_seedvr2UpscaleDescription;
+
+  /// No description provided for @comfyWorkflow_seedvr2TiledUpscaleName.
+  ///
+  /// In en, this message translates to:
+  /// **'SeedVR2 Tiled Upscale'**
+  String get comfyWorkflow_seedvr2TiledUpscaleName;
+
+  /// No description provided for @comfyWorkflow_seedvr2TiledUpscaleDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Use SeedVR2TilingUpscaler for tiled upscale to reduce VRAM pressure on large images.'**
+  String get comfyWorkflow_seedvr2TiledUpscaleDescription;
+
+  /// No description provided for @comfyWorkflow_modelUpscaleName.
+  ///
+  /// In en, this message translates to:
+  /// **'ComfyUI Standard Upscale Model'**
+  String get comfyWorkflow_modelUpscaleName;
+
+  /// No description provided for @comfyWorkflow_modelUpscaleDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Load a standard upscale model with ComfyUI UpscaleModelLoader, then correct the final scale with Lanczos.'**
+  String get comfyWorkflow_modelUpscaleDescription;
+
+  /// No description provided for @comfyWorkflow_rtxUpscaleName.
+  ///
+  /// In en, this message translates to:
+  /// **'RTX Upscale'**
+  String get comfyWorkflow_rtxUpscaleName;
+
+  /// No description provided for @comfyWorkflow_rtxUpscaleDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Use the Nvidia RTX Video Super Resolution node for local upscaling.'**
+  String get comfyWorkflow_rtxUpscaleDescription;
+
+  /// No description provided for @comfyWorkflowSlot_inputImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Input Image'**
+  String get comfyWorkflowSlot_inputImage;
+
+  /// No description provided for @comfyWorkflowSlot_targetShortSide.
+  ///
+  /// In en, this message translates to:
+  /// **'Target Short Side'**
+  String get comfyWorkflowSlot_targetShortSide;
+
+  /// No description provided for @comfyWorkflowSlot_targetLongSide.
+  ///
+  /// In en, this message translates to:
+  /// **'Target Long Side'**
+  String get comfyWorkflowSlot_targetLongSide;
+
+  /// No description provided for @comfyWorkflowSlot_upscaleModel.
+  ///
+  /// In en, this message translates to:
+  /// **'Upscale Model'**
+  String get comfyWorkflowSlot_upscaleModel;
+
+  /// No description provided for @comfyWorkflowSlot_randomSeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Random Seed'**
+  String get comfyWorkflowSlot_randomSeed;
+
+  /// No description provided for @comfyWorkflowSlot_outputImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Output Image'**
+  String get comfyWorkflowSlot_outputImage;
+
+  /// No description provided for @comfyWorkflowSlot_tileWidth.
+  ///
+  /// In en, this message translates to:
+  /// **'Tile Width'**
+  String get comfyWorkflowSlot_tileWidth;
+
+  /// No description provided for @comfyWorkflowSlot_tileHeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Tile Height'**
+  String get comfyWorkflowSlot_tileHeight;
+
+  /// No description provided for @comfyWorkflowSlot_tileUpscaleResolution.
+  ///
+  /// In en, this message translates to:
+  /// **'Tile Upscale Resolution'**
+  String get comfyWorkflowSlot_tileUpscaleResolution;
+
+  /// No description provided for @comfyWorkflowSlot_targetWidth.
+  ///
+  /// In en, this message translates to:
+  /// **'Target Width'**
+  String get comfyWorkflowSlot_targetWidth;
+
+  /// No description provided for @comfyWorkflowSlot_targetHeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Target Height'**
+  String get comfyWorkflowSlot_targetHeight;
+
+  /// No description provided for @comfyWorkflowSlot_scale.
+  ///
+  /// In en, this message translates to:
+  /// **'Scale'**
+  String get comfyWorkflowSlot_scale;
+
+  /// No description provided for @comfyWorkflow_parameters.
+  ///
+  /// In en, this message translates to:
+  /// **'Parameters'**
+  String get comfyWorkflow_parameters;
+
+  /// No description provided for @comfyWorkflow_selectImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Click to select image'**
+  String get comfyWorkflow_selectImage;
+
+  /// No description provided for @comfyWorkflow_pickImageFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to select image: {error}'**
+  String comfyWorkflow_pickImageFailed(Object error);
+
+  /// No description provided for @comfyWorkflow_useResult.
+  ///
+  /// In en, this message translates to:
+  /// **'Use Result'**
+  String get comfyWorkflow_useResult;
+
+  /// No description provided for @comfyWorkflow_execute.
+  ///
+  /// In en, this message translates to:
+  /// **'Run'**
+  String get comfyWorkflow_execute;
+
+  /// No description provided for @comfyWorkflow_uploadingImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading image...'**
+  String get comfyWorkflow_uploadingImage;
+
+  /// No description provided for @comfyWorkflow_queued.
+  ///
+  /// In en, this message translates to:
+  /// **'Queued...'**
+  String get comfyWorkflow_queued;
+
+  /// No description provided for @comfyWorkflow_runningSteps.
+  ///
+  /// In en, this message translates to:
+  /// **'Processing {current}/{total}'**
+  String comfyWorkflow_runningSteps(Object current, Object total);
+
+  /// No description provided for @comfyWorkflow_processing.
+  ///
+  /// In en, this message translates to:
+  /// **'Processing...'**
+  String get comfyWorkflow_processing;
+
+  /// No description provided for @comfyWorkflow_complete.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete'**
+  String get comfyWorkflow_complete;
+
+  /// No description provided for @comfyWorkflow_imageCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} images'**
+  String comfyWorkflow_imageCount(Object count);
+
+  /// No description provided for @promptAssistant_defaultOptimizeRuleName.
+  ///
+  /// In en, this message translates to:
+  /// **'Default Optimize Rule'**
+  String get promptAssistant_defaultOptimizeRuleName;
+
+  /// No description provided for @promptAssistant_defaultOptimizeRuleContent.
+  ///
+  /// In en, this message translates to:
+  /// **'You are a prompt optimization assistant. Preserve the user intent, add actionable visual details, and output a single comma-separated prompt line.'**
+  String get promptAssistant_defaultOptimizeRuleContent;
+
+  /// No description provided for @promptAssistant_defaultTranslateRuleName.
+  ///
+  /// In en, this message translates to:
+  /// **'Default Translate Rule'**
+  String get promptAssistant_defaultTranslateRuleName;
+
+  /// No description provided for @promptAssistant_defaultTranslateRuleContent.
+  ///
+  /// In en, this message translates to:
+  /// **'You are a translation assistant. Detect the source language, translate between Chinese and English automatically, and return only the translation without explanation.'**
+  String get promptAssistant_defaultTranslateRuleContent;
+
+  /// No description provided for @promptAssistant_defaultReverseRuleName.
+  ///
+  /// In en, this message translates to:
+  /// **'Default Reverse Prompt Rule'**
+  String get promptAssistant_defaultReverseRuleName;
+
+  /// No description provided for @promptAssistant_defaultReverseRuleContent.
+  ///
+  /// In en, this message translates to:
+  /// **'You are an image reverse-prompt assistant. Based on the image and optional tagger results, output English comma-separated prompts suitable for NovelAI. Preserve subject, character, style, clothing, action, composition, lighting, and background. Do not explain.'**
+  String get promptAssistant_defaultReverseRuleContent;
+
+  /// No description provided for @promptAssistant_defaultCharacterReplaceRuleName.
+  ///
+  /// In en, this message translates to:
+  /// **'Default Character Replace Rule'**
+  String get promptAssistant_defaultCharacterReplaceRuleName;
+
+  /// No description provided for @promptAssistant_defaultCharacterReplaceRuleContent.
+  ///
+  /// In en, this message translates to:
+  /// **'You are a character replacement assistant. Replace the original character identity, hairstyle, outfit, and appearance in the input prompt with the target character while preserving action, composition, background, style, camera, and quality tags. Output only the replaced single-line prompt.'**
+  String get promptAssistant_defaultCharacterReplaceRuleContent;
+
+  /// No description provided for @promptAssistant_defaultCustomRuleName.
+  ///
+  /// In en, this message translates to:
+  /// **'Default Custom Rule'**
+  String get promptAssistant_defaultCustomRuleName;
+
+  /// No description provided for @promptAssistant_defaultCustomRuleContent.
+  ///
+  /// In en, this message translates to:
+  /// **'You are a prompt rewriting assistant. Modify the prompt according to the current prompt, the user request, and optional reference images. Output only the final single-line prompt that can be used directly, without explanation.'**
+  String get promptAssistant_defaultCustomRuleContent;
+
+  /// No description provided for @localGallery_dateFilterButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Date Filter'**
+  String get localGallery_dateFilterButton;
+
+  /// No description provided for @cacheStats_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Cache Statistics'**
+  String get cacheStats_title;
+
+  /// No description provided for @cacheStats_autoRefreshUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto refresh · Last updated: {time}'**
+  String cacheStats_autoRefreshUpdated(Object time);
+
+  /// No description provided for @cacheStats_secondsAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{seconds} seconds ago'**
+  String cacheStats_secondsAgo(Object seconds);
+
+  /// No description provided for @cacheStats_refreshNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh now'**
+  String get cacheStats_refreshNow;
+
+  /// No description provided for @cacheStats_refreshed.
+  ///
+  /// In en, this message translates to:
+  /// **'Refreshed'**
+  String get cacheStats_refreshed;
+
+  /// No description provided for @cacheStats_resetStats.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset statistics'**
+  String get cacheStats_resetStats;
+
+  /// No description provided for @cacheStats_statsReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Statistics reset'**
+  String get cacheStats_statsReset;
+
+  /// No description provided for @cacheStats_l1Memory.
+  ///
+  /// In en, this message translates to:
+  /// **'L1 Memory Cache'**
+  String get cacheStats_l1Memory;
+
+  /// No description provided for @cacheStats_l2Hive.
+  ///
+  /// In en, this message translates to:
+  /// **'L2 Hive Cache'**
+  String get cacheStats_l2Hive;
+
+  /// No description provided for @cacheStats_l3Sqlite.
+  ///
+  /// In en, this message translates to:
+  /// **'L3 SQLite Database'**
+  String get cacheStats_l3Sqlite;
+
+  /// No description provided for @cacheStats_recordCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} records'**
+  String cacheStats_recordCount(Object count);
+
+  /// No description provided for @cacheStats_databaseValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{imageCount} images · {metadataCount} metadata rows'**
+  String cacheStats_databaseValue(Object imageCount, Object metadataCount);
+
+  /// No description provided for @galleryCache_rescanTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rescan Gallery'**
+  String get galleryCache_rescanTitle;
+
+  /// No description provided for @galleryCache_rescanContent.
+  ///
+  /// In en, this message translates to:
+  /// **'This will:\n\n1. Check data consistency and mark missing files\n2. Scan new and changed files\n3. Retry metadata extraction that failed before, including failed records\n\nThis will not clear existing data or delete image files.'**
+  String get galleryCache_rescanContent;
+
+  /// No description provided for @galleryCache_startScan.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Scan'**
+  String get galleryCache_startScan;
+
+  /// No description provided for @galleryCache_scanAlreadyRunning.
+  ///
+  /// In en, this message translates to:
+  /// **'A scan task is already running. Please wait for it to finish.'**
+  String get galleryCache_scanAlreadyRunning;
+
+  /// No description provided for @galleryCache_preparing.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing...'**
+  String get galleryCache_preparing;
+
+  /// No description provided for @galleryCache_noGalleryFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'Gallery folder is not set'**
+  String get galleryCache_noGalleryFolder;
+
+  /// No description provided for @galleryCache_galleryFolderMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Gallery folder does not exist'**
+  String get galleryCache_galleryFolderMissing;
+
+  /// No description provided for @galleryCache_scanningPhase.
+  ///
+  /// In en, this message translates to:
+  /// **'Scanning {processed}/{total}...'**
+  String galleryCache_scanningPhase(Object processed, Object total);
+
+  /// No description provided for @galleryCache_scanComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan complete'**
+  String get galleryCache_scanComplete;
+
+  /// No description provided for @galleryCache_scanFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan failed: {error}'**
+  String galleryCache_scanFailed(Object error);
+
+  /// No description provided for @galleryCache_rescan.
+  ///
+  /// In en, this message translates to:
+  /// **'Rescan'**
+  String get galleryCache_rescan;
+
+  /// No description provided for @galleryCache_rescanSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Check data consistency, find missing files, and extract metadata'**
+  String get galleryCache_rescanSubtitle;
+
+  /// No description provided for @galleryCache_scanning.
+  ///
+  /// In en, this message translates to:
+  /// **'Scanning...'**
+  String get galleryCache_scanning;
+
+  /// No description provided for @galleryCache_scanAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan'**
+  String get galleryCache_scanAction;
+
+  /// No description provided for @workflowImport_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Import ComfyUI Workflow'**
+  String get workflowImport_title;
+
+  /// No description provided for @workflowImport_step.
+  ///
+  /// In en, this message translates to:
+  /// **'Step {current}/4: {title}'**
+  String workflowImport_step(Object current, Object title);
+
+  /// No description provided for @workflowImport_stepFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Workflow File'**
+  String get workflowImport_stepFile;
+
+  /// No description provided for @workflowImport_stepInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Workflow Info'**
+  String get workflowImport_stepInfo;
+
+  /// No description provided for @workflowImport_stepSlots.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Slot Config'**
+  String get workflowImport_stepSlots;
+
+  /// No description provided for @workflowImport_stepDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete Import'**
+  String get workflowImport_stepDone;
+
+  /// No description provided for @workflowImport_previous.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous'**
+  String get workflowImport_previous;
+
+  /// No description provided for @workflowImport_next.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get workflowImport_next;
+
+  /// No description provided for @workflowImport_finish.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish Import'**
+  String get workflowImport_finish;
+
+  /// No description provided for @workflowImport_defaultName.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom Workflow'**
+  String get workflowImport_defaultName;
+
+  /// No description provided for @workflowImport_fileInstructions.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a workflow_api.json file exported from ComfyUI.\n\nIn ComfyUI, open the menu and choose Export (API format) to get this file.'**
+  String get workflowImport_fileInstructions;
+
+  /// No description provided for @workflowImport_nodeCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} nodes'**
+  String workflowImport_nodeCount(Object count);
+
+  /// No description provided for @workflowImport_reselect.
+  ///
+  /// In en, this message translates to:
+  /// **'Click to choose another file'**
+  String get workflowImport_reselect;
+
+  /// No description provided for @workflowImport_selectWorkflowApi.
+  ///
+  /// In en, this message translates to:
+  /// **'Click to select workflow_api.json'**
+  String get workflowImport_selectWorkflowApi;
+
+  /// No description provided for @workflowImport_invalidTopLevel.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid file format: top level should be a JSON object'**
+  String get workflowImport_invalidTopLevel;
+
+  /// No description provided for @workflowImport_noComfyNodes.
+  ///
+  /// In en, this message translates to:
+  /// **'No ComfyUI nodes detected. Make sure this is an API-format export.'**
+  String get workflowImport_noComfyNodes;
+
+  /// No description provided for @workflowImport_readFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to read file: {error}'**
+  String workflowImport_readFailed(Object error);
+
+  /// No description provided for @workflowImport_analysisResult.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic Analysis Result'**
+  String get workflowImport_analysisResult;
+
+  /// No description provided for @workflowImport_inputImageNodes.
+  ///
+  /// In en, this message translates to:
+  /// **'Input image nodes'**
+  String get workflowImport_inputImageNodes;
+
+  /// No description provided for @workflowImport_adjustableParams.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjustable parameters'**
+  String get workflowImport_adjustableParams;
+
+  /// No description provided for @workflowImport_outputNodes.
+  ///
+  /// In en, this message translates to:
+  /// **'Output nodes'**
+  String get workflowImport_outputNodes;
+
+  /// No description provided for @workflowImport_totalNodes.
+  ///
+  /// In en, this message translates to:
+  /// **'Total nodes'**
+  String get workflowImport_totalNodes;
+
+  /// No description provided for @workflowImport_countUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'{count}'**
+  String workflowImport_countUnit(Object count);
+
+  /// No description provided for @workflowImport_workflowName.
+  ///
+  /// In en, this message translates to:
+  /// **'Workflow Name *'**
+  String get workflowImport_workflowName;
+
+  /// No description provided for @workflowImport_description.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get workflowImport_description;
+
+  /// No description provided for @workflowImport_category.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get workflowImport_category;
+
+  /// No description provided for @workflowImport_slotsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Select the slots to expose in the UI. Input and output slots should usually stay enabled; parameters that users do not need to adjust can be disabled.'**
+  String get workflowImport_slotsHint;
+
+  /// No description provided for @workflowImport_inputSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Input'**
+  String get workflowImport_inputSection;
+
+  /// No description provided for @workflowImport_outputSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Output'**
+  String get workflowImport_outputSection;
+
+  /// No description provided for @workflowImport_parameterSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Parameters'**
+  String get workflowImport_parameterSection;
+
+  /// No description provided for @workflowImport_noSlotsWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'No usable slots were detected. This workflow may not integrate correctly.\nMake sure the workflow includes LoadImage and SaveImage/SaveImageWebsocket nodes.'**
+  String get workflowImport_noSlotsWarning;
+
+  /// No description provided for @workflowImport_nodeRef.
+  ///
+  /// In en, this message translates to:
+  /// **'Node {node}'**
+  String workflowImport_nodeRef(Object node);
+
+  /// No description provided for @workflowImport_confirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'About to import this workflow'**
+  String get workflowImport_confirmTitle;
+
+  /// No description provided for @workflowImport_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get workflowImport_name;
+
+  /// No description provided for @workflowImport_inputSlots.
+  ///
+  /// In en, this message translates to:
+  /// **'Input Slots'**
+  String get workflowImport_inputSlots;
+
+  /// No description provided for @workflowImport_parameterSlots.
+  ///
+  /// In en, this message translates to:
+  /// **'Parameter Slots'**
+  String get workflowImport_parameterSlots;
+
+  /// No description provided for @workflowImport_outputSlots.
+  ///
+  /// In en, this message translates to:
+  /// **'Output Slots'**
+  String get workflowImport_outputSlots;
+
+  /// No description provided for @workflowImport_afterImportHint.
+  ///
+  /// In en, this message translates to:
+  /// **'After import, it can be used from the ComfyUI workflow list on the generation screen.'**
+  String get workflowImport_afterImportHint;
+
+  /// No description provided for @workflowImport_success.
+  ///
+  /// In en, this message translates to:
+  /// **'Workflow \"{name}\" imported'**
+  String workflowImport_success(Object name);
+
+  /// No description provided for @shortcut_settings_help.
+  ///
+  /// In en, this message translates to:
+  /// **'View shortcut help'**
+  String get shortcut_settings_help;
+
+  /// No description provided for @shortcut_settings_show_in_menus.
+  ///
+  /// In en, this message translates to:
+  /// **'Show in menus'**
+  String get shortcut_settings_show_in_menus;
+
+  /// No description provided for @shortcut_settings_defaultShortcut.
+  ///
+  /// In en, this message translates to:
+  /// **'Default: {shortcut}'**
+  String shortcut_settings_defaultShortcut(Object shortcut);
+
+  /// No description provided for @shortcut_settings_unassigned.
+  ///
+  /// In en, this message translates to:
+  /// **'Not set'**
+  String get shortcut_settings_unassigned;
+
+  /// No description provided for @shortcut_settings_no_matches.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching shortcuts found'**
+  String get shortcut_settings_no_matches;
+
+  /// No description provided for @shortcut_settings_reset_all_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset All Shortcuts'**
+  String get shortcut_settings_reset_all_title;
+
+  /// No description provided for @shortcut_settings_reset_all_confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset all shortcuts to their default settings? This cannot be undone.'**
+  String get shortcut_settings_reset_all_confirm;
+
+  /// No description provided for @shortcut_settings_reset_to_default.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset to default'**
+  String get shortcut_settings_reset_to_default;
+
+  /// No description provided for @performanceReport_noTaskStats.
+  ///
+  /// In en, this message translates to:
+  /// **'No task statistics yet'**
+  String get performanceReport_noTaskStats;
+
+  /// No description provided for @performanceReport_taskStatsLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Count: {count} | Avg: {average} | Min: {min} | Max: {max}'**
+  String performanceReport_taskStatsLine(
+      Object count, Object average, Object min, Object max);
+
+  /// No description provided for @performanceReport_clearTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Performance Data'**
+  String get performanceReport_clearTitle;
+
+  /// No description provided for @performanceReport_clearContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear all performance statistics? This cannot be undone.'**
+  String get performanceReport_clearContent;
+
+  /// No description provided for @performanceReport_clearSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Performance data cleared'**
+  String get performanceReport_clearSuccess;
+
+  /// No description provided for @performanceReport_clearAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get performanceReport_clearAction;
+
+  /// No description provided for @toast_previewUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview image updated'**
+  String get toast_previewUpdated;
+
+  /// No description provided for @toast_styleReferenceLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'Style references reached the limit ({max} images)'**
+  String toast_styleReferenceLimit(Object max);
+
+  /// No description provided for @toast_noValidPromptFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No valid prompt found'**
+  String get toast_noValidPromptFound;
+
+  /// No description provided for @toast_addedToQueue.
+  ///
+  /// In en, this message translates to:
+  /// **'Added to queue: {prompt}'**
+  String toast_addedToQueue(Object prompt);
+
+  /// No description provided for @toast_noValidMaskIgnored.
+  ///
+  /// In en, this message translates to:
+  /// **'No valid mask detected; save result was ignored.'**
+  String get toast_noValidMaskIgnored;
+
+  /// No description provided for @toast_kritaBusy.
+  ///
+  /// In en, this message translates to:
+  /// **'Krita Bridge is generating. Wait for the current task to finish.'**
+  String get toast_kritaBusy;
+
+  /// No description provided for @toast_kritaNotConnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Krita is not connected. Enable the bridge in Settings and connect the plugin first.'**
+  String get toast_kritaNotConnected;
+
+  /// No description provided for @toast_sentToKrita.
+  ///
+  /// In en, this message translates to:
+  /// **'Image sent to Krita'**
+  String get toast_sentToKrita;
+
+  /// No description provided for @toast_kritaUnsupportedImageFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'This image format cannot be sent to Krita. Use a common image format.'**
+  String get toast_kritaUnsupportedImageFormat;
+
+  /// No description provided for @toast_deletedNamed.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted: {name}'**
+  String toast_deletedNamed(Object name);
+
+  /// No description provided for @toast_vibeParamSaveReencodeFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save parameters because Vibe re-encoding failed'**
+  String get toast_vibeParamSaveReencodeFailed;
+
+  /// No description provided for @toast_exportSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Export successful'**
+  String get toast_exportSuccess;
+
+  /// No description provided for @toast_exportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Export failed: {error}'**
+  String toast_exportFailed(Object error);
+
+  /// No description provided for @toast_selectVibeToExport.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a Vibe to export first'**
+  String get toast_selectVibeToExport;
+
+  /// No description provided for @toast_embedPngSingleVibeOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Embedding into PNG only supports exporting one Vibe'**
+  String get toast_embedPngSingleVibeOnly;
+
+  /// No description provided for @toast_selectPngCarrier.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a PNG carrier image for export'**
+  String get toast_selectPngCarrier;
+
+  /// No description provided for @toast_renameSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Renamed successfully'**
+  String get toast_renameSuccess;
+
+  /// No description provided for @toast_paramsSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Parameters saved'**
+  String get toast_paramsSaved;
+
+  /// No description provided for @toast_paramsSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save parameters'**
+  String get toast_paramsSaveFailed;
+
+  /// No description provided for @toast_dropNoReadableImageOrVibe.
+  ///
+  /// In en, this message translates to:
+  /// **'The drop source did not provide a readable image or Vibe file'**
+  String get toast_dropNoReadableImageOrVibe;
+
+  /// No description provided for @toast_importedTasks.
+  ///
+  /// In en, this message translates to:
+  /// **'Imported {count} tasks'**
+  String toast_importedTasks(Object count);
+
+  /// No description provided for @toast_contentCannotBeEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Content cannot be empty'**
+  String get toast_contentCannotBeEmpty;
+
+  /// No description provided for @toast_addedToLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Added to library'**
+  String get toast_addedToLibrary;
+
+  /// No description provided for @toast_addFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Add failed: {error}'**
+  String toast_addFailed(Object error);
+
+  /// No description provided for @toast_libraryNotLoaded.
+  ///
+  /// In en, this message translates to:
+  /// **'Library is not loaded'**
+  String get toast_libraryNotLoaded;
+
+  /// No description provided for @toast_noValidTagContent.
+  ///
+  /// In en, this message translates to:
+  /// **'No valid tag content'**
+  String get toast_noValidTagContent;
+
+  /// No description provided for @toast_allTagsAlreadyExist.
+  ///
+  /// In en, this message translates to:
+  /// **'All tags already exist in the library'**
+  String get toast_allTagsAlreadyExist;
+
+  /// No description provided for @toast_noAddableTags.
+  ///
+  /// In en, this message translates to:
+  /// **'No tags can be added'**
+  String get toast_noAddableTags;
+
+  /// No description provided for @toast_addedTagsSkippedDuplicates.
+  ///
+  /// In en, this message translates to:
+  /// **'Added {added} tags, skipped {skipped} duplicate tags'**
+  String toast_addedTagsSkippedDuplicates(Object added, Object skipped);
+
+  /// No description provided for @toast_favorited.
+  ///
+  /// In en, this message translates to:
+  /// **'Favorited'**
+  String get toast_favorited;
+
+  /// No description provided for @toast_unfavorited.
+  ///
+  /// In en, this message translates to:
+  /// **'Unfavorited'**
+  String get toast_unfavorited;
+
+  /// No description provided for @toast_favoriteUpdateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update favorite state: {error}'**
+  String toast_favoriteUpdateFailed(Object error);
+
+  /// No description provided for @toast_packingImages.
+  ///
+  /// In en, this message translates to:
+  /// **'Packing {count} images...'**
+  String toast_packingImages(Object count);
+
+  /// No description provided for @toast_packedImages.
+  ///
+  /// In en, this message translates to:
+  /// **'Packed {count} images'**
+  String toast_packedImages(Object count);
+
+  /// No description provided for @toast_packFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Pack failed'**
+  String get toast_packFailed;
+
+  /// No description provided for @toast_packFailedWithError.
+  ///
+  /// In en, this message translates to:
+  /// **'Pack failed: {error}'**
+  String toast_packFailedWithError(Object error);
+
+  /// No description provided for @toast_saveDirNotSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Save directory is not set'**
+  String get toast_saveDirNotSet;
+
+  /// No description provided for @toast_savedTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to {path}'**
+  String toast_savedTo(Object path);
+
+  /// No description provided for @toast_tagAlreadyExists.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag already exists'**
+  String get toast_tagAlreadyExists;
+
+  /// No description provided for @toast_nameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a name'**
+  String get toast_nameRequired;
+
+  /// No description provided for @toast_savedToVibeLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to Vibe Library'**
+  String get toast_savedToVibeLibrary;
+
+  /// No description provided for @toast_saveBundleFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save bundle'**
+  String get toast_saveBundleFailed;
+
+  /// No description provided for @toast_saveEntryFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save entry'**
+  String get toast_saveEntryFailed;
+
+  /// No description provided for @toast_presetNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a preset name'**
+  String get toast_presetNameRequired;
+
+  /// No description provided for @toast_selectPresetContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Select at least one item to save'**
+  String get toast_selectPresetContent;
+
+  /// No description provided for @toast_presetSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Preset saved successfully'**
+  String get toast_presetSaved;
+
+  /// No description provided for @toast_imagePromptCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Prompt copied'**
+  String get toast_imagePromptCopied;
+
+  /// No description provided for @toast_imageHasNoPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'This image has no Prompt'**
+  String get toast_imageHasNoPrompt;
+
+  /// No description provided for @toast_useDeleteButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Use the delete button in the UI'**
+  String get toast_useDeleteButton;
+
+  /// No description provided for @toast_imageHasNoMetadata.
+  ///
+  /// In en, this message translates to:
+  /// **'This image has no metadata'**
+  String get toast_imageHasNoMetadata;
+
+  /// No description provided for @toast_imageDataUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Image data is unavailable and cannot be copied'**
+  String get toast_imageDataUnavailable;
+
+  /// No description provided for @toast_tempFileCreateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to create temporary file'**
+  String get toast_tempFileCreateFailed;
+
+  /// No description provided for @toast_powershellCommandFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'PowerShell command failed (exitCode: {exitCode}): {error}'**
+  String toast_powershellCommandFailed(Object exitCode, Object error);
+
+  /// No description provided for @toast_vibeDataCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Vibe data copied'**
+  String get toast_vibeDataCopied;
+
+  /// No description provided for @toast_tagCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Tags copied'**
+  String get toast_tagCopied;
+
+  /// No description provided for @toast_characterPromptCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Character prompt copied'**
+  String get toast_characterPromptCopied;
+
+  /// No description provided for @toast_copiedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{title} copied'**
+  String toast_copiedTitle(Object title);
+
+  /// No description provided for @toast_replacedVibesCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Replaced with {count} Vibes: {name}'**
+  String toast_replacedVibesCount(Object count, Object name);
+
+  /// No description provided for @toast_sentVibesCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent {count} Vibes to generation: {name}'**
+  String toast_sentVibesCount(Object count, Object name);
+
+  /// No description provided for @toast_replacedVibe.
+  ///
+  /// In en, this message translates to:
+  /// **'Replaced with: {name}'**
+  String toast_replacedVibe(Object name);
+
+  /// No description provided for @toast_sentVibeToGeneration.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent to generation: {name}'**
+  String toast_sentVibeToGeneration(Object name);
+
+  /// No description provided for @toast_unreadableDroppedImageSource.
+  ///
+  /// In en, this message translates to:
+  /// **'The drop source did not provide a readable image file or image URL'**
+  String get toast_unreadableDroppedImageSource;
+
+  /// No description provided for @toast_appendedStyleReferences.
+  ///
+  /// In en, this message translates to:
+  /// **'Appended {count} style references'**
+  String toast_appendedStyleReferences(Object count);
+
+  /// No description provided for @toast_appendedPreencodedVibe.
+  ///
+  /// In en, this message translates to:
+  /// **'Appended 1 style reference (reused pre-encoded Vibe)'**
+  String get toast_appendedPreencodedVibe;
+
+  /// No description provided for @toast_addedPreencodedVibe.
+  ///
+  /// In en, this message translates to:
+  /// **'Added style reference (reused pre-encoded Vibe, saved 2 Anlas)'**
+  String get toast_addedPreencodedVibe;
+
+  /// No description provided for @toast_vibesMissingEncoding.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} Vibes are missing encoded data and cannot be saved'**
+  String toast_vibesMissingEncoding(Object count);
+
+  /// No description provided for @toast_savedBundle.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved Bundle ({count} Vibes)'**
+  String toast_savedBundle(Object count);
+
+  /// No description provided for @toast_replacedCharacterReference.
+  ///
+  /// In en, this message translates to:
+  /// **'Replaced character reference'**
+  String get toast_replacedCharacterReference;
+
+  /// No description provided for @toast_extractMetadataFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to extract metadata: {error}'**
+  String toast_extractMetadataFailed(Object error);
+
+  /// No description provided for @toast_extractPromptFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to extract prompt: {error}'**
+  String toast_extractPromptFailed(Object error);
+
+  /// No description provided for @toast_smartDecomposeSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Smart decomposed and sent'**
+  String get toast_smartDecomposeSent;
+
+  /// No description provided for @toast_addedToFixedTags.
+  ///
+  /// In en, this message translates to:
+  /// **'Added to fixed tags'**
+  String get toast_addedToFixedTags;
+
+  /// No description provided for @toast_renameNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Name is required'**
+  String get toast_renameNameRequired;
+
+  /// No description provided for @toast_renameNameConflict.
+  ///
+  /// In en, this message translates to:
+  /// **'Name already exists. Use another name.'**
+  String get toast_renameNameConflict;
+
+  /// No description provided for @toast_renameEntryNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'The entry no longer exists and may have been deleted'**
+  String get toast_renameEntryNotFound;
+
+  /// No description provided for @toast_renameFilePathMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'This entry has no file path and cannot be renamed'**
+  String get toast_renameFilePathMissing;
+
+  /// No description provided for @toast_renameFileFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to rename file. Try again later.'**
+  String get toast_renameFileFailed;
+
+  /// No description provided for @toast_renameFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename failed. Try again later.'**
+  String get toast_renameFailed;
+
+  /// No description provided for @toast_processImageFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to process image: {error}'**
+  String toast_processImageFailed(Object error);
+
+  /// No description provided for @toast_savePreviewFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save preview image'**
+  String get toast_savePreviewFailed;
 
   /// No description provided for @common_justNow.
   ///

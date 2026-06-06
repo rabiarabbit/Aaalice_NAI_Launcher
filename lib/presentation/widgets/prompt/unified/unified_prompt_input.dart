@@ -314,7 +314,9 @@ class _UnifiedPromptInputState extends ConsumerState<UnifiedPromptInput> {
   Future<void> _runAssistantAction(AssistantTaskType taskType) async {
     final text = _assistantInputText().trim();
     if (text.isEmpty) {
-      if (mounted) AppToast.warning(context, '请输入提示词后再操作');
+      if (mounted) {
+        AppToast.warning(context, context.l10n.promptAssistant_needPrompt);
+      }
       return;
     }
 
@@ -324,7 +326,9 @@ class _UnifiedPromptInputState extends ConsumerState<UnifiedPromptInput> {
         .push(_sessionId, beforeText);
 
     final stateNotifier = ref.read(promptAssistantStateProvider.notifier);
-    final label = taskType == AssistantTaskType.llm ? '优化中' : '翻译中';
+    final label = taskType == AssistantTaskType.llm
+        ? context.l10n.promptAssistant_optimizeProcessing
+        : context.l10n.promptAssistant_translateProcessing;
     stateNotifier.startProcessing(_sessionId, label);
 
     final service = ref.read(promptAssistantServiceProvider);
@@ -349,7 +353,12 @@ class _UnifiedPromptInputState extends ConsumerState<UnifiedPromptInput> {
       },
       onError: (e) {
         stateNotifier.setError(_sessionId, e.toString());
-        if (mounted) AppToast.error(context, '助手请求失败: $e');
+        if (mounted) {
+          AppToast.error(
+            context,
+            context.l10n.promptAssistant_requestFailed(e),
+          );
+        }
       },
       onDone: () {
         if (buffer.isNotEmpty) {

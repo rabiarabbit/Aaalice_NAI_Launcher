@@ -169,7 +169,7 @@ class _SendToHomeDialogState extends ConsumerState<SendToHomeDialog> {
                         );
                       },
                       icon: const Icon(Icons.send, size: 18),
-                      label: const Text('发送'),
+                      label: Text(context.l10n.sendToHome_send),
                     ),
                   ),
                 ],
@@ -191,7 +191,7 @@ class _SendToHomeDialogState extends ConsumerState<SendToHomeDialog> {
           iconColor: theme.colorScheme.primary,
           title: context.l10n.sendToHome_mainPrompt,
           subtitle: _isPipeFormat
-              ? '发送完整内容到主提示词（包含竖线）'
+              ? context.l10n.sendToHome_mainPromptPipeSubtitle
               : context.l10n.sendToHome_mainPromptSubtitle,
           isSelected: _selectedTarget == SendTargetType.mainPrompt,
           onTap: () =>
@@ -203,8 +203,10 @@ class _SendToHomeDialogState extends ConsumerState<SendToHomeDialog> {
           _TargetOptionTile(
             icon: Icons.account_tree,
             iconColor: theme.colorScheme.secondary,
-            title: '智能分解',
-            subtitle: '主提示词 + ${_parsedResult.characters.length}个角色',
+            title: context.l10n.sendToHome_smartDecompose,
+            subtitle: context.l10n.sendToHome_smartDecomposeSubtitle(
+              _parsedResult.characters.length,
+            ),
             isSelected: _selectedTarget == SendTargetType.smartDecompose,
             onTap: () =>
                 setState(() => _selectedTarget = SendTargetType.smartDecompose),
@@ -237,8 +239,8 @@ class _SendToHomeDialogState extends ConsumerState<SendToHomeDialog> {
         _TargetOptionTile(
           icon: Icons.push_pin,
           iconColor: Colors.orange,
-          title: '发送到固定词',
-          subtitle: '追加到固定词列表',
+          title: context.l10n.sendToHome_fixedTags,
+          subtitle: context.l10n.sendToHome_fixedTagsSubtitle,
           isSelected: _selectedTarget == SendTargetType.fixedTag,
           onTap: () =>
               setState(() => _selectedTarget = SendTargetType.fixedTag),
@@ -268,13 +270,15 @@ class _SendToHomeDialogState extends ConsumerState<SendToHomeDialog> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '作为别名发送',
+                  context.l10n.sendToHome_sendAsAlias,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w500,
                   ),
                 ),
                 Text(
-                  '发送到主页时包装为 <${widget.entry.name}>',
+                  context.l10n.sendToHome_sendAsAliasSubtitle(
+                    widget.entry.name,
+                  ),
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
@@ -316,7 +320,7 @@ class _SendToHomeDialogState extends ConsumerState<SendToHomeDialog> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  '发送预览',
+                  context.l10n.sendToHome_preview,
                   style: theme.textTheme.labelLarge?.copyWith(
                     color: theme.colorScheme.primary,
                     fontWeight: FontWeight.w600,
@@ -347,7 +351,7 @@ class _SendToHomeDialogState extends ConsumerState<SendToHomeDialog> {
       SendTargetType.smartDecompose =>
         _buildSmartDecomposePreview(theme, parsed),
       SendTargetType.mainPrompt => _PreviewItem(
-          label: '主提示词',
+          label: context.l10n.naiAlgorithm_mainPrompt,
           content: _processedContent,
           color: theme.colorScheme.primary,
         ),
@@ -355,7 +359,7 @@ class _SendToHomeDialogState extends ConsumerState<SendToHomeDialog> {
       SendTargetType.appendCharacter =>
         _buildCharacterPreview(parsed),
       SendTargetType.fixedTag => _PreviewItem(
-          label: '固定词',
+          label: context.l10n.fixedTags_label,
           content: _processedContent,
           color: Colors.orange,
         ),
@@ -365,13 +369,19 @@ class _SendToHomeDialogState extends ConsumerState<SendToHomeDialog> {
   /// 构建别名发送预览
   Widget _buildAliasPreview(ThemeData theme) {
     final (label, color) = switch (_selectedTarget) {
-      SendTargetType.mainPrompt => ('主提示词', theme.colorScheme.primary),
-      SendTargetType.smartDecompose => ('智能分解', theme.colorScheme.tertiary),
+      SendTargetType.mainPrompt => (
+          context.l10n.naiAlgorithm_mainPrompt,
+          theme.colorScheme.primary,
+        ),
+      SendTargetType.smartDecompose => (
+          context.l10n.sendToHome_smartDecompose,
+          theme.colorScheme.tertiary,
+        ),
       SendTargetType.replaceCharacter || SendTargetType.appendCharacter => (
-          '角色提示词',
+          context.l10n.sendToHome_characterPrompt,
           theme.colorScheme.tertiary
         ),
-      SendTargetType.fixedTag => ('固定词', Colors.orange),
+      SendTargetType.fixedTag => (context.l10n.fixedTags_label, Colors.orange),
     };
     return _PreviewItem(label: label, content: _processedContent, color: color);
   }
@@ -382,13 +392,13 @@ class _SendToHomeDialogState extends ConsumerState<SendToHomeDialog> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _PreviewItem(
-          label: '主提示词',
+          label: context.l10n.naiAlgorithm_mainPrompt,
           content: parsed.mainPrompt,
           color: theme.colorScheme.primary,
         ),
         ...parsed.characters.asMap().entries.map(
               (e) => _PreviewItem(
-                label: '角色 ${e.key + 1}',
+                label: context.l10n.sendToHome_characterIndex(e.key + 1),
                 content: e.value,
                 color: theme.colorScheme.secondary,
               ),
@@ -402,8 +412,11 @@ class _SendToHomeDialogState extends ConsumerState<SendToHomeDialog> {
     final hasCharacters = _isPipeFormat && parsed.characters.isNotEmpty;
     final content =
         hasCharacters ? parsed.characters.join('\n| ') : _processedContent;
-    final label =
-        hasCharacters ? '角色提示词 (${parsed.characters.length}个)' : '角色提示词';
+    final label = hasCharacters
+        ? context.l10n.sendToHome_characterPromptCount(
+            parsed.characters.length,
+          )
+        : context.l10n.sendToHome_characterPrompt;
     return _PreviewItem(
       label: label,
       content: content,
@@ -493,7 +506,7 @@ class _TargetOptionTile extends StatelessWidget {
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
-                          '推荐',
+                          context.l10n.sendToHome_recommended,
                           style: TextStyle(
                             fontSize: 8,
                             color: theme.colorScheme.onPrimary,

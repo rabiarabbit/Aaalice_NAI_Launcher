@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nai_launcher/core/utils/localization_extension.dart';
 
 import '../../../../core/utils/app_logger.dart';
 import 'autocomplete_controller.dart';
@@ -37,20 +38,20 @@ class SuggestionData {
   /// 获取分类名称
   /// 应用内分类值映射: 0=通用, 1=角色, 3=版权, 4=艺术家, 5=元数据
   String get categoryName {
-    if (isCooccurrence) return '推荐';
+    if (isCooccurrence) return 'Recommended';
     switch (category) {
       case 1:
-        return '角色';
+        return 'Character';
       case 3:
-        return '版权';
+        return 'Copyright';
       case 4:
-        return '艺术家';
+        return 'Artist';
       case 5:
-        return '元数据';
+        return 'Meta';
       case categoryLibrary:
-        return '词库';
+        return 'Library';
       default:
-        return '通用';
+        return 'General';
     }
   }
 
@@ -150,7 +151,7 @@ class GenericSuggestionTile extends StatelessWidget {
                     borderRadius: BorderRadius.circular(3),
                   ),
                   child: Text(
-                    data.categoryName,
+                    _localizedCategoryName(context),
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: categoryColor,
                       fontWeight: FontWeight.w500,
@@ -203,6 +204,26 @@ class GenericSuggestionTile extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _localizedCategoryName(BuildContext context) {
+    if (data.isCooccurrence) {
+      return context.l10n.autocomplete_categoryRecommended;
+    }
+    switch (data.category) {
+      case 1:
+        return context.l10n.autocomplete_categoryCharacter;
+      case 3:
+        return context.l10n.autocomplete_categoryCopyright;
+      case 4:
+        return context.l10n.autocomplete_categoryArtist;
+      case 5:
+        return context.l10n.autocomplete_categoryMeta;
+      case SuggestionData.categoryLibrary:
+        return context.l10n.autocomplete_categoryLibrary;
+      default:
+        return context.l10n.autocomplete_categoryGeneral;
+    }
   }
 
   Color _getCategoryColor(int category) {

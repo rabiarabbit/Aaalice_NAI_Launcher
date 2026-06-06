@@ -67,7 +67,7 @@ class PromptAssistantApiClient {
       final trimmed = content.trim();
       if (trimmed.isEmpty) {
         throw StateError(
-          'LLM 服务返回空内容：provider=${request.provider.name}, model=${request.model}',
+          'LLM service returned empty content: provider=${request.provider.name}, model=${request.model}',
         );
       }
 

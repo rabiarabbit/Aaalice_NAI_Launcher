@@ -105,7 +105,7 @@ class BlurTool extends EditorTool {
           layerId: activeLayer.id,
           newImageBytes: pngData.buffer.asUint8List(),
           newImage: result,
-          actionDescription: '模糊',
+          actionDescription: 'Blur',
         ),
         state,
       );
@@ -140,11 +140,12 @@ class BlurTool extends EditorTool {
     c.drawImage(
       source,
       Offset.zero,
-      Paint()..imageFilter = ui.ImageFilter.blur(
-        sigmaX: sigma,
-        sigmaY: sigma,
-        tileMode: TileMode.clamp,
-      ),
+      Paint()
+        ..imageFilter = ui.ImageFilter.blur(
+          sigmaX: sigma,
+          sigmaY: sigma,
+          tileMode: TileMode.clamp,
+        ),
     );
     final pic = rec.endRecording();
     final img = await pic.toImage(w, h);
@@ -212,7 +213,7 @@ class BlurTool extends EditorTool {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                name,
+                context.l10n.editor_toolBlur,
                 style: theme.textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),

@@ -107,25 +107,25 @@ class _TagLibraryToolbarState extends ConsumerState<TagLibraryToolbar> {
         actions: [
           BulkActionItem(
             icon: Icons.drive_file_move_outline,
-            label: '转移分类',
+            label: context.l10n.tagLibrary_transferCategory,
             onPressed: widget.onBulkMoveCategory,
             color: theme.colorScheme.secondary,
           ),
           BulkActionItem(
             icon: Icons.copy,
-            label: '复制内容',
+            label: context.l10n.tagLibrary_copyContent,
             onPressed: widget.onBulkCopy,
             color: theme.colorScheme.tertiary,
           ),
           BulkActionItem(
             icon: Icons.favorite_outline,
-            label: '收藏',
+            label: context.l10n.common_favorite,
             onPressed: widget.onBulkToggleFavorite,
             color: Colors.pink,
           ),
           BulkActionItem(
             icon: Icons.delete_outline,
-            label: '删除',
+            label: context.l10n.common_delete,
             onPressed: widget.onBulkDelete,
             color: theme.colorScheme.error,
             isDanger: true,
@@ -152,63 +152,95 @@ class _TagLibraryToolbarState extends ConsumerState<TagLibraryToolbar> {
               ),
             ),
           ),
-          child: Row(
-            children: [
-              // 添加条目按钮
-              FilledButton.icon(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final compact = constraints.maxWidth < 900;
+              final addButton = FilledButton.icon(
                 onPressed: widget.onAddEntry,
                 icon: const Icon(Icons.add, size: 18),
                 label: Text(context.l10n.tagLibrary_addEntry),
-              ),
-              const SizedBox(width: 12),
+              );
 
-              // 搜索框
-              Expanded(
-                child: _buildSearchField(theme, state),
-              ),
+              Widget buildActions() {
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // 排序下拉菜单
+                    _buildSortDropdown(theme, state),
+                    const SizedBox(width: 8),
 
-              const SizedBox(width: 12),
+                    // 视图切换
+                    _buildViewModeToggle(theme, state),
 
-              // 排序下拉菜单
-              _buildSortDropdown(theme, state),
-              const SizedBox(width: 8),
+                    const SizedBox(width: 8),
 
-              // 视图切换
-              _buildViewModeToggle(theme, state),
+                    // 分隔线
+                    Container(
+                      width: 1,
+                      height: 24,
+                      color: theme.dividerColor.withValues(alpha: 0.3),
+                    ),
+                    const SizedBox(width: 8),
 
-              const SizedBox(width: 8),
+                    // 多选按钮
+                    _CompactIconButton(
+                      icon: Icons.checklist,
+                      label: context.l10n.common_multiSelect,
+                      onPressed: widget.onEnterSelectionMode,
+                    ),
+                    const SizedBox(width: 6),
 
-              // 分隔线
-              Container(
-                width: 1,
-                height: 24,
-                color: theme.dividerColor.withValues(alpha: 0.3),
-              ),
-              const SizedBox(width: 8),
+                    // 导入按钮
+                    _CompactIconButton(
+                      icon: Icons.file_upload_outlined,
+                      label: context.l10n.common_import,
+                      onPressed: widget.onImport,
+                    ),
+                    const SizedBox(width: 6),
 
-              // 多选按钮
-              _CompactIconButton(
-                icon: Icons.checklist,
-                label: '多选',
-                onPressed: widget.onEnterSelectionMode,
-              ),
-              const SizedBox(width: 6),
+                    // 导出按钮
+                    _CompactIconButton(
+                      icon: Icons.file_download_outlined,
+                      label: context.l10n.common_export,
+                      onPressed: state.entries.isEmpty ? null : widget.onExport,
+                    ),
+                  ],
+                );
+              }
 
-              // 导入按钮
-              _CompactIconButton(
-                icon: Icons.file_upload_outlined,
-                label: '导入',
-                onPressed: widget.onImport,
-              ),
-              const SizedBox(width: 6),
+              if (compact) {
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: [
+                        addButton,
+                        const SizedBox(width: 12),
+                        Expanded(child: _buildSearchField(theme, state)),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: buildActions(),
+                      ),
+                    ),
+                  ],
+                );
+              }
 
-              // 导出按钮
-              _CompactIconButton(
-                icon: Icons.file_download_outlined,
-                label: '导出',
-                onPressed: state.entries.isEmpty ? null : widget.onExport,
-              ),
-            ],
+              return Row(
+                children: [
+                  addButton,
+                  const SizedBox(width: 12),
+                  Expanded(child: _buildSearchField(theme, state)),
+                  const SizedBox(width: 12),
+                  buildActions(),
+                ],
+              );
+            },
           ),
         ),
       ),
@@ -342,19 +374,31 @@ class _TagLibraryToolbarState extends ConsumerState<TagLibraryToolbar> {
           items: [
             DropdownMenuItem(
               value: TagLibrarySortBy.order,
-              child: _buildSortItem(Icons.sort, '自定义排序'),
+              child: _buildSortItem(
+                Icons.sort,
+                context.l10n.tagLibrary_sortCustom,
+              ),
             ),
             DropdownMenuItem(
               value: TagLibrarySortBy.name,
-              child: _buildSortItem(Icons.sort_by_alpha, '名称'),
+              child: _buildSortItem(
+                Icons.sort_by_alpha,
+                context.l10n.tagLibrary_sortName,
+              ),
             ),
             DropdownMenuItem(
               value: TagLibrarySortBy.useCount,
-              child: _buildSortItem(Icons.trending_up, '使用频率'),
+              child: _buildSortItem(
+                Icons.trending_up,
+                context.l10n.tagLibrary_sortUseCount,
+              ),
             ),
             DropdownMenuItem(
               value: TagLibrarySortBy.updatedAt,
-              child: _buildSortItem(Icons.access_time, '更新时间'),
+              child: _buildSortItem(
+                Icons.access_time,
+                context.l10n.tagLibrary_sortUpdatedAt,
+              ),
             ),
           ],
           onChanged: (value) {

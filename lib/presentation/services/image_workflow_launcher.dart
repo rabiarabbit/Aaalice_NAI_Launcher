@@ -115,7 +115,7 @@ class ImageWorkflowLauncher {
     if (effectiveMask != null) {
       AppToast.success(context, context.l10n.img2img_inpaintMaskReady);
     } else if (result.maskImage != null) {
-      AppToast.warning(context, '没有检测到有效蒙版，保存结果已忽略。');
+      AppToast.warning(context, context.l10n.toast_noValidMaskIgnored);
     }
   }
 
@@ -204,7 +204,7 @@ class ImageWorkflowLauncher {
 
     if (!context.mounted) return;
     if (ref.read(kritaBridgeNotifierProvider).isBridgeGenerating) {
-      AppToast.warning(context, 'Krita Bridge 正在生成，请等待当前任务结束');
+      AppToast.warning(context, context.l10n.toast_kritaBusy);
       return;
     }
     AppToast.info(context, context.l10n.img2img_variationsStarted);

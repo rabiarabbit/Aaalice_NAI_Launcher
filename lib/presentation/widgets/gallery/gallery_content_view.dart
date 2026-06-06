@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
+import '../../../core/utils/localization_extension.dart';
 import '../../../data/models/gallery/local_image_record.dart';
 import '../../providers/local_gallery_provider.dart';
 import '../../providers/reverse_prompt_provider.dart';
@@ -567,10 +568,10 @@ class LocalGalleryContentView extends ConsumerWidget {
               if (!context.mounted) return;
               Navigator.of(context).pop();
               context.go(AppRoutes.home);
-              AppToast.success(context, '图片已发送到图生图');
+              AppToast.success(context, context.l10n.gallery_sentToImg2Img);
             } catch (e) {
               if (context.mounted) {
-                AppToast.error(context, '发送失败: $e');
+                AppToast.error(context, context.l10n.gallery_sendFailed('$e'));
               }
             }
           },
@@ -583,10 +584,13 @@ class LocalGalleryContentView extends ConsumerWidget {
               if (!context.mounted) return;
               Navigator.of(context).pop();
               context.go(AppRoutes.home);
-              AppToast.success(context, '图片已发送到反推模块');
+              AppToast.success(
+                context,
+                context.l10n.gallery_sentToReversePrompt,
+              );
             } catch (e) {
               if (context.mounted) {
-                AppToast.error(context, '发送失败: $e');
+                AppToast.error(context, context.l10n.gallery_sendFailed('$e'));
               }
             }
           },

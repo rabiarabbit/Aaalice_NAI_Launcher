@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
+import '../../../core/utils/localization_extension.dart';
 import '../../../data/models/gallery/local_image_record.dart';
 import 'draggable_image_card.dart';
 import 'local_image_card_3d.dart';
@@ -127,13 +128,16 @@ class _GalleryGridState extends State<GalleryGrid> {
   @override
   Widget build(BuildContext context) {
     if (widget.images.isEmpty) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.image_not_supported, size: 64, color: Colors.grey),
-            SizedBox(height: 16),
-            Text('暂无图片', style: TextStyle(color: Colors.grey, fontSize: 16)),
+            const Icon(Icons.image_not_supported, size: 64, color: Colors.grey),
+            const SizedBox(height: 16),
+            Text(
+              context.l10n.localGallery_noImagesFound,
+              style: const TextStyle(color: Colors.grey, fontSize: 16),
+            ),
           ],
         ),
       );

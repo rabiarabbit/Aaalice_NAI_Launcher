@@ -105,7 +105,7 @@ class _ImportDialogState extends ConsumerState<ImportDialog> {
                           _conflictResolutions.clear();
                         });
                       },
-                      child: const Text('重新选择'),
+                      child: Text(context.l10n.tagLibrary_reselect),
                     ),
                     const SizedBox(width: 8),
                     FilledButton.icon(
@@ -115,7 +115,10 @@ class _ImportDialogState extends ConsumerState<ImportDialog> {
                           : null,
                       icon: const Icon(Icons.file_download),
                       label: Text(
-                        '导入 (${_selectedEntryIds.length + _selectedCategoryIds.length} 项)',
+                        context.l10n.tagLibrary_selectedImportCount(
+                          _selectedEntryIds.length +
+                              _selectedCategoryIds.length,
+                        ),
                       ),
                     ),
                   ],
@@ -159,12 +162,12 @@ class _ImportDialogState extends ConsumerState<ImportDialog> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    '点击选择 ZIP 文件',
+                    context.l10n.tagLibrary_selectZipFile,
                     style: theme.textTheme.titleMedium,
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '支持从本应用导出的词库文件',
+                    context.l10n.tagLibrary_zipFileHint,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.outline,
                     ),
@@ -232,16 +235,22 @@ class _ImportDialogState extends ConsumerState<ImportDialog> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '文件信息',
+                  context.l10n.tagLibrary_fileInfo,
                   style: theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 const SizedBox(height: 12),
-                _InfoRow(label: '条目数', value: preview.entryCount.toString()),
-                _InfoRow(label: '分类数', value: preview.categoryCount.toString()),
                 _InfoRow(
-                  label: '导出时间',
+                  label: context.l10n.tagLibrary_entryCountLabel,
+                  value: preview.entryCount.toString(),
+                ),
+                _InfoRow(
+                  label: context.l10n.tagLibrary_categoryCountLabel,
+                  value: preview.categoryCount.toString(),
+                ),
+                _InfoRow(
+                  label: context.l10n.tagLibrary_exportDateLabel,
                   value:
                       '${preview.exportDate.year}-${preview.exportDate.month.toString().padLeft(2, '0')}-${preview.exportDate.day.toString().padLeft(2, '0')}',
                 ),
@@ -270,7 +279,9 @@ class _ImportDialogState extends ConsumerState<ImportDialog> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      '发现 ${_conflicts.length} 个冲突项，请点击下方冲突项选择处理方式',
+                      context.l10n.tagLibrary_importConflictsHint(
+                        _conflicts.length,
+                      ),
                       style: TextStyle(color: theme.colorScheme.tertiary),
                     ),
                   ),
@@ -283,7 +294,10 @@ class _ImportDialogState extends ConsumerState<ImportDialog> {
           // 选择全部
           Row(
             children: [
-              Text('选择要导入的内容', style: theme.textTheme.titleSmall),
+              Text(
+                context.l10n.tagLibrary_selectImportContent,
+                style: theme.textTheme.titleSmall,
+              ),
               const Spacer(),
               TextButton(
                 onPressed: () {
@@ -293,7 +307,7 @@ class _ImportDialogState extends ConsumerState<ImportDialog> {
                         .addAll(preview.categories.map((c) => c.id));
                   });
                 },
-                child: const Text('全选'),
+                child: Text(context.l10n.common_selectAll),
               ),
               TextButton(
                 onPressed: () {
@@ -302,7 +316,7 @@ class _ImportDialogState extends ConsumerState<ImportDialog> {
                     _selectedCategoryIds.clear();
                   });
                 },
-                child: const Text('全不选'),
+                child: Text(context.l10n.common_deselectAll),
               ),
             ],
           ),
@@ -312,7 +326,9 @@ class _ImportDialogState extends ConsumerState<ImportDialog> {
           // 分类列表
           if (preview.categories.isNotEmpty) ...[
             Text(
-              '分类 (${preview.categories.length})',
+              context.l10n.tagLibrary_categoriesSection(
+                preview.categories.length,
+              ),
               style: theme.textTheme.labelLarge,
             ),
             const SizedBox(height: 8),
@@ -361,7 +377,7 @@ class _ImportDialogState extends ConsumerState<ImportDialog> {
           // 条目列表
           if (preview.entries.isNotEmpty) ...[
             Text(
-              '条目 (${preview.entries.length})',
+              context.l10n.tagLibrary_entriesSection(preview.entries.length),
               style: theme.textTheme.labelLarge,
             ),
             const SizedBox(height: 8),
@@ -477,7 +493,7 @@ class _ImportDialogState extends ConsumerState<ImportDialog> {
     ValueChanged<ConflictResolution> onChanged,
   ) {
     return PopupMenuButton<ConflictResolution>(
-      tooltip: '选择冲突处理方式',
+      tooltip: context.l10n.tagLibrary_conflictResolutionTooltip,
       initialValue: currentResolution,
       onSelected: onChanged,
       itemBuilder: (context) => [
@@ -494,7 +510,7 @@ class _ImportDialogState extends ConsumerState<ImportDialog> {
               ),
               const SizedBox(width: 8),
               Text(
-                '跳过',
+                context.l10n.common_skip,
                 style: TextStyle(
                   color: currentResolution == ConflictResolution.skip
                       ? theme.colorScheme.primary
@@ -520,7 +536,7 @@ class _ImportDialogState extends ConsumerState<ImportDialog> {
               ),
               const SizedBox(width: 8),
               Text(
-                '重命名',
+                context.l10n.common_rename,
                 style: TextStyle(
                   color: currentResolution == ConflictResolution.rename
                       ? theme.colorScheme.primary
@@ -546,7 +562,7 @@ class _ImportDialogState extends ConsumerState<ImportDialog> {
               ),
               const SizedBox(width: 8),
               Text(
-                '替换',
+                context.l10n.common_replace,
                 style: TextStyle(
                   color: currentResolution == ConflictResolution.overwrite
                       ? theme.colorScheme.primary
@@ -598,22 +614,22 @@ class _ImportDialogState extends ConsumerState<ImportDialog> {
   String _getConflictSubtitle(ConflictResolution resolution) {
     switch (resolution) {
       case ConflictResolution.skip:
-        return '冲突 - 将跳过';
+        return context.l10n.tagLibrary_conflictSkip;
       case ConflictResolution.rename:
-        return '冲突 - 将重命名导入';
+        return context.l10n.tagLibrary_conflictRename;
       case ConflictResolution.overwrite:
-        return '冲突 - 将替换现有';
+        return context.l10n.tagLibrary_conflictOverwrite;
     }
   }
 
   String _getResolutionLabel(ConflictResolution resolution) {
     switch (resolution) {
       case ConflictResolution.skip:
-        return '跳过';
+        return context.l10n.common_skip;
       case ConflictResolution.rename:
-        return '重命名';
+        return context.l10n.common_rename;
       case ConflictResolution.overwrite:
-        return '替换';
+        return context.l10n.common_replace;
     }
   }
 
@@ -672,7 +688,7 @@ class _ImportDialogState extends ConsumerState<ImportDialog> {
     } catch (e) {
       setState(() {
         _isLoading = false;
-        _errorMessage = '无法解析文件: $e';
+        _errorMessage = context.l10n.tagLibrary_parseFileFailed('$e');
       });
     }
   }
@@ -680,10 +696,12 @@ class _ImportDialogState extends ConsumerState<ImportDialog> {
   Future<void> _import() async {
     if (_selectedFile == null || _preview == null) return;
 
+    final l10n = context.l10n;
+
     setState(() {
       _isImporting = true;
       _progress = 0;
-      _progressMessage = '准备导入...';
+      _progressMessage = l10n.tagLibrary_preparingImport;
     });
 
     try {
@@ -747,7 +765,7 @@ class _ImportDialogState extends ConsumerState<ImportDialog> {
         final resolution = _conflictResolutions[c.id];
         return resolution == ConflictResolution.rename;
       })
-          ? ' (导入)'
+          ? ' (${l10n.common_import})'
           : null;
 
       // 导入分类并获取 ID 映射
@@ -775,7 +793,7 @@ class _ImportDialogState extends ConsumerState<ImportDialog> {
         final resolution = _conflictResolutions[e.id];
         return resolution == ConflictResolution.rename;
       })
-          ? ' (导入)'
+          ? ' (${l10n.common_import})'
           : null;
 
       // 导入条目（使用更新后的缩略图路径）
@@ -791,29 +809,49 @@ class _ImportDialogState extends ConsumerState<ImportDialog> {
         Navigator.of(context).pop();
         final messages = <String>[];
         if (result.importedEntries > 0) {
-          messages.add('${result.importedEntries} 条目');
+          messages.add(
+            context.l10n.tagLibrary_importedEntriesCount(
+              result.importedEntries,
+            ),
+          );
         }
         if (result.importedCategories > 0) {
-          messages.add('${result.importedCategories} 分类');
+          messages.add(
+            context.l10n.tagLibrary_importedCategoriesCount(
+              result.importedCategories,
+            ),
+          );
         }
         if (result.renamedCount > 0) {
-          messages.add('${result.renamedCount} 重命名');
+          messages
+              .add(context.l10n.tagLibrary_renamedCount(result.renamedCount));
         }
         if (result.overwrittenCount > 0) {
-          messages.add('${result.overwrittenCount} 替换');
+          messages.add(
+            context.l10n.tagLibrary_overwrittenCount(result.overwrittenCount),
+          );
         }
         if (result.skippedConflicts > 0) {
-          messages.add('${result.skippedConflicts} 跳过');
+          messages.add(
+            context.l10n.tagLibrary_skippedCount(result.skippedConflicts),
+          );
         }
         AppToast.info(
           context,
-          messages.isEmpty ? '导入完成' : '导入成功: ${messages.join(', ')}',
+          messages.isEmpty
+              ? context.l10n.tagLibrary_importCompleted
+              : context.l10n.tagLibrary_importSuccessSummary(
+                  messages.join(', '),
+                ),
         );
       }
     } catch (e) {
       if (mounted) {
         setState(() => _isImporting = false);
-        AppToast.info(context, '导入失败: $e');
+        AppToast.info(
+          context,
+          context.l10n.tagLibrary_importFailedWithError('$e'),
+        );
       }
     }
   }

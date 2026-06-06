@@ -7,6 +7,7 @@ import 'package:super_drag_and_drop/super_drag_and_drop.dart';
 
 import '../../../core/utils/drag_drop_utils.dart';
 import '../../../core/utils/image_share_sanitizer.dart';
+import '../../../core/utils/localization_extension.dart';
 import '../../../data/models/gallery/local_image_record.dart';
 import '../../providers/share_image_settings_provider.dart';
 
@@ -154,7 +155,8 @@ class _DraggableImageCardState extends ConsumerState<DraggableImageCard> {
                   theme,
                   dragData,
                   width: widget.feedbackWidth,
-                  hintText: widget.feedbackHint ?? '拖拽以分享',
+                  hintText: widget.feedbackHint ??
+                      context.l10n.localGallery_dragToShare,
                   previewProvider: _previewProvider,
                 );
               }
@@ -170,7 +172,8 @@ class _DraggableImageCardState extends ConsumerState<DraggableImageCard> {
                   theme,
                   dragData,
                   width: widget.feedbackWidth,
-                  hintText: widget.feedbackHint ?? '拖拽以分享',
+                  hintText: widget.feedbackHint ??
+                      context.l10n.localGallery_dragToShare,
                   previewProvider: _previewProvider,
                 );
               }
@@ -383,7 +386,8 @@ class _DragWrapperState extends ConsumerState<_DragWrapper> {
                   theme,
                   dragData,
                   width: widget.feedbackWidth,
-                  hintText: widget.feedbackHint ?? '拖拽以分享',
+                  hintText: widget.feedbackHint ??
+                      context.l10n.localGallery_dragToShare,
                   previewProvider: _previewProvider,
                 );
               }
@@ -399,7 +403,8 @@ class _DragWrapperState extends ConsumerState<_DragWrapper> {
                   theme,
                   dragData,
                   width: widget.feedbackWidth,
-                  hintText: widget.feedbackHint ?? '拖拽以分享',
+                  hintText: widget.feedbackHint ??
+                      context.l10n.localGallery_dragToShare,
                   previewProvider: _previewProvider,
                 );
               }

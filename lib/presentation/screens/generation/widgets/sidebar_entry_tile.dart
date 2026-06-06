@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../core/utils/localization_extension.dart';
 import '../../../../data/models/fixed_tag/fixed_tag_entry.dart';
 import '../../../../data/models/tag_library/tag_library_entry.dart';
 import '../../../widgets/common/app_toast.dart';
@@ -324,7 +325,7 @@ class _SidebarEntryTileState extends State<SidebarEntryTile> {
   Future<void> _copyContent() async {
     await Clipboard.setData(ClipboardData(text: widget.entry.content));
     if (!mounted) return;
-    AppToast.info(context, '已复制');
+    AppToast.info(context, context.l10n.common_copied);
   }
 }
 

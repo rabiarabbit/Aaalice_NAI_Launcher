@@ -35,7 +35,10 @@ class LocalTagStrategy extends AutocompleteStrategy<LocalTag> {
         _config = config;
 
   /// 工厂方法：创建 LocalTagStrategy
-  static Future<LocalTagStrategy> create(WidgetRef ref, AutocompleteConfig config) async {
+  static Future<LocalTagStrategy> create(
+    WidgetRef ref,
+    AutocompleteConfig config,
+  ) async {
     final service = await ref.read(danbooruTagsLazyServiceProvider.future);
     return LocalTagStrategy._(
       danbooruService: service,
@@ -53,7 +56,11 @@ class LocalTagStrategy extends AutocompleteStrategy<LocalTag> {
   bool get isLoading => _isLoading;
 
   @override
-  Future<void> search(String text, int cursorPosition, {bool immediate = false}) async {
+  Future<void> search(
+    String text,
+    int cursorPosition, {
+    bool immediate = false,
+  }) async {
     _debounceTimer?.cancel();
 
     // 获取当前正在输入的标签

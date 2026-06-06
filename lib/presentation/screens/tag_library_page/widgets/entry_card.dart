@@ -497,7 +497,7 @@ class _EntryCardState extends State<EntryCard>
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        '移到分类',
+                        context.l10n.tagLibrary_moveToCategoryTitle,
                         style: TextStyle(
                           fontSize: 11,
                           color: theme.colorScheme.onPrimary,

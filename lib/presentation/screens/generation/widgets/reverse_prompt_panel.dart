@@ -15,6 +15,7 @@ import '../../../providers/tag_library_page_provider.dart';
 import '../../../prompt_assistant/providers/prompt_assistant_history_provider.dart';
 import '../../../utils/asset_protection_guard.dart';
 import '../../../utils/dropped_file_reader.dart';
+import '../../../../core/utils/localization_extension.dart';
 import '../../../widgets/common/app_toast.dart';
 import '../../../widgets/common/collapsible_image_panel.dart';
 import '../../../widgets/common/decoded_memory_image.dart';
@@ -40,7 +41,7 @@ class _ReversePromptPanelState extends ConsumerState<ReversePromptPanel> {
     final showBackground = hasImages && !_isExpanded;
 
     return CollapsibleImagePanel(
-      title: '反推',
+      title: context.l10n.reversePrompt_title,
       icon: Icons.manage_search_rounded,
       isExpanded: _isExpanded,
       onToggle: () => setState(() => _isExpanded = !_isExpanded),
@@ -79,7 +80,7 @@ class _ReversePromptPanelState extends ConsumerState<ReversePromptPanel> {
             if (state.error != null) ...[
               const SizedBox(height: 8),
               Text(
-                state.error!,
+                _localizedError(state.error!),
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.error,
                 ),
@@ -94,18 +95,24 @@ class _ReversePromptPanelState extends ConsumerState<ReversePromptPanel> {
             ],
             if (state.llmPrompt.isNotEmpty) ...[
               const SizedBox(height: 8),
-              _PromptOutputBlock(title: 'LLM 反推', text: state.llmPrompt),
+              _PromptOutputBlock(
+                title: context.l10n.reversePrompt_llmReverse,
+                text: state.llmPrompt,
+              ),
             ],
             if (state.characterReplacePrompt.isNotEmpty) ...[
               const SizedBox(height: 8),
               _PromptOutputBlock(
-                title: '角色替换',
+                title: context.l10n.reversePrompt_characterReplace,
                 text: state.characterReplacePrompt,
               ),
             ],
             if (state.finalPrompt.isNotEmpty) ...[
               const SizedBox(height: 8),
-              _PromptOutputBlock(title: '最终结果', text: state.finalPrompt),
+              _PromptOutputBlock(
+                title: context.l10n.reversePrompt_finalResult,
+                text: state.finalPrompt,
+              ),
             ],
           ],
         ),
@@ -128,7 +135,9 @@ class _ReversePromptPanelState extends ConsumerState<ReversePromptPanel> {
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
-        state.images.isEmpty ? '待添加' : '${state.images.length} 张',
+        state.images.isEmpty
+            ? context.l10n.reversePrompt_pending
+            : context.l10n.reversePrompt_imageCount(state.images.length),
         style: theme.textTheme.labelSmall?.copyWith(
           color: showBackground
               ? Colors.white
@@ -166,7 +175,11 @@ class _ReversePromptPanelState extends ConsumerState<ReversePromptPanel> {
           _isDragging ? Icons.file_download_rounded : Icons.add_photo_alternate,
           size: 18,
         ),
-        label: Text(_isDragging ? '松开后添加到反推' : '增加图片 / 拖入图片'),
+        label: Text(
+          _isDragging
+              ? context.l10n.reversePrompt_dropToAdd
+              : context.l10n.reversePrompt_addOrDropImages,
+        ),
       ),
     );
   }
@@ -230,12 +243,12 @@ class _ReversePromptPanelState extends ConsumerState<ReversePromptPanel> {
           onSelected: state.isProcessing ? null : notifier.setUseOnnxTagger,
         ),
         FilterChip(
-          label: const Text('LLM 反推'),
+          label: Text(context.l10n.reversePrompt_llmReverse),
           selected: state.useLlmReverse,
           onSelected: state.isProcessing ? null : notifier.setUseLlmReverse,
         ),
         FilterChip(
-          label: const Text('角色替换'),
+          label: Text(context.l10n.reversePrompt_characterReplace),
           selected: state.useCharacterReplace,
           onSelected:
               state.isProcessing ? null : notifier.setUseCharacterReplace,
@@ -272,15 +285,15 @@ class _ReversePromptPanelState extends ConsumerState<ReversePromptPanel> {
                   : ref
                       .read(reversePromptProvider.notifier)
                       .setSelectedTaggerModelPath,
-              decoration: const InputDecoration(
-                labelText: '本地 tagger 模型',
-                hintText: '请在设置中配置模型文件夹',
+              decoration: InputDecoration(
+                labelText: context.l10n.reversePrompt_localTaggerModel,
+                hintText: context.l10n.reversePrompt_localTaggerModelHint,
                 isDense: true,
               ),
             ),
             const SizedBox(height: 6),
             _ThresholdSlider(
-              label: '通用标签阈值',
+              label: context.l10n.reversePrompt_generalThreshold,
               value: state.taggerGeneralThreshold,
               onChanged: state.isProcessing
                   ? null
@@ -289,7 +302,7 @@ class _ReversePromptPanelState extends ConsumerState<ReversePromptPanel> {
                       .setTaggerGeneralThreshold,
             ),
             _ThresholdSlider(
-              label: '角色标签阈值',
+              label: context.l10n.reversePrompt_characterThreshold,
               value: state.taggerCharacterThreshold,
               onChanged: state.isProcessing
                   ? null
@@ -298,7 +311,7 @@ class _ReversePromptPanelState extends ConsumerState<ReversePromptPanel> {
                       .setTaggerCharacterThreshold,
             ),
             Text(
-              '只输出 General / Character 分类标签；Rating、Artist、Copyright、Meta 等分类会被过滤。',
+              context.l10n.reversePrompt_taggerFilterHint,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Colors.white70,
                   ),
@@ -321,7 +334,7 @@ class _ReversePromptPanelState extends ConsumerState<ReversePromptPanel> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '替换目标角色为空。这里从词库选择一个角色作为替换目标，不会注入到正向提示词。',
+            context.l10n.reversePrompt_replacementEmptyHint,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: Colors.white70,
                 ),
@@ -334,7 +347,8 @@ class _ReversePromptPanelState extends ConsumerState<ReversePromptPanel> {
                   ? null
                   : _selectReverseCharacterFromLibrary,
               icon: const Icon(Icons.library_books_outlined, size: 18),
-              label: const Text('从词库选择替换目标角色'),
+              label:
+                  Text(context.l10n.reversePrompt_selectReplacementCharacter),
             ),
           ),
         ],
@@ -383,7 +397,7 @@ class _ReversePromptPanelState extends ConsumerState<ReversePromptPanel> {
                     ? null
                     : _selectReverseCharacterFromLibrary,
                 icon: const Icon(Icons.swap_horiz_rounded, size: 16),
-                label: const Text('更换'),
+                label: Text(context.l10n.reversePrompt_change),
               ),
               TextButton.icon(
                 onPressed: state.isProcessing
@@ -392,7 +406,7 @@ class _ReversePromptPanelState extends ConsumerState<ReversePromptPanel> {
                         .read(reversePromptCharacterProvider.notifier)
                         .clearReplacementCharacter,
                 icon: const Icon(Icons.close_rounded, size: 16),
-                label: const Text('清除'),
+                label: Text(context.l10n.common_clear),
               ),
             ],
           ),
@@ -404,7 +418,9 @@ class _ReversePromptPanelState extends ConsumerState<ReversePromptPanel> {
   Future<void> _selectReverseCharacterFromLibrary() async {
     final entry = await showDialog<TagLibraryEntry>(
       context: context,
-      builder: (context) => const TagLibraryPickerDialog(title: '选择替换目标角色'),
+      builder: (context) => TagLibraryPickerDialog(
+        title: context.l10n.reversePrompt_selectReplacementTargetTitle,
+      ),
     );
 
     if (entry == null) {
@@ -436,7 +452,11 @@ class _ReversePromptPanelState extends ConsumerState<ReversePromptPanel> {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : const Icon(Icons.play_arrow_rounded, size: 18),
-            label: Text(state.processingLabel ?? '开始反推'),
+            label: Text(
+              state.processingStage == null
+                  ? context.l10n.reversePrompt_start
+                  : _localizedProcessingStage(state.processingStage!),
+            ),
           ),
         ),
         const SizedBox(width: 8),
@@ -457,10 +477,13 @@ class _ReversePromptPanelState extends ConsumerState<ReversePromptPanel> {
                   ref
                       .read(generationParamsNotifierProvider.notifier)
                       .updatePrompt(prompt);
-                  AppToast.success(context, '已发送到提示词');
+                  AppToast.success(
+                    context,
+                    context.l10n.reversePrompt_sentToPrompt,
+                  );
                 },
           icon: const Icon(Icons.send_rounded, size: 18),
-          label: const Text('发送到提示词'),
+          label: Text(context.l10n.reversePrompt_sendToPrompt),
         ),
       ],
     );
@@ -471,7 +494,7 @@ class _ReversePromptPanelState extends ConsumerState<ReversePromptPanel> {
       final confirmed = await AssetProtectionGuard.confirmExternalImageSend(
         context: context,
         ref: ref,
-        targetName: '多模态 LLM 反推服务',
+        targetName: context.l10n.reversePrompt_externalTarget,
         imageCount: state.images.length,
       );
       if (!confirmed || !mounted) {
@@ -521,8 +544,34 @@ class _ReversePromptPanelState extends ConsumerState<ReversePromptPanel> {
       }
     }
     if (!handledAny && mounted) {
-      AppToast.warning(context, '拖入源未提供可读取的图片文件或图片链接');
+      AppToast.warning(context, context.l10n.reversePrompt_dropUnreadable);
     }
+  }
+
+  String _localizedProcessingStage(ReversePromptProcessingStage stage) {
+    return switch (stage) {
+      ReversePromptProcessingStage.preparing =>
+        context.l10n.reversePrompt_stagePreparing,
+      ReversePromptProcessingStage.onnxTagger =>
+        context.l10n.reversePrompt_stageOnnxTagger,
+      ReversePromptProcessingStage.llmReverse =>
+        context.l10n.reversePrompt_stageLlmReverse,
+      ReversePromptProcessingStage.characterReplace =>
+        context.l10n.reversePrompt_stageCharacterReplace,
+    };
+  }
+
+  String _localizedError(String error) {
+    return switch (error) {
+      'reversePrompt_needImageAndMethod' =>
+        context.l10n.reversePrompt_needImageAndMethod,
+      'reversePrompt_needReplacementCharacter' =>
+        context.l10n.reversePrompt_needReplacementCharacter,
+      'reversePrompt_needPromptForCharacterReplace' =>
+        context.l10n.reversePrompt_needPromptForCharacterReplace,
+      'reversePrompt_noOnnxModel' => context.l10n.reversePrompt_noOnnxModel,
+      _ => error,
+    };
   }
 }
 

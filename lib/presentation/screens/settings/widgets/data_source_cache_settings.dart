@@ -14,6 +14,33 @@ import '../../../providers/data_source_cache_provider.dart';
 import '../../../widgets/common/app_toast.dart';
 import '../widgets/settings_card.dart';
 
+extension _AutoRefreshIntervalL10n on AutoRefreshInterval {
+  String localizedLabel(BuildContext context) {
+    final l10n = context.l10n;
+    return switch (this) {
+      AutoRefreshInterval.days7 => l10n.dataSource_refresh7Days,
+      AutoRefreshInterval.days15 => l10n.dataSource_refresh15Days,
+      AutoRefreshInterval.days30 => l10n.dataSource_refresh30Days,
+      AutoRefreshInterval.never => l10n.dataSource_refreshNever,
+    };
+  }
+}
+
+extension _TagHotPresetL10n on TagHotPreset {
+  String localizedLabel(BuildContext context) {
+    final l10n = context.l10n;
+    return switch (this) {
+      TagHotPreset.all => l10n.dataSource_hotAll,
+      TagHotPreset.hot10k => l10n.dataSource_hot10k,
+      TagHotPreset.common1k => l10n.dataSource_common1k,
+      TagHotPreset.medium500 => l10n.dataSource_common500,
+      TagHotPreset.low100 => l10n.dataSource_normal100,
+      TagHotPreset.minimal50 => l10n.dataSource_minimal50,
+      TagHotPreset.custom => l10n.dataSource_custom,
+    };
+  }
+}
+
 /// 标签补全数据源管理设置组件
 class DataSourceCacheSettings extends ConsumerStatefulWidget {
   const DataSourceCacheSettings({super.key});
@@ -55,7 +82,7 @@ class _ClearingDialog extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           Text(
-            '正在清除数据...',
+            context.l10n.dataSource_clearingData,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w500,
                 ),
@@ -216,15 +243,9 @@ class _DataSourceCacheSettingsState
             size: 28,
           ),
         ),
-        title: const Text('清除标签数据源'),
+        title: Text(context.l10n.dataSource_clearTitle),
         content: Text(
-          '确定要清除 Danbooru 标签补全数据吗？\n\n'
-          '这将清空以下数据：\n'
-          '• Danbooru 标签补全数据\n\n'
-          '以下数据将保留：\n'
-          '• 中英文标签翻译\n'
-          '• 标签共现关系\n\n'
-          '清除后下次启动时将自动重新加载标签数据。',
+          context.l10n.dataSource_clearContent,
           style: theme.textTheme.bodyMedium?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
@@ -238,12 +259,12 @@ class _DataSourceCacheSettingsState
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: const Text('取消'),
+            child: Text(context.l10n.common_cancel),
           ),
           FilledButton.icon(
             onPressed: () => Navigator.of(context).pop(true),
             icon: const Icon(Icons.delete_outline, size: 18),
-            label: const Text('确认清除'),
+            label: Text(context.l10n.dataSource_confirmClear),
             style: FilledButton.styleFrom(
               backgroundColor: theme.colorScheme.error,
               foregroundColor: theme.colorScheme.onError,
@@ -305,7 +326,7 @@ class _DataSourceCacheSettingsState
         if (context.mounted) {
           AppToast.success(
             context,
-            '已清除 ${result.totalRemoved} 条数据，下次启动时将自动恢复',
+            context.l10n.dataSource_clearSuccess(result.totalRemoved),
           );
         }
 
@@ -325,7 +346,10 @@ class _DataSourceCacheSettingsState
       } else {
         // 清除失败（如数据库损坏已自动修复）
         if (context.mounted) {
-          AppToast.warning(context, result.error ?? '清除失败，请重试');
+          AppToast.warning(
+            context,
+            result.error ?? context.l10n.dataSource_clearFailed,
+          );
         }
       }
     } catch (e, stack) {
@@ -338,7 +362,10 @@ class _DataSourceCacheSettingsState
 
       if (context.mounted) {
         Navigator.of(context, rootNavigator: true).pop();
-        AppToast.error(context, '清除失败: $e');
+        AppToast.error(
+          context,
+          context.l10n.dataSource_clearFailedWithError(e),
+        );
       }
     }
   }
@@ -354,6 +381,8 @@ class _StatusCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isLoaded = state.totalTags > 0;
+    final locale =
+        Localizations.localeOf(context).languageCode == 'zh' ? 'zh' : 'en';
 
     return Container(
       decoration: BoxDecoration(
@@ -414,7 +443,9 @@ class _StatusCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          isLoaded ? '数据源已就绪' : '数据源未加载',
+                          isLoaded
+                              ? context.l10n.dataSource_ready
+                              : context.l10n.dataSource_notLoaded,
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w600,
                             color: isLoaded
@@ -425,8 +456,10 @@ class _StatusCard extends StatelessWidget {
                         const SizedBox(height: 4),
                         Text(
                           isLoaded
-                              ? '已缓存 ${_formatNumber(state.totalTags)} 个标签'
-                              : '点击"立即同步"下载标签数据',
+                              ? context.l10n.dataSource_cachedTagCount(
+                                  _formatNumber(state.totalTags),
+                                )
+                              : context.l10n.dataSource_clickSyncToDownload,
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
                           ),
@@ -445,7 +478,9 @@ class _StatusCard extends StatelessWidget {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                '${_formatNumber(state.translationCount)} 翻译',
+                                context.l10n.dataSource_translationCount(
+                                  _formatNumber(state.translationCount),
+                                ),
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   color: theme.colorScheme.outline,
                                   fontSize: 12,
@@ -459,7 +494,9 @@ class _StatusCard extends StatelessWidget {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                '${_formatNumber(state.cooccurrenceCount)} 共现',
+                                context.l10n.dataSource_cooccurrenceCount(
+                                  _formatNumber(state.cooccurrenceCount),
+                                ),
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   color: theme.colorScheme.outline,
                                   fontSize: 12,
@@ -519,7 +556,9 @@ class _StatusCard extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
                 child: Text(
-                  '上次更新: ${timeago.format(state.lastUpdate!, locale: 'zh')}',
+                  context.l10n.dataSource_lastUpdated(
+                    timeago.format(state.lastUpdate!, locale: locale),
+                  ),
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.outline,
                   ),
@@ -656,7 +695,7 @@ class _SyncSettingsCard extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             Text(
-              '热度阈值',
+              context.l10n.dataSource_heatThresholdTitle,
               style: theme.textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.w600,
               ),
@@ -665,7 +704,7 @@ class _SyncSettingsCard extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          '选择不同类别标签的热度阈值',
+          context.l10n.dataSource_heatThresholdSubtitle,
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.outline,
           ),
@@ -678,7 +717,7 @@ class _SyncSettingsCard extends StatelessWidget {
               child: _CategoryThresholdBox(
                 icon: Icons.label_outline,
                 iconColor: Colors.blue,
-                label: '一般',
+                label: context.l10n.tagCategory_general,
                 preset: state.categoryThresholds.generalPreset,
                 customThreshold:
                     state.categoryThresholds.generalCustomThreshold,
@@ -690,7 +729,7 @@ class _SyncSettingsCard extends StatelessWidget {
               child: _CategoryThresholdBox(
                 icon: Icons.brush_outlined,
                 iconColor: Colors.orange,
-                label: '画师',
+                label: context.l10n.tagCategory_artist,
                 preset: state.categoryThresholds.artistPreset,
                 customThreshold: state.categoryThresholds.artistCustomThreshold,
                 onChanged: onArtistThresholdChanged,
@@ -701,7 +740,7 @@ class _SyncSettingsCard extends StatelessWidget {
               child: _CategoryThresholdBox(
                 icon: Icons.person_outline,
                 iconColor: Colors.purple,
-                label: '角色',
+                label: context.l10n.tagCategory_character,
                 preset: state.categoryThresholds.characterPreset,
                 customThreshold:
                     state.categoryThresholds.characterCustomThreshold,
@@ -717,7 +756,7 @@ class _SyncSettingsCard extends StatelessWidget {
               child: _CategoryThresholdBox(
                 icon: Icons.copyright_outlined,
                 iconColor: Colors.green,
-                label: '版权',
+                label: context.l10n.tagCategory_copyright,
                 preset: state.categoryThresholds.copyrightPreset,
                 customThreshold:
                     state.categoryThresholds.copyrightCustomThreshold,
@@ -729,7 +768,7 @@ class _SyncSettingsCard extends StatelessWidget {
               child: _CategoryThresholdBox(
                 icon: Icons.code_outlined,
                 iconColor: Colors.grey,
-                label: '元标签',
+                label: context.l10n.tagCategory_meta,
                 preset: state.categoryThresholds.metaPreset,
                 customThreshold: state.categoryThresholds.metaCustomThreshold,
                 onChanged: onMetaThresholdChanged,
@@ -766,7 +805,7 @@ class _SyncSettingsCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    '自动刷新间隔',
+                    context.l10n.dataSource_autoRefreshInterval,
                     style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
@@ -779,7 +818,7 @@ class _SyncSettingsCard extends StatelessWidget {
                 children: AutoRefreshInterval.values.map((interval) {
                   final isSelected = interval == state.refreshInterval;
                   return _ChoiceChip(
-                    label: interval.displayName,
+                    label: interval.localizedLabel(context),
                     isSelected: isSelected,
                     onSelected: () => onRefreshIntervalChanged(interval),
                   );
@@ -849,7 +888,7 @@ class _CategoryThresholdBox extends StatelessWidget {
                 child: Text(
                   preset == TagHotPreset.custom
                       ? '>$customThreshold'
-                      : preset.displayName,
+                      : preset.localizedLabel(context),
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: iconColor,
                     fontWeight: FontWeight.w600,
@@ -867,7 +906,7 @@ class _CategoryThresholdBox extends StatelessWidget {
             children: TagHotPreset.values.map((p) {
               final isSelected = p == preset;
               return _SmallChoiceChip(
-                label: p.displayName,
+                label: p.localizedLabel(context),
                 isSelected: isSelected,
                 accentColor: iconColor,
                 onSelected: () =>
@@ -1051,7 +1090,9 @@ class _ActionCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 10),
                 Text(
-                  isSyncing ? '取消同步' : '立即同步',
+                  isSyncing
+                      ? context.l10n.dataSource_cancelSync
+                      : context.l10n.dataSource_syncNow,
                   style: theme.textTheme.bodyLarge?.copyWith(
                     color: theme.colorScheme.onPrimary,
                     fontWeight: FontWeight.w600,
@@ -1109,7 +1150,7 @@ class _SyncProgressCard extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  '正在同步标签数据...',
+                  context.l10n.dataSource_syncingTags,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w500,
                   ),
@@ -1224,7 +1265,7 @@ class _ErrorStateCard extends StatelessWidget {
           const SizedBox(width: 16),
           Expanded(
             child: Text(
-              '加载失败: $message',
+              context.l10n.dataSource_loadFailed(message),
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onErrorContainer,
               ),
@@ -1300,7 +1341,7 @@ class _DangerZoneCardState extends State<_DangerZoneCard> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    '清除标签补全数据',
+                    context.l10n.dataSource_clearTagAutocompleteData,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: theme.colorScheme.error,
                       fontWeight: FontWeight.w600,

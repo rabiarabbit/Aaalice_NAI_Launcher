@@ -130,7 +130,7 @@ class _FixedTagEditDialogState extends ConsumerState<FixedTagEditDialog> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            '关联自词库（双向同步）',
+                            context.l10n.fixedTags_linkedFromLibrary,
                             style: TextStyle(
                               fontSize: 13,
                               color: Colors.blue.shade700,
@@ -214,22 +214,28 @@ class _FixedTagEditDialogState extends ConsumerState<FixedTagEditDialog> {
                 Row(
                   children: [
                     Text(
-                      '作用范围',
+                      context.l10n.fixedTags_scope,
                       style: theme.textTheme.labelLarge,
                     ),
                     const SizedBox(width: 16),
                     Expanded(
                       child: SegmentedButton<FixedTagPromptType>(
-                        segments: const [
+                        segments: [
                           ButtonSegment(
                             value: FixedTagPromptType.positive,
-                            label: Text('正向'),
-                            icon: Icon(Icons.add_circle_outline, size: 16),
+                            label: Text(context.l10n.fixedTags_positive),
+                            icon: const Icon(
+                              Icons.add_circle_outline,
+                              size: 16,
+                            ),
                           ),
                           ButtonSegment(
                             value: FixedTagPromptType.negative,
-                            label: Text('负向'),
-                            icon: Icon(Icons.remove_circle_outline, size: 16),
+                            label: Text(context.l10n.fixedTags_negative),
+                            icon: const Icon(
+                              Icons.remove_circle_outline,
+                              size: 16,
+                            ),
                           ),
                         ],
                         selected: {_promptType},

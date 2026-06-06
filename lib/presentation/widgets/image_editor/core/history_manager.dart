@@ -135,7 +135,7 @@ class AddStrokeAction extends EditorAction {
   }
 
   @override
-  String get description => '绘制笔画';
+  String get description => 'Draw Stroke';
 }
 
 /// 清除图层操作
@@ -192,7 +192,7 @@ class ClearLayerAction extends EditorAction {
   }
 
   @override
-  String get description => '清除图层';
+  String get description => 'Clear Layer';
 }
 
 /// 添加图层操作
@@ -215,7 +215,7 @@ class AddLayerAction extends EditorAction {
   }
 
   @override
-  String get description => '添加图层';
+  String get description => 'Add Layer';
 }
 
 /// 删除图层操作
@@ -243,7 +243,7 @@ class DeleteLayerAction extends EditorAction {
   }
 
   @override
-  String get description => '删除图层';
+  String get description => 'Delete Layer';
 }
 
 /// 合并图层操作
@@ -295,7 +295,7 @@ class MergeLayerAction extends EditorAction {
   }
 
   @override
-  String get description => '合并图层';
+  String get description => 'Merge Layers';
 }
 
 /// 图层重排序操作
@@ -324,7 +324,7 @@ class ReorderLayerAction extends EditorAction {
   }
 
   @override
-  String get description => '重排图层';
+  String get description => 'Reorder Layers';
 }
 
 /// 画布调整大小操作
@@ -383,7 +383,7 @@ class ResizeCanvasAction extends EditorAction {
   }
 
   @override
-  String get description => '调整画布大小 (${mode.label})';
+  String get description => 'Resize Canvas (${mode.label})';
 }
 
 /// 替换图层图像操作（用于模糊、仿制图章等全图处理）
@@ -407,7 +407,7 @@ class ReplaceLayerImageAction extends EditorAction {
     required this.layerId,
     required this.newImageBytes,
     Image? newImage,
-    this.actionDescription = '替换图层图像',
+    this.actionDescription = 'Replace Layer Image',
   }) : _newImage = newImage;
 
   @override

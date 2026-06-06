@@ -9,6 +9,7 @@ import 'package:super_drag_and_drop/super_drag_and_drop.dart';
 
 import '../../../core/utils/drag_drop_utils.dart';
 import '../../../core/utils/image_share_sanitizer.dart';
+import '../../../core/utils/localization_extension.dart';
 import '../../../data/models/gallery/local_image_record.dart';
 import '../../providers/share_image_settings_provider.dart';
 
@@ -125,14 +126,16 @@ class _DraggableMemoryImageState extends ConsumerState<DraggableMemoryImage> {
           Theme.of(context),
           dragData,
           width: widget.feedbackWidth,
-          hintText: widget.feedbackHint ?? '拖拽到图生图或其他区域',
+          hintText:
+              widget.feedbackHint ?? context.l10n.drop_dragToImg2ImgOrOther,
           previewProvider: _previewProvider,
         ),
         dragBuilder: (context, child) => buildImageDragFeedback(
           Theme.of(context),
           dragData,
           width: widget.feedbackWidth,
-          hintText: widget.feedbackHint ?? '拖拽到图生图或其他区域',
+          hintText:
+              widget.feedbackHint ?? context.l10n.drop_dragToImg2ImgOrOther,
           previewProvider: _previewProvider,
         ),
         child: DraggableWidget(

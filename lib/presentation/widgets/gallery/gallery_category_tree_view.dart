@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:super_clipboard/super_clipboard.dart';
 import 'package:super_drag_and_drop/super_drag_and_drop.dart';
 
+import '../../../core/utils/localization_extension.dart';
 import '../../../data/models/gallery/gallery_category.dart';
 import '../../../data/models/gallery/local_image_record.dart';
 import '../common/themed_divider.dart';
@@ -90,7 +91,7 @@ class _GalleryCategoryTreeViewState extends State<GalleryCategoryTreeView> {
                   categoryId: null,
                   child: _CategoryItem(
                     icon: Icons.photo_library_outlined,
-                    label: '全部图片',
+                    label: context.l10n.localGallery_allImages,
                     count: widget.totalImageCount,
                     isSelected: widget.selectedCategoryId == null,
                     onTap: () => widget.onCategorySelected(null),
@@ -101,7 +102,7 @@ class _GalleryCategoryTreeViewState extends State<GalleryCategoryTreeView> {
                       ? Icons.favorite
                       : Icons.favorite_border,
                   iconColor: Colors.red.shade400,
-                  label: '收藏',
+                  label: context.l10n.common_favorite,
                   count: widget.favoriteCount,
                   isSelected: widget.selectedCategoryId == 'favorites',
                   onTap: () => widget.onCategorySelected('favorites'),
@@ -133,11 +134,11 @@ class _GalleryCategoryTreeViewState extends State<GalleryCategoryTreeView> {
       items: [
         PopupMenuItem(
           onTap: () => widget.onAddSubCategory?.call(null),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.create_new_folder, size: 18),
-              SizedBox(width: 8),
-              Text('新建分类'),
+              const Icon(Icons.create_new_folder, size: 18),
+              const SizedBox(width: 8),
+              Text(context.l10n.localGallery_createCategoryTitle),
             ],
           ),
         ),
@@ -651,33 +652,33 @@ class _CategoryItemState extends State<_CategoryItem> {
             onTap: () => Future.delayed(const Duration(milliseconds: 100), () {
               if (mounted) setState(() => _isEditing = true);
             }),
-            child: const Row(
+            child: Row(
               children: [
-                Icon(Icons.edit, size: 18),
-                SizedBox(width: 8),
-                Text('重命名'),
+                const Icon(Icons.edit, size: 18),
+                const SizedBox(width: 8),
+                Text(context.l10n.common_rename),
               ],
             ),
           ),
         if (widget.onAddSubCategory != null)
           PopupMenuItem(
             onTap: widget.onAddSubCategory,
-            child: const Row(
+            child: Row(
               children: [
-                Icon(Icons.create_new_folder, size: 18),
-                SizedBox(width: 8),
-                Text('新建子分类'),
+                const Icon(Icons.create_new_folder, size: 18),
+                const SizedBox(width: 8),
+                Text(context.l10n.localGallery_createSubCategoryTitle),
               ],
             ),
           ),
         if (widget.onMoveToRoot != null)
           PopupMenuItem(
             onTap: widget.onMoveToRoot,
-            child: const Row(
+            child: Row(
               children: [
-                Icon(Icons.drive_file_move_outline, size: 18),
-                SizedBox(width: 8),
-                Text('移至根目录'),
+                const Icon(Icons.drive_file_move_outline, size: 18),
+                const SizedBox(width: 8),
+                Text(context.l10n.localGallery_moveToRoot),
               ],
             ),
           ),
@@ -693,7 +694,7 @@ class _CategoryItemState extends State<_CategoryItem> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  '删除',
+                  context.l10n.common_delete,
                   style: TextStyle(color: Theme.of(context).colorScheme.error),
                 ),
               ],

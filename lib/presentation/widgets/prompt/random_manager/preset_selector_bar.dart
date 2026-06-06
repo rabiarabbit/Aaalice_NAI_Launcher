@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/utils/localization_extension.dart';
 import '../../../providers/random_preset_provider.dart';
 import '../../../providers/tag_group_sync_provider.dart';
 import '../../../../data/models/prompt/random_preset.dart';
 import '../../common/app_toast.dart';
 import '../new_preset_dialog.dart';
+import 'random_config_l10n.dart';
 import 'random_manager_widgets.dart';
 
 /// 预设选择栏组件
@@ -129,11 +131,17 @@ class PresetSelectorBar extends ConsumerWidget {
               Expanded(
                 child: Row(
                   children: [
-                    if (selectedPreset?.description != null &&
-                        selectedPreset!.description!.isNotEmpty)
+                    if (selectedPreset != null &&
+                        (context.l10n.presetDisplayDescription(
+                                  selectedPreset,
+                                ) ??
+                                '')
+                            .isNotEmpty)
                       Flexible(
                         child: Text(
-                          selectedPreset.description!,
+                          context.l10n.presetDisplayDescription(
+                            selectedPreset,
+                          )!,
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                           ),
@@ -193,7 +201,10 @@ class PresetSelectorBar extends ConsumerWidget {
     await notifier.selectPreset(newPreset.id);
 
     if (context.mounted) {
-      AppToast.success(context, '已创建预设 "${result.name}"');
+      AppToast.success(
+        context,
+        context.l10n.randomManager_presetCreated(result.name),
+      );
     }
   }
 
@@ -205,17 +216,19 @@ class PresetSelectorBar extends ConsumerWidget {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('删除预设'),
-        content: Text('确定要删除 "${preset.name}" 吗？此操作不可撤销。'),
+        title: Text(context.l10n.config_deletePreset),
+        content: Text(
+          context.l10n.randomManager_deletePresetConfirm(preset.name),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('取消'),
+            child: Text(context.l10n.common_cancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('删除'),
+            child: Text(context.l10n.common_delete),
           ),
         ],
       ),
@@ -234,10 +247,15 @@ class PresetSelectorBar extends ConsumerWidget {
 
     if (context.mounted) {
       if (success) {
-        AppToast.success(context, 'Danbooru 标签同步完成');
+        AppToast.success(context, context.l10n.randomManager_syncCompleted);
       } else {
         final error = ref.read(tagGroupSyncNotifierProvider).error;
-        AppToast.error(context, '同步失败: ${error ?? "未知错误"}');
+        AppToast.error(
+          context,
+          context.l10n.randomManager_syncFailed(
+            error ?? context.l10n.randomManager_unknownError,
+          ),
+        );
       }
     }
   }
@@ -250,16 +268,16 @@ class PresetSelectorBar extends ConsumerWidget {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('重置为默认配置'),
-        content: const Text('将恢复官方默认配置。\n您添加的自定义词组会被保留但禁用。'),
+        title: Text(context.l10n.randomManager_resetDefaultTitle),
+        content: Text(context.l10n.randomManager_resetDefaultContent),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('取消'),
+            child: Text(context.l10n.common_cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('确认重置'),
+            child: Text(context.l10n.randomManager_resetDefaultConfirm),
           ),
         ],
       ),
@@ -270,7 +288,7 @@ class PresetSelectorBar extends ConsumerWidget {
           .read(randomPresetNotifierProvider.notifier)
           .resetToDefault(preset.id);
       if (context.mounted) {
-        AppToast.success(context, '已重置为默认配置');
+        AppToast.success(context, context.l10n.randomManager_resetDefaultDone);
       }
     }
   }
@@ -358,7 +376,7 @@ class _PresetDropdownState extends State<_PresetDropdown> {
                     const SizedBox(width: 6),
                     Expanded(
                       child: Text(
-                        preset.name,
+                        context.l10n.presetDisplayName(preset),
                         overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.bodySmall,
                       ),
@@ -379,7 +397,7 @@ class _PresetDropdownState extends State<_PresetDropdown> {
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    '新建预设...',
+                    '${context.l10n.config_newPreset}...',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: colorScheme.onSurface.withValues(alpha: 0.35),
                     ),
@@ -438,7 +456,7 @@ class _StatisticsInfo extends StatelessWidget {
           Flexible(
             child: StatItem(
               icon: Icons.category_outlined,
-              label: '类别',
+              label: context.l10n.randomManager_categories,
               value: '${preset.categoryCount}',
               color: colorScheme.primary,
             ),
@@ -447,7 +465,7 @@ class _StatisticsInfo extends StatelessWidget {
           Flexible(
             child: StatItem(
               icon: Icons.layers_outlined,
-              label: '词组',
+              label: context.l10n.randomManager_tagGroups,
               value:
                   '${preset.categories.fold(0, (sum, c) => sum + c.groupCount)}',
               color: colorScheme.secondary,
@@ -457,7 +475,7 @@ class _StatisticsInfo extends StatelessWidget {
           Flexible(
             child: StatItem(
               icon: Icons.label_outlined,
-              label: '标签',
+              label: context.l10n.randomManager_tags,
               value: '${preset.totalTagCount}',
               color: colorScheme.tertiary,
             ),
@@ -559,7 +577,7 @@ class _ActionButtons extends StatelessWidget {
         if (onGeneratePreview != null)
           _ActionButton(
             icon: Icons.play_arrow_rounded,
-            tooltip: '生成预览',
+            tooltip: context.l10n.randomManager_generatePreview,
             onPressed: onGeneratePreview,
             color: colorScheme.primary,
           ),
@@ -569,7 +587,7 @@ class _ActionButtons extends StatelessWidget {
         if (onDelete != null)
           _ActionButton(
             icon: Icons.delete_outline,
-            tooltip: '删除预设',
+            tooltip: context.l10n.config_deletePreset,
             onPressed: onDelete,
             color: Colors.red.shade400,
           ),
@@ -577,7 +595,7 @@ class _ActionButtons extends StatelessWidget {
         if (onImportExport != null)
           _ActionButton(
             icon: Icons.import_export,
-            tooltip: '导入/导出',
+            tooltip: context.l10n.randomManager_importExport,
             onPressed: onImportExport,
           ),
       ],
@@ -643,7 +661,9 @@ class _SyncButtonState extends State<_SyncButton>
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
       child: Tooltip(
-        message: widget.isSyncing ? '同步中...' : '同步 Danbooru 标签',
+        message: widget.isSyncing
+            ? context.l10n.randomManager_syncingWithEllipsis
+            : context.l10n.randomManager_syncDanbooruTags,
         child: GestureDetector(
           onTap: widget.isSyncing ? null : widget.onPressed,
           child: AnimatedContainer(
@@ -690,7 +710,9 @@ class _SyncButtonState extends State<_SyncButton>
                       ),
                 const SizedBox(width: 6),
                 Text(
-                  widget.isSyncing ? '同步中' : 'Danbooru',
+                  widget.isSyncing
+                      ? context.l10n.randomManager_syncing
+                      : 'Danbooru',
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
@@ -729,7 +751,7 @@ class _ResetButtonState extends State<_ResetButton> {
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
       child: Tooltip(
-        message: '重置为默认配置',
+        message: context.l10n.resetToDefaultTooltip,
         child: GestureDetector(
           onTap: widget.onPressed,
           child: AnimatedContainer(
@@ -777,7 +799,7 @@ class _ResetButtonState extends State<_ResetButton> {
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  '重置',
+                  context.l10n.common_reset,
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
@@ -880,7 +902,7 @@ class _ReadOnlyIndicator extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Tooltip(
-      message: '当前预设为默认预设，所有配置项已锁定',
+      message: context.l10n.randomManager_readOnlyTooltip,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
@@ -906,7 +928,7 @@ class _ReadOnlyIndicator extends StatelessWidget {
             ),
             const SizedBox(width: 6),
             Text(
-              '只读模式',
+              context.l10n.randomManager_readOnlyMode,
               style: theme.textTheme.labelSmall?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: Colors.amber.shade900,

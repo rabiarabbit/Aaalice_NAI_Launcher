@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/utils/localization_extension.dart';
 import '../../common/elevated_card.dart';
 
 /// 搜索和筛选状态
@@ -183,7 +184,7 @@ class _SearchInputState extends State<_SearchInput> {
           onChanged: widget.onChanged,
           style: Theme.of(context).textTheme.bodySmall,
           decoration: InputDecoration(
-            hintText: '搜索类别或标签组...',
+            hintText: context.l10n.randomManager_searchCategoryOrTagGroup,
             hintStyle: TextStyle(
               color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
             ),
@@ -326,7 +327,7 @@ class _ClearButtonState extends State<_ClearButton> {
               ),
               const SizedBox(width: 4),
               Text(
-                '清除',
+                context.l10n.common_clear,
                 style: TextStyle(
                   fontSize: 12,
                   color: colorScheme.error,
@@ -373,7 +374,7 @@ class _FilterOptions extends StatelessWidget {
         children: [
           // 作用域筛选
           Text(
-            '作用域',
+            context.l10n.randomManager_scope,
             style: theme.textTheme.labelMedium?.copyWith(
               fontWeight: FontWeight.w600,
             ),
@@ -384,7 +385,7 @@ class _FilterOptions extends StatelessWidget {
             runSpacing: 8,
             children: [
               _FilterChip(
-                label: '全局',
+                label: context.l10n.randomManager_global,
                 icon: Icons.public,
                 isSelected: state.selectedScopes.contains('global'),
                 onSelected: (selected) {
@@ -398,7 +399,7 @@ class _FilterOptions extends StatelessWidget {
                 },
               ),
               _FilterChip(
-                label: '私有',
+                label: context.l10n.randomManager_private,
                 icon: Icons.person,
                 isSelected: state.selectedScopes.contains('private'),
                 onSelected: (selected) {
@@ -416,7 +417,7 @@ class _FilterOptions extends StatelessWidget {
           const SizedBox(height: 16),
           // 状态筛选
           Text(
-            '状态',
+            context.l10n.randomManager_status,
             style: theme.textTheme.labelMedium?.copyWith(
               fontWeight: FontWeight.w600,
             ),
@@ -427,7 +428,7 @@ class _FilterOptions extends StatelessWidget {
             runSpacing: 8,
             children: [
               _FilterChip(
-                label: '仅启用',
+                label: context.l10n.randomManager_enabledOnly,
                 icon: Icons.check_circle_outline,
                 isSelected: state.showEnabledOnly,
                 onSelected: (selected) {
@@ -435,7 +436,7 @@ class _FilterOptions extends StatelessWidget {
                 },
               ),
               _FilterChip(
-                label: '有 DIY 能力',
+                label: context.l10n.randomManager_diyCapable,
                 icon: Icons.auto_awesome,
                 isSelected: state.showWithDiyOnly,
                 onSelected: (selected) {

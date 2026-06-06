@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/utils/localization_extension.dart';
 import '../../../providers/random_preset_provider.dart';
 import '../../../../data/models/prompt/random_category.dart';
 import '../../../../data/models/prompt/random_tag_group.dart';
@@ -8,6 +9,7 @@ import '../../common/elevated_card.dart';
 import '../../common/themed_confirm_dialog.dart';
 import 'add_tag_group_dialog.dart';
 import 'category_card_widgets.dart';
+import 'random_config_l10n.dart';
 import 'tag_group_card.dart';
 
 // 导出拆分的组件，方便外部使用
@@ -98,6 +100,7 @@ class _CategoryCardState extends ConsumerState<CategoryCard>
   Widget _buildHeader(BuildContext context, RandomCategory category) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = context.l10n;
 
     return Padding(
       padding: const EdgeInsets.all(12),
@@ -115,7 +118,7 @@ class _CategoryCardState extends ConsumerState<CategoryCard>
               if (category.emoji.isNotEmpty) const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  category.name,
+                  l10n.randomCategoryName(category),
                   style: theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                     decoration:
@@ -171,7 +174,9 @@ class _CategoryCardState extends ConsumerState<CategoryCard>
               ),
               const SizedBox(width: 12),
               Text(
-                '${category.groupCount} 个词组',
+                l10n.randomManager_tagGroupCount(
+                  category.groupCount.toString(),
+                ),
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),
@@ -194,6 +199,7 @@ class _CategoryCardState extends ConsumerState<CategoryCard>
   Widget _buildExpandedContent(BuildContext context, RandomCategory category) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = context.l10n;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -208,7 +214,7 @@ class _CategoryCardState extends ConsumerState<CategoryCard>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '词组列表',
+                l10n.randomManager_tagGroupList,
                 style: theme.textTheme.labelLarge?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
@@ -306,10 +312,12 @@ class _CategoryCardState extends ConsumerState<CategoryCard>
   void _showDeleteConfirmDialog(BuildContext context, _DragData data) async {
     final confirmed = await ThemedConfirmDialog.show(
       context: context,
-      title: '删除词组',
-      content: '确定要删除词组「${data.group.name}」吗？此操作不可撤销。',
-      confirmText: '删除',
-      cancelText: '取消',
+      title: context.l10n.randomManager_deleteTagGroupTitle,
+      content: context.l10n.randomManager_deleteTagGroupConfirm(
+        context.l10n.randomTagGroupName(data.group),
+      ),
+      confirmText: context.l10n.common_delete,
+      cancelText: context.l10n.common_cancel,
       type: ThemedConfirmDialogType.danger,
       icon: Icons.delete_outline,
     );

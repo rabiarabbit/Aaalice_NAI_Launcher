@@ -303,7 +303,7 @@ class _FixedTagsDialogState extends ConsumerState<FixedTagsDialog> {
                           '${context.l10n.fixedTags_enabledCount(
                             enabledCount.toString(),
                             totalCount.toString(),
-                          )} · 关联 $linkCount',
+                          )} · ${context.l10n.fixedTags_linkCount(linkCount)}',
                           style: theme.textTheme.labelSmall?.copyWith(
                             color: enabledCount > 0
                                 ? theme.colorScheme.secondary
@@ -333,11 +333,13 @@ class _FixedTagsDialogState extends ConsumerState<FixedTagsDialog> {
               size: 18,
             ),
             label: Text(
-              fixedTagsState.negativePanelExpanded ? '收起负向' : '展开负向',
+              fixedTagsState.negativePanelExpanded
+                  ? context.l10n.fixedTags_collapseNegative
+                  : context.l10n.fixedTags_expandNegative,
             ),
           ),
           IconButton(
-            tooltip: '撤销固定词操作',
+            tooltip: context.l10n.fixedTags_undoTooltip,
             onPressed: fixedTagsState.canUndo
                 ? () => ref.read(fixedTagsNotifierProvider.notifier).undo()
                 : null,
@@ -345,7 +347,7 @@ class _FixedTagsDialogState extends ConsumerState<FixedTagsDialog> {
             visualDensity: VisualDensity.compact,
           ),
           IconButton(
-            tooltip: '重做固定词操作',
+            tooltip: context.l10n.fixedTags_redoTooltip,
             onPressed: fixedTagsState.canRedo
                 ? () => ref.read(fixedTagsNotifierProvider.notifier).redo()
                 : null,
@@ -553,7 +555,7 @@ class _FixedTagsDialogState extends ConsumerState<FixedTagsDialog> {
                 Expanded(
                   child: _buildFixedTagColumn(
                     theme: theme,
-                    title: '正向固定词',
+                    title: context.l10n.fixedTags_positiveTitle,
                     promptType: FixedTagPromptType.positive,
                     entries: positives,
                     searchController: _positiveSearchController,
@@ -569,7 +571,7 @@ class _FixedTagsDialogState extends ConsumerState<FixedTagsDialog> {
                 Expanded(
                   child: _buildFixedTagColumn(
                     theme: theme,
-                    title: '负向固定词',
+                    title: context.l10n.fixedTags_negativeTitle,
                     promptType: FixedTagPromptType.negative,
                     entries: negatives,
                     searchController: _negativeSearchController,
@@ -621,8 +623,12 @@ class _FixedTagsDialogState extends ConsumerState<FixedTagsDialog> {
     final enabledCount = allEntries.where((entry) => entry.enabled).length;
     final hasSearch = searchQuery.trim().isNotEmpty;
     final totalText = hasSearch
-        ? '$enabledCount/${allEntries.length} · 显示 ${entries.length}'
-        : '$enabledCount/${allEntries.length}';
+        ? context.l10n.fixedTags_columnFilteredCount(
+            enabledCount,
+            allEntries.length,
+            entries.length,
+          )
+        : context.l10n.fixedTags_columnCount(enabledCount, allEntries.length);
 
     return Column(
       children: [
@@ -643,8 +649,8 @@ class _FixedTagsDialogState extends ConsumerState<FixedTagsDialog> {
               _buildColumnActionButton(
                 theme: theme,
                 icon: Icons.add_rounded,
-                label: '新建',
-                tooltip: '新建$title',
+                label: context.l10n.fixedTags_new,
+                tooltip: context.l10n.fixedTags_newTarget(title),
                 onPressed: () => _showEditDialog(
                   null,
                   initialPromptType: promptType,
@@ -654,8 +660,8 @@ class _FixedTagsDialogState extends ConsumerState<FixedTagsDialog> {
               _buildColumnActionButton(
                 theme: theme,
                 icon: Icons.playlist_add_rounded,
-                label: '词库',
-                tooltip: '从词库添加到$title',
+                label: context.l10n.fixedTags_library,
+                tooltip: context.l10n.fixedTags_addFromLibraryToTarget(title),
                 onPressed: () => _showLibraryPicker(theme, promptType),
               ),
               const SizedBox(width: 4),
@@ -679,7 +685,11 @@ class _FixedTagsDialogState extends ConsumerState<FixedTagsDialog> {
                   visualDensity: VisualDensity.compact,
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                 ),
-                child: Text(enabledCount == allEntries.length ? '全关' : '全开'),
+                child: Text(
+                  enabledCount == allEntries.length
+                      ? context.l10n.fixedTags_disableAll
+                      : context.l10n.fixedTags_enableAll,
+                ),
               ),
             ],
           ),
@@ -689,7 +699,7 @@ class _FixedTagsDialogState extends ConsumerState<FixedTagsDialog> {
           child: ThemedInput(
             controller: searchController,
             decoration: InputDecoration(
-              hintText: '搜索 $title...',
+              hintText: context.l10n.fixedTags_searchTarget(title),
               prefixIcon: const Icon(Icons.search, size: 18),
               suffixIcon: hasSearch
                   ? IconButton(
@@ -710,7 +720,9 @@ class _FixedTagsDialogState extends ConsumerState<FixedTagsDialog> {
           child: entries.isEmpty
               ? Center(
                   child: Text(
-                    hasSearch ? '无匹配固定词' : '暂无$title',
+                    hasSearch
+                        ? context.l10n.fixedTags_noMatching
+                        : context.l10n.fixedTags_emptyTarget(title),
                     style: TextStyle(color: theme.colorScheme.outline),
                   ),
                 )
@@ -764,7 +776,9 @@ class _FixedTagsDialogState extends ConsumerState<FixedTagsDialog> {
             .linkedPositivesOf(entry.id)
             .map((entry) => entry.displayName)
             .join(', ');
-    final tooltip = linkCount == 0 ? '拖拽创建联动' : '已联动：$linkedNames';
+    final tooltip = linkCount == 0
+        ? context.l10n.fixedTags_dragToLink
+        : context.l10n.fixedTags_linkedToNames(linkedNames);
 
     final anchorVisual = SizedBox(
       width: 22,
@@ -867,7 +881,7 @@ class _FixedTagsDialogState extends ConsumerState<FixedTagsDialog> {
         ? state.linkedNegativesOf(entry.id)
         : state.linkedPositivesOf(entry.id);
     if (linkedEntries.isEmpty) {
-      AppToast.info(context, '拖拽正向固定词的关联图标到负向固定词即可创建联动');
+      AppToast.info(context, context.l10n.fixedTags_linkInstruction);
       return;
     }
 
@@ -875,7 +889,7 @@ class _FixedTagsDialogState extends ConsumerState<FixedTagsDialog> {
       context: context,
       builder: (context) {
         return SimpleDialog(
-          title: const Text('管理联动'),
+          title: Text(context.l10n.fixedTags_manageLinks),
           children: [
             for (final linkedEntry in linkedEntries)
               SimpleDialogOption(
@@ -902,7 +916,11 @@ class _FixedTagsDialogState extends ConsumerState<FixedTagsDialog> {
                     const Icon(Icons.link_off_rounded, size: 16),
                     const SizedBox(width: 8),
                     Expanded(
-                      child: Text('取消联动：${linkedEntry.displayName}'),
+                      child: Text(
+                        context.l10n.fixedTags_removeLink(
+                          linkedEntry.displayName,
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -966,7 +984,7 @@ class _FixedTagsDialogState extends ConsumerState<FixedTagsDialog> {
           const Spacer(),
           if (negativeExpanded)
             Text(
-              '在各列顶部新建或从词库添加',
+              context.l10n.fixedTags_footerExpandedHint,
               style: theme.textTheme.labelMedium?.copyWith(
                 color: theme.colorScheme.outline,
               ),
@@ -979,7 +997,7 @@ class _FixedTagsDialogState extends ConsumerState<FixedTagsDialog> {
                 initialPromptType: FixedTagPromptType.positive,
               ),
               icon: const Icon(Icons.add_rounded, size: 17),
-              label: const Text('新建正向'),
+              label: Text(context.l10n.fixedTags_newPositive),
               style: FilledButton.styleFrom(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -992,7 +1010,7 @@ class _FixedTagsDialogState extends ConsumerState<FixedTagsDialog> {
                 FixedTagPromptType.positive,
               ),
               icon: const Icon(Icons.playlist_add_rounded, size: 17),
-              label: const Text('词库添加正向'),
+              label: Text(context.l10n.fixedTags_addPositiveFromLibraryShort),
               style: FilledButton.styleFrom(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -1010,7 +1028,7 @@ class _FixedTagsDialogState extends ConsumerState<FixedTagsDialog> {
     final entries = libraryState.entries;
 
     if (entries.isEmpty) {
-      AppToast.info(context, '词库为空，请先添加条目');
+      AppToast.info(context, context.l10n.fixedTags_libraryEmpty);
       return;
     }
 
@@ -1167,7 +1185,7 @@ class _LibraryPickerDialogState extends State<_LibraryPickerDialog> {
                   ),
                   const SizedBox(width: 10),
                   Text(
-                    '从词库添加',
+                    context.l10n.fixedTags_addFromLibrary,
                     style: theme.textTheme.titleMedium
                         ?.copyWith(fontWeight: FontWeight.w600),
                   ),
@@ -1185,7 +1203,7 @@ class _LibraryPickerDialogState extends State<_LibraryPickerDialog> {
               child: ThemedInput(
                 controller: _searchController,
                 decoration: InputDecoration(
-                  hintText: '搜索词库条目...',
+                  hintText: context.l10n.fixedTags_searchLibraryEntries,
                   prefixIcon: Icon(
                     Icons.search,
                     size: 20,
@@ -1209,7 +1227,7 @@ class _LibraryPickerDialogState extends State<_LibraryPickerDialog> {
               child: filtered.isEmpty
                   ? Center(
                       child: Text(
-                        '无匹配结果',
+                        context.l10n.fixedTags_noMatchingResults,
                         style: TextStyle(color: theme.colorScheme.outline),
                       ),
                     )

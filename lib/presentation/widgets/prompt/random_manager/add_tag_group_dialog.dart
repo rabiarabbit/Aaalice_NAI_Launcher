@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../core/utils/localization_extension.dart';
 import '../../../providers/random_preset_provider.dart';
 import '../../../../data/models/prompt/random_category.dart';
 import '../../../../data/models/prompt/random_tag_group.dart';
@@ -9,6 +10,7 @@ import '../../../../data/models/prompt/weighted_tag.dart';
 import '../../common/emoji_picker_dialog.dart';
 import '../../common/hover_preview_card.dart';
 import 'danbooru_preview_content.dart';
+import 'random_config_l10n.dart';
 
 /// 添加词组对话框
 class AddTagGroupDialog extends ConsumerStatefulWidget {
@@ -183,13 +185,15 @@ class _AddTagGroupDialogState extends ConsumerState<AddTagGroupDialog>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '添加词组',
+                  context.l10n.randomManager_addTagGroup,
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 Text(
-                  '添加到「${widget.category.name}」类别',
+                  context.l10n.randomManager_addTagGroupSubtitle(
+                    context.l10n.randomCategoryName(widget.category),
+                  ),
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),
@@ -227,8 +231,8 @@ class _AddTagGroupDialogState extends ConsumerState<AddTagGroupDialog>
             child: TextFormField(
               controller: _nameController,
               decoration: InputDecoration(
-                labelText: '词组名称',
-                hintText: '输入词组名称',
+                labelText: context.l10n.randomManager_tagGroupName,
+                hintText: context.l10n.randomManager_tagGroupNameHint,
                 border: const OutlineInputBorder(),
                 filled: true,
                 fillColor: colorScheme.surfaceContainerHighest,
@@ -239,7 +243,7 @@ class _AddTagGroupDialogState extends ConsumerState<AddTagGroupDialog>
               ),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
-                  return '请输入词组名称';
+                  return context.l10n.randomManager_tagGroupNameRequired;
                 }
                 return null;
               },
@@ -272,18 +276,18 @@ class _AddTagGroupDialogState extends ConsumerState<AddTagGroupDialog>
         labelColor: colorScheme.onPrimaryContainer,
         unselectedLabelColor: colorScheme.onSurfaceVariant,
         labelStyle: const TextStyle(fontSize: 12),
-        tabs: const [
+        tabs: [
           Tab(
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.edit_note, size: 16),
-                SizedBox(width: 4),
-                Text('自定义'),
+                const Icon(Icons.edit_note, size: 16),
+                const SizedBox(width: 4),
+                Text(context.l10n.randomManager_customTab),
               ],
             ),
           ),
-          Tab(
+          const Tab(
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -293,7 +297,7 @@ class _AddTagGroupDialogState extends ConsumerState<AddTagGroupDialog>
               ],
             ),
           ),
-          Tab(
+          const Tab(
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -316,7 +320,9 @@ class _AddTagGroupDialogState extends ConsumerState<AddTagGroupDialog>
       child: TextField(
         controller: _searchController,
         decoration: InputDecoration(
-          hintText: _sourceTabIndex == 1 ? '搜索 Tag Group...' : '搜索 Pool...',
+          hintText: _sourceTabIndex == 1
+              ? context.l10n.randomManager_searchTagGroup
+              : context.l10n.randomManager_searchPool,
           prefixIcon: const Icon(Icons.search, size: 20),
           suffixIcon: _searchQuery.isNotEmpty
               ? IconButton(
@@ -364,13 +370,13 @@ class _AddTagGroupDialogState extends ConsumerState<AddTagGroupDialog>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '标签列表',
+            context.l10n.randomManager_tagList,
             style: theme.textTheme.labelLarge
                 ?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 4),
           Text(
-            '每行一个标签，支持格式: tag 或 tag:weight',
+            context.l10n.randomManager_tagListHelp,
             style: theme.textTheme.bodySmall
                 ?.copyWith(color: colorScheme.onSurfaceVariant),
           ),
@@ -414,7 +420,7 @@ class _AddTagGroupDialogState extends ConsumerState<AddTagGroupDialog>
               ),
               const Spacer(),
               Text(
-                '${filtered.length} 个',
+                context.l10n.randomManager_itemCount(filtered.length),
                 style: theme.textTheme.bodySmall
                     ?.copyWith(color: colorScheme.onSurfaceVariant),
               ),
@@ -425,7 +431,7 @@ class _AddTagGroupDialogState extends ConsumerState<AddTagGroupDialog>
             child: filtered.isEmpty
                 ? Center(
                     child: Text(
-                      '未找到匹配的 Tag Group',
+                      context.l10n.randomManager_noMatchingTagGroup,
                       style: TextStyle(color: colorScheme.onSurfaceVariant),
                     ),
                   )
@@ -472,7 +478,7 @@ class _AddTagGroupDialogState extends ConsumerState<AddTagGroupDialog>
               ),
               const Spacer(),
               Text(
-                '${filtered.length} 个',
+                context.l10n.randomManager_itemCount(filtered.length),
                 style: theme.textTheme.bodySmall
                     ?.copyWith(color: colorScheme.onSurfaceVariant),
               ),
@@ -483,7 +489,7 @@ class _AddTagGroupDialogState extends ConsumerState<AddTagGroupDialog>
             child: filtered.isEmpty
                 ? Center(
                     child: Text(
-                      '未找到匹配的 Pool',
+                      context.l10n.randomManager_noMatchingPool,
                       style: TextStyle(color: colorScheme.onSurfaceVariant),
                     ),
                   )
@@ -525,13 +531,13 @@ class _AddTagGroupDialogState extends ConsumerState<AddTagGroupDialog>
         children: [
           OutlinedButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('取消'),
+            child: Text(context.l10n.common_cancel),
           ),
           const SizedBox(width: 12),
           FilledButton.icon(
             onPressed: _canSubmit() ? _addGroup : null,
             icon: const Icon(Icons.add, size: 18),
-            label: const Text('添加'),
+            label: Text(context.l10n.common_add),
           ),
         ],
       ),
@@ -737,7 +743,9 @@ class _DanbooruListTileState extends State<_DanbooruListTile> {
         widget.poolId != null) {
       return PoolPreviewContent(poolId: widget.poolId!);
     }
-    return const PreviewCardError(message: '无法加载预览');
+    return PreviewCardError(
+      message: context.l10n.randomManager_cannotLoadPreview,
+    );
   }
 
   @override
@@ -804,7 +812,7 @@ class _DanbooruListTileState extends State<_DanbooruListTile> {
                 IconButton(
                   icon: const Icon(Icons.open_in_new, size: 18),
                   onPressed: widget.onOpenExternal,
-                  tooltip: '在 Danbooru 中查看',
+                  tooltip: context.l10n.randomManager_openInDanbooru,
                   style: IconButton.styleFrom(
                     backgroundColor: colorScheme.surfaceContainerHighest
                         .withValues(alpha: 0.5),

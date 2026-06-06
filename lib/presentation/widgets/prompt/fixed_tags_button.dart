@@ -239,7 +239,7 @@ class _FixedTagsButtonState extends ConsumerState<FixedTagsButton> {
               ),
               const SizedBox(height: 2),
               Text(
-                '点击管理，长按打开侧栏',
+                context.l10n.fixedTags_clickManageLongPressSidebar,
                 style: TextStyle(
                   fontSize: 10,
                   color: theme.colorScheme.outline,
@@ -306,7 +306,7 @@ class _FixedTagsButtonState extends ConsumerState<FixedTagsButton> {
             theme,
             icon: Icons.link_rounded,
             count: linkCount,
-            label: '联动',
+            label: context.l10n.fixedTags_linked,
             color: theme.colorScheme.secondary,
             isActive: linkCount > 0,
           ),
@@ -584,7 +584,7 @@ class _FixedTagsButtonState extends ConsumerState<FixedTagsButton> {
           ),
           const SizedBox(width: 4),
           Text(
-            '点击管理，长按侧栏',
+            context.l10n.fixedTags_clickManageLongPressCompact,
             style: TextStyle(
               fontSize: 10,
               color: theme.colorScheme.outline.withValues(alpha: 0.6),

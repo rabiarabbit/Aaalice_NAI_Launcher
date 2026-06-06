@@ -33,6 +33,7 @@
   "common_featureInDev": "Feature in development...",
   "common_add": "Add",
   "common_added": "Added",
+  "common_new": "New",
   "common_confirmDelete": "Confirm Delete",
   "common_settings": "Settings",
   "common_today": "Today",
@@ -70,6 +71,16 @@
   "common_skip": "Skip",
   "common_yes": "Yes",
   "common_no": "No",
+  "common_exit": "Exit",
+  "common_folder": "Folder",
+  "common_filter": "Filter",
+  "common_grid": "Grid",
+  "common_date": "Date",
+  "common_pack": "Pack",
+  "common_multiSelect": "Multi-select",
+  "common_category": "Category",
+  "common_categories": "Categories",
+  "common_items": "items",
 
   "nav_canvas": "Canvas",
   "nav_gallery": "Gallery",
@@ -193,6 +204,11 @@
   "settings_language": "Language",
   "settings_languageChinese": "中文",
   "settings_languageEnglish": "English",
+  "settings_shortcuts": "Shortcuts",
+  "settings_dataSource": "Data Source",
+  "settings_queue": "Queue",
+  "settings_notifications": "Notifications",
+  "settings_promptAssistant": "Assistant",
   "settings_selectStyle": "Select Style",
   "settings_defaultPreset": "Default",
   "settings_selectFont": "Select Font",
@@ -217,6 +233,8 @@
   },
   "settings_openSource": "Open Source",
   "settings_openSourceSubtitle": "View source code and documentation",
+  "settings_fileLogging": "Record application logs",
+  "settings_fileLoggingSubtitle": "Off by default; enable only for troubleshooting. When enabled, logs are written to Documents/NAI_Launcher/logs. When disabled, log files are no longer created or written.",
   "settings_pathReset": "Reset to default location",
   "settings_pathSaved": "Save location updated",
   "settings_selectFolder": "Select Save Folder",
@@ -402,11 +420,37 @@
       }
     }
   },
+  "prompt_characterPromptReplaced": "Replaced character prompts",
+  "prompt_characterPromptAppended": "Appended character prompts ({count} character(s))",
+  "@prompt_characterPromptAppended": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "prompt_smartDecomposedWithCharacters": "Decomposed into main prompt + {count} character(s)",
+  "@prompt_smartDecomposedWithCharacters": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "prompt_appliedToMainPrompt": "Applied to main prompt",
   "prompt_editPrompt": "Edit Prompt",
   "prompt_inputPrompt": "Enter prompt...",
   "prompt_inputNegativePrompt": "Enter negative prompt...",
   "prompt_describeImage": "Describe the image you want to generate...",
   "prompt_describeImageWithHint": "Enter prompt to describe image, type < to reference library, supports tag autocomplete",
+  "promptAssistant_needPrompt": "Enter a prompt before using the assistant",
+  "promptAssistant_requestFailed": "Assistant request failed: {error}",
+  "@promptAssistant_requestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "promptAssistant_enableAssistant": "Enable Prompt Assistant",
+  "promptAssistant_desktopOverlay": "Desktop bottom-right overlay",
+  "kritaBridge_busyGenerating": "Krita Bridge is generating. Wait for the current task to finish.",
+  "prompt_negativeFixedTagPrefix": "Negative Fixed Tag Prefix",
+  "prompt_negativeFixedTagSuffix": "Negative Fixed Tag Suffix",
   "prompt_unwantedContent": "Content you don't want in the image...",
   "prompt_addTagsHint": "Add tags to describe your desired image",
   "prompt_addUnwantedHint": "Add unwanted elements",
@@ -648,6 +692,63 @@
   "img2img_enhanceMagnitude": "Magnitude",
   "img2img_enhanceShowIndividualSettings": "Show Individual Settings",
   "img2img_enhanceUpscaleAmount": "Upscale Amount",
+  "img2img_focusedInpaint": "Focused Inpainting",
+  "img2img_focusedInpaintEnabledHint": "Enabled. Adjust the focus area and Minimum Context Area from the top-left control in the inpaint editor.",
+  "img2img_focusedInpaintDisabledHint": "Regular inpaint is the default. To use Focused Inpaint, enable it from the top-left control in the inpaint editor and draw a focus area.",
+  "img2img_disabled": "Disabled",
+  "img2img_novelAiCloudUpscale": "NovelAI cloud upscale (fixed 4x)",
+  "img2img_comfyuiEnableHint": "Enable and connect ComfyUI in Settings > ComfyUI first.",
+  "img2img_upscaleMode": "Upscale Mode",
+  "img2img_upscaleRegularModel": "Regular Model",
+  "img2img_upscaleModel": "Upscale Model",
+  "img2img_noSeedvr2Models": "No SeedVR2 model found. Refresh the model list or check the SeedVR2 node/model files.",
+  "img2img_noRegularUpscaleModels": "No regular upscale model found. Refresh the model list or check models/upscale_models.",
+  "img2img_useSeedvr2TiledWorkflow": "Using the SeedVR2TilingUpscaler tiled upscale workflow.",
+  "img2img_useSeedvr2Workflow": "Using the SeedVR2VideoUpscaler workflow.",
+  "img2img_useRegularUpscaleWorkflow": "Using UpscaleModelLoader + ImageUpscaleWithModel, then correcting to the target scale with Lanczos.",
+  "img2img_useRtxUpscaleWorkflow": "Using RTX Video Super Resolution. No model selection is required.",
+  "img2img_refreshModelList": "Refresh model list",
+  "img2img_startUpscale": "Start Upscale",
+  "img2img_novelAiUpscaleComplete": "NovelAI upscale complete",
+  "img2img_upscaleCompleteAdded": "Upscale complete ({width}x{height}); added to preview list",
+  "@img2img_upscaleCompleteAdded": {
+    "placeholders": {
+      "width": {},
+      "height": {}
+    }
+  },
+  "img2img_regularUpscaleCompleteAdded": "Regular model upscale complete ({width}x{height}); added to preview list",
+  "@img2img_regularUpscaleCompleteAdded": {
+    "placeholders": {
+      "width": {},
+      "height": {}
+    }
+  },
+  "img2img_rtxUpscaleCompleteAdded": "RTX upscale complete ({width}x{height}); added to preview list",
+  "@img2img_rtxUpscaleCompleteAdded": {
+    "placeholders": {
+      "width": {},
+      "height": {}
+    }
+  },
+  "img2img_noAvailableSeedvr2Model": "No available SeedVR2 model selected",
+  "img2img_noAvailableRegularUpscaleModel": "No available regular upscale model selected",
+  "img2img_decodeSourceFailed": "Failed to decode source image",
+  "img2img_metricSpeed": "Speed",
+  "img2img_metricVram": "VRAM",
+  "img2img_metricQuality": "Quality",
+  "img2img_seedvr2VaeTileHint": "Also writes the SeedVR2 VAE MODEL encode/decode tile size.",
+  "img2img_seedvr2UseTiledUpscale": "Use tiled upscale",
+  "img2img_seedvr2UseTiledUpscaleHint": "When enabled, uses SeedVR2TilingUpscaler. Recommended for large images or high VRAM pressure.",
+  "img2img_seedvr2TileSize": "Tile Size",
+  "img2img_seedvr2TileSizeHint": "Also controls SeedVR2TilingUpscaler tile_width / tile_height.",
+  "img2img_regularModelDescription": "Regular Model · {name}",
+  "@img2img_regularModelDescription": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "img2img_upscalePanelOpened": "Opened the image-to-image upscale panel",
 
   "editor_title": "Image Editor",
   "editor_done": "Done",
@@ -686,7 +787,10 @@
   "editor_toolLine": "Line",
   "editor_toolRectSelect": "Rectangle",
   "editor_toolEllipseSelect": "Ellipse",
+  "editor_toolLassoSelect": "Lasso",
   "editor_toolColorPicker": "Color Picker",
+  "editor_toolCloneStamp": "Clone Stamp",
+  "editor_toolBlur": "Blur",
   "editor_presetDefault": "Default",
   "editor_presetPencil": "Pencil",
   "editor_presetMarker": "Marker",
@@ -707,6 +811,278 @@
   "editor_addToSelection": "Add to selection",
   "editor_subtractFromSelection": "Subtract from selection",
   "editor_selectionHint": "Draw selection for inpaint mask",
+  "editor_back": "Back",
+  "editor_layers": "Layers",
+  "editor_loadMask": "Load Mask",
+  "editor_togglePanels": "Toggle Panels",
+  "editor_fillClosedRegion": "Fill Closed Region",
+  "editor_resetMask": "Reset Mask",
+  "editor_zoomIn": "Zoom In",
+  "editor_zoomOut": "Zoom Out",
+  "editor_fitToWindow": "Fit to Window",
+  "editor_tempColorPickerShortcut": "Alt+Click: temporary color picker",
+  "editor_shortcutHelpTitle": "Shortcut Help",
+  "editor_shortcutPaintTools": "Paint Tools",
+  "editor_shortcutSelectionTools": "Selection Tools",
+  "editor_shortcutCanvasView": "Canvas View",
+  "editor_shortcutBrushAdjust": "Brush Adjustments",
+  "editor_shortcutColors": "Colors",
+  "editor_shortcutCanvasActions": "Canvas Actions",
+  "editor_shortcutHistoryActions": "History Actions",
+  "editor_shortcutSelectionActions": "Selection Actions",
+  "editor_shortcutTemporaryColorPicker": "Temporary Color Picker",
+  "editor_shortcutRectSelection": "Rectangle Selection",
+  "editor_shortcutEllipseSelection": "Ellipse Selection",
+  "editor_shortcutLassoSelection": "Lasso Selection",
+  "editor_shortcut100Zoom": "100% Zoom",
+  "editor_shortcutFitHeight": "Fit Height",
+  "editor_shortcutFitWidth": "Fit Width",
+  "editor_shortcutRotateLeft15": "Rotate Left 15°",
+  "editor_shortcutResetRotation": "Reset Rotation",
+  "editor_shortcutRotateRight15": "Rotate Right 15°",
+  "editor_shortcutFlipHorizontal": "Flip Horizontal",
+  "editor_shortcutWheel": "Mouse Wheel",
+  "editor_shortcutBrushSmaller": "Decrease Brush Size",
+  "editor_shortcutBrushLarger": "Increase Brush Size",
+  "editor_shortcutOpacityLower": "Decrease Opacity",
+  "editor_shortcutOpacityHigher": "Increase Opacity",
+  "editor_shortcutDragBrushSize": "Adjust Brush Size",
+  "editor_shortcutSwapColors": "Swap Foreground/Background Colors",
+  "editor_shortcutPanCanvas": "Pan Canvas",
+  "editor_shortcutClearSelectionContent": "Clear Selection Content",
+  "editor_shortcutCancelCurrentAction": "Cancel Current Action",
+  "editor_selectUnlockedLayerWithContent": "Select an unlocked layer with content",
+  "editor_readCurrentLayerFailed": "Failed to read the current layer",
+  "editor_localEffects": "Local Post-processing / Effects",
+  "editor_basicAdjustments": "Basic Adjustments",
+  "editor_styleAndRepair": "Style & Repair",
+  "editor_transformCrop": "Rotate / Flip / Crop",
+  "editor_transformCropDescription": "Geometry operations are separate. They generate a preview first and write back only after confirmation.",
+  "editor_effectPreviewHint": "Preview does not modify the original image. Click Apply to write the result to the active layer and undo history.",
+  "editor_applyToCurrentLayer": "Apply to Current Layer",
+  "editor_oneShotEffectHint": "{effect} is a one-shot operation and has no intensity slider.",
+  "@editor_oneShotEffectHint": {
+    "placeholders": {
+      "effect": {}
+    }
+  },
+  "editor_effectIntensity": "{effect} Intensity",
+  "@editor_effectIntensity": {
+    "placeholders": {
+      "effect": {}
+    }
+  },
+  "editor_original": "Original",
+  "editor_effectPreview": "Effect Preview",
+  "editor_effectBrightness": "Brightness",
+  "editor_effectContrast": "Contrast",
+  "editor_effectSaturation": "Saturation",
+  "editor_effectTemperature": "Temperature",
+  "editor_effectGamma": "Gamma",
+  "editor_effectGrayscale": "Grayscale",
+  "editor_effectInvert": "Invert",
+  "editor_effectSepia": "Sepia",
+  "editor_effectDenoise": "Denoise",
+  "editor_effectBlur": "Gaussian Blur",
+  "editor_effectSharpen": "Sharpen",
+  "editor_effectCropToSelection": "Crop to Selection",
+  "editor_effectRotateLeft": "Rotate Left 90°",
+  "editor_effectRotateRight": "Rotate Right 90°",
+  "editor_effectFlipHorizontal": "Flip Horizontal",
+  "editor_effectFlipVertical": "Flip Vertical",
+  "editor_effectApplied": "Applied {effect}",
+  "@editor_effectApplied": {
+    "placeholders": {
+      "effect": {}
+    }
+  },
+  "editor_applyEffectFailed": "Failed to apply effect: {error}",
+  "@editor_applyEffectFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "editor_changeCanvasSize": "Change Canvas Size",
+  "editor_canvasTooSmall": "Canvas size is too small. Minimum size is {width} x {height} pixels",
+  "@editor_canvasTooSmall": {
+    "placeholders": {
+      "width": {},
+      "height": {}
+    }
+  },
+  "editor_canvasTooLarge": "Canvas size is too large. Maximum size is {width} x {height} pixels",
+  "@editor_canvasTooLarge": {
+    "placeholders": {
+      "width": {},
+      "height": {}
+    }
+  },
+  "editor_canvasResized": "Canvas resized to {width} x {height}",
+  "@editor_canvasResized": {
+    "placeholders": {
+      "width": {},
+      "height": {}
+    }
+  },
+  "editor_canvasResizeFailed": "Failed to resize canvas: {error}",
+  "@editor_canvasResizeFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "editor_confirmExitTitle": "Confirm Exit",
+  "editor_confirmExitContent": "There are unsaved changes. Are you sure you want to exit?",
+  "editor_exit": "Exit",
+  "editor_saveAndExit": "Save and Exit",
+  "editor_exportFailed": "Export failed: {error}",
+  "@editor_exportFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "editor_clickInsideClosedRegion": "Click inside a closed region to fill it.",
+  "editor_drawClosedMaskOutlineFirst": "Draw a closed mask outline first.",
+  "editor_noClosedRegionAtPosition": "No fillable closed region at this position.",
+  "editor_generateMaskOverlayFailed": "Failed to generate mask overlay",
+  "editor_maskLayerName": "Mask",
+  "editor_updateMaskLayerFailed": "Failed to update mask layer",
+  "editor_closedRegionFilled": "Closed region filled as mask.",
+  "editor_fillMaskFailed": "Failed to fill mask: {error}",
+  "@editor_fillMaskFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "editor_focusInactiveHint": "Click the button to enter focus mode, then draw a focus area and paint the mask.",
+  "editor_focusReadyHint": "Focus area selected. You can continue editing the mask with the brush.",
+  "editor_focusNeedsSelectionHint": "Draw a focus area first, then switch to the brush and paint the mask.",
+  "editor_focusSelection": "Selection",
+  "editor_focusBrush": "Brush",
+  "editor_focusContextHint": "The outer rectangle is the area sent to Focused Inpaint. The inner rectangle is the main repaint area. The band between them is the Minimum Context Area.",
+  "editor_unsupportedImageFormat": "Unsupported file format: .{extension}\nPlease choose an image file (PNG, JPG, WEBP, etc.)",
+  "@editor_unsupportedImageFormat": {
+    "placeholders": {
+      "extension": {}
+    }
+  },
+  "editor_readFileFailed": "Failed to read file: {error}",
+  "@editor_readFileFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "editor_noFileData": "Failed to get file data",
+  "editor_emptyImageFile": "File is empty. Choose a valid image file",
+  "editor_fileTooLarge": "File is too large ({sizeMB} MB). Choose an image under 50 MB",
+  "@editor_fileTooLarge": {
+    "placeholders": {
+      "sizeMB": {}
+    }
+  },
+  "editor_maskLayerAdded": "Mask layer added",
+  "editor_parseImageFailed": "Failed to parse image file\nMake sure the file is not corrupted and the format is supported",
+  "editor_loadMaskFailed": "Failed to load mask: {error}",
+  "@editor_loadMaskFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "editor_defaultTitle": "Canvas",
+  "editor_baseLayerName": "Base Image",
+  "editor_existingMaskLayerName": "Existing Mask",
+  "editor_defaultDrawingLayerName": "Layer 1",
+  "editor_layerName": "Layer {count}",
+  "@editor_layerName": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "editor_statusZoom": "Zoom: {value}%",
+  "@editor_statusZoom": {
+    "placeholders": {
+      "value": {}
+    }
+  },
+  "editor_statusCanvas": "Canvas: {width} x {height}",
+  "@editor_statusCanvas": {
+    "placeholders": {
+      "width": {},
+      "height": {}
+    }
+  },
+  "editor_statusLayers": "Layers: {count}",
+  "@editor_statusLayers": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "editor_statusHasSelection": "Selection active",
+  "editor_statusRotation": "Rotation: {degrees}°",
+  "@editor_statusRotation": {
+    "placeholders": {
+      "degrees": {}
+    }
+  },
+  "editor_statusMirrored": "Mirrored",
+  "editor_focusMinimumContextArea": "Minimum Context Area: {value}",
+  "@editor_focusMinimumContextArea": {
+    "placeholders": {
+      "value": {}
+    }
+  },
+  "editor_canvasSizeTitle": "Canvas Size",
+  "editor_presetSize": "Preset Size",
+  "editor_customSize": "Custom",
+  "editor_contentHandling": "Content Handling",
+  "editor_contentCrop": "Crop",
+  "editor_contentPad": "Pad",
+  "editor_contentStretch": "Stretch",
+  "editor_width": "Width",
+  "editor_height": "Height",
+  "editor_lockAspectRatio": "Lock aspect ratio",
+  "editor_unlockAspectRatio": "Unlock aspect ratio",
+  "editor_sizePreview": "Size Preview",
+  "editor_originalSize": "Original",
+  "editor_newSize": "New Size",
+  "editor_cropModeDescription": "Crop mode - keep aspect ratio and crop",
+  "editor_padModeDescription": "Pad mode - keep aspect ratio and pad",
+  "editor_stretchModeDescription": "Stretch mode - stretch to fill",
+  "editor_canvasPresetSquare": "Square {size}",
+  "@editor_canvasPresetSquare": {
+    "placeholders": {
+      "size": {}
+    }
+  },
+  "editor_canvasPresetLandscape": "Landscape {ratio}",
+  "@editor_canvasPresetLandscape": {
+    "placeholders": {
+      "ratio": {}
+    }
+  },
+  "editor_canvasPresetPortrait": "Portrait {ratio}",
+  "@editor_canvasPresetPortrait": {
+    "placeholders": {
+      "ratio": {}
+    }
+  },
+  "editor_canvasPresetNaiPortrait": "NAI Portrait",
+  "editor_canvasPresetNaiLandscape": "NAI Landscape",
+  "editor_canvasPresetFullHd": "Full HD 16:9",
+  "editor_colorPanelTitle": "Color",
+  "editor_colorPickerTitle": "Choose Color",
+  "editor_brushSettings": "Brush Settings",
+  "editor_eraserSettings": "Eraser Settings",
+  "editor_colorPickerHint": "Click anywhere on the canvas to pick a color. Release to switch back to the previous tool.",
+  "editor_sample": "Sample",
+  "editor_samplePoint": "Point",
+  "editor_sampleArea": "Area",
+  "editor_source": "Source",
+  "editor_sourceCurrentLayer": "Current Layer",
+  "editor_sourceAllLayers": "All Layers",
+  "editor_lassoSelectionHelp": "Hold and drag to draw a freeform selection. Release to close it automatically.",
+  "layer_empty": "No layers",
+  "layer_add": "Add Layer",
+  "layer_mergeDown": "Merge Down",
 
   "layer_duplicate": "Duplicate",
   "layer_delete": "Delete",
@@ -856,6 +1232,43 @@
   "gallery_negativePrompt": "Negative Prompt",
   "gallery_promptCopied": "Prompt copied",
   "gallery_seedCopied": "Seed copied",
+  "gallery_sendToImg2Img": "Image to Image",
+  "gallery_useImageForGeneration": "Use this image for image generation",
+  "gallery_sendToReversePromptTitle": "Reverse Prompt",
+  "gallery_addToReversePromptModule": "Add to the canvas reverse-prompt module",
+  "gallery_applyVibeFromImage": "Extract and apply the image style / character",
+  "gallery_noVibeData": "This image does not contain Vibe data",
+  "gallery_sendToKrita": "Krita",
+  "gallery_sendToConnectedKrita": "Send to the connected Krita plugin",
+  "gallery_upscalePanelLoaded": "Loaded the image-to-image upscale panel",
+  "gallery_readImageFailed": "Failed to read image: {error}",
+  "@gallery_readImageFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "gallery_fileMissing": "File does not exist",
+  "gallery_copiedToClipboard": "Copied to clipboard",
+  "gallery_copyFailed": "Copy failed: {error}",
+  "@gallery_copyFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "gallery_textToImage": "Text to Image",
+  "gallery_applyParams": "Apply parameters",
+  "gallery_unavailable": "Unavailable",
+  "gallery_loadSourceImage": "Load source image",
+  "gallery_upscale": "Upscale",
+  "gallery_superResolutionUpscale": "Super-resolution upscale",
+  "gallery_sentToImg2Img": "Image sent to image-to-image",
+  "gallery_sentToReversePrompt": "Image sent to reverse-prompt module",
+  "gallery_sendFailed": "Send failed: {error}",
+  "@gallery_sendFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
 
   "preset_noPresets": "No presets",
   "preset_restoreDefault": "Restore Default",
@@ -990,6 +1403,41 @@
   "onlineGallery_copied": "Copied",
   "onlineGallery_copyTags": "Copy Tags",
   "onlineGallery_open": "Open",
+  "onlineGallery_send": "Send",
+  "onlineGallery_addToQueue": "Add to Queue",
+  "onlineGallery_sendToTextToImage": "Send to Text to Image",
+  "onlineGallery_sentToTextToImage": "Sent to text-to-image",
+  "onlineGallery_sendToReversePrompt": "Send to Reverse Prompt",
+  "onlineGallery_sentToReversePrompt": "Sent to reverse-prompt module",
+  "onlineGallery_reversePromptSendFailed": "Failed to send to reverse prompt: {error}",
+  "@onlineGallery_reversePromptSendFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "onlineGallery_noTagInfo": "This image has no tag information",
+  "onlineGallery_promptSentToGeneration": "Prompt sent to generation page",
+  "onlineGallery_noImageUrl": "This image has no available URL",
+  "onlineGallery_gifLoadFailed": "Failed to load GIF",
+  "onlineGallery_pinchToZoom": "Pinch to zoom",
+  "onlineGallery_metadata": "Metadata",
+  "onlineGallery_addedToQueue": "Added to queue",
+  "onlineGallery_queueFullMax": "Queue is full (maximum 50 items)",
+  "onlineGallery_chooseDownloadDirectory": "Choose Download Directory",
+  "onlineGallery_downloadStarted": "Download started...",
+  "onlineGallery_savedToPath": "Saved to: {path}",
+  "@onlineGallery_savedToPath": {
+    "placeholders": {
+      "path": {}
+    }
+  },
+  "onlineGallery_downloadFailed": "Download failed: {error}",
+  "@onlineGallery_downloadFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "onlineGallery_downloadOriginal": "Download original image",
   "onlineGallery_all": "All",
   "onlineGallery_ratingGeneral": "General",
   "onlineGallery_ratingSensitive": "Sensitive",
@@ -1005,6 +1453,70 @@
     }
   },
   "onlineGallery_dateRange": "Date Range",
+  "onlineGallery_fuzzySearch": "Fuzzy Match",
+  "onlineGallery_fuzzySearchTooltip": "Use *tag* matching for related tags when enabled; search exact Danbooru tags when disabled",
+  "onlineGallery_blacklistTags": "Blacklist Tags",
+  "onlineGallery_blacklistTitle": "Online Gallery Blacklist",
+  "onlineGallery_blacklistSubtitle": "Images containing blacklisted tags will be hidden directly in the online gallery.",
+  "onlineGallery_addBlacklistTagHint": "Add blacklist tag",
+  "onlineGallery_noLocalBlacklistTags": "No local blacklist tags",
+  "onlineGallery_autoSyncOnStartup": "Auto-sync on startup",
+  "onlineGallery_autoSyncOnStartupSubtitle": "Enabled by default; you can turn it off at any time",
+  "onlineGallery_lastSyncFailed": "Last sync failed: {error}",
+  "@onlineGallery_lastSyncFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "onlineGallery_neverSyncedBlacklist": "Danbooru blacklist has not been synced yet",
+  "onlineGallery_lastSync": "Last sync: {time}",
+  "@onlineGallery_lastSync": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "onlineGallery_blacklistSettingsTitle": "Online Gallery Blacklist Settings",
+  "onlineGallery_blacklistLoginHint": "You are not logged in to Danbooru. The local blacklist still works, but syncing requires login.",
+  "onlineGallery_bulkFavorite": "Favorite Selected",
+  "onlineGallery_bulkDownload": "Download Selected",
+  "onlineGallery_addedTasksToQueue": "Added {count} tasks to queue",
+  "@onlineGallery_addedTasksToQueue": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "onlineGallery_unfavorited": "Unfavorited",
+  "onlineGallery_favorited": "Favorited",
+  "onlineGallery_favoritedImages": "Favorited {count} images",
+  "@onlineGallery_favoritedImages": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "onlineGallery_selectDownloadDirectoryFailed": "Failed to choose download directory: {error}",
+  "@onlineGallery_selectDownloadDirectoryFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "onlineGallery_downloadSelectedStarted": "Downloading {count} images...",
+  "@onlineGallery_downloadSelectedStarted": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "onlineGallery_downloadSelectedCompleted": "Download complete: {success} succeeded, {failed} failed",
+  "@onlineGallery_downloadSelectedCompleted": {
+    "placeholders": {
+      "success": {},
+      "failed": {}
+    }
+  },
+  "onlineGallery_startDate": "Start Date",
+  "onlineGallery_endDate": "End Date",
+  "onlineGallery_invalidDateFormat": "Invalid date format",
+  "onlineGallery_dateOutOfRange": "Date out of range",
+  "onlineGallery_last30Days": "Last 30 Days",
 
   "tooltip_randomPrompt": "Random Prompt (long press to configure)",
   "tooltip_fullscreenEdit": "Fullscreen Edit",
@@ -1396,6 +1908,12 @@
   "performanceReport_averageDuration": "Average Duration",
   "performanceReport_successRate": "Success Rate",
   "performanceReport_exportSuccess": "Report exported successfully",
+  "performanceReport_noDataTitle": "No performance data",
+  "performanceReport_noDataSubtitle": "Statistics will appear here after warmup completes",
+  "performanceReport_overallStats": "Overall Statistics",
+  "performanceReport_warmupCount": "Warmup Runs",
+  "performanceReport_totalTasks": "Total Tasks",
+  "performanceReport_averageTotalDuration": "Average Total Duration",
 
   "copyName": " (Copy)",
 
@@ -2411,6 +2929,256 @@
   "characterCountConfig_addSlotHint": "e.g., 1trap, 1futanari",
   "characterCountConfig_slotExists": "This slot already exists",
   "characterCountConfig_cannotDeleteBuiltin": "Cannot delete built-in slot",
+  "randomManager_algorithmConfig": "Algorithm Config",
+  "randomManager_characterCountWeight": "Character Count Weight",
+  "randomManager_genderWeight": "Gender Weight",
+  "randomManager_globalSettings": "Global Settings",
+  "randomManager_enableSeasonalWordlists": "Enable Seasonal Wordlists",
+  "randomManager_enableSeasonalWordlistsDesc": "Wordlists for Christmas, Halloween, and other special dates",
+  "randomManager_globalEmphasisProbability": "Global Emphasis Probability",
+  "randomManager_soloGenderOptions": "Solo Gender Options",
+  "randomManager_femaleShort": "F",
+  "randomManager_maleShort": "M",
+  "randomManager_other": "Other",
+  "randomManager_tagGroupList": "Tag Groups",
+  "randomManager_deleteTagGroupTitle": "Delete Tag Group",
+  "randomManager_deleteTagGroupConfirm": "Delete tag group \"{name}\"? This action cannot be undone.",
+  "@randomManager_deleteTagGroupConfirm": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "randomManager_tagGroupCount": "{count} tag groups",
+  "@randomManager_tagGroupCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "randomManager_categories": "Categories",
+  "randomManager_tagGroups": "Tag Groups",
+  "randomManager_tags": "Tags",
+  "randomManager_addTagGroup": "Add Tag Group",
+  "randomManager_locked": "Locked",
+  "randomManager_addCategory": "Add Category",
+  "randomManager_noCategories": "No categories",
+  "randomManager_noCategoriesHint": "Click \"Add Category\" to start configuring",
+  "randomManager_globalPeopleSettings": "Global Character Settings",
+  "randomManager_closePreview": "Close preview",
+  "randomManager_importPreset": "Import Preset",
+  "randomManager_importPresetSubtitle": "Import random config preset from JSON text",
+  "randomManager_exportCurrentPreset": "Export Current Preset",
+  "randomManager_noPresetSelected": "No preset selected",
+  "randomManager_selectPresetFirst": "Please select a preset first",
+  "randomManager_defaultPresetReadonly": "Default presets are read-only. Create or copy a custom preset first.",
+  "randomManager_presetImported": "Imported preset \"{name}\"",
+  "@randomManager_presetImported": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "randomManager_defaultPresetV4": "Default Mode (V4)",
+  "randomManager_defaultPresetLegacy": "Default Mode (Legacy)",
+  "randomManager_defaultPresetFurry": "Default Mode (Furry)",
+  "randomManager_defaultPresetV4Description": "Random algorithm configuration based on the NAI V4 model, with multi-character support",
+  "randomManager_defaultPresetLegacyDescription": "Random algorithm configuration based on the NAI Legacy model",
+  "randomManager_defaultPresetFurryDescription": "Random algorithm configuration based on the NAI Furry model",
+  "randomManager_defaultPresetOfficialDescription": "Random algorithm configuration based on the NAI official setup",
+  "randomManager_femaleClothing": "Female Clothing",
+  "randomManager_maleClothing": "Male Clothing",
+  "randomManager_generalClothing": "General Clothing",
+  "randomManager_femaleBodyType": "Female Body Type",
+  "randomManager_maleBodyType": "Male Body Type",
+  "randomManager_generalBodyType": "General Body Type",
+  "randomManager_soloFemale": "Female",
+  "randomManager_soloMale": "Male",
+  "randomManager_duoGirls": "Two Girls",
+  "randomManager_duoMixed": "Girl and Boy",
+  "randomManager_duoBoys": "Two Boys",
+  "randomManager_trioGirls": "Three Girls",
+  "randomManager_trioTwoGirlsOneBoy": "Two Girls and One Boy",
+  "randomManager_trioOneGirlTwoBoys": "One Girl and Two Boys",
+  "randomManager_trioBoys": "Three Boys",
+  "randomManager_noHumanScene": "No-Human Scene",
+  "randomManager_presetCreated": "Created preset \"{name}\"",
+  "@randomManager_presetCreated": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "randomManager_deletePresetConfirm": "Delete \"{name}\"? This cannot be undone.",
+  "@randomManager_deletePresetConfirm": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "randomManager_syncCompleted": "Danbooru tags synced",
+  "randomManager_syncFailed": "Sync failed: {error}",
+  "@randomManager_syncFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "randomManager_resetDefaultTitle": "Reset to Default",
+  "randomManager_resetDefaultContent": "Restore the official default configuration.\nCustom tag groups will be kept but disabled.",
+  "randomManager_resetDefaultConfirm": "Reset",
+  "randomManager_resetDefaultDone": "Reset to default configuration",
+  "randomManager_generatePreview": "Generate Preview",
+  "randomManager_importExport": "Import / Export",
+  "randomManager_syncing": "Syncing",
+  "randomManager_syncingWithEllipsis": "Syncing...",
+  "randomManager_syncDanbooruTags": "Sync Danbooru Tags",
+  "randomManager_unknownError": "Unknown error",
+  "randomManager_readOnlyMode": "Read-only Mode",
+  "randomManager_readOnlyTooltip": "The current preset is a default preset, so all configuration items are locked",
+  "randomManager_searchCategoryOrTagGroup": "Search categories or tag groups...",
+  "randomManager_scope": "Scope",
+  "randomManager_global": "Global",
+  "randomManager_private": "Private",
+  "randomManager_status": "Status",
+  "randomManager_enabledOnly": "Enabled only",
+  "randomManager_diyCapable": "Has DIY capabilities",
+  "randomManager_addTagGroupSubtitle": "Add to \"{category}\"",
+  "@randomManager_addTagGroupSubtitle": {
+    "placeholders": {
+      "category": {}
+    }
+  },
+  "randomManager_tagGroupName": "Tag Group Name",
+  "randomManager_tagGroupNameHint": "Enter tag group name",
+  "randomManager_tagGroupNameRequired": "Please enter a tag group name",
+  "randomManager_customTab": "Custom",
+  "randomManager_tagList": "Tag List",
+  "randomManager_tagListHelp": "One tag per line. Supports tag or tag:weight.",
+  "randomManager_searchTagGroup": "Search Tag Group...",
+  "randomManager_searchPool": "Search Pool...",
+  "randomManager_itemCount": "{count} items",
+  "@randomManager_itemCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "randomManager_noMatchingTagGroup": "No matching Tag Groups found",
+  "randomManager_noMatchingPool": "No matching Pools found",
+  "randomManager_cannotLoadPreview": "Unable to load preview",
+  "randomManager_openInDanbooru": "View in Danbooru",
+  "randomManager_editTagGroup": "Edit Tag Group",
+  "randomManager_basicTab": "Basic",
+  "randomManager_tagsTab": "Tags ({count})",
+  "@randomManager_tagsTab": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "randomManager_diyAbilitiesTab": "DIY Capabilities",
+  "randomManager_selectionSingle": "Single",
+  "randomManager_selectionSingleDesc": "Weighted random single pick",
+  "randomManager_selectionAll": "All",
+  "randomManager_selectionAllDesc": "Select all tags",
+  "randomManager_selectionMultipleCount": "Multiple Count",
+  "randomManager_selectionMultipleCountDesc": "Select a specified count",
+  "randomManager_selectionMultipleProbability": "Multiple Probability",
+  "randomManager_selectionMultipleProbabilityDesc": "Evaluate each tag independently",
+  "randomManager_selectionSequential": "Sequential",
+  "randomManager_selectionSequentialDesc": "Keep state across batches",
+  "randomManager_noTags": "No tags",
+  "randomManager_conditionalBranch": "Conditional Branch",
+  "randomManager_conditionalBranchDesc": "Choose different tag subsets based on variable values",
+  "randomManager_dependencyConfig": "Dependency Config",
+  "randomManager_dependencyConfigDesc": "Make count selection depend on other category values",
+  "randomManager_visibilityRules": "Visibility Rules",
+  "randomManager_visibilityRulesDesc": "Decide whether to generate based on composition",
+  "randomManager_timeCondition": "Time Condition",
+  "randomManager_timeConditionDesc": "Enable within a specific date range",
+  "randomManager_postProcessRules": "Post-process Rules",
+  "randomManager_postProcessRulesDesc": "Remove conflicts based on selected tags",
+  "randomManager_emphasisProbability": "Emphasis Probability",
+  "randomManager_probability": "Probability",
+  "randomManager_selectionMode": "Selection Mode",
+  "randomManager_editHint": "{name} (click to edit)",
+  "@randomManager_editHint": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "randomManager_emphasisProbabilityValue": "Emphasis probability: {percent}%",
+  "@randomManager_emphasisProbabilityValue": {
+    "placeholders": {
+      "percent": {}
+    }
+  },
+  "randomManager_previewGeneration": "Preview Generation",
+  "randomManager_generating": "Generating",
+  "randomManager_generate": "Generate",
+  "randomManager_generationFailed": "Generation Failed",
+  "randomManager_copy": "Copy",
+  "randomManager_regenerate": "Regenerate",
+  "randomManager_copiedToClipboard": "Copied to clipboard",
+  "randomManager_selectPresetRequired": "Please select a preset",
+  "randomManager_characterCountLabel": "{count} characters",
+  "@randomManager_characterCountLabel": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "randomManager_tagCountLabel": "{count} tags",
+  "@randomManager_tagCountLabel": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "randomManager_previewHint": "Click \"Generate\" to preview random tags",
+  "randomManager_generateNow": "Generate Now",
+  "randomManager_batchOperations": "Batch Operations",
+  "randomManager_selectedItems": "{count} selected",
+  "@randomManager_selectedItems": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "randomManager_totalItems": "{count} total",
+  "@randomManager_totalItems": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "randomManager_enabledItems": "Enabled {count} items",
+  "@randomManager_enabledItems": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "randomManager_disabledItems": "Disabled {count} items",
+  "@randomManager_disabledItems": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "randomManager_batchDeleteTitle": "Batch Delete",
+  "randomManager_batchDeleteContent": "Delete {count} selected items? This action cannot be undone.",
+  "@randomManager_batchDeleteContent": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "randomManager_deletedItems": "Deleted {count} items",
+  "@randomManager_deletedItems": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "randomManager_invertSelection": "Invert Selection",
+  "randomManager_moreActions": "More Actions",
+  "randomManager_enableSelected": "Enable Selected",
+  "randomManager_disableSelected": "Disable Selected",
+  "randomManager_deleteSelected": "Delete Selected",
+  "randomManager_noHistory": "No history",
+  "randomManager_operationHistory": "Operation History",
+  "randomManager_keyboardShortcuts": "Keyboard Shortcuts",
+  "randomManager_generalShortcuts": "General",
+  "randomManager_presetActions": "Preset Actions",
+  "randomManager_selectionActions": "Selection Actions",
+  "randomManager_closeWindow": "Close Window",
+  "randomManager_refreshOrSync": "Refresh / Sync",
 
   "genderRestriction_enabled": "Gender Restriction",
   "genderRestriction_enabledDesc": "Gender filter not enabled",
@@ -2571,7 +3339,211 @@
   "localGallery_preloadComplete": "Preload complete",
   "localGallery_progressiveLoadError": "Failed to load image",
   "localGallery_noImagesFound": "No images found",
+  "localGallery_unknownError": "Unknown error",
+  "localGallery_loadFailed": "Load failed: {error}",
+  "@localGallery_loadFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "localGallery_indexingLocalImages": "Indexing local images...",
+  "localGallery_emptyTitle": "No local images",
+  "localGallery_emptySubtitle": "Generated images will be saved here",
+  "localGallery_noMatchingResults": "No matching results",
+  "localGallery_loadingGroupedImages": "Loading grouped images...",
+  "localGallery_jumpedToMonth": "Jumped to {year}-{month}",
+  "@localGallery_jumpedToMonth": {
+    "placeholders": {
+      "year": {},
+      "month": {}
+    }
+  },
   "localGallery_searchPlaceholder": "Search prompts, models, samplers...",
+  "localGallery_title": "Local Gallery",
+  "localGallery_allImages": "All Images",
+  "localGallery_categoryPanelTitle": "Categories",
+  "localGallery_searchFilenamePromptPlaceholder": "Search filename/Prompt; comma-separated terms are matched together...",
+  "localGallery_selectCurrentPage": "Select Page",
+  "localGallery_deselectCurrentPage": "Deselect Page",
+  "localGallery_selectAllResults": "Select All",
+  "localGallery_deselectAllResults": "Deselect All",
+  "localGallery_moveSelected": "Move",
+  "localGallery_packSelected": "Pack",
+  "localGallery_editMetadata": "Edit",
+  "localGallery_addToCollection": "Collect",
+  "localGallery_switchToGridView": "Switch to grid view",
+  "localGallery_switchToDateGroupedView": "Switch to date grouped view",
+  "localGallery_openFilterPanel": "Open filter panel",
+  "localGallery_hideCategoryPanel": "Hide category panel",
+  "localGallery_showCategoryPanel": "Show category panel",
+  "localGallery_enterSelectionMode": "Enter selection mode",
+  "localGallery_refreshTooltip": "Refresh gallery\n\nAutomatically detects new or changed images and updates the index",
+  "localGallery_tagIntersection": "Tag Intersection",
+  "localGallery_createCategoryTitle": "New Category",
+  "localGallery_createCategoryHint": "Enter category name",
+  "localGallery_createCategoryConfirm": "Create",
+  "localGallery_createSubCategoryTitle": "New Subcategory",
+  "localGallery_showInFolder": "Show in Folder",
+  "localGallery_promptCopied": "Prompt copied",
+  "localGallery_seedCopied": "Seed copied",
+  "localGallery_confirmDeleteImageContent": "Delete image \"{name}\"?\n\nThis cannot be undone.",
+  "@localGallery_confirmDeleteImageContent": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "localGallery_imageDeleted": "Image deleted",
+  "localGallery_deleteFailed": "Delete failed: {error}",
+  "@localGallery_deleteFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "localGallery_categoryDeleteContent": "Delete this category? The folder and its contents will be kept.",
+  "localGallery_protectedDeleteCategoryTitle": "Protected Mode: Confirm Category Deletion",
+  "localGallery_protectedDeleteCategoryContent": "This will delete the category record. The folder and its contents will be kept. Confirm again.",
+  "localGallery_confirmDelete": "Confirm Delete",
+  "localGallery_confirmMoveImageTitle": "Protected Mode: Confirm Image Move",
+  "localGallery_confirmMoveImageContent": "This will move the image to the target category folder. Confirm this was not an accidental drag.",
+  "localGallery_confirmMove": "Confirm Move",
+  "localGallery_imageMovedToCategory": "Image moved to category",
+  "localGallery_categoriesSynced": "Categories synced with folders",
+  "localGallery_saveDirectoryNotSet": "Save directory is not set",
+  "localGallery_folderNotFound": "Folder not found",
+  "localGallery_openFolderFailed": "Failed to open folder: {error}",
+  "@localGallery_openFolderFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "localGallery_protectedDeleteTitle": "Protected Mode: Confirm Delete Again",
+  "localGallery_protectedDeleteImagesContent": "This will permanently delete {count} local image files. This cannot be undone.",
+  "@localGallery_protectedDeleteImagesContent": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "localGallery_protectedBulkMoveTitle": "Protected Mode: Confirm Bulk Move",
+  "localGallery_protectedBulkMoveContent": "This will move {count} local image files to the target folder. Confirm this is not a mistake.",
+  "@localGallery_protectedBulkMoveContent": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "localGallery_importParamsFailed": "Failed to import parameters: {error}",
+  "@localGallery_importParamsFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "localGallery_protectedDeleteImageContent": "This will permanently delete image \"{name}\". This cannot be undone.",
+  "@localGallery_protectedDeleteImageContent": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "localGallery_saveZipArchive": "Save ZIP Archive",
+  "localGallery_packingImages": "Packing {count} images...",
+  "@localGallery_packingImages": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "localGallery_packedImages": "Packed {count} images",
+  "@localGallery_packedImages": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "localGallery_packFailed": "Failed to pack images",
+  "localGallery_noMetadata": "This image has no metadata",
+  "localGallery_imageFileMissing": "Image file does not exist",
+  "localGallery_sentToImageToImage": "Image sent to image-to-image",
+  "localGallery_sendFailed": "Send failed: {error}",
+  "@localGallery_sendFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "localGallery_noVibeData": "This image does not contain Vibe data",
+  "localGallery_vibeAddedToParams": "Vibe \"{name}\" added to generation parameters",
+  "@localGallery_vibeAddedToParams": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "localGallery_addVibeFailed": "Failed to add Vibe: {error}",
+  "@localGallery_addVibeFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "localGallery_sentToReversePrompt": "Image sent to reverse prompt",
+  "localGallery_sendToKritaFailed": "Failed to send to Krita: {error}",
+  "@localGallery_sendToKritaFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "localGallery_sendTo": "Send to...",
+  "localGallery_copyPrompt": "Copy Prompt",
+  "localGallery_copySeed": "Copy Seed",
+  "localGallery_dragToShare": "Drag to share",
+  "localGallery_moveToRoot": "Move to Root",
+  "localGallery_folderName": "Folder Name",
+  "localGallery_newFolderName": "New Name",
+  "localGallery_folderNameHint": "Enter folder name",
+  "localGallery_folderCreated": "Folder created",
+  "localGallery_folderCreateFailed": "Failed to create folder",
+  "localGallery_renameFolderTitle": "Rename Folder",
+  "localGallery_renameSuccess": "Renamed",
+  "localGallery_renameFailed": "Rename failed",
+  "localGallery_deleteFolderTitle": "Delete Folder",
+  "localGallery_deleteFolderWithImagesContent": "Folder \"{name}\" contains {count} images. Delete it?\n\nNote: this will delete the folder and all images in it. This cannot be undone.",
+  "@localGallery_deleteFolderWithImagesContent": {
+    "placeholders": {
+      "name": {},
+      "count": {}
+    }
+  },
+  "localGallery_deleteEmptyFolderContent": "Delete empty folder \"{name}\"?",
+  "@localGallery_deleteEmptyFolderContent": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "localGallery_folderDeleted": "Folder deleted",
+  "localGallery_folderDeleteFailed": "Failed to delete folder",
+  "localGallery_cachingMetadata": "Caching metadata...",
+  "localGallery_metadataCacheStats": "Metadata Cache Stats",
+  "localGallery_totalImages": "Total Images",
+  "localGallery_withMetadata": "With Metadata",
+  "localGallery_skipped": "Skipped",
+  "localGallery_remaining": "Remaining",
+  "localGallery_cacheMonitor": "Cache Monitor",
+  "localGallery_threeLayerCacheStats": "Three-layer Cache Stats",
+  "localGallery_updatedAt": "Updated: {time}",
+  "@localGallery_updatedAt": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "localGallery_memoryCache": "Memory Cache",
+  "localGallery_hiveCache": "Hive Cache",
+  "localGallery_sqliteDatabase": "SQLite Database",
+  "localGallery_imageUnit": "images",
+  "localGallery_metadataUnit": "metadata",
+  "localGallery_entriesUnit": "entries",
+  "localGallery_hitRate": "Hit Rate",
+  "localGallery_performanceStats": "Performance Stats",
+  "localGallery_cacheHit": "Hit",
+  "localGallery_cacheMiss": "Miss",
+  "localGallery_clearL1": "Clear L1",
+  "localGallery_clearL2": "Clear L2",
+  "localGallery_clearAll": "Clear All",
+  "localGallery_resetStats": "Reset Stats",
+  "localGallery_confirmClearCache": "Confirm Clear",
+  "localGallery_confirmClearCacheContent": "Clear all caches? This will rescan all images.",
   "localGallery_filterByDate": "Filter by date",
   "localGallery_clearFilters": "Clear filters",
 
@@ -2947,6 +3919,7 @@
   "statistics_saturday": "Sat",
 
   "fixedTags_label": "Fixed Tags",
+  "fixedTags_enabled": "Enabled",
   "fixedTags_empty": "No fixed tags",
   "fixedTags_emptyHint": "Click the button below to add fixed tags, they will be automatically applied to your prompts",
   "fixedTags_clickToManage": "Click to manage fixed tags",
@@ -2966,6 +3939,10 @@
   "fixedTags_content": "Content",
   "fixedTags_contentHint": "Enter prompt content, NAI syntax supported",
   "fixedTags_syntaxHelp": "Supports NAI syntax for weight enhancement/reduction and tag alternation",
+  "fixedTags_linkedFromLibrary": "Linked from library (two-way sync)",
+  "fixedTags_scope": "Scope",
+  "fixedTags_positive": "Positive",
+  "fixedTags_negative": "Negative",
   "fixedTags_resetWeight": "Reset to 1.0",
   "fixedTags_weightPreview": "Weight preview:",
   "fixedTags_deleteTitle": "Delete Fixed Tag",
@@ -2994,6 +3971,277 @@
     }
   },
   "fixedTags_clearedSuccess": "All fixed tags cleared",
+  "fixedTags_sidebarTitle": "Fixed Tags Sidebar",
+  "fixedTags_switchGridView": "Switch to Grid View",
+  "fixedTags_switchListView": "Switch to List View",
+  "fixedTags_addPositive": "Add Positive Fixed Tag",
+  "fixedTags_addNegative": "Add Negative Fixed Tag",
+  "fixedTags_addPositiveFromLibrary": "Add Positive from Library",
+  "fixedTags_addNegativeFromLibrary": "Add Negative from Library",
+  "fixedTags_searchNameOrContent": "Search name or content",
+  "fixedTags_clearSearch": "Clear Search",
+  "fixedTags_enabledPositive": "Enabled Positive",
+  "fixedTags_emptyEnabledPositive": "No enabled positive fixed tags",
+  "fixedTags_noMatchingEnabled": "No matching enabled fixed tags",
+  "fixedTags_negativeTitle": "Negative Fixed Tags",
+  "fixedTags_emptyNegative": "No negative fixed tags",
+  "fixedTags_noMatchingNegative": "No matching negative fixed tags",
+  "fixedTags_addedToSidebar": "Added to fixed tags sidebar",
+  "fixedTags_unknownCategory": "Unknown Category",
+  "fixedTags_uncategorized": "Uncategorized",
+  "fixedTags_clickManageLongPressSidebar": "Click to manage, long-press to open sidebar",
+  "fixedTags_clickManageLongPressCompact": "Click to manage, long-press sidebar",
+  "fixedTags_linked": "Linked",
+  "fixedTags_linkCount": "{count} linked",
+  "@fixedTags_linkCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "fixedTags_expandNegative": "Expand Negative",
+  "fixedTags_collapseNegative": "Collapse Negative",
+  "fixedTags_undoTooltip": "Undo fixed tag operation",
+  "fixedTags_redoTooltip": "Redo fixed tag operation",
+  "fixedTags_positiveTitle": "Positive Fixed Tags",
+  "fixedTags_columnCount": "{enabled}/{total}",
+  "@fixedTags_columnCount": {
+    "placeholders": {
+      "enabled": {},
+      "total": {}
+    }
+  },
+  "fixedTags_columnFilteredCount": "{enabled}/{total} · showing {shown}",
+  "@fixedTags_columnFilteredCount": {
+    "placeholders": {
+      "enabled": {},
+      "total": {},
+      "shown": {}
+    }
+  },
+  "fixedTags_new": "New",
+  "fixedTags_newTarget": "New {target}",
+  "@fixedTags_newTarget": {
+    "placeholders": {
+      "target": {}
+    }
+  },
+  "fixedTags_library": "Library",
+  "fixedTags_addFromLibraryToTarget": "Add from library to {target}",
+  "@fixedTags_addFromLibraryToTarget": {
+    "placeholders": {
+      "target": {}
+    }
+  },
+  "fixedTags_enableAll": "Enable All",
+  "fixedTags_disableAll": "Disable All",
+  "fixedTags_searchTarget": "Search {target}...",
+  "@fixedTags_searchTarget": {
+    "placeholders": {
+      "target": {}
+    }
+  },
+  "fixedTags_noMatching": "No matching fixed tags",
+  "fixedTags_emptyTarget": "No {target}",
+  "@fixedTags_emptyTarget": {
+    "placeholders": {
+      "target": {}
+    }
+  },
+  "fixedTags_dragToLink": "Drag to create link",
+  "fixedTags_linkedToNames": "Linked: {names}",
+  "@fixedTags_linkedToNames": {
+    "placeholders": {
+      "names": {}
+    }
+  },
+  "fixedTags_linkInstruction": "Drag the link icon from a positive fixed tag to a negative fixed tag to create a link",
+  "fixedTags_manageLinks": "Manage Links",
+  "fixedTags_removeLink": "Remove link: {name}",
+  "@fixedTags_removeLink": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "fixedTags_footerExpandedHint": "Create or add from the library at the top of each column",
+  "fixedTags_newPositive": "New Positive",
+  "fixedTags_addPositiveFromLibraryShort": "Add Positive from Library",
+  "fixedTags_libraryEmpty": "Library is empty. Add entries first",
+  "fixedTags_addFromLibrary": "Add from Library",
+  "fixedTags_searchLibraryEntries": "Search library entries...",
+  "fixedTags_noMatchingResults": "No matching results",
+
+  "reversePrompt_title": "Reverse Prompt",
+  "reversePrompt_pending": "Pending",
+  "reversePrompt_imageCount": "{count} image(s)",
+  "@reversePrompt_imageCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "reversePrompt_llmReverse": "LLM Reverse",
+  "reversePrompt_characterReplace": "Character Replace",
+  "reversePrompt_finalResult": "Final Result",
+  "reversePrompt_dropToAdd": "Release to add to reverse prompt",
+  "reversePrompt_addOrDropImages": "Add images / drop images",
+  "reversePrompt_localTaggerModel": "Local tagger model",
+  "reversePrompt_localTaggerModelHint": "Configure model folder in Settings",
+  "reversePrompt_generalThreshold": "General tag threshold",
+  "reversePrompt_characterThreshold": "Character tag threshold",
+  "reversePrompt_taggerFilterHint": "Only General / Character tags are output. Rating, Artist, Copyright, Meta, and other categories are filtered.",
+  "reversePrompt_replacementEmptyHint": "No replacement target character selected. Choose a character from the tag library here; it will not be injected into the positive prompt.",
+  "reversePrompt_selectReplacementCharacter": "Choose replacement target character from library",
+  "reversePrompt_selectReplacementTargetTitle": "Choose Replacement Target Character",
+  "reversePrompt_change": "Change",
+  "reversePrompt_start": "Start Reverse Prompt",
+  "reversePrompt_sentToPrompt": "Sent to prompt",
+  "reversePrompt_sendToPrompt": "Send to Prompt",
+  "reversePrompt_externalTarget": "multimodal LLM reverse prompt service",
+  "reversePrompt_dropUnreadable": "The dropped source did not provide a readable image file or image URL",
+  "reversePrompt_needImageAndMethod": "Add an image and enable at least ONNX tagger or LLM reverse prompt",
+  "reversePrompt_stagePreparing": "Preparing reverse prompt",
+  "reversePrompt_stageOnnxTagger": "ONNX tagger reverse prompting",
+  "reversePrompt_stageLlmReverse": "LLM image reverse prompting",
+  "reversePrompt_stageCharacterReplace": "Replacing character",
+  "reversePrompt_needReplacementCharacter": "Choose a valid character from the reverse-prompt character library first",
+  "reversePrompt_needPromptForCharacterReplace": "Character replacement requires a reverse-prompt result first",
+  "reversePrompt_noOnnxModel": "No ONNX tagger model found. Configure the model folder in Settings first",
+
+  "promptAssistant_translateProcessing": "Translating",
+  "promptAssistant_optimizeProcessing": "Optimizing",
+  "promptAssistant_characterReplaceProcessing": "Replacing character",
+  "promptAssistant_customProcessing": "Processing custom request",
+  "promptAssistant_imageInputDisabled": "The current custom-task provider does not have image input enabled",
+  "promptAssistant_needCharacter": "Add a valid character in the reverse-prompt character library first",
+  "promptAssistant_assistantSettings": "Assistant Settings",
+  "promptAssistant_serviceSettings": "Service Settings",
+  "promptAssistant_ruleSettings": "Rule Settings",
+  "promptAssistant_cancelCurrentTask": "Cancel Current Task",
+  "promptAssistant_collapseAssistant": "Collapse Assistant",
+  "promptAssistant_expandAssistant": "Expand Assistant",
+  "promptAssistant_history": "History",
+  "promptAssistant_undo": "Undo",
+  "promptAssistant_redo": "Redo",
+  "promptAssistant_translate": "Translate",
+  "promptAssistant_optimize": "Optimize",
+  "promptAssistant_custom": "Custom",
+  "promptAssistant_characterReplace": "Character Replace",
+  "promptAssistant_cancelTask": "Cancel Task",
+  "promptAssistant_menu": "Menu",
+  "promptAssistant_customDialogTitle": "Custom Prompt Assistant",
+  "promptAssistant_currentPrompt": "Current Prompt",
+  "promptAssistant_currentPromptEmpty": "(current prompt is empty)",
+  "promptAssistant_customRequestLabel": "Your modification request",
+  "promptAssistant_customRequestHint": "For example: make it more ominous, add a rainy night street background, make the action more dynamic, return only the final prompt",
+  "promptAssistant_addReferenceImage": "Add Reference Image",
+  "promptAssistant_execute": "Run",
+  "promptAssistant_maxReferenceImages": "Add up to {count} reference images",
+  "@promptAssistant_maxReferenceImages": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "promptAssistant_unsupportedImageFormat": "Unsupported image format: {fileName}",
+  "@promptAssistant_unsupportedImageFormat": {
+    "placeholders": {
+      "fileName": {}
+    }
+  },
+  "promptAssistant_needCustomRequestOrImage": "Enter a custom request or add a reference image",
+  "promptAssistant_taskOptimize": "Optimize",
+  "promptAssistant_taskTranslate": "Translate",
+  "promptAssistant_taskReverse": "Reverse Prompt",
+  "promptAssistant_taskCharacterReplace": "Character Replace",
+  "promptAssistant_taskCustom": "Custom",
+  "promptAssistant_settingsInputSwitchSubtitle": "Assistant switch in the bottom-right of the prompt input",
+  "promptAssistant_desktopOverlayTitle": "Desktop Overlay Interaction",
+  "promptAssistant_desktopOverlaySubtitle": "Enable hover, right-click, and shortcut behavior",
+  "promptAssistant_taskRouting": "Task Routing",
+  "promptAssistant_taskRoutingSubtitle": "Bind optimize, translate, reverse prompt, and character replacement to different providers and models",
+  "promptAssistant_taskRouteTitle": "{title} Task",
+  "@promptAssistant_taskRouteTitle": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "promptAssistant_provider": "Provider",
+  "promptAssistant_model": "Model",
+  "promptAssistant_noModelsPullFirst": "No models yet. Pull the model list first",
+  "promptAssistant_providerManagement": "Provider Management",
+  "promptAssistant_providerManagementSubtitle": "Supports OpenAI Chat / Responses, Anthropic, Gemini, DeepSeek, LM Studio, Ollama, Pollinations, and custom compatible endpoints",
+  "promptAssistant_apiKeyConfigured": "API Key: configured",
+  "promptAssistant_apiKeyNotConfigured": "API Key: not configured",
+  "promptAssistant_supportsImageInput": "Supports image input",
+  "promptAssistant_textOnly": "Text only",
+  "promptAssistant_connectionConfig": "Connection Config",
+  "promptAssistant_pullModelList": "Pull model list",
+  "promptAssistant_editProvider": "Edit provider",
+  "promptAssistant_deleteProvider": "Delete provider",
+  "promptAssistant_pullingModels": "Pulling model list...",
+  "promptAssistant_emptyModelList": "Provider returned an empty model list",
+  "promptAssistant_modelsSynced": "Synced {count} models",
+  "@promptAssistant_modelsSynced": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "promptAssistant_pullModelsFailed": "Failed to pull models: {error}",
+  "@promptAssistant_pullModelsFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "promptAssistant_ruleTemplates": "Rule Templates",
+  "promptAssistant_ruleTemplatesSubtitle": "System prompts are assembled as rules + user input + task parameters",
+  "promptAssistant_addRule": "Add Rule",
+  "promptAssistant_addProvider": "Add Provider",
+  "promptAssistant_editProviderTitle": "Edit Provider",
+  "promptAssistant_name": "Name",
+  "promptAssistant_protocol": "Protocol",
+  "promptAssistant_allowImageInput": "Allow image input",
+  "promptAssistant_allowImageInputSubtitle": "Enable only when the model and provider actually support vision input",
+  "promptAssistant_apiKeyLeaveEmpty": "API Key (leave empty to keep unchanged)",
+  "promptAssistant_connectionTitle": "{name} Connection Config",
+  "@promptAssistant_connectionTitle": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "promptAssistant_baseUrlHint": "Example: https://api.openai.com/v1",
+  "promptAssistant_clearCurrentApiKey": "Clear current API Key",
+  "promptAssistant_protocolSupportsImagePayload": "The current protocol supports image payloads; the model itself must still support vision input",
+  "promptAssistant_protocolTextOnlyWarning": "The current protocol is text-only by default; enabling this may still be rejected by the server",
+  "promptAssistant_addRuleTitle": "Add Rule",
+  "promptAssistant_editRuleTitle": "Edit Rule",
+  "promptAssistant_taskType": "Task Type",
+  "promptAssistant_ruleContent": "Rule Content",
+  "promptAssistant_newRule": "New Rule",
+  "autocomplete_resultsCount": "{count} results",
+  "@autocomplete_resultsCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "autocomplete_keyNavigate": "↑↓/Scroll",
+  "autocomplete_actionSelect": "Select",
+  "autocomplete_actionConfirm": "Confirm",
+  "autocomplete_actionClose": "Close",
+  "autocomplete_categoryRecommended": "Recommended",
+  "autocomplete_categoryCharacter": "Character",
+  "autocomplete_categoryCopyright": "Copyright",
+  "autocomplete_categoryArtist": "Artist",
+  "autocomplete_categoryMeta": "Meta",
+  "autocomplete_categoryLibrary": "Library",
+  "autocomplete_categoryGeneral": "General",
+
+  "promptToken_webCalibration": "Web calibration",
+  "promptToken_prompt": "Prompt",
+  "promptToken_fixedTags": "Fixed Tags",
+  "promptToken_qualityPreset": "Quality Preset",
+  "promptToken_character": "Character",
+  "promptToken_negativePrompt": "Negative Prompt",
+  "promptToken_negativeFixedTags": "Negative Fixed Tags",
+  "promptToken_negativePreset": "Negative Preset",
+  "promptToken_characterNegative": "Character Negative",
 
   "common_rename": "Rename",
   "common_create": "Create",
@@ -3007,6 +4255,178 @@
   "tagLibrary_listView": "List View",
   "tagLibrary_import": "Import",
   "tagLibrary_export": "Export",
+  "tagLibrary_sortCustom": "Custom Sort",
+  "tagLibrary_sortName": "Name",
+  "tagLibrary_sortUseCount": "Usage",
+  "tagLibrary_sortUpdatedAt": "Updated",
+  "tagLibrary_transferCategory": "Move Category",
+  "tagLibrary_copyContent": "Copy Content",
+  "tagLibrary_moveToCategoryTitle": "Move to Category",
+  "tagLibrary_selectTargetCategory": "Select target category:",
+  "tagLibrary_includeThumbnails": "Include thumbnails",
+  "tagLibrary_includeThumbnailsSubtitle": "Increases file size",
+  "tagLibrary_selectedExportCount": "Export ({count} items)",
+  "@tagLibrary_selectedExportCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "tagLibrary_selectedImportCount": "Import ({count} items)",
+  "@tagLibrary_selectedImportCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "tagLibrary_entriesLabel": "Entries",
+  "tagLibrary_categoriesLabel": "Categories",
+  "tagLibrary_selectExportContent": "Select content to export",
+  "tagLibrary_selectImportContent": "Select content to import",
+  "tagLibrary_selectSaveLocation": "Select save location",
+  "tagLibrary_preparingExport": "Preparing export...",
+  "tagLibrary_exportSuccess": "Export successful",
+  "tagLibrary_exportFailedWithError": "Export failed: {error}",
+  "@tagLibrary_exportFailedWithError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "tagLibrary_selectZipFile": "Click to select ZIP file",
+  "tagLibrary_zipFileHint": "Supports library files exported from this app",
+  "tagLibrary_reselect": "Select Again",
+  "tagLibrary_fileInfo": "File Info",
+  "tagLibrary_entryCountLabel": "Entries",
+  "tagLibrary_categoryCountLabel": "Categories",
+  "tagLibrary_exportDateLabel": "Export Date",
+  "tagLibrary_importConflictsHint": "{count} conflicts found. Click a conflicted item below to choose how to handle it.",
+  "@tagLibrary_importConflictsHint": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "tagLibrary_categoriesSection": "Categories ({count})",
+  "@tagLibrary_categoriesSection": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "tagLibrary_entriesSection": "Entries ({count})",
+  "@tagLibrary_entriesSection": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "tagLibrary_conflictResolutionTooltip": "Choose conflict handling",
+  "tagLibrary_conflictSkip": "Conflict - will skip",
+  "tagLibrary_conflictRename": "Conflict - will import with renamed name",
+  "tagLibrary_conflictOverwrite": "Conflict - will replace existing",
+  "tagLibrary_parseFileFailed": "Unable to parse file: {error}",
+  "@tagLibrary_parseFileFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "tagLibrary_preparingImport": "Preparing import...",
+  "tagLibrary_importCompleted": "Import complete",
+  "tagLibrary_importSuccessSummary": "Import successful: {summary}",
+  "@tagLibrary_importSuccessSummary": {
+    "placeholders": {
+      "summary": {}
+    }
+  },
+  "tagLibrary_importFailedWithError": "Import failed: {error}",
+  "@tagLibrary_importFailedWithError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "tagLibrary_importedEntriesCount": "{count} entries",
+  "@tagLibrary_importedEntriesCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "tagLibrary_importedCategoriesCount": "{count} categories",
+  "@tagLibrary_importedCategoriesCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "tagLibrary_renamedCount": "{count} renamed",
+  "@tagLibrary_renamedCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "tagLibrary_overwrittenCount": "{count} replaced",
+  "@tagLibrary_overwrittenCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "tagLibrary_skippedCount": "{count} skipped",
+  "@tagLibrary_skippedCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "tagLibrary_dragToCategoryHint": "Drag to the category panel to file",
+  "tagLibrary_unknownCategory": "Unknown Category",
+  "tagLibrary_selectEntryToUpdate": "Select Entry to Update",
+  "tagLibrary_updatePreview": "Update Preview",
+  "tagLibrary_replaceThumbnailHint": "Will replace existing thumbnail",
+  "tagLibrary_sentEntriesToMainPrompt": "Sent {count} entries to main prompt",
+  "@tagLibrary_sentEntriesToMainPrompt": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "tagLibrary_confirmDeleteSelectedEntries": "Delete {count} selected entries? This action cannot be undone.",
+  "@tagLibrary_confirmDeleteSelectedEntries": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "tagLibrary_deletedEntries": "Deleted {count} entries",
+  "@tagLibrary_deletedEntries": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "tagLibrary_movedEntries": "Moved {count} entries",
+  "@tagLibrary_movedEntries": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "tagLibrary_favoritedEntries": "Favorited {count} entries",
+  "@tagLibrary_favoritedEntries": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "tagLibrary_unfavoritedEntries": "Unfavorited {count} entries",
+  "@tagLibrary_unfavoritedEntries": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "tagLibrary_copiedEntriesContent": "Copied content from {count} entries",
+  "@tagLibrary_copiedEntriesContent": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "tagLibrary_droppedImage": "Dropped Image",
+  "tagLibrary_createEntryFromImage": "Create New Entry",
+  "tagLibrary_promptExtracted": "Prompt extracted: \"{prompt}\"",
+  "@tagLibrary_promptExtracted": {
+    "placeholders": {
+      "prompt": {}
+    }
+  },
+  "tagLibrary_createEntryFromImageSubtitle": "Create a new entry from this image",
+  "tagLibrary_updateExistingThumbnail": "Update Existing Entry Thumbnail",
+  "tagLibrary_updateExistingThumbnailSubtitle": "Select an entry and replace its thumbnail",
   "tagLibrary_allEntries": "All",
   "tagLibrary_favorites": "Favorites",
   "tagLibrary_addSubCategory": "Add Subcategory",
@@ -3283,6 +4703,18 @@
   "settings_queueRetryInterval": "Retry Interval",
   "settings_queueRetryCountSubtitle": "Maximum retry attempts for failed tasks",
   "settings_queueRetryIntervalSubtitle": "Time to wait between retries",
+  "settings_queueRetryCountMax": "Max {count} times",
+  "@settings_queueRetryCountMax": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "settings_queueRetryIntervalValue": "{seconds} seconds",
+  "@settings_queueRetryIntervalValue": {
+    "placeholders": {
+      "seconds": {}
+    }
+  },
   "unit_times": "times",
   "unit_seconds": "seconds",
   "settings_floatingButtonBackground": "Floating Button Background",
@@ -3380,12 +4812,45 @@
   "statistics_heatmapNoActivity": "No activity",
 
   "sendToHome_dialogTitle": "Send to Home",
+  "sendToHome_send": "Send",
   "sendToHome_mainPrompt": "Send to Main Prompt",
   "sendToHome_mainPromptSubtitle": "Fill into the main prompt input field",
+  "sendToHome_mainPromptPipeSubtitle": "Send the full content to the main prompt (including pipes)",
+  "sendToHome_smartDecompose": "Smart Decompose",
+  "sendToHome_smartDecomposeSubtitle": "Main prompt + {count} characters",
+  "@sendToHome_smartDecomposeSubtitle": {
+    "placeholders": {
+      "count": {}
+    }
+  },
   "sendToHome_replaceCharacter": "Replace Character Prompt",
   "sendToHome_replaceCharacterSubtitle": "Clear existing characters and add as new",
   "sendToHome_appendCharacter": "Append Character Prompt",
   "sendToHome_appendCharacterSubtitle": "Keep existing characters and append new",
+  "sendToHome_fixedTags": "Send to Fixed Tags",
+  "sendToHome_fixedTagsSubtitle": "Append to the fixed tag list",
+  "sendToHome_sendAsAlias": "Send as Alias",
+  "sendToHome_sendAsAliasSubtitle": "Wrap as <{name}> when sending to home",
+  "@sendToHome_sendAsAliasSubtitle": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "sendToHome_preview": "Send Preview",
+  "sendToHome_characterPrompt": "Character Prompt",
+  "sendToHome_characterPromptCount": "Character Prompt ({count})",
+  "@sendToHome_characterPromptCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "sendToHome_characterIndex": "Character {index}",
+  "@sendToHome_characterIndex": {
+    "placeholders": {
+      "index": {}
+    }
+  },
+  "sendToHome_recommended": "Recommended",
   "sendToHome_successMainPrompt": "Sent to main prompt",
   "sendToHome_successReplaceCharacter": "Character prompt replaced",
   "sendToHome_successAppendCharacter": "Character prompt appended",
@@ -3397,10 +4862,86 @@
   "metadataImport_selectAll": "Select All",
   "metadataImport_deselectAll": "Deselect All",
   "metadataImport_promptsOnly": "Prompts Only",
-  "metadataImport_generationOnly": "Generation Only",
+  "metadataImport_generationOnly": "Parameters Only",
+  "metadataImport_clear": "Clear",
   "metadataImport_prompt": "Positive Prompt",
+  "metadataImport_mainPrompt": "Main Prompt",
+  "metadataImport_fixedTags": "Fixed Tags",
+  "metadataImport_fixedPrefix": "Prefix: {text}",
+  "@metadataImport_fixedPrefix": {
+    "placeholders": {
+      "text": {}
+    }
+  },
+  "metadataImport_fixedSuffix": "Suffix: {text}",
+  "@metadataImport_fixedSuffix": {
+    "placeholders": {
+      "text": {}
+    }
+  },
+  "metadataImport_negativeFixedPrefix": "Negative Prefix: {text}",
+  "@metadataImport_negativeFixedPrefix": {
+    "placeholders": {
+      "text": {}
+    }
+  },
+  "metadataImport_negativeFixedSuffix": "Negative Suffix: {text}",
+  "@metadataImport_negativeFixedSuffix": {
+    "placeholders": {
+      "text": {}
+    }
+  },
+  "metadataImport_qualityTagsCount": "Quality Tags ({count})",
+  "@metadataImport_qualityTagsCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "metadataImport_negativePrompt": "Negative Prompt",
   "metadataImport_characterPrompts": "Character Prompts",
+  "metadataImport_characterPromptsCount": "Character Prompts ({count})",
+  "@metadataImport_characterPromptsCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "metadataImport_characterIndex": "Character {index}: {text}",
+  "@metadataImport_characterIndex": {
+    "placeholders": {
+      "index": {"type": "int"},
+      "text": {}
+    }
+  },
+  "metadataImport_referenceSection": "References",
+  "metadataImport_countUnit": "{count}",
+  "@metadataImport_countUnit": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "metadataImport_preciseReferenceCount": "Precise Reference ({count})",
+  "@metadataImport_preciseReferenceCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "metadataImport_vibeDetail": "{name} (strength {strength}%, info extraction {info}%)",
+  "@metadataImport_vibeDetail": {
+    "placeholders": {
+      "name": {},
+      "strength": {},
+      "info": {}
+    }
+  },
+  "metadataImport_preciseReferenceDetail": "Reference {index}: {type} (strength {strength}%, fidelity {fidelity}%)",
+  "@metadataImport_preciseReferenceDetail": {
+    "placeholders": {
+      "index": {"type": "int"},
+      "type": {},
+      "strength": {},
+      "fidelity": {}
+    }
+  },
   "metadataImport_seed": "Seed",
   "metadataImport_steps": "Steps",
   "metadataImport_scale": "CFG Scale",
@@ -3574,6 +5115,7 @@
   "drop_reuseVibeSubtitle": "Use pre-encoded data directly (free)",
   "drop_useAsRawImage": "Use as Raw Image",
   "drop_useAsRawImageSubtitle": "Re-encode (costs 2 Anlas)",
+  "drop_dragToImg2ImgOrOther": "Drag to image-to-image or another target",
 
   "preciseRef_title": "Precise Reference",
   "preciseRef_description": "Add reference images and set type and parameters. Multiple references can be used simultaneously.",
@@ -3588,8 +5130,126 @@
   "preciseRef_typeStyle": "Style",
   "preciseRef_typeCharacterAndStyle": "Character + Style",
   "preciseRef_costHint": "Using precise reference consumes extra points",
+  "preciseRef_costBadge": "Uses points",
+  "preciseRef_dropToAdd": "Release to add precise reference",
+  "preciseRef_dropNoReadableImage": "The drop source did not provide a readable image file or image link",
+  "preciseRef_addedCount": "Added {count} precise references",
+  "@preciseRef_addedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "preciseRef_removedCount": "Removed {count} precise references",
+  "@preciseRef_removedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
 
   "vibeLibrary_title": "Vibe Library",
+  "vibeLibrary_categories": "Categories",
+  "vibeLibrary_newCategoryShort": "New",
+  "vibeLibrary_createCategoryTitle": "New Category",
+  "vibeLibrary_createSubCategoryTitle": "New Subcategory",
+  "vibeLibrary_categoryNameHint": "Enter category name",
+  "vibeLibrary_createCategoryConfirm": "Create",
+  "vibeLibrary_deleteCategoryTitle": "Confirm Delete",
+  "vibeLibrary_deleteCategoryContent": "Delete this category? Vibes in it will be moved to Uncategorized.",
+  "vibeLibrary_sortTooltip": "Sort by",
+  "vibeLibrary_hideCategoryPanel": "Hide category panel",
+  "vibeLibrary_showCategoryPanel": "Show category panel",
+  "vibeLibrary_enterSelectionMode": "Enter selection mode",
+  "vibeLibrary_importTooltip": "Import Vibe files or PNG/JPG/JPEG/WEBP images (right-click for more options)",
+  "vibeLibrary_exportTooltip": "Export Vibe to file",
+  "vibeLibrary_openFolderTooltip": "Open Vibe library folder",
+  "vibeLibrary_refresh": "Refresh",
+  "vibeLibrary_loading": "Loading...",
+  "vibeLibrary_totalCount": "{count} Vibes",
+  "@vibeLibrary_totalCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "vibeLibrary_noCategoriesAvailable": "No categories available",
+  "vibeLibrary_moveToCategory": "Move to Category",
+  "vibeLibrary_uncategorized": "Uncategorized",
+  "vibeLibrary_movedToCategory": "Moved {count} Vibes",
+  "@vibeLibrary_movedToCategory": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "vibeLibrary_favoriteStatusUpdated": "Favorite status updated",
+  "vibeLibrary_importFromFile": "Import from File",
+  "vibeLibrary_importFromImage": "Import from Image",
+  "vibeLibrary_importFromClipboard": "Import Encoded Data from Clipboard",
+  "vibeLibrary_openFolderFailed": "Failed to open folder: {error}",
+  "@vibeLibrary_openFolderFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "vibeLibrary_importFileDialogTitle": "Select Vibe files to import",
+  "vibeLibrary_preparingImport": "Preparing import...",
+  "vibeLibrary_importSuccessCount": "Imported {count} Vibes",
+  "@vibeLibrary_importSuccessCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "vibeLibrary_importSummary": "Import complete: {success} succeeded, {failed} failed",
+  "@vibeLibrary_importSummary": {
+    "placeholders": {
+      "success": {},
+      "failed": {}
+    }
+  },
+  "vibeLibrary_dropImportHint": "Drop .naiv4vibe/.naiv4vibebundle/.png/.jpg/.jpeg/.webp files or folders here to import",
+  "vibeLibrary_importing": "Importing...",
+  "vibeLibrary_pageIndicator": "{current} / {total} pages",
+  "@vibeLibrary_pageIndicator": {
+    "placeholders": {
+      "current": {},
+      "total": {}
+    }
+  },
+  "vibeLibrary_itemsPerPage": "Per page:",
+  "vibeLibrary_tooManyTitle": "Too Many Vibes",
+  "vibeLibrary_tooManySelectedContent": "Selected {count} Vibes, but at most 16 can be used at once.\n\nPlease reduce the selection and try again.",
+  "@vibeLibrary_tooManySelectedContent": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "vibeLibrary_tooManyExistingContent": "The generation page already has {current} Vibes. You can add {remaining} more.\n\nPlease reduce the selection and try again.",
+  "@vibeLibrary_tooManyExistingContent": {
+    "placeholders": {
+      "current": {},
+      "remaining": {}
+    }
+  },
+  "vibeLibrary_sentToGenerationCount": "Sent {count} Vibes to generation",
+  "@vibeLibrary_sentToGenerationCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "vibeLibrary_deleteSelectedContent": "Delete {count} selected Vibes? This action cannot be undone.",
+  "@vibeLibrary_deleteSelectedContent": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "vibeLibrary_deletedCount": "Deleted {count} Vibes",
+  "@vibeLibrary_deletedCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "vibeLibrary_importImageDialogTitle": "Select images containing Vibe data",
+  "vibeLibrary_clipboardEmpty": "Clipboard is empty",
+  "vibeLibrary_encodeTimeout": "Encoding timed out. Please check your network connection.",
+  "vibeLibrary_unknownError": "Unknown error",
   "vibeLibrary_save": "Save to Library",
   "vibeLibrary_import": "Import Vibe",
   "vibeLibrary_searchHint": "Search name, tags...",
@@ -3682,6 +5342,12 @@
   "vibe_import_fileParseFailed": "Failed to parse file",
   "vibe_import_fileSelectionFailed": "File selection failed",
   "vibe_import_importFailed": "Import failed",
+  "vibe_import_failedWithError": "Import failed: {error}",
+  "@vibe_import_failedWithError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
   "vibe_saveToLibrary_title": "Save to Library",
   "vibe_saveToLibrary_strength": "Strength",
   "vibe_saveToLibrary_infoExtracted": "Info Extracted",
@@ -3720,6 +5386,13 @@
     }
   },
   "vibe_maxReached": "Maximum 16 vibes reached",
+  "vibe_maxReachedRemoveSome": "Maximum 16 vibes reached. Remove some vibes first.",
+  "vibe_addedNamed": "Added Vibe: {name}",
+  "@vibe_addedNamed": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "vibe_addedCount": "Added {count} vibes",
   "@vibe_addedCount": {
     "placeholders": {
@@ -3810,6 +5483,27 @@
   "settings_restartRequiredTitle": "Restart Required",
   "settings_changePathConfirm": "After changing the data storage path, the app needs to restart to take effect.\\n\\nThe new path will take effect on the next startup. Continue?",
   "settings_resetPathConfirm": "After resetting the data storage path, the app needs to restart to take effect.\\n\\nThe default path will take effect on the next startup. Continue?",
+  "settings_kritaBridgeTitle": "Krita Bridge",
+  "settings_kritaBridgeEnable": "Enable Krita local bridge",
+  "settings_kritaBridgeDisabledText": "Off by default; listens only on local 127.0.0.1 when enabled",
+  "settings_kritaBridgeStartingText": "Starting local bridge service...",
+  "settings_kritaBridgeListeningText": "Waiting for Krita plugin connection",
+  "settings_kritaBridgeConnectedText": "Krita plugin connected",
+  "settings_kritaBridgeErrorText": "Startup failed, check the error message",
+  "settings_kritaBridgeDisabled": "Disabled",
+  "settings_kritaBridgeStarting": "Starting",
+  "settings_kritaBridgeListening": "Listening",
+  "settings_kritaBridgeConnected": "Connected",
+  "settings_kritaBridgeError": "Error",
+  "settings_kritaBridgeRegenerateSession": "Regenerate Session",
+  "settings_kritaBridgeDiscoveryFile": "Discovery File",
+  "settings_kritaBridgeWaitingEndpoint": "Waiting for local WebSocket listener",
+  "settings_kritaBridgeClient": "Client: {client}",
+  "@settings_kritaBridgeClient": {
+    "placeholders": {
+      "client": {}
+    }
+  },
 
   "settings_fontScale": "Font Size",
   "settings_fontScale_description": "Adjust global font scale",
@@ -3818,6 +5512,601 @@
   "settings_fontScale_previewLarge": "Font Size Preview",
   "settings_fontScale_reset": "Reset",
   "settings_fontScale_done": "Done",
+
+  "settings_defaultImagesPath": "Default (Documents/NAI_Launcher/images/)",
+  "settings_defaultVibePath": "{path} (Default)",
+  "@settings_defaultVibePath": {
+    "placeholders": {
+      "path": {}
+    }
+  },
+  "settings_defaultHivePath": "Default (%APPDATA%/NAI_Launcher/hive/)",
+  "settings_protectionMode": "Protection Mode",
+  "settings_protectionModeSubtitle": "Protect local assets, shared copies, and high-cost operations through the options below. Turning this off keeps the option values but disables them.",
+  "settings_protectionFeatures": "Protection Features",
+  "settings_stripMetadataTitle": "Remove all metadata when copying or dragging",
+  "settings_stripMetadataSubtitle": "Create a sanitized copy, remove PNG text chunks, EXIF, and NAI steganographic watermark data, and avoid exposing the original path while dragging.",
+  "settings_confirmDangerousActionsTitle": "Double-confirm dangerous asset actions",
+  "settings_confirmDangerousActionsSubtitle": "Deleting, moving, or batch-moving local assets will show an additional protection confirmation.",
+  "settings_warnExternalImageSendTitle": "Confirm before sending to external services",
+  "settings_warnExternalImageSendSubtitle": "Confirm before local images cross the app boundary to LLMs, NovelAI, ComfyUI, or similar services.",
+  "settings_preventOverwriteTitle": "Avoid overwriting existing files on export",
+  "settings_preventOverwriteSubtitle": "Automatically number duplicate export or package paths to avoid replacing existing assets by mistake.",
+  "settings_warnHighAnlasCostTitle": "High Anlas cost warning",
+  "settings_warnHighAnlasCostSubtitle": "Show a confirmation before generation when the estimated single request cost reaches {threshold} Anlas.",
+  "@settings_warnHighAnlasCostSubtitle": {
+    "placeholders": {
+      "threshold": {}
+    }
+  },
+  "settings_highAnlasCostThresholdTitle": "Anlas Warning Threshold",
+  "settings_setHighAnlasCostThresholdTitle": "Set Anlas Warning Threshold",
+  "settings_threshold": "Threshold",
+  "settings_highAnlasCostThresholdHelper": "Show a confirmation when the estimated single generation cost reaches or exceeds this value.",
+  "settings_selectLocalOnnxTaggerFolder": "Select ONNX tagger model folder",
+  "settings_localOnnxTaggerFolderSaved": "ONNX tagger model folder saved",
+  "settings_localOnnxTaggerFolder": "Local ONNX tagger model folder",
+  "settings_notConfigured": "Not configured",
+  "settings_confirmExternalSendTitle": "Protection Mode: Confirm External Send",
+  "settings_confirmExternalSendContent": "About to send {count} local image(s) to {target}. The image data will leave the local app boundary. Confirm this is expected.",
+  "@settings_confirmExternalSendContent": {
+    "placeholders": {
+      "count": {},
+      "target": {}
+    }
+  },
+  "settings_confirmExternalSend": "Send",
+  "settings_highAnlasCostTitle": "Protection Mode: High Anlas Cost",
+  "settings_highAnlasCostContent": "This request is estimated to cost {cost} Anlas, which reaches or exceeds your {threshold} Anlas warning threshold. Continue generation?",
+  "@settings_highAnlasCostContent": {
+    "placeholders": {
+      "cost": {},
+      "threshold": {}
+    }
+  },
+  "settings_continueGeneration": "Continue Generation",
+
+  "dataSource_clearingData": "Clearing data...",
+  "dataSource_clearTitle": "Clear Tag Data Source",
+  "dataSource_clearContent": "Clear Danbooru tag autocomplete data?\n\nThis will clear:\n- Danbooru tag autocomplete data\n\nThis will be preserved:\n- Chinese/English tag translations\n- Tag co-occurrence data\n\nTag data will be loaded again automatically on the next startup.",
+  "dataSource_confirmClear": "Clear",
+  "dataSource_clearSuccess": "Cleared {count} rows. Data will be restored automatically on the next startup.",
+  "@dataSource_clearSuccess": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "dataSource_clearFailed": "Clear failed",
+  "dataSource_clearFailedWithError": "Clear failed: {error}",
+  "@dataSource_clearFailedWithError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "dataSource_clearTagAutocompleteData": "Clear tag autocomplete data",
+  "dataSource_ready": "Data Source Ready",
+  "dataSource_notLoaded": "Data Source Not Loaded",
+  "dataSource_cachedTagCount": "Cached {count} tags",
+  "@dataSource_cachedTagCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "dataSource_clickSyncToDownload": "Click \"Sync Now\" to download tag data",
+  "dataSource_translationCount": "{count} translations",
+  "@dataSource_translationCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "dataSource_cooccurrenceCount": "{count} co-occurrences",
+  "@dataSource_cooccurrenceCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "dataSource_lastUpdated": "Last updated: {time}",
+  "@dataSource_lastUpdated": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "dataSource_heatThresholdTitle": "Heat Threshold",
+  "dataSource_heatThresholdSubtitle": "Choose heat thresholds for each tag category",
+  "dataSource_autoRefreshInterval": "Auto Refresh Interval",
+  "dataSource_syncNow": "Sync Now",
+  "dataSource_cancelSync": "Cancel Sync",
+  "dataSource_syncingTags": "Syncing tag data...",
+  "dataSource_loadFailed": "Load failed: {error}",
+  "@dataSource_loadFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "dataSource_hotAll": "All",
+  "dataSource_hot10k": "Hot >10K",
+  "dataSource_common1k": "Common >1K",
+  "dataSource_common500": "Common >500",
+  "dataSource_normal100": "Normal >100",
+  "dataSource_minimal50": "Minimal >50",
+  "dataSource_custom": "Custom",
+  "dataSource_refresh7Days": "7 days",
+  "dataSource_refresh15Days": "15 days",
+  "dataSource_refresh30Days": "30 days",
+  "dataSource_refreshNever": "Never",
+
+  "settings_comfyUiEnable": "Enable ComfyUI Integration",
+  "settings_comfyUiDisabledSubtitle": "When disabled, local upscale and other ComfyUI features are hidden",
+  "settings_comfyUiServerUrl": "Server URL",
+  "settings_comfyUiConnectionSuccess": "Connection successful",
+  "settings_comfyUiConnectionFailed": "Connection failed: {error}",
+  "@settings_comfyUiConnectionFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "settings_comfyUiConnected": "Connected",
+  "settings_comfyUiDisconnect": "Disconnect",
+  "settings_comfyUiWorkflowManagement": "Workflow Management",
+  "settings_comfyUiBuiltinWorkflows": "Built-in Workflows",
+  "settings_comfyUiCustomWorkflows": "Custom Workflows",
+  "settings_comfyUiNoCustomWorkflows": "No custom workflows yet. Click \"Import\" to add a ComfyUI workflow.",
+  "settings_comfyUiSlotCount": "{count} slots",
+  "@settings_comfyUiSlotCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "settings_comfyUiBuiltin": "Built-in",
+  "settings_comfyUiDeleteWorkflowTitle": "Delete Workflow",
+  "settings_comfyUiDeleteWorkflowContent": "Delete workflow \"{name}\"? This cannot be undone.",
+  "@settings_comfyUiDeleteWorkflowContent": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "settings_comfyUiDeleted": "Deleted: {name}",
+  "@settings_comfyUiDeleted": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "settings_comfyUiNoResponse": "Server did not respond",
+  "settings_comfyUiStatusDisconnected": "Disconnected",
+  "settings_comfyUiStatusConnecting": "Connecting...",
+  "settings_comfyUiStatusConnected": "Connected",
+  "settings_comfyUiStatusError": "Connection error",
+  "settings_comfyUiCategoryEnhance": "Enhance/Upscale",
+  "settings_comfyUiCategoryImg2Img": "Image-to-Image",
+  "settings_comfyUiCategoryInpaint": "Inpaint",
+  "settings_comfyUiCategoryTxt2Img": "Text-to-Image",
+  "settings_comfyUiCategoryCustom": "Custom",
+
+  "comfyWorkflow_seedvr2UpscaleName": "SeedVR2 Upscale",
+  "comfyWorkflow_seedvr2UpscaleDescription": "Upscale with the SeedVR2 AI model. Produces high-quality results.",
+  "comfyWorkflow_seedvr2TiledUpscaleName": "SeedVR2 Tiled Upscale",
+  "comfyWorkflow_seedvr2TiledUpscaleDescription": "Use SeedVR2TilingUpscaler for tiled upscale to reduce VRAM pressure on large images.",
+  "comfyWorkflow_modelUpscaleName": "ComfyUI Standard Upscale Model",
+  "comfyWorkflow_modelUpscaleDescription": "Load a standard upscale model with ComfyUI UpscaleModelLoader, then correct the final scale with Lanczos.",
+  "comfyWorkflow_rtxUpscaleName": "RTX Upscale",
+  "comfyWorkflow_rtxUpscaleDescription": "Use the Nvidia RTX Video Super Resolution node for local upscaling.",
+  "comfyWorkflowSlot_inputImage": "Input Image",
+  "comfyWorkflowSlot_targetShortSide": "Target Short Side",
+  "comfyWorkflowSlot_targetLongSide": "Target Long Side",
+  "comfyWorkflowSlot_upscaleModel": "Upscale Model",
+  "comfyWorkflowSlot_randomSeed": "Random Seed",
+  "comfyWorkflowSlot_outputImage": "Output Image",
+  "comfyWorkflowSlot_tileWidth": "Tile Width",
+  "comfyWorkflowSlot_tileHeight": "Tile Height",
+  "comfyWorkflowSlot_tileUpscaleResolution": "Tile Upscale Resolution",
+  "comfyWorkflowSlot_targetWidth": "Target Width",
+  "comfyWorkflowSlot_targetHeight": "Target Height",
+  "comfyWorkflowSlot_scale": "Scale",
+  "comfyWorkflow_parameters": "Parameters",
+  "comfyWorkflow_selectImage": "Click to select image",
+  "comfyWorkflow_pickImageFailed": "Failed to select image: {error}",
+  "@comfyWorkflow_pickImageFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "comfyWorkflow_useResult": "Use Result",
+  "comfyWorkflow_execute": "Run",
+  "comfyWorkflow_uploadingImage": "Uploading image...",
+  "comfyWorkflow_queued": "Queued...",
+  "comfyWorkflow_runningSteps": "Processing {current}/{total}",
+  "@comfyWorkflow_runningSteps": {
+    "placeholders": {
+      "current": {},
+      "total": {}
+    }
+  },
+  "comfyWorkflow_processing": "Processing...",
+  "comfyWorkflow_complete": "Complete",
+  "comfyWorkflow_imageCount": "{count} images",
+  "@comfyWorkflow_imageCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+
+  "promptAssistant_defaultOptimizeRuleName": "Default Optimize Rule",
+  "promptAssistant_defaultOptimizeRuleContent": "You are a prompt optimization assistant. Preserve the user intent, add actionable visual details, and output a single comma-separated prompt line.",
+  "promptAssistant_defaultTranslateRuleName": "Default Translate Rule",
+  "promptAssistant_defaultTranslateRuleContent": "You are a translation assistant. Detect the source language, translate between Chinese and English automatically, and return only the translation without explanation.",
+  "promptAssistant_defaultReverseRuleName": "Default Reverse Prompt Rule",
+  "promptAssistant_defaultReverseRuleContent": "You are an image reverse-prompt assistant. Based on the image and optional tagger results, output English comma-separated prompts suitable for NovelAI. Preserve subject, character, style, clothing, action, composition, lighting, and background. Do not explain.",
+  "promptAssistant_defaultCharacterReplaceRuleName": "Default Character Replace Rule",
+  "promptAssistant_defaultCharacterReplaceRuleContent": "You are a character replacement assistant. Replace the original character identity, hairstyle, outfit, and appearance in the input prompt with the target character while preserving action, composition, background, style, camera, and quality tags. Output only the replaced single-line prompt.",
+  "promptAssistant_defaultCustomRuleName": "Default Custom Rule",
+  "promptAssistant_defaultCustomRuleContent": "You are a prompt rewriting assistant. Modify the prompt according to the current prompt, the user request, and optional reference images. Output only the final single-line prompt that can be used directly, without explanation.",
+
+  "localGallery_dateFilterButton": "Date Filter",
+
+  "cacheStats_title": "Cache Statistics",
+  "cacheStats_autoRefreshUpdated": "Auto refresh · Last updated: {time}",
+  "@cacheStats_autoRefreshUpdated": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "cacheStats_secondsAgo": "{seconds} seconds ago",
+  "@cacheStats_secondsAgo": {
+    "placeholders": {
+      "seconds": {}
+    }
+  },
+  "cacheStats_refreshNow": "Refresh now",
+  "cacheStats_refreshed": "Refreshed",
+  "cacheStats_resetStats": "Reset statistics",
+  "cacheStats_statsReset": "Statistics reset",
+  "cacheStats_l1Memory": "L1 Memory Cache",
+  "cacheStats_l2Hive": "L2 Hive Cache",
+  "cacheStats_l3Sqlite": "L3 SQLite Database",
+  "cacheStats_recordCount": "{count} records",
+  "@cacheStats_recordCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "cacheStats_databaseValue": "{imageCount} images · {metadataCount} metadata rows",
+  "@cacheStats_databaseValue": {
+    "placeholders": {
+      "imageCount": {},
+      "metadataCount": {}
+    }
+  },
+
+  "galleryCache_rescanTitle": "Rescan Gallery",
+  "galleryCache_rescanContent": "This will:\n\n1. Check data consistency and mark missing files\n2. Scan new and changed files\n3. Retry metadata extraction that failed before, including failed records\n\nThis will not clear existing data or delete image files.",
+  "galleryCache_startScan": "Start Scan",
+  "galleryCache_scanAlreadyRunning": "A scan task is already running. Please wait for it to finish.",
+  "galleryCache_preparing": "Preparing...",
+  "galleryCache_noGalleryFolder": "Gallery folder is not set",
+  "galleryCache_galleryFolderMissing": "Gallery folder does not exist",
+  "galleryCache_scanningPhase": "Scanning {processed}/{total}...",
+  "@galleryCache_scanningPhase": {
+    "placeholders": {
+      "processed": {},
+      "total": {}
+    }
+  },
+  "galleryCache_scanComplete": "Scan complete",
+  "galleryCache_scanFailed": "Scan failed: {error}",
+  "@galleryCache_scanFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "galleryCache_rescan": "Rescan",
+  "galleryCache_rescanSubtitle": "Check data consistency, find missing files, and extract metadata",
+  "galleryCache_scanning": "Scanning...",
+  "galleryCache_scanAction": "Scan",
+
+  "workflowImport_title": "Import ComfyUI Workflow",
+  "workflowImport_step": "Step {current}/4: {title}",
+  "@workflowImport_step": {
+    "placeholders": {
+      "current": {},
+      "title": {}
+    }
+  },
+  "workflowImport_stepFile": "Select Workflow File",
+  "workflowImport_stepInfo": "Workflow Info",
+  "workflowImport_stepSlots": "Confirm Slot Config",
+  "workflowImport_stepDone": "Complete Import",
+  "workflowImport_previous": "Previous",
+  "workflowImport_next": "Next",
+  "workflowImport_finish": "Finish Import",
+  "workflowImport_defaultName": "Custom Workflow",
+  "workflowImport_fileInstructions": "Select a workflow_api.json file exported from ComfyUI.\n\nIn ComfyUI, open the menu and choose Export (API format) to get this file.",
+  "workflowImport_nodeCount": "{count} nodes",
+  "@workflowImport_nodeCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "workflowImport_reselect": "Click to choose another file",
+  "workflowImport_selectWorkflowApi": "Click to select workflow_api.json",
+  "workflowImport_invalidTopLevel": "Invalid file format: top level should be a JSON object",
+  "workflowImport_noComfyNodes": "No ComfyUI nodes detected. Make sure this is an API-format export.",
+  "workflowImport_readFailed": "Failed to read file: {error}",
+  "@workflowImport_readFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "workflowImport_analysisResult": "Automatic Analysis Result",
+  "workflowImport_inputImageNodes": "Input image nodes",
+  "workflowImport_adjustableParams": "Adjustable parameters",
+  "workflowImport_outputNodes": "Output nodes",
+  "workflowImport_totalNodes": "Total nodes",
+  "workflowImport_countUnit": "{count}",
+  "@workflowImport_countUnit": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "workflowImport_workflowName": "Workflow Name *",
+  "workflowImport_description": "Description",
+  "workflowImport_category": "Category",
+  "workflowImport_slotsHint": "Select the slots to expose in the UI. Input and output slots should usually stay enabled; parameters that users do not need to adjust can be disabled.",
+  "workflowImport_inputSection": "Input",
+  "workflowImport_outputSection": "Output",
+  "workflowImport_parameterSection": "Parameters",
+  "workflowImport_noSlotsWarning": "No usable slots were detected. This workflow may not integrate correctly.\nMake sure the workflow includes LoadImage and SaveImage/SaveImageWebsocket nodes.",
+  "workflowImport_nodeRef": "Node {node}",
+  "@workflowImport_nodeRef": {
+    "placeholders": {
+      "node": {}
+    }
+  },
+  "workflowImport_confirmTitle": "About to import this workflow",
+  "workflowImport_name": "Name",
+  "workflowImport_inputSlots": "Input Slots",
+  "workflowImport_parameterSlots": "Parameter Slots",
+  "workflowImport_outputSlots": "Output Slots",
+  "workflowImport_afterImportHint": "After import, it can be used from the ComfyUI workflow list on the generation screen.",
+  "workflowImport_success": "Workflow \"{name}\" imported",
+  "@workflowImport_success": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+
+  "shortcut_settings_help": "View shortcut help",
+  "shortcut_settings_show_in_menus": "Show in menus",
+  "shortcut_settings_defaultShortcut": "Default: {shortcut}",
+  "@shortcut_settings_defaultShortcut": {
+    "placeholders": {
+      "shortcut": {}
+    }
+  },
+  "shortcut_settings_unassigned": "Not set",
+  "shortcut_settings_no_matches": "No matching shortcuts found",
+  "shortcut_settings_reset_all_title": "Reset All Shortcuts",
+  "shortcut_settings_reset_all_confirm": "Reset all shortcuts to their default settings? This cannot be undone.",
+  "shortcut_settings_reset_to_default": "Reset to default",
+
+  "performanceReport_noTaskStats": "No task statistics yet",
+  "performanceReport_taskStatsLine": "Count: {count} | Avg: {average} | Min: {min} | Max: {max}",
+  "@performanceReport_taskStatsLine": {
+    "placeholders": {
+      "count": {},
+      "average": {},
+      "min": {},
+      "max": {}
+    }
+  },
+  "performanceReport_clearTitle": "Clear Performance Data",
+  "performanceReport_clearContent": "Clear all performance statistics? This cannot be undone.",
+  "performanceReport_clearSuccess": "Performance data cleared",
+  "performanceReport_clearAction": "Clear",
+
+  "toast_previewUpdated": "Preview image updated",
+  "toast_styleReferenceLimit": "Style references reached the limit ({max} images)",
+  "@toast_styleReferenceLimit": {
+    "placeholders": {
+      "max": {}
+    }
+  },
+  "toast_noValidPromptFound": "No valid prompt found",
+  "toast_addedToQueue": "Added to queue: {prompt}",
+  "@toast_addedToQueue": {
+    "placeholders": {
+      "prompt": {}
+    }
+  },
+  "toast_noValidMaskIgnored": "No valid mask detected; save result was ignored.",
+  "toast_kritaBusy": "Krita Bridge is generating. Wait for the current task to finish.",
+  "toast_kritaNotConnected": "Krita is not connected. Enable the bridge in Settings and connect the plugin first.",
+  "toast_sentToKrita": "Image sent to Krita",
+  "toast_kritaUnsupportedImageFormat": "This image format cannot be sent to Krita. Use a common image format.",
+  "toast_deletedNamed": "Deleted: {name}",
+  "@toast_deletedNamed": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "toast_vibeParamSaveReencodeFailed": "Failed to save parameters because Vibe re-encoding failed",
+  "toast_exportSuccess": "Export successful",
+  "toast_exportFailed": "Export failed: {error}",
+  "@toast_exportFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "toast_selectVibeToExport": "Select a Vibe to export first",
+  "toast_embedPngSingleVibeOnly": "Embedding into PNG only supports exporting one Vibe",
+  "toast_selectPngCarrier": "Select a PNG carrier image for export",
+  "toast_renameSuccess": "Renamed successfully",
+  "toast_paramsSaved": "Parameters saved",
+  "toast_paramsSaveFailed": "Failed to save parameters",
+  "toast_dropNoReadableImageOrVibe": "The drop source did not provide a readable image or Vibe file",
+  "toast_importedTasks": "Imported {count} tasks",
+  "@toast_importedTasks": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "toast_contentCannotBeEmpty": "Content cannot be empty",
+  "toast_addedToLibrary": "Added to library",
+  "toast_addFailed": "Add failed: {error}",
+  "@toast_addFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "toast_libraryNotLoaded": "Library is not loaded",
+  "toast_noValidTagContent": "No valid tag content",
+  "toast_allTagsAlreadyExist": "All tags already exist in the library",
+  "toast_noAddableTags": "No tags can be added",
+  "toast_addedTagsSkippedDuplicates": "Added {added} tags, skipped {skipped} duplicate tags",
+  "@toast_addedTagsSkippedDuplicates": {
+    "placeholders": {
+      "added": {},
+      "skipped": {}
+    }
+  },
+  "toast_favorited": "Favorited",
+  "toast_unfavorited": "Unfavorited",
+  "toast_favoriteUpdateFailed": "Failed to update favorite state: {error}",
+  "@toast_favoriteUpdateFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "toast_packingImages": "Packing {count} images...",
+  "@toast_packingImages": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "toast_packedImages": "Packed {count} images",
+  "@toast_packedImages": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "toast_packFailed": "Pack failed",
+  "toast_packFailedWithError": "Pack failed: {error}",
+  "@toast_packFailedWithError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "toast_saveDirNotSet": "Save directory is not set",
+  "toast_savedTo": "Saved to {path}",
+  "@toast_savedTo": {
+    "placeholders": {
+      "path": {}
+    }
+  },
+  "toast_tagAlreadyExists": "Tag already exists",
+  "toast_nameRequired": "Enter a name",
+  "toast_savedToVibeLibrary": "Saved to Vibe Library",
+  "toast_saveBundleFailed": "Failed to save bundle",
+  "toast_saveEntryFailed": "Failed to save entry",
+  "toast_presetNameRequired": "Enter a preset name",
+  "toast_selectPresetContent": "Select at least one item to save",
+  "toast_presetSaved": "Preset saved successfully",
+  "toast_imagePromptCopied": "Prompt copied",
+  "toast_imageHasNoPrompt": "This image has no Prompt",
+  "toast_useDeleteButton": "Use the delete button in the UI",
+  "toast_imageHasNoMetadata": "This image has no metadata",
+  "toast_imageDataUnavailable": "Image data is unavailable and cannot be copied",
+  "toast_tempFileCreateFailed": "Failed to create temporary file",
+  "toast_powershellCommandFailed": "PowerShell command failed (exitCode: {exitCode}): {error}",
+  "@toast_powershellCommandFailed": {
+    "placeholders": {
+      "exitCode": {},
+      "error": {}
+    }
+  },
+  "toast_vibeDataCopied": "Vibe data copied",
+  "toast_tagCopied": "Tags copied",
+  "toast_characterPromptCopied": "Character prompt copied",
+  "toast_copiedTitle": "{title} copied",
+  "@toast_copiedTitle": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "toast_replacedVibesCount": "Replaced with {count} Vibes: {name}",
+  "@toast_replacedVibesCount": {
+    "placeholders": {
+      "count": {},
+      "name": {}
+    }
+  },
+  "toast_sentVibesCount": "Sent {count} Vibes to generation: {name}",
+  "@toast_sentVibesCount": {
+    "placeholders": {
+      "count": {},
+      "name": {}
+    }
+  },
+  "toast_replacedVibe": "Replaced with: {name}",
+  "@toast_replacedVibe": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "toast_sentVibeToGeneration": "Sent to generation: {name}",
+  "@toast_sentVibeToGeneration": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "toast_unreadableDroppedImageSource": "The drop source did not provide a readable image file or image URL",
+  "toast_appendedStyleReferences": "Appended {count} style references",
+  "@toast_appendedStyleReferences": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "toast_appendedPreencodedVibe": "Appended 1 style reference (reused pre-encoded Vibe)",
+  "toast_addedPreencodedVibe": "Added style reference (reused pre-encoded Vibe, saved 2 Anlas)",
+  "toast_vibesMissingEncoding": "{count} Vibes are missing encoded data and cannot be saved",
+  "@toast_vibesMissingEncoding": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "toast_savedBundle": "Saved Bundle ({count} Vibes)",
+  "@toast_savedBundle": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "toast_replacedCharacterReference": "Replaced character reference",
+  "toast_extractMetadataFailed": "Failed to extract metadata: {error}",
+  "@toast_extractMetadataFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "toast_extractPromptFailed": "Failed to extract prompt: {error}",
+  "@toast_extractPromptFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "toast_smartDecomposeSent": "Smart decomposed and sent",
+  "toast_addedToFixedTags": "Added to fixed tags",
+  "toast_renameNameRequired": "Name is required",
+  "toast_renameNameConflict": "Name already exists. Use another name.",
+  "toast_renameEntryNotFound": "The entry no longer exists and may have been deleted",
+  "toast_renameFilePathMissing": "This entry has no file path and cannot be renamed",
+  "toast_renameFileFailed": "Failed to rename file. Try again later.",
+  "toast_renameFailed": "Rename failed. Try again later.",
+  "toast_processImageFailed": "Failed to process image: {error}",
+  "@toast_processImageFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "toast_savePreviewFailed": "Failed to save preview image",
 
   "common_justNow": "Just now",
   "common_minutesAgo": "{minutes} minutes ago",

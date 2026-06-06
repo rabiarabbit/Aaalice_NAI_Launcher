@@ -7,7 +7,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/comfyui/comfyui_models.dart';
 import '../../../../core/comfyui/workflow_template.dart';
+import '../../../../core/utils/localization_extension.dart';
 import '../../../providers/comfyui/comfyui_provider.dart';
+import '../../../utils/comfyui_workflow_l10n.dart';
 import '../../../widgets/common/app_toast.dart';
 
 /// 通用 ComfyUI 工作流执行对话框
@@ -103,7 +105,10 @@ class _ComfyUIWorkflowDialogState extends ConsumerState<ComfyUIWorkflowDialog> {
                     // 参数区
                     if (widget.template.parameterSlots.isNotEmpty) ...[
                       const SizedBox(height: 12),
-                      Text('参数设置', style: theme.textTheme.titleSmall),
+                      Text(
+                        context.l10n.comfyWorkflow_parameters,
+                        style: theme.textTheme.titleSmall,
+                      ),
                       const SizedBox(height: 8),
                       ...widget.template.parameterSlots
                           .map((s) => _buildParameterInput(theme, s)),
@@ -150,12 +155,12 @@ class _ComfyUIWorkflowDialogState extends ConsumerState<ComfyUIWorkflowDialog> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  widget.template.name,
+                  widget.template.localizedName(context),
                   style: theme.textTheme.titleMedium,
                 ),
-                if (widget.template.description.isNotEmpty)
+                if (widget.template.localizedDescription(context).isNotEmpty)
                   Text(
-                    widget.template.description,
+                    widget.template.localizedDescription(context),
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
@@ -191,26 +196,26 @@ class _ComfyUIWorkflowDialogState extends ConsumerState<ComfyUIWorkflowDialog> {
           if (_results != null && _results!.isNotEmpty) ...[
             OutlinedButton(
               onPressed: () => Navigator.of(context).pop(_results),
-              child: const Text('使用结果'),
+              child: Text(context.l10n.comfyWorkflow_useResult),
             ),
             const SizedBox(width: 8),
           ],
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('关闭'),
+            child: Text(context.l10n.common_close),
           ),
           const SizedBox(width: 8),
           if (!taskState.isRunning)
             FilledButton.icon(
               onPressed: canExecute ? _execute : null,
               icon: const Icon(Icons.play_arrow, size: 18),
-              label: const Text('执行'),
+              label: Text(context.l10n.comfyWorkflow_execute),
             )
           else
             OutlinedButton.icon(
               onPressed: () => ref.read(comfyUITaskProvider.notifier).cancel(),
               icon: const Icon(Icons.stop, size: 18),
-              label: const Text('取消'),
+              label: Text(context.l10n.common_cancel),
             ),
         ],
       ),
@@ -238,7 +243,7 @@ class _ComfyUIWorkflowDialogState extends ConsumerState<ComfyUIWorkflowDialog> {
           Row(
             children: [
               Text(
-                slot.label,
+                slot.localizedLabel(context),
                 style: theme.textTheme.titleSmall,
               ),
               if (slot.required)
@@ -308,7 +313,7 @@ class _ComfyUIWorkflowDialogState extends ConsumerState<ComfyUIWorkflowDialog> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '点击选择图像',
+                        context.l10n.comfyWorkflow_selectImage,
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.onSurface
                               .withValues(alpha: 0.4),
@@ -343,7 +348,9 @@ class _ComfyUIWorkflowDialogState extends ConsumerState<ComfyUIWorkflowDialog> {
         setState(() => _inputImages[slotId] = bytes!);
       }
     } catch (e) {
-      if (mounted) AppToast.error(context, '选择图像失败: $e');
+      if (mounted) {
+        AppToast.error(context, context.l10n.comfyWorkflow_pickImageFailed(e));
+      }
     }
   }
 
@@ -371,7 +378,7 @@ class _ComfyUIWorkflowDialogState extends ConsumerState<ComfyUIWorkflowDialog> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(slot.label, style: theme.textTheme.bodyMedium),
+        Text(slot.localizedLabel(context), style: theme.textTheme.bodyMedium),
         const SizedBox(height: 4),
         if (choices.length <= 5)
           Wrap(
@@ -392,7 +399,7 @@ class _ComfyUIWorkflowDialogState extends ConsumerState<ComfyUIWorkflowDialog> {
             decoration: InputDecoration(
               border: const OutlineInputBorder(),
               isDense: true,
-              labelText: slot.label,
+              labelText: slot.localizedLabel(context),
             ),
             items: choices
                 .map((c) => DropdownMenuItem(value: c, child: Text(c)))
@@ -416,7 +423,10 @@ class _ComfyUIWorkflowDialogState extends ConsumerState<ComfyUIWorkflowDialog> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(slot.label, style: theme.textTheme.bodyMedium),
+              Text(
+                slot.localizedLabel(context),
+                style: theme.textTheme.bodyMedium,
+              ),
               Text(
                 val.toInt().toString(),
                 style: theme.textTheme.bodySmall
@@ -438,7 +448,7 @@ class _ComfyUIWorkflowDialogState extends ConsumerState<ComfyUIWorkflowDialog> {
     return TextFormField(
       initialValue: val.toInt().toString(),
       decoration: InputDecoration(
-        labelText: slot.label,
+        labelText: slot.localizedLabel(context),
         border: const OutlineInputBorder(),
         isDense: true,
       ),
@@ -461,7 +471,10 @@ class _ComfyUIWorkflowDialogState extends ConsumerState<ComfyUIWorkflowDialog> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(slot.label, style: theme.textTheme.bodyMedium),
+              Text(
+                slot.localizedLabel(context),
+                style: theme.textTheme.bodyMedium,
+              ),
               Text(
                 val.toStringAsFixed(2),
                 style: theme.textTheme.bodySmall
@@ -485,7 +498,7 @@ class _ComfyUIWorkflowDialogState extends ConsumerState<ComfyUIWorkflowDialog> {
     return TextFormField(
       initialValue: val.toString(),
       decoration: InputDecoration(
-        labelText: slot.label,
+        labelText: slot.localizedLabel(context),
         border: const OutlineInputBorder(),
         isDense: true,
       ),
@@ -501,7 +514,7 @@ class _ComfyUIWorkflowDialogState extends ConsumerState<ComfyUIWorkflowDialog> {
     final val =
         _paramValues[slot.id] as bool? ?? slot.defaultValue as bool? ?? false;
     return SwitchListTile(
-      title: Text(slot.label),
+      title: Text(slot.localizedLabel(context)),
       value: val,
       dense: true,
       contentPadding: EdgeInsets.zero,
@@ -519,7 +532,7 @@ class _ComfyUIWorkflowDialogState extends ConsumerState<ComfyUIWorkflowDialog> {
       initialValue:
           (_paramValues[slot.id] ?? slot.defaultValue ?? '').toString(),
       decoration: InputDecoration(
-        labelText: slot.label,
+        labelText: slot.localizedLabel(context),
         border: const OutlineInputBorder(),
         isDense: true,
       ),
@@ -531,12 +544,15 @@ class _ComfyUIWorkflowDialogState extends ConsumerState<ComfyUIWorkflowDialog> {
 
   Widget _buildProgress(ThemeData theme, ComfyUITaskState taskState) {
     final statusText = switch (taskState.status) {
-      ComfyUITaskStatus.uploading => '正在上传图像...',
-      ComfyUITaskStatus.queued => '排队中...',
+      ComfyUITaskStatus.uploading => context.l10n.comfyWorkflow_uploadingImage,
+      ComfyUITaskStatus.queued => context.l10n.comfyWorkflow_queued,
       ComfyUITaskStatus.running => taskState.totalSteps > 0
-          ? '处理中 ${taskState.currentStep}/${taskState.totalSteps}'
-          : '处理中...',
-      _ => '处理中...',
+          ? context.l10n.comfyWorkflow_runningSteps(
+              taskState.currentStep,
+              taskState.totalSteps,
+            )
+          : context.l10n.comfyWorkflow_processing,
+      _ => context.l10n.comfyWorkflow_processing,
     };
 
     return Container(
@@ -614,13 +630,13 @@ class _ComfyUIWorkflowDialogState extends ConsumerState<ComfyUIWorkflowDialog> {
             ),
             const SizedBox(width: 8),
             Text(
-              '执行完成',
+              context.l10n.comfyWorkflow_complete,
               style: theme.textTheme.titleSmall
                   ?.copyWith(color: theme.colorScheme.primary),
             ),
             const Spacer(),
             Text(
-              '${_results!.length} 张图像',
+              context.l10n.comfyWorkflow_imageCount(_results!.length),
               style: theme.textTheme.bodySmall,
             ),
           ],

@@ -159,6 +159,9 @@ void main() {
             ),
           ],
           child: MaterialApp(
+            locale: const Locale('zh'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             home: Scaffold(
               body: PageShortcuts(
                 contextType: ShortcutContext.gallery,
@@ -356,7 +359,7 @@ void main() {
       await _pumpOnlineGalleryScreen(tester);
       await tester.pump();
 
-      expect(find.text('模糊匹配'), findsOneWidget);
+      expect(find.text('Fuzzy Match'), findsOneWidget);
     });
 
     testWidgets('opens date range controls in a compact anchored popup', (
@@ -369,9 +372,9 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(DateRangePickerDialog), findsNothing);
-      expect(find.text('开始日期'), findsOneWidget);
-      expect(find.text('结束日期'), findsOneWidget);
-      expect(find.text('应用'), findsOneWidget);
+      expect(find.text('Start Date'), findsOneWidget);
+      expect(find.text('End Date'), findsOneWidget);
+      expect(find.text('Apply'), findsOneWidget);
     });
   });
 
@@ -389,6 +392,8 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             home: Scaffold(
               body: AutocompleteWrapper(
                 controller: controller,
@@ -480,6 +485,48 @@ void main() {
         ),
         r'\\nas\gallery\history image.png',
       );
+    });
+
+    test('reveals existing files through the shared launcher path', () async {
+      final tempDir = await Directory.systemTemp.createTemp('nai_reveal_test_');
+      final file = File(
+        '${tempDir.path}${Platform.pathSeparator}history image.png',
+      );
+      await file.writeAsString('image');
+      addTearDown(() async {
+        if (await tempDir.exists()) {
+          await tempDir.delete(recursive: true);
+        }
+      });
+
+      String? executable;
+      List<String>? arguments;
+
+      await FileExplorerUtils.revealFile(
+        file.path,
+        startProcess: (exe, args) async {
+          executable = exe;
+          arguments = List<String>.of(args);
+        },
+      );
+
+      final absolutePath = Platform.isWindows
+          ? FileExplorerUtils.normalizeWindowsExplorerPath(file.absolute.path)
+          : file.absolute.path;
+
+      if (Platform.isWindows) {
+        expect(executable, 'explorer.exe');
+        expect(
+          arguments,
+          FileExplorerUtils.windowsRevealFileArguments(absolutePath),
+        );
+      } else if (Platform.isMacOS) {
+        expect(executable, 'open');
+        expect(arguments, ['-R', absolutePath]);
+      } else if (Platform.isLinux) {
+        expect(executable, 'xdg-open');
+        expect(arguments, [file.parent.absolute.path]);
+      }
     });
   });
 
@@ -1177,10 +1224,10 @@ void main() {
         characterPrompt: 'target girl, silver hair, blue dress',
       );
 
-      expect(payload, contains('待替换提示词'));
+      expect(payload, contains('Source prompt to replace'));
       expect(payload, contains('1girl, sitting, classroom, looking at viewer'));
       expect(payload, isNot(contains('源语境标签')));
-      expect(payload, contains('目标角色提示词'));
+      expect(payload, contains('Target character prompt'));
       expect(payload, contains('target girl, silver hair, blue dress'));
       expect(
         payload.indexOf('1girl, sitting, classroom'),
@@ -1188,7 +1235,7 @@ void main() {
       );
       expect(
         PromptAssistantService.characterReplacementInstruction,
-        contains('不要输出分析'),
+        contains('Do not output analysis'),
       );
     });
 
