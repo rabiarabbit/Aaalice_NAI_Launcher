@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/utils/app_logger.dart';
 import '../../core/services/anlas_calculator.dart';
 import '../../data/datasources/remote/nai_image_enhancement_api_service.dart';
 import '../../data/models/director/director_tool_type.dart';
@@ -123,7 +124,12 @@ class DirectorToolsNotifier extends Notifier<DirectorToolsState> {
       frame.image.dispose();
       codec.dispose();
       state = state.copyWith(imageWidth: w, imageHeight: h);
-    } catch (_) {}
+    } catch (e) {
+      AppLogger.d(
+        'Failed to resolve director tool image dimensions: $e',
+        'DirectorTools',
+      );
+    }
   }
 
   void selectTool(DirectorToolType tool) {
@@ -155,7 +161,8 @@ class DirectorToolsNotifier extends Notifier<DirectorToolsState> {
     final source = state.sourceImage;
     if (source == null) return;
 
-    state = state.copyWith(isRunning: true, clearError: true, clearResult: true);
+    state =
+        state.copyWith(isRunning: true, clearError: true, clearResult: true);
 
     try {
       final service = ref.read(naiImageEnhancementApiServiceProvider);

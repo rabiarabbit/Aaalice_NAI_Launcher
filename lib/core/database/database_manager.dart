@@ -191,7 +191,12 @@ class DatabaseManager {
         _initCompleter.completeError(e, stack);
       }
 
-      AppLogger.e('DatabaseManager initialization failed', e, stack, 'DatabaseManager');
+      AppLogger.e(
+        'DatabaseManager initialization failed',
+        e,
+        stack,
+        'DatabaseManager',
+      );
       rethrow;
     }
   }
@@ -327,19 +332,39 @@ class DatabaseManager {
 
     try {
       await _translationDataSource?.dispose();
-    } catch (_) {}
+    } catch (e) {
+      AppLogger.d(
+        'Failed to dispose translation data source: $e',
+        'DatabaseManager',
+      );
+    }
 
     try {
       await _cooccurrenceDataSource?.dispose();
-    } catch (_) {}
+    } catch (e) {
+      AppLogger.d(
+        'Failed to dispose cooccurrence data source: $e',
+        'DatabaseManager',
+      );
+    }
 
     try {
       await _danbooruTagDataSource?.dispose();
-    } catch (_) {}
+    } catch (e) {
+      AppLogger.d(
+        'Failed to dispose Danbooru tag data source: $e',
+        'DatabaseManager',
+      );
+    }
 
     try {
       await _galleryDataSource?.dispose();
-    } catch (_) {}
+    } catch (e) {
+      AppLogger.d(
+        'Failed to dispose gallery data source: $e',
+        'DatabaseManager',
+      );
+    }
 
     await ConnectionPoolHolder.dispose();
 
@@ -354,14 +379,24 @@ class DatabaseManager {
     try {
       await _danbooruTagDataSource!.initialize();
     } catch (e, stack) {
-      AppLogger.e('Failed to initialize DanbooruTagDataSource', e, stack, 'DatabaseManager');
+      AppLogger.e(
+        'Failed to initialize DanbooruTagDataSource',
+        e,
+        stack,
+        'DatabaseManager',
+      );
     }
 
     _galleryDataSource = GalleryDataSource();
     try {
       await _galleryDataSource!.initialize();
     } catch (e, stack) {
-      AppLogger.e('Failed to initialize GalleryDataSource', e, stack, 'DatabaseManager');
+      AppLogger.e(
+        'Failed to initialize GalleryDataSource',
+        e,
+        stack,
+        'DatabaseManager',
+      );
     }
 
     await _warmupConnectionPool();
@@ -386,7 +421,12 @@ class DatabaseManager {
         );
       }
     } catch (e, stack) {
-      AppLogger.e('Failed to warmup connection pool', e, stack, 'DatabaseManager');
+      AppLogger.e(
+        'Failed to warmup connection pool',
+        e,
+        stack,
+        'DatabaseManager',
+      );
     }
   }
 
@@ -397,18 +437,28 @@ class DatabaseManager {
         onStatusChange: (oldStatus, newStatus, result) {
           AppLogger.w(
             'Database health changed: $oldStatus -> $newStatus '
-            '(latency: ${result.connectionAcquireLatency.inMilliseconds}ms, '
-            'failureRate: ${result.failureRate.toStringAsFixed(2)}%)',
+                '(latency: ${result.connectionAcquireLatency.inMilliseconds}ms, '
+                'failureRate: ${result.failureRate.toStringAsFixed(2)}%)',
             'DatabaseManager',
           );
         },
         onAlert: (alertType, message, result) {
-          AppLogger.e('Database health alert [$alertType]: $message', null, null, 'DatabaseManager');
+          AppLogger.e(
+            'Database health alert [$alertType]: $message',
+            null,
+            null,
+            'DatabaseManager',
+          );
         },
       );
       _healthMonitor!.start();
     } catch (e, stack) {
-      AppLogger.e('Failed to start health monitoring', e, stack, 'DatabaseManager');
+      AppLogger.e(
+        'Failed to start health monitoring',
+        e,
+        stack,
+        'DatabaseManager',
+      );
     }
   }
 
@@ -416,13 +466,19 @@ class DatabaseManager {
     try {
       _metricsReporter = metrics_reporter.MetricsReporter();
 
-      const isProduction = bool.fromEnvironment('dart.vm.product', defaultValue: false);
-      const reportInterval = isProduction ? Duration(minutes: 5) : Duration(minutes: 10);
+      const isProduction =
+          bool.fromEnvironment('dart.vm.product', defaultValue: false);
+      const reportInterval =
+          isProduction ? Duration(minutes: 5) : Duration(minutes: 10);
 
       _metricsReporter!.startReporting(interval: reportInterval);
     } catch (e, stack) {
-      AppLogger.e('Failed to start metrics reporting', e, stack, 'DatabaseManager');
+      AppLogger.e(
+        'Failed to start metrics reporting',
+        e,
+        stack,
+        'DatabaseManager',
+      );
     }
   }
-
 }

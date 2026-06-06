@@ -224,7 +224,12 @@ class ComfyUIApiService {
         if (e.response!.data is String) {
           return e.response!.data as String;
         }
-      } catch (_) {}
+      } catch (e) {
+        AppLogger.d(
+          'Failed to parse ComfyUI error response: $e',
+          _tag,
+        );
+      }
     }
     if (e.type == DioExceptionType.connectionTimeout ||
         e.type == DioExceptionType.connectionError) {

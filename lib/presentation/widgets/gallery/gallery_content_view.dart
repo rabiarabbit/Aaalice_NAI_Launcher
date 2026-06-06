@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
+import '../../../core/utils/app_logger.dart';
 import '../../../core/utils/localization_extension.dart';
 import '../../../data/models/gallery/local_image_record.dart';
 import '../../providers/local_gallery_provider.dart';
@@ -344,7 +345,12 @@ class _GenericGalleryContentViewState<T>
       if (descriptor.width > 0 && descriptor.height > 0) {
         return descriptor.width / descriptor.height;
       }
-    } catch (_) {}
+    } catch (e) {
+      AppLogger.d(
+        'Failed to read gallery image aspect ratio: $e',
+        'GalleryContent',
+      );
+    }
 
     return 1.0;
   }
