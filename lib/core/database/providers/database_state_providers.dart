@@ -36,11 +36,19 @@ ConnectionPoolLifecycleManager connectionPoolLifecycle(Ref ref) {
             maxConnections: 20,
           );
         } catch (e) {
-          AppLogger.w('Failed to initialize ConnectionPoolLifecycleManager: $e', 'ConnectionPoolLifecycle');
+          AppLogger.w(
+            'Failed to initialize ConnectionPoolLifecycleManager: $e',
+            'ConnectionPoolLifecycle',
+          );
         }
       });
     }
-  } catch (_) {}
+  } catch (e) {
+    AppLogger.d(
+      'Skipped ConnectionPoolLifecycleManager sync because DatabaseManager is unavailable: $e',
+      'ConnectionPoolLifecycle',
+    );
+  }
 
   ref.onDispose(manager.dispose);
   return manager;
@@ -129,7 +137,8 @@ class DatabaseStatusNotifier extends _$DatabaseStatusNotifier {
           await db.execute('BEGIN TRANSACTION');
           try {
             for (final table in tables) {
-              final countResult = await db.rawQuery('SELECT COUNT(*) as count FROM $table');
+              final countResult =
+                  await db.rawQuery('SELECT COUNT(*) as count FROM $table');
               stats[table] = (countResult.first['count'] as num?)?.toInt() ?? 0;
               await db.execute('DELETE FROM $table');
             }
@@ -148,7 +157,10 @@ class DatabaseStatusNotifier extends _$DatabaseStatusNotifier {
         ref.invalidate(danbooruTagDataSourceProvider);
         ref.invalidate(danbooruTagsLazyServiceProvider);
         ref.invalidate(danbooruTagsCacheNotifierProvider);
-        AppLogger.i('Providers invalidated after clear', 'DatabaseStatusNotifier');
+        AppLogger.i(
+          'Providers invalidated after clear',
+          'DatabaseStatusNotifier',
+        );
       },
       tablesToClear: const ['danbooru_tags'],
     );

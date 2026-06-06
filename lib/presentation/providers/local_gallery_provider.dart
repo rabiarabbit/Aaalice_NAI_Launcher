@@ -665,7 +665,12 @@ class LocalGalleryNotifier extends _$LocalGalleryNotifier {
     try {
       final service = await getService();
       await service.setPageSize(size);
-    } catch (_) {}
+    } catch (e) {
+      AppLogger.d(
+        'Failed to update gallery service page size: $e',
+        'LocalGallery',
+      );
+    }
 
     await loadPage(0);
   }

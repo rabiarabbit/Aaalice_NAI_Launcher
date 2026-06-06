@@ -192,7 +192,9 @@ class ProxyService {
   }
 
   /// 测试代理连接
-  static Future<ProxyTestResult> testProxyConnection(String proxyAddress) async {
+  static Future<ProxyTestResult> testProxyConnection(
+    String proxyAddress,
+  ) async {
     final stopwatch = Stopwatch()..start();
     final dio = _createTestDio(proxyAddress: proxyAddress);
 
@@ -209,7 +211,12 @@ class ProxyService {
           if (response.statusCode == 200 || response.statusCode == 204) {
             return ProxyTestResult.success(stopwatch.elapsedMilliseconds);
           }
-        } catch (_) {}
+        } catch (e) {
+          AppLogger.d(
+            'Proxy test URL failed ($url): $e',
+            'ProxyService',
+          );
+        }
       }
       return ProxyTestResult.failure('无法连接到测试服务器');
     } on DioException catch (e) {
@@ -222,13 +229,21 @@ class ProxyService {
   }
 
   /// 测试 NovelAI 连接
-  static Future<ProxyTestResult> testNovelAIConnection({String? proxyAddress, Duration? timeout}) async {
+  static Future<ProxyTestResult> testNovelAIConnection({
+    String? proxyAddress,
+    Duration? timeout,
+  }) async {
     final stopwatch = Stopwatch()..start();
-    final dio = _createTestDio(proxyAddress: proxyAddress, timeout: timeout ?? const Duration(seconds: 5));
+    final dio = _createTestDio(
+      proxyAddress: proxyAddress,
+      timeout: timeout ?? const Duration(seconds: 5),
+    );
 
     try {
       final response = await dio.get('https://novelai.net');
-      if (response.statusCode == 200 || response.statusCode == 307 || response.statusCode == 302) {
+      if (response.statusCode == 200 ||
+          response.statusCode == 307 ||
+          response.statusCode == 302) {
         return ProxyTestResult.success(stopwatch.elapsedMilliseconds);
       }
       return ProxyTestResult.failure('HTTP ${response.statusCode}');

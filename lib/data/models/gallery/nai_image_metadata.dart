@@ -310,12 +310,22 @@ class NaiImageMetadata with _$NaiImageMetadata {
     String prompt = '';
     try {
       prompt = commentData['prompt'] as String? ?? '';
-    } catch (_) {}
+    } catch (e) {
+      AppLogger.d(
+        'Failed to parse prompt field: $e',
+        'NaiImageMetadata',
+      );
+    }
 
     String negativePrompt = '';
     try {
       negativePrompt = commentData['uc'] as String? ?? '';
-    } catch (_) {}
+    } catch (e) {
+      AppLogger.d(
+        'Failed to parse negative prompt field: $e',
+        'NaiImageMetadata',
+      );
+    }
 
     final sourceModel = _modelIdFromSource(source);
     final importedUcPreset = _toInt(commentData['uc_preset']);

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 
+import '../../../../core/utils/app_logger.dart';
 import '../core/editor_state.dart';
 import '../layers/layer.dart';
 import 'project_data.dart';
@@ -240,7 +241,12 @@ class ProjectManager {
     for (final fileInfo in validFiles.skip(keepCount)) {
       try {
         await fileInfo.file.delete();
-      } catch (_) {}
+      } catch (e) {
+        AppLogger.d(
+          'Failed to delete old project file: $e',
+          'ProjectManager',
+        );
+      }
     }
   }
 

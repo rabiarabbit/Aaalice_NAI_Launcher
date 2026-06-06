@@ -35,7 +35,8 @@ class ConnectionPoolHolder {
   static int get version => _version;
 
   /// 检查版本是否匹配（用于检测重置）
-  static bool isVersionValid(int expectedVersion) => _version == expectedVersion;
+  static bool isVersionValid(int expectedVersion) =>
+      _version == expectedVersion;
 
   /// 获取当前实例
   static ConnectionPool get instance {
@@ -101,7 +102,10 @@ class ConnectionPoolHolder {
 
     _instance = newInstance;
 
-    AppLogger.i('ConnectionPool reset (version: $currentVersion)', 'ConnectionPoolHolder');
+    AppLogger.i(
+      'ConnectionPool reset (version: $currentVersion)',
+      'ConnectionPoolHolder',
+    );
     return newInstance;
   }
 
@@ -145,13 +149,20 @@ class ConnectionPoolHolder {
         final conn = await pool.acquire().timeout(timeout);
 
         try {
-          await conn.rawQuery(validationQuery).timeout(const Duration(seconds: 2));
+          await conn
+              .rawQuery(validationQuery)
+              .timeout(const Duration(seconds: 2));
           validatedConnections.add(conn);
         } catch (e) {
           lastError = 'Validation failed: $e';
           try {
             await pool.release(conn);
-          } catch (_) {}
+          } catch (releaseError) {
+            AppLogger.d(
+              'Failed to release invalid warmup connection: $releaseError',
+              'ConnectionPoolHolder',
+            );
+          }
         }
       } on TimeoutException {
         lastError = 'Connection acquisition timeout';
@@ -167,7 +178,12 @@ class ConnectionPoolHolder {
     for (final conn in validatedConnections) {
       try {
         await pool.release(conn);
-      } catch (_) {}
+      } catch (releaseError) {
+        AppLogger.d(
+          'Failed to release validated warmup connection: $releaseError',
+          'ConnectionPoolHolder',
+        );
+      }
     }
 
     final success = validatedConnections.length >= connections ~/ 2;

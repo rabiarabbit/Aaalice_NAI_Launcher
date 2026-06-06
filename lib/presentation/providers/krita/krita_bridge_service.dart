@@ -26,6 +26,7 @@ typedef KritaBridgeFallbackGenerator = Future<List<Uint8List>> Function(
 typedef KritaBridgeExternalImageRegistrar = Future<String?> Function(
   Uint8List image, {
   required ImageParams params,
+  bool? addToDisplay,
 });
 typedef KritaBridgeCancelGeneration = void Function();
 typedef KritaBridgeClock = DateTime Function();
@@ -247,6 +248,7 @@ class KritaBridgeService implements KritaBridgeMessageService {
       final savedPath = await _registerExternalImage(
         displayImage,
         params: request.params,
+        addToDisplay: true,
       );
       _sendResult(request, layerImage, savedPath: savedPath);
       AppLogger.i('Completed Krita request: ${request.id}', _logTag);
@@ -275,6 +277,11 @@ class KritaBridgeService implements KritaBridgeMessageService {
   }
 
   Future<Uint8List?> _generateImage(KritaBridgeGenerateRequest request) async {
+    if (_shouldUseDirectFallback(request)) {
+      final fallback = await _generateFallback(request);
+      return fallback.isEmpty ? null : fallback.first;
+    }
+
     Uint8List? finalImage;
     var streamingUnsupported = false;
 
@@ -498,6 +505,10 @@ class KritaBridgeService implements KritaBridgeMessageService {
         lower.contains('streaming not allowed') ||
         lower.contains('stream is not allowed') ||
         lower.contains('stream not allowed');
+  }
+
+  bool _shouldUseDirectFallback(KritaBridgeGenerateRequest request) {
+    return request.params.action == ImageGenerationAction.infill;
   }
 
   Rect? _toRect(KritaSelectionRect? rect) {

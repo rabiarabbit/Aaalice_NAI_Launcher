@@ -260,7 +260,12 @@ $image = [System.Drawing.Image]::FromFile("''';
       if (tempFile != null && await tempFile.exists()) {
         try {
           await tempFile.delete();
-        } catch (_) {}
+        } catch (e) {
+          AppLogger.d(
+            'Failed to delete temporary shared image: $e',
+            'LocalImageCard3D',
+          );
+        }
       }
     }
   }
