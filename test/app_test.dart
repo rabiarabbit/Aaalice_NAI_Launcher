@@ -486,6 +486,48 @@ void main() {
         r'\\nas\gallery\history image.png',
       );
     });
+
+    test('reveals existing files through the shared launcher path', () async {
+      final tempDir = await Directory.systemTemp.createTemp('nai_reveal_test_');
+      final file = File(
+        '${tempDir.path}${Platform.pathSeparator}history image.png',
+      );
+      await file.writeAsString('image');
+      addTearDown(() async {
+        if (await tempDir.exists()) {
+          await tempDir.delete(recursive: true);
+        }
+      });
+
+      String? executable;
+      List<String>? arguments;
+
+      await FileExplorerUtils.revealFile(
+        file.path,
+        startProcess: (exe, args) async {
+          executable = exe;
+          arguments = List<String>.of(args);
+        },
+      );
+
+      final absolutePath = Platform.isWindows
+          ? FileExplorerUtils.normalizeWindowsExplorerPath(file.absolute.path)
+          : file.absolute.path;
+
+      if (Platform.isWindows) {
+        expect(executable, 'explorer.exe');
+        expect(
+          arguments,
+          FileExplorerUtils.windowsRevealFileArguments(absolutePath),
+        );
+      } else if (Platform.isMacOS) {
+        expect(executable, 'open');
+        expect(arguments, ['-R', absolutePath]);
+      } else if (Platform.isLinux) {
+        expect(executable, 'xdg-open');
+        expect(arguments, [file.parent.absolute.path]);
+      }
+    });
   });
 
   group('ComfyUI upscale workflows', () {
