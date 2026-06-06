@@ -33,7 +33,8 @@ void main() {
         isUiGenerating: () => false,
         generateStream: (_) => const Stream.empty(),
         generateFallback: (_) async => const [],
-        registerExternalImage: (_, {required params}) async => null,
+        registerExternalImage: (_, {required params, addToDisplay}) async =>
+            null,
         cancelGeneration: () {},
       );
 
@@ -76,7 +77,8 @@ void main() {
         isUiGenerating: () => false,
         generateStream: (_) => const Stream.empty(),
         generateFallback: (_) async => const [],
-        registerExternalImage: (_, {required params}) async => null,
+        registerExternalImage: (_, {required params, addToDisplay}) async =>
+            null,
         cancelGeneration: () {},
       );
 
@@ -105,7 +107,8 @@ void main() {
           return const Stream.empty();
         },
         generateFallback: (_) async => const [],
-        registerExternalImage: (_, {required params}) async => null,
+        registerExternalImage: (_, {required params, addToDisplay}) async =>
+            null,
         cancelGeneration: () {},
       );
 
@@ -140,7 +143,8 @@ void main() {
           throw Exception('500 server error');
         },
         generateFallback: (_) async => const [],
-        registerExternalImage: (_, {required params}) async => null,
+        registerExternalImage: (_, {required params, addToDisplay}) async =>
+            null,
         cancelGeneration: () {},
         clock: () => now,
         failureCooldown: const Duration(seconds: 5),
@@ -193,7 +197,7 @@ void main() {
           ),
         ]),
         generateFallback: (_) async => const [],
-        registerExternalImage: (_, {required params}) async {
+        registerExternalImage: (_, {required params, addToDisplay}) async {
           registered = true;
           return null;
         },
@@ -228,7 +232,8 @@ void main() {
         isUiGenerating: () => false,
         generateStream: (_) => throw Exception('streaming is not allowed'),
         generateFallback: (_) async => const [],
-        registerExternalImage: (_, {required params}) async => null,
+        registerExternalImage: (_, {required params, addToDisplay}) async =>
+            null,
         cancelGeneration: () {},
       );
 
@@ -260,7 +265,8 @@ void main() {
         isUiGenerating: () => false,
         generateStream: (_) => throw Exception('Inpaint mask is empty'),
         generateFallback: (_) async => const [],
-        registerExternalImage: (_, {required params}) async => null,
+        registerExternalImage: (_, {required params, addToDisplay}) async =>
+            null,
         cancelGeneration: () {},
       );
 
@@ -305,7 +311,8 @@ void main() {
           isUiGenerating: () => false,
           generateStream: (_) => throw Exception(entry.error),
           generateFallback: (_) async => const [],
-          registerExternalImage: (_, {required params}) async => null,
+          registerExternalImage: (_, {required params, addToDisplay}) async =>
+              null,
           cancelGeneration: () {},
         );
 
@@ -338,7 +345,8 @@ void main() {
           '401 token pst-secret account user@example.com endpoint https://nai.local',
         ),
         generateFallback: (_) async => const [],
-        registerExternalImage: (_, {required params}) async => null,
+        registerExternalImage: (_, {required params, addToDisplay}) async =>
+            null,
         cancelGeneration: () {},
       );
 
@@ -369,7 +377,8 @@ void main() {
         isUiGenerating: () => false,
         generateStream: (_) => streamController.stream,
         generateFallback: (_) async => const [],
-        registerExternalImage: (_, {required params}) async => null,
+        registerExternalImage: (_, {required params, addToDisplay}) async =>
+            null,
         cancelGeneration: () {},
       )..setActiveRequestReporter(activeRequests.add);
 
@@ -421,7 +430,7 @@ void main() {
           ]);
         },
         generateFallback: (_) async => const [],
-        registerExternalImage: (image, {required params}) async {
+        registerExternalImage: (image, {required params, addToDisplay}) async {
           registered.add((image: image, params: params));
           return 'G:/AIdarw/generated/krita-result.png';
         },
@@ -473,6 +482,38 @@ void main() {
       expect(registered.single.params.prompt, 'dog');
     });
 
+    test('registers bridge results for current display history ordering',
+        () async {
+      final displayFlags = <bool?>[];
+      final service = KritaBridgeService(
+        readBaseParams: () => const ImageParams(),
+        send: (_) {},
+        isUiGenerating: () => false,
+        generateStream: (_) => Stream.value(
+          ImageStreamChunk.complete(Uint8List.fromList([7, 8, 9])),
+        ),
+        generateFallback: (_) async => const [],
+        registerExternalImage: (_, {required params, addToDisplay}) async {
+          displayFlags.add(addToDisplay);
+          return null;
+        },
+        cancelGeneration: () {},
+      );
+
+      await service.handle(
+        KritaImg2ImgMessage(
+          id: 'img-display-history',
+          image: Uint8List.fromList([1]),
+          prompt: '',
+          negativePrompt: '',
+          strength: 0.5,
+          noise: 0.0,
+        ),
+      );
+
+      expect(displayFlags, [isTrue]);
+    });
+
     test('composites Krita inpaint result with source mask before writeback',
         () async {
       final sent = <Map<String, dynamic>>[];
@@ -480,14 +521,17 @@ void main() {
       final source = _solidPng(4, 4, 10, 20, 30);
       final generated = _solidPng(4, 4, 200, 210, 220);
       final mask = _maskPng(4, 4, const [(1, 1), (2, 1)]);
+      var streamCalled = false;
       final service = KritaBridgeService(
         readBaseParams: () => const ImageParams(),
         send: sent.add,
         isUiGenerating: () => false,
-        generateStream: (_) =>
-            Stream.value(ImageStreamChunk.complete(generated)),
-        generateFallback: (_) async => const [],
-        registerExternalImage: (image, {required params}) async {
+        generateStream: (_) {
+          streamCalled = true;
+          return Stream.value(ImageStreamChunk.complete(generated));
+        },
+        generateFallback: (_) async => [generated],
+        registerExternalImage: (image, {required params, addToDisplay}) async {
           registered.add(image);
           return null;
         },
@@ -511,6 +555,7 @@ void main() {
         ),
       );
 
+      expect(streamCalled, isFalse);
       expect(sent, hasLength(1));
       expect(sent.single['type'], 'result');
       final result = img.decodeImage(
@@ -525,25 +570,31 @@ void main() {
       expect(historyResult.getPixel(3, 3).b.toInt(), equals(30));
     });
 
-    test('composites Krita inpaint previews with source mask', () async {
+    test('uses direct fallback for Krita inpaint instead of streaming previews',
+        () async {
       final sent = <Map<String, dynamic>>[];
       final source = _solidPng(4, 4, 10, 20, 30);
       final generated = _solidPng(4, 4, 200, 210, 220);
       final mask = _maskPng(4, 4, const [(1, 1)]);
+      var streamCalled = false;
       final service = KritaBridgeService(
         readBaseParams: () => const ImageParams(),
         send: sent.add,
         isUiGenerating: () => false,
-        generateStream: (_) => Stream.value(
-          ImageStreamChunk.progress(
-            progress: 0.5,
-            currentStep: 1,
-            totalSteps: 2,
-            previewImage: generated,
-          ),
-        ),
-        generateFallback: (_) async => const [],
-        registerExternalImage: (_, {required params}) async => null,
+        generateStream: (_) {
+          streamCalled = true;
+          return Stream.value(
+            ImageStreamChunk.progress(
+              progress: 0.5,
+              currentStep: 1,
+              totalSteps: 2,
+              previewImage: generated,
+            ),
+          );
+        },
+        generateFallback: (_) async => [generated],
+        registerExternalImage: (_, {required params, addToDisplay}) async =>
+            null,
         cancelGeneration: () {},
       );
 
@@ -564,14 +615,16 @@ void main() {
         ),
       );
 
-      expect(sent.first['type'], 'progress');
-      final preview = img.decodeImage(
-        base64Decode(sent.first['preview_image'] as String),
+      expect(streamCalled, isFalse);
+      expect(sent, hasLength(1));
+      expect(sent.single['type'], 'result');
+      final result = img.decodeImage(
+        base64Decode(sent.single['image'] as String),
       )!;
 
-      expect(preview.getPixel(1, 1).r.toInt(), equals(200));
-      expect(preview.getPixel(0, 0).a.toInt(), equals(0));
-      expect(preview.getPixel(3, 3).a.toInt(), equals(0));
+      expect(result.getPixel(1, 1).r.toInt(), equals(200));
+      expect(result.getPixel(0, 0).a.toInt(), equals(0));
+      expect(result.getPixel(3, 3).a.toInt(), equals(0));
     });
 
     test(
@@ -580,6 +633,7 @@ void main() {
       final sent = <Map<String, dynamic>>[];
       final registered = <Uint8List>[];
       late KritaBridgeGenerateRequest capturedRequest;
+      var streamCalled = false;
       final source = _solidPng(4, 4, 10, 20, 30);
       final generatedFullCanvas = _solidPng(4, 4, 200, 210, 220);
       final mask = _maskPng(4, 4, const [(1, 1)]);
@@ -589,10 +643,14 @@ void main() {
         isUiGenerating: () => false,
         generateStream: (request) {
           capturedRequest = request;
+          streamCalled = true;
           return Stream.value(ImageStreamChunk.complete(generatedFullCanvas));
         },
-        generateFallback: (_) async => const [],
-        registerExternalImage: (image, {required params}) async {
+        generateFallback: (request) async {
+          capturedRequest = request;
+          return [generatedFullCanvas];
+        },
+        registerExternalImage: (image, {required params, addToDisplay}) async {
           registered.add(image);
           return null;
         },
@@ -623,6 +681,7 @@ void main() {
       );
 
       expect(capturedRequest.focusedInpaintEnabled, isTrue);
+      expect(streamCalled, isFalse);
       expect(capturedRequest.minimumContextPixels, equals(12));
       expect(capturedRequest.focusedSelectionRect?.left, equals(1));
       expect(capturedRequest.focusedSelectionRect?.top, equals(1));
@@ -656,7 +715,8 @@ void main() {
         isUiGenerating: () => false,
         generateStream: (_) => streamController.stream,
         generateFallback: (_) async => const [],
-        registerExternalImage: (_, {required params}) async => null,
+        registerExternalImage: (_, {required params, addToDisplay}) async =>
+            null,
         cancelGeneration: () {
           cancelCalled = true;
         },
@@ -706,7 +766,8 @@ void main() {
         isUiGenerating: () => false,
         generateStream: (_) => streamController.stream,
         generateFallback: (_) async => const [],
-        registerExternalImage: (_, {required params}) async => null,
+        registerExternalImage: (_, {required params, addToDisplay}) async =>
+            null,
         cancelGeneration: () {
           cancelCalled = true;
         },

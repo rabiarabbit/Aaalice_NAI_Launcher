@@ -319,12 +319,13 @@ final kritaBridgeNotifierProvider =
           focusedSelectionRect: request.focusedSelectionRect,
         );
       },
-      registerExternalImage: (image, {required params}) => ref
+      registerExternalImage: (image, {required params, addToDisplay}) => ref
           .read(imageGenerationNotifierProvider.notifier)
           .registerExternalImage(
             image,
             params: params,
             saveToLocal: ref.read(imageSaveSettingsNotifierProvider).autoSave,
+            addToDisplay: addToDisplay ?? false,
           ),
       cancelGeneration: () =>
           ref.read(naiImageGenerationApiServiceProvider).cancelGeneration(),
