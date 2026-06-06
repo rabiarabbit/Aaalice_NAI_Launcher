@@ -444,13 +444,13 @@ class EditorState extends ChangeNotifier {
         layerId: activeLayer.id,
         newImageBytes: remainPng.buffer.asUint8List(),
         newImage: remainImg,
-        actionDescription: '剪切选区',
+        actionDescription: 'Cut Selection',
       ),
       this,
     );
 
     final cutLayer = layerManager.addLayer(
-      name: '${activeLayer.name} (选区)',
+      name: '${activeLayer.name} (Selection)',
     );
     await cutLayer.setBaseImage(cutPng.buffer.asUint8List());
     cutImg.dispose();
@@ -699,11 +699,11 @@ class EditorState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void initNewCanvas(Size size) {
+  void initNewCanvas(Size size, {String? initialLayerName}) {
     reset();
     _canvasSize = size;
     canvasSizeNotifier.value = size;
-    layerManager.addLayer(name: '图层 1');
+    layerManager.addLayer(name: initialLayerName ?? 'Layer 1');
     // 同步初始工具到通知器
     toolChangeNotifier.value = toolManager.currentTool;
     notifyListeners();

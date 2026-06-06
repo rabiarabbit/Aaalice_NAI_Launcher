@@ -12,6 +12,7 @@ import 'package:go_router/go_router.dart';
 import 'package:super_drag_and_drop/super_drag_and_drop.dart';
 
 import '../../../core/utils/app_logger.dart';
+import '../../../core/utils/localization_extension.dart';
 import '../../../core/utils/vibe_file_parser.dart';
 import '../../../core/utils/vibe_image_embedder.dart';
 import '../../../core/utils/vibe_library_path_helper.dart';
@@ -121,8 +122,9 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
     final theme = Theme.of(context);
 
     // 计算内容区域宽度
+    const categoryPanelWidth = 260.0;
     final contentWidth = _showCategoryPanel && screenWidth > 800
-        ? screenWidth - 250
+        ? screenWidth - categoryPanelWidth
         : screenWidth;
 
     // 计算列数（200px/列，最少2列，最多8列）
@@ -190,7 +192,7 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
                     // 左侧分类面板
                     if (_showCategoryPanel && screenWidth > 800)
                       Container(
-                        width: 250,
+                        width: categoryPanelWidth,
                         decoration: BoxDecoration(
                           color: theme.colorScheme.surfaceContainerLow,
                           border: Border(
@@ -220,20 +222,22 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
-                                      '分类',
+                                      context.l10n.vibeLibrary_categories,
                                       style:
                                           theme.textTheme.titleSmall?.copyWith(
                                         fontWeight: FontWeight.w600,
                                       ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
                                   FilledButton.tonalIcon(
                                     onPressed: () =>
                                         _showCreateCategoryDialog(context),
                                     icon: const Icon(Icons.add, size: 18),
-                                    label: const Text(
-                                      '新建',
-                                      style: TextStyle(fontSize: 13),
+                                    label: Text(
+                                      context.l10n.common_new,
+                                      style: const TextStyle(fontSize: 13),
                                     ),
                                     style: FilledButton.styleFrom(
                                       padding: const EdgeInsets.symmetric(
@@ -297,10 +301,12 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
                                   final confirmed =
                                       await ThemedConfirmDialog.show(
                                     context: context,
-                                    title: '确认删除',
-                                    content: '确定要删除此分类吗？分类下的Vibe将被移动到未分类。',
-                                    confirmText: '删除',
-                                    cancelText: '取消',
+                                    title: context
+                                        .l10n.vibeLibrary_deleteCategoryTitle,
+                                    content: context
+                                        .l10n.vibeLibrary_deleteCategoryContent,
+                                    confirmText: context.l10n.common_delete,
+                                    cancelText: context.l10n.common_cancel,
                                     type: ThemedConfirmDialogType.danger,
                                     icon: Icons.delete_outline,
                                   );
@@ -319,10 +325,16 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
                                 onAddSubCategory: (parentId) async {
                                   final name = await ThemedInputDialog.show(
                                     context: context,
-                                    title: parentId == null ? '新建分类' : '新建子分类',
-                                    hintText: '请输入分类名称',
-                                    confirmText: '创建',
-                                    cancelText: '取消',
+                                    title: parentId == null
+                                        ? context.l10n
+                                            .vibeLibrary_createCategoryTitle
+                                        : context.l10n
+                                            .vibeLibrary_createSubCategoryTitle,
+                                    hintText: context
+                                        .l10n.vibeLibrary_categoryNameHint,
+                                    confirmText: context
+                                        .l10n.vibeLibrary_createCategoryConfirm,
+                                    cancelText: context.l10n.common_cancel,
                                   );
                                   if (name != null && name.isNotEmpty) {
                                     await ref
@@ -421,7 +433,7 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
             children: [
               // 标题
               Text(
-                'Vibe库',
+                context.l10n.vibeLibrary_title,
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
@@ -468,8 +480,10 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
                 icon: _showCategoryPanel
                     ? Icons.view_sidebar
                     : Icons.view_sidebar_outlined,
-                label: '分类',
-                tooltip: _showCategoryPanel ? '隐藏分类面板' : '显示分类面板',
+                label: context.l10n.common_categories,
+                tooltip: _showCategoryPanel
+                    ? context.l10n.vibeLibrary_hideCategoryPanel
+                    : context.l10n.vibeLibrary_showCategoryPanel,
                 onPressed: () {
                   setState(() {
                     _showCategoryPanel = !_showCategoryPanel;
@@ -480,8 +494,8 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
               // 选择模式
               CompactIconButton(
                 icon: Icons.checklist,
-                label: '多选',
-                tooltip: '进入选择模式',
+                label: context.l10n.common_multiSelect,
+                tooltip: context.l10n.vibeLibrary_enterSelectionMode,
                 onPressed: () {
                   ref
                       .read(vibeLibrarySelectionNotifierProvider.notifier)
@@ -498,8 +512,8 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
                 },
                 child: CompactIconButton(
                   icon: Icons.file_download_outlined,
-                  label: '导入',
-                  tooltip: '导入 Vibe 文件或 PNG/JPG/JPEG/WEBP 图片（右键查看更多选项）',
+                  label: context.l10n.common_import,
+                  tooltip: context.l10n.vibeLibrary_importTooltip,
                   isLoading: _isPickingFile,
                   onPressed: (_isImporting || _isPickingFile)
                       ? null
@@ -510,16 +524,16 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
               // 导出按钮
               CompactIconButton(
                 icon: Icons.file_upload_outlined,
-                label: '导出',
-                tooltip: '导出Vibe到文件',
+                label: context.l10n.common_export,
+                tooltip: context.l10n.vibeLibrary_exportTooltip,
                 onPressed: state.entries.isEmpty ? null : () => _exportVibes(),
               ),
               const SizedBox(width: 6),
               // 打开文件夹按钮
               CompactIconButton(
                 icon: Icons.folder_open_outlined,
-                label: '文件夹',
-                tooltip: '打开 Vibe 库文件夹',
+                label: context.l10n.common_folder,
+                tooltip: context.l10n.vibeLibrary_openFolderTooltip,
                 onPressed: () => _openVibeLibraryFolder(),
               ),
               const SizedBox(width: 6),
@@ -545,7 +559,7 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
         controller: _searchController,
         style: theme.textTheme.bodyMedium,
         decoration: InputDecoration(
-          hintText: '搜索Vibe名称或标签...',
+          hintText: context.l10n.vibeLibrary_searchHint,
           hintStyle: TextStyle(
             color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
             fontSize: 13,
@@ -604,20 +618,20 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
     switch (state.sortOrder) {
       case VibeLibrarySortOrder.createdAt:
         sortIcon = Icons.access_time;
-        sortLabel = '创建时间';
+        sortLabel = context.l10n.vibeSelectorSortCreated;
       case VibeLibrarySortOrder.lastUsed:
         sortIcon = Icons.history;
-        sortLabel = '最近使用';
+        sortLabel = context.l10n.vibeSelectorSortLastUsed;
       case VibeLibrarySortOrder.usedCount:
         sortIcon = Icons.trending_up;
-        sortLabel = '使用次数';
+        sortLabel = context.l10n.vibeSelectorSortUsedCount;
       case VibeLibrarySortOrder.name:
         sortIcon = Icons.sort_by_alpha;
-        sortLabel = '名称';
+        sortLabel = context.l10n.vibeSelectorSortName;
     }
 
     return PopupMenuButton<VibeLibrarySortOrder>(
-      tooltip: '排序方式',
+      tooltip: context.l10n.vibeLibrary_sortTooltip,
       child: Container(
         height: 36,
         padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -644,25 +658,25 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
       itemBuilder: (context) => [
         _buildSortMenuItem(
           VibeLibrarySortOrder.createdAt,
-          '创建时间',
+          context.l10n.vibeSelectorSortCreated,
           Icons.access_time,
           state,
         ),
         _buildSortMenuItem(
           VibeLibrarySortOrder.lastUsed,
-          '最近使用',
+          context.l10n.vibeSelectorSortLastUsed,
           Icons.history,
           state,
         ),
         _buildSortMenuItem(
           VibeLibrarySortOrder.usedCount,
-          '使用次数',
+          context.l10n.vibeSelectorSortUsedCount,
           Icons.trending_up,
           state,
         ),
         _buildSortMenuItem(
           VibeLibrarySortOrder.name,
-          '名称',
+          context.l10n.vibeSelectorSortName,
           Icons.sort_by_alpha,
           state,
         ),
@@ -740,7 +754,7 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
             ),
             const SizedBox(width: 6),
             Text(
-              '加载中...',
+              context.l10n.vibeLibrary_loading,
               style: theme.textTheme.labelMedium?.copyWith(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
@@ -754,8 +768,8 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
 
     return CompactIconButton(
       icon: Icons.refresh,
-      label: '刷新',
-      tooltip: '刷新Vibe库',
+      label: context.l10n.vibeLibrary_refresh,
+      tooltip: context.l10n.vibeLibrary_refresh,
       onPressed: () {
         ref
             .read(vibeLibraryNotifierProvider.notifier)
@@ -794,31 +808,31 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
       actions: [
         BulkActionItem(
           icon: Icons.send,
-          label: '发送到生成',
+          label: context.l10n.vibeLibrary_sendToGeneration,
           onPressed: () => _batchSendToGeneration(),
           color: theme.colorScheme.primary,
         ),
         BulkActionItem(
           icon: Icons.drive_file_move_outline,
-          label: '移动',
+          label: context.l10n.common_move,
           onPressed: () => _showMoveToCategoryDialog(context),
           color: theme.colorScheme.secondary,
         ),
         BulkActionItem(
           icon: Icons.file_upload_outlined,
-          label: '导出',
+          label: context.l10n.common_export,
           onPressed: () => _batchExport(),
           color: theme.colorScheme.secondary,
         ),
         BulkActionItem(
           icon: Icons.favorite_border,
-          label: '收藏',
+          label: context.l10n.common_favorite,
           onPressed: () => _batchToggleFavorite(),
           color: theme.colorScheme.primary,
         ),
         BulkActionItem(
           icon: Icons.delete_outline,
-          label: '删除',
+          label: context.l10n.common_delete,
           onPressed: () => _batchDelete(),
           color: theme.colorScheme.error,
           isDanger: true,
@@ -890,7 +904,10 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Text(
-              '${state.currentPage + 1} / ${state.totalPages} 页',
+              context.l10n.vibeLibrary_pageIndicator(
+                state.currentPage + 1,
+                state.totalPages,
+              ),
               style: theme.textTheme.bodyMedium,
             ),
           ),
@@ -905,7 +922,10 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
                 : null,
           ),
           const SizedBox(width: 16),
-          Text('每页:', style: theme.textTheme.bodySmall),
+          Text(
+            context.l10n.vibeLibrary_itemsPerPage,
+            style: theme.textTheme.bodySmall,
+          ),
           const SizedBox(width: 8),
           DropdownButton<int>(
             value: state.pageSize,
@@ -926,7 +946,9 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
           ),
           const Spacer(),
           Text(
-            '共 ${state.filteredCount} 个Vibe',
+            context.l10n.vibeLibrary_totalCount(
+              state.filteredCount.toString(),
+            ),
             style: theme.textTheme.bodySmall,
           ),
         ],
@@ -938,10 +960,10 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
   Future<void> _showCreateCategoryDialog(BuildContext context) async {
     final name = await ThemedInputDialog.show(
       context: context,
-      title: '新建分类',
-      hintText: '请输入分类名称',
-      confirmText: '创建',
-      cancelText: '取消',
+      title: context.l10n.vibeLibrary_createCategoryTitle,
+      hintText: context.l10n.vibeLibrary_categoryNameHint,
+      confirmText: context.l10n.vibeLibrary_createCategoryConfirm,
+      cancelText: context.l10n.common_cancel,
     );
     if (name != null && name.isNotEmpty) {
       await ref
@@ -957,7 +979,10 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
 
     if (categories.isEmpty) {
       if (mounted) {
-        AppToast.warning(context, '没有可用的分类');
+        AppToast.warning(
+          context,
+          context.l10n.vibeLibrary_noCategoriesAvailable,
+        );
       }
       return;
     }
@@ -965,7 +990,7 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
     final selectedCategory = await showDialog<VibeLibraryCategory>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('移动到分类'),
+        title: Text(context.l10n.vibeLibrary_moveToCategory),
         content: SizedBox(
           width: 300,
           child: ListView.builder(
@@ -975,7 +1000,7 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
               if (index == 0) {
                 return ListTile(
                   leading: const Icon(Icons.folder_outlined),
-                  title: const Text('未分类'),
+                  title: Text(context.l10n.vibeLibrary_uncategorized),
                   onTap: () => Navigator.of(context).pop(null),
                 );
               }
@@ -991,7 +1016,7 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('取消'),
+            child: Text(context.l10n.common_cancel),
           ),
         ],
       ),
@@ -1012,7 +1037,10 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
 
     ref.read(vibeLibrarySelectionNotifierProvider.notifier).exit();
     if (!context.mounted) return;
-    AppToast.success(context, '已移动 $movedCount 个Vibe');
+    AppToast.success(
+      context,
+      context.l10n.vibeLibrary_movedToCategory(movedCount.toString()),
+    );
   }
 
   /// 批量切换收藏
@@ -1025,7 +1053,7 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
     }
 
     if (mounted) {
-      AppToast.success(context, '收藏状态已更新');
+      AppToast.success(context, context.l10n.vibeLibrary_favoriteStatusUpdated);
       ref.read(vibeLibrarySelectionNotifierProvider.notifier).exit();
     }
   }
@@ -1043,15 +1071,16 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
         await showDialog<void>(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Vibe数量过多'),
+            title: Text(context.l10n.vibeLibrary_tooManyTitle),
             content: Text(
-              '选中了 ${selectedIds.length} 个Vibe，但最多只能同时使用16个。\n\n'
-              '请减少选择数量后再试。',
+              context.l10n.vibeLibrary_tooManySelectedContent(
+                selectedIds.length,
+              ),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('确定'),
+                child: Text(context.l10n.common_ok),
               ),
             ],
           ),
@@ -1078,16 +1107,17 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
         await showDialog<void>(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Vibe数量过多'),
+            title: Text(context.l10n.vibeLibrary_tooManyTitle),
             content: Text(
-              '当前生成页面已有 $currentVibeCount 个Vibe，'
-              '还可以添加 $remainingSlots 个。\n\n'
-              '请减少选择数量后再试。',
+              context.l10n.vibeLibrary_tooManyExistingContent(
+                currentVibeCount,
+                remainingSlots,
+              ),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('确定'),
+                child: Text(context.l10n.common_ok),
               ),
             ],
           ),
@@ -1102,7 +1132,12 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
 
     // 显示成功提示
     if (mounted) {
-      AppToast.success(context, '已发送 ${selectedEntries.length} 个Vibe到生成页面');
+      AppToast.success(
+        context,
+        context.l10n.vibeLibrary_sentToGenerationCount(
+          selectedEntries.length,
+        ),
+      );
     }
 
     // 退出选择模式
@@ -1139,10 +1174,10 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
 
     final confirmed = await ThemedConfirmDialog.show(
       context: context,
-      title: '确认删除',
-      content: '确定要删除选中的 ${ids.length} 个Vibe吗？此操作无法撤销。',
-      confirmText: '删除',
-      cancelText: '取消',
+      title: context.l10n.common_confirmDelete,
+      content: context.l10n.vibeLibrary_deleteSelectedContent(ids.length),
+      confirmText: context.l10n.common_delete,
+      cancelText: context.l10n.common_cancel,
       type: ThemedConfirmDialogType.danger,
       icon: Icons.delete_forever_outlined,
     );
@@ -1151,7 +1186,10 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
       await ref.read(vibeLibraryNotifierProvider.notifier).deleteEntries(ids);
 
       if (mounted) {
-        AppToast.success(context, '已删除 ${ids.length} 个Vibe');
+        AppToast.success(
+          context,
+          context.l10n.vibeLibrary_deletedCount(ids.length),
+        );
         ref.read(vibeLibrarySelectionNotifierProvider.notifier).exit();
       }
     }
@@ -1165,19 +1203,19 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
         items: [
           ProMenuItem(
             id: 'import_file',
-            label: '从文件导入',
+            label: context.l10n.vibeLibrary_importFromFile,
             icon: Icons.folder_outlined,
             onTap: () => _importVibes(),
           ),
           ProMenuItem(
             id: 'import_image',
-            label: '从图片导入',
+            label: context.l10n.vibeLibrary_importFromImage,
             icon: Icons.image_outlined,
             onTap: () => _importVibesFromImage(),
           ),
           ProMenuItem(
             id: 'import_clipboard',
-            label: '从剪贴板导入编码',
+            label: context.l10n.vibeLibrary_importFromClipboard,
             icon: Icons.content_paste,
             onTap: () => _importVibesFromClipboard(),
           ),
@@ -1209,7 +1247,10 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
       }
     } catch (e) {
       if (mounted) {
-        AppToast.error(context, '打开文件夹失败: $e');
+        AppToast.error(
+          context,
+          context.l10n.vibeLibrary_openFolderFailed('$e'),
+        );
       }
     }
   }
@@ -1280,7 +1321,7 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
           ..._vibeImportImageExtensions,
         ],
         allowMultiple: true,
-        dialogTitle: '选择要导入的 Vibe 文件',
+        dialogTitle: context.l10n.vibeLibrary_importFileDialogTitle,
         withData: false,
         lockParentWindow: true,
       );
@@ -1469,11 +1510,14 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
     }
 
     if (totalFail == 0) {
-      AppToast.success(context, '成功导入 $totalSuccess 个 Vibe');
+      AppToast.success(
+        context,
+        context.l10n.vibeLibrary_importSuccessCount(totalSuccess),
+      );
     } else {
       AppToast.warning(
         context,
-        '导入完成: $totalSuccess 成功, $totalFail 失败',
+        context.l10n.vibeLibrary_importSummary(totalSuccess, totalFail),
       );
     }
   }
@@ -1680,7 +1724,7 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
           _isImporting = true;
           _importProgress = ImportProgress(
             total: imagePaths.length + vibeFilePaths.length,
-            message: '准备导入...',
+            message: context.l10n.vibeLibrary_preparingImport,
           );
         });
       }
@@ -1760,11 +1804,14 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
 
       if (mounted) {
         if (totalFail == 0) {
-          AppToast.success(context, '成功导入 $totalSuccess 个 Vibe');
+          AppToast.success(
+            context,
+            context.l10n.vibeLibrary_importSuccessCount(totalSuccess),
+          );
         } else {
           AppToast.warning(
             context,
-            '导入完成: $totalSuccess 成功, $totalFail 失败',
+            context.l10n.vibeLibrary_importSummary(totalSuccess, totalFail),
           );
         }
       }
@@ -1816,7 +1863,7 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    '拖拽 .naiv4vibe/.naiv4vibebundle/.png/.jpg/.jpeg/.webp 文件或文件夹到此处导入',
+                    context.l10n.vibeLibrary_dropImportHint,
                     style: theme.textTheme.titleMedium?.copyWith(
                       color: theme.colorScheme.primary,
                     ),
@@ -1871,7 +1918,7 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  '正在导入...',
+                  context.l10n.vibeLibrary_importing,
                   style: theme.textTheme.titleMedium,
                 ),
                 if (hasProgress) ...[
@@ -1915,7 +1962,7 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
         type: FileType.custom,
         allowedExtensions: _vibeImportImageExtensions,
         allowMultiple: true,
-        dialogTitle: '选择包含 Vibe 的图片',
+        dialogTitle: context.l10n.vibeLibrary_importImageDialogTitle,
         withData: false,
         lockParentWindow: true,
       );
@@ -1997,11 +2044,14 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
 
       if (mounted) {
         if (totalFail == 0) {
-          AppToast.success(context, '成功导入 $totalSuccess 个 Vibe');
+          AppToast.success(
+            context,
+            context.l10n.vibeLibrary_importSuccessCount(totalSuccess),
+          );
         } else {
           AppToast.warning(
             context,
-            '导入完成: $totalSuccess 成功, $totalFail 失败',
+            context.l10n.vibeLibrary_importSummary(totalSuccess, totalFail),
           );
         }
       }
@@ -2257,6 +2307,8 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
   }) async {
     if (!mounted) return null;
 
+    final l10n = context.l10n;
+
     // 显示编码配置对话框
     final config = await encode_dialog.VibeImageEncodeDialog.show(
       context: context,
@@ -2314,7 +2366,7 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
             .timeout(
           const Duration(seconds: 30),
           onTimeout: () {
-            errorMessage = '编码超时，请检查网络连接';
+            errorMessage = l10n.vibeLibrary_encodeTimeout;
             return null;
           },
         );
@@ -2344,7 +2396,7 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
       final action = await encode_dialog.VibeImageEncodeErrorDialog.show(
         context: context,
         fileName: imageFile.source,
-        errorMessage: errorMessage ?? '未知错误',
+        errorMessage: errorMessage ?? context.l10n.vibeLibrary_unknownError,
       );
 
       if (action == encode_dialog.VibeEncodeErrorAction.skip) {
@@ -2403,7 +2455,7 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
 
     if (text == null || text.isEmpty) {
       if (mounted) {
-        AppToast.error(context, '剪贴板为空');
+        AppToast.error(context, context.l10n.vibeLibrary_clipboardEmpty);
       }
       return;
     }
@@ -2469,11 +2521,14 @@ class _VibeLibraryScreenState extends ConsumerState<VibeLibraryScreen> {
 
       if (mounted) {
         if (totalFail == 0) {
-          AppToast.success(context, '成功导入 $totalSuccess 个 Vibe');
+          AppToast.success(
+            context,
+            context.l10n.vibeLibrary_importSuccessCount(totalSuccess),
+          );
         } else {
           AppToast.warning(
             context,
-            '导入完成: $totalSuccess 成功, $totalFail 失败',
+            context.l10n.vibeLibrary_importSummary(totalSuccess, totalFail),
           );
         }
       }

@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/shortcuts/default_shortcuts.dart';
+import '../../../../core/utils/localization_extension.dart';
 import '../../../../data/models/vibe/vibe_library_entry.dart';
 import '../../../../data/models/vibe/vibe_reference.dart';
 import '../../../../data/services/vibe_library_storage_service.dart';
@@ -410,7 +411,7 @@ class _VibeDetailViewerState extends ConsumerState<VibeDetailViewer> {
     });
 
     if (errorMessage == null) {
-      AppToast.success(context, '重命名成功');
+      AppToast.success(context, context.l10n.toast_renameSuccess);
     } else {
       AppToast.error(context, errorMessage);
     }
@@ -473,9 +474,9 @@ class _VibeDetailViewerState extends ConsumerState<VibeDetailViewer> {
           _hydrateBundleParamCache(updatedEntry);
           _syncDisplayedParamsWithSelection();
         });
-        AppToast.success(context, '参数已保存');
+        AppToast.success(context, context.l10n.toast_paramsSaved);
       } else {
-        AppToast.error(context, '保存参数失败');
+        AppToast.error(context, context.l10n.toast_paramsSaveFailed);
       }
     } finally {
       if (mounted) {

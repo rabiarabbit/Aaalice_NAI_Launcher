@@ -195,7 +195,12 @@ class _TagLibraryPageScreenState extends ConsumerState<TagLibraryPageScreen> {
     ref.read(tagLibrarySelectionNotifierProvider.notifier).exit();
 
     if (mounted) {
-      AppToast.success(context, '已发送 ${selectedEntries.length} 个词条到主提示词');
+      AppToast.success(
+        context,
+        context.l10n.tagLibrary_sentEntriesToMainPrompt(
+          selectedEntries.length,
+        ),
+      );
       // 导航到主页
       context.go(AppRoutes.home);
     }
@@ -204,7 +209,7 @@ class _TagLibraryPageScreenState extends ConsumerState<TagLibraryPageScreen> {
   /// 构建分类侧边栏
   Widget _buildCategorySidebar(ThemeData theme, TagLibraryPageState state) {
     return Container(
-      width: 220,
+      width: 240,
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerLow,
         border: Border(
@@ -233,13 +238,15 @@ class _TagLibraryPageScreenState extends ConsumerState<TagLibraryPageScreen> {
                     style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 FilledButton.tonalIcon(
                   onPressed: () => _showAddCategoryDialog(),
                   icon: const Icon(Icons.add, size: 18),
                   label: Text(
-                    context.l10n.tagLibrary_newCategory,
+                    context.l10n.common_new,
                     style: const TextStyle(fontSize: 13),
                   ),
                   style: FilledButton.styleFrom(
@@ -484,10 +491,12 @@ class _TagLibraryPageScreenState extends ConsumerState<TagLibraryPageScreen> {
 
     final confirmed = await ThemedConfirmDialog.show(
       context: context,
-      title: '确认删除',
-      content: '确定要删除选中的 ${selectedIds.length} 个词条吗？此操作不可撤销。',
-      confirmText: '删除',
-      cancelText: '取消',
+      title: context.l10n.common_confirmDelete,
+      content: context.l10n.tagLibrary_confirmDeleteSelectedEntries(
+        selectedIds.length,
+      ),
+      confirmText: context.l10n.common_delete,
+      cancelText: context.l10n.common_cancel,
       type: ThemedConfirmDialogType.danger,
       icon: Icons.delete_forever_outlined,
     );
@@ -501,7 +510,10 @@ class _TagLibraryPageScreenState extends ConsumerState<TagLibraryPageScreen> {
     ref.read(tagLibrarySelectionNotifierProvider.notifier).exit();
 
     if (mounted) {
-      AppToast.success(context, '已删除 ${selectedIds.length} 个词条');
+      AppToast.success(
+        context,
+        context.l10n.tagLibrary_deletedEntries(selectedIds.length),
+      );
     }
   }
 
@@ -535,7 +547,10 @@ class _TagLibraryPageScreenState extends ConsumerState<TagLibraryPageScreen> {
     ref.read(tagLibrarySelectionNotifierProvider.notifier).exit();
 
     if (mounted) {
-      AppToast.success(context, '已移动 ${selectedIds.length} 个词条');
+      AppToast.success(
+        context,
+        context.l10n.tagLibrary_movedEntries(selectedIds.length),
+      );
     }
   }
 
@@ -568,8 +583,8 @@ class _TagLibraryPageScreenState extends ConsumerState<TagLibraryPageScreen> {
       AppToast.success(
         context,
         allFavorited
-            ? '已取消收藏 ${selectedIds.length} 个词条'
-            : '已收藏 ${selectedIds.length} 个词条',
+            ? context.l10n.tagLibrary_unfavoritedEntries(selectedIds.length)
+            : context.l10n.tagLibrary_favoritedEntries(selectedIds.length),
       );
     }
   }
@@ -593,7 +608,10 @@ class _TagLibraryPageScreenState extends ConsumerState<TagLibraryPageScreen> {
     ref.read(tagLibrarySelectionNotifierProvider.notifier).exit();
 
     if (mounted) {
-      AppToast.success(context, '已复制 ${selectedEntries.length} 个词条的内容');
+      AppToast.success(
+        context,
+        context.l10n.tagLibrary_copiedEntriesContent(selectedEntries.length),
+      );
     }
   }
 
@@ -782,7 +800,7 @@ class _TagLibraryPageScreenState extends ConsumerState<TagLibraryPageScreen> {
         );
 
     if (!mounted) return;
-    AppToast.success(context, '已添加到固定词');
+    AppToast.success(context, context.l10n.tagLibrary_addedToFixed);
   }
 
   /// 处理发送到主页
@@ -836,12 +854,12 @@ class _TagLibraryPageScreenState extends ConsumerState<TagLibraryPageScreen> {
   String _getSendSuccessMessage(SendTargetType targetType) {
     return switch (targetType) {
       SendTargetType.mainPrompt => context.l10n.sendToHome_successMainPrompt,
-      SendTargetType.smartDecompose => '已智能分解并发送',
+      SendTargetType.smartDecompose => context.l10n.toast_smartDecomposeSent,
       SendTargetType.replaceCharacter =>
         context.l10n.sendToHome_successReplaceCharacter,
       SendTargetType.appendCharacter =>
         context.l10n.sendToHome_successAppendCharacter,
-      SendTargetType.fixedTag => '已添加到固定词',
+      SendTargetType.fixedTag => context.l10n.toast_addedToFixedTags,
     };
   }
 

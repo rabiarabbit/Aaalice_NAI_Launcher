@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../core/utils/localization_extension.dart';
 import '../core/editor_state.dart';
 import 'tool_base.dart';
 import '../../../widgets/common/themed_divider.dart';
@@ -142,7 +143,7 @@ class ColorPickerTool extends EditorTool {
   String get id => 'color_picker';
 
   @override
-  String get name => '拾色器';
+  String get name => 'Color Picker';
 
   @override
   IconData get icon => Icons.colorize;
@@ -630,9 +631,9 @@ extension ColorPickerSampleModeExtension on ColorPickerSampleMode {
   String get label {
     switch (this) {
       case ColorPickerSampleMode.point:
-        return '单点';
+        return 'Point';
       case ColorPickerSampleMode.area:
-        return '区域';
+        return 'Area';
     }
   }
 }
@@ -650,9 +651,9 @@ extension ColorPickerSourceExtension on ColorPickerSource {
   String get label {
     switch (this) {
       case ColorPickerSource.currentLayer:
-        return '当前图层';
+        return 'Current Layer';
       case ColorPickerSource.allLayers:
-        return '所有图层';
+        return 'All Layers';
     }
   }
 }
@@ -677,7 +678,7 @@ class _ColorPickerSettingsPanel extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           child: Text(
-            '拾色器',
+            context.l10n.editor_toolColorPicker,
             style: theme.textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.bold,
             ),
@@ -704,7 +705,7 @@ class _ColorPickerSettingsPanel extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    '点击画布任意位置取色，松开后自动切回上一工具',
+                    context.l10n.editor_colorPickerHint,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
@@ -722,14 +723,17 @@ class _ColorPickerSettingsPanel extends StatelessWidget {
             children: [
               SizedBox(
                 width: 60,
-                child: Text('取样', style: theme.textTheme.bodySmall),
+                child: Text(
+                  context.l10n.editor_sample,
+                  style: theme.textTheme.bodySmall,
+                ),
               ),
               Expanded(
                 child: SegmentedButton<ColorPickerSampleMode>(
                   segments: ColorPickerSampleMode.values.map((mode) {
                     return ButtonSegment<ColorPickerSampleMode>(
                       value: mode,
-                      label: Text(mode.label),
+                      label: Text(_sampleModeLabel(context, mode)),
                     );
                   }).toList(),
                   selected: {tool.sampleMode},
@@ -755,14 +759,17 @@ class _ColorPickerSettingsPanel extends StatelessWidget {
             children: [
               SizedBox(
                 width: 60,
-                child: Text('来源', style: theme.textTheme.bodySmall),
+                child: Text(
+                  context.l10n.editor_source,
+                  style: theme.textTheme.bodySmall,
+                ),
               ),
               Expanded(
                 child: SegmentedButton<ColorPickerSource>(
                   segments: ColorPickerSource.values.map((source) {
                     return ButtonSegment<ColorPickerSource>(
                       value: source,
-                      label: Text(source.label),
+                      label: Text(_sourceLabel(context, source)),
                     );
                   }).toList(),
                   selected: {tool.source},
@@ -782,6 +789,24 @@ class _ColorPickerSettingsPanel extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  String _sampleModeLabel(BuildContext context, ColorPickerSampleMode mode) {
+    switch (mode) {
+      case ColorPickerSampleMode.point:
+        return context.l10n.editor_samplePoint;
+      case ColorPickerSampleMode.area:
+        return context.l10n.editor_sampleArea;
+    }
+  }
+
+  String _sourceLabel(BuildContext context, ColorPickerSource source) {
+    switch (source) {
+      case ColorPickerSource.currentLayer:
+        return context.l10n.editor_sourceCurrentLayer;
+      case ColorPickerSource.allLayers:
+        return context.l10n.editor_sourceAllLayers;
+    }
   }
 }
 

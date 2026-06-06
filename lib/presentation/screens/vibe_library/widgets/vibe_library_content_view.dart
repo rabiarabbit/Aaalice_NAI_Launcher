@@ -357,8 +357,14 @@ class _VibeLibraryContentViewState
                 .recordUsage(actualEntry.id);
             if (context.mounted) {
               final message = isShiftPressed
-                  ? '已替换为 ${adjustedVibes.length} 个 Vibe: ${actualEntry.displayName}'
-                  : '已发送 ${adjustedVibes.length} 个 Vibe 到生成页面: ${actualEntry.displayName}';
+                  ? context.l10n.toast_replacedVibesCount(
+                      adjustedVibes.length,
+                      actualEntry.displayName,
+                    )
+                  : context.l10n.toast_sentVibesCount(
+                      adjustedVibes.length,
+                      actualEntry.displayName,
+                    );
               AppToast.success(context, message);
               context.go(AppRoutes.home);
             }
@@ -406,8 +412,10 @@ class _VibeLibraryContentViewState
           .recordUsage(actualEntry.id);
       if (context.mounted) {
         final message = isShiftPressed
-            ? '已替换为: ${actualEntry.displayName}'
-            : '已发送到生成页面: ${actualEntry.displayName}';
+            ? context.l10n.toast_replacedVibe(actualEntry.displayName)
+            : context.l10n.toast_sentVibeToGeneration(
+                actualEntry.displayName,
+              );
         AppToast.success(context, message);
         context.go(AppRoutes.home);
       }
@@ -504,8 +512,14 @@ class _VibeLibraryContentViewState
                 .recordUsage(entry.id);
             if (context.mounted) {
               final message = isShiftPressed
-                  ? '已替换为 ${adjustedVibes.length} 个 Vibe: ${entry.displayName}'
-                  : '已发送 ${adjustedVibes.length} 个 Vibe 到生成页面: ${entry.displayName}';
+                  ? context.l10n.toast_replacedVibesCount(
+                      adjustedVibes.length,
+                      entry.displayName,
+                    )
+                  : context.l10n.toast_sentVibesCount(
+                      adjustedVibes.length,
+                      entry.displayName,
+                    );
               AppToast.success(context, message);
               context.go(AppRoutes.home);
             }
@@ -545,8 +559,8 @@ class _VibeLibraryContentViewState
       ref.read(vibeLibraryNotifierProvider.notifier).recordUsage(entry.id);
       if (context.mounted) {
         final message = isShiftPressed
-            ? '已替换为: ${entry.displayName}'
-            : '已发送到生成页面: ${entry.displayName}';
+            ? context.l10n.toast_replacedVibe(entry.displayName)
+            : context.l10n.toast_sentVibeToGeneration(entry.displayName);
         AppToast.success(context, message);
         context.go(AppRoutes.home);
       }
@@ -623,7 +637,10 @@ class _VibeLibraryContentViewState
           .read(vibeLibraryNotifierProvider.notifier)
           .deleteEntries([entry.id]);
       if (context.mounted) {
-        AppToast.success(context, '已删除: ${entry.displayName}');
+        AppToast.success(
+          context,
+          context.l10n.toast_deletedNamed(entry.displayName),
+        );
       }
     }
   }
@@ -634,9 +651,10 @@ class _VibeLibraryContentViewState
     VibeLibraryEntry entry,
     String newName,
   ) async {
+    final l10n = context.l10n;
     final trimmedName = newName.trim();
     if (trimmedName.isEmpty) {
-      return '名称不能为空';
+      return l10n.toast_renameNameRequired;
     }
 
     final result = await ref
@@ -648,17 +666,17 @@ class _VibeLibraryContentViewState
 
     switch (result.error) {
       case VibeEntryRenameError.invalidName:
-        return '名称不能为空';
+        return l10n.toast_renameNameRequired;
       case VibeEntryRenameError.nameConflict:
-        return '名称已存在，请使用其他名称';
+        return l10n.toast_renameNameConflict;
       case VibeEntryRenameError.entryNotFound:
-        return '条目不存在，可能已被删除';
+        return l10n.toast_renameEntryNotFound;
       case VibeEntryRenameError.filePathMissing:
-        return '该条目缺少文件路径，无法重命名';
+        return l10n.toast_renameFilePathMissing;
       case VibeEntryRenameError.fileRenameFailed:
-        return '重命名文件失败，请稍后重试';
+        return l10n.toast_renameFileFailed;
       case null:
-        return '重命名失败，请稍后重试';
+        return l10n.toast_renameFailed;
     }
   }
 
@@ -704,7 +722,10 @@ class _VibeLibraryContentViewState
           );
       if (preparedVibeData == null) {
         if (context.mounted) {
-          AppToast.error(context, '保存参数失败，Vibe 重新编码失败');
+          AppToast.error(
+            context,
+            context.l10n.toast_vibeParamSaveReencodeFailed,
+          );
         }
         return null;
       }
@@ -731,7 +752,10 @@ class _VibeLibraryContentViewState
         );
     if (preparedVibeData == null) {
       if (context.mounted) {
-        AppToast.error(context, '保存参数失败，Vibe 重新编码失败');
+        AppToast.error(
+          context,
+          context.l10n.toast_vibeParamSaveReencodeFailed,
+        );
       }
       return null;
     }

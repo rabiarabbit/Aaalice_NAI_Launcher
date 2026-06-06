@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/utils/localization_extension.dart';
 import '../../providers/random_preset_provider.dart';
 import '../../widgets/common/app_toast.dart';
 import '../../widgets/prompt/diy/dialogs/preset_import_dialog.dart';
@@ -138,15 +139,18 @@ class _PromptConfigScreenState extends ConsumerState<PromptConfigScreen> {
             children: [
               ListTile(
                 leading: const Icon(Icons.download_rounded),
-                title: const Text('导入预设'),
-                subtitle: const Text('从 JSON 文本导入随机配置预设'),
+                title: Text(context.l10n.randomManager_importPreset),
+                subtitle: Text(context.l10n.randomManager_importPresetSubtitle),
                 onTap: () => Navigator.pop(context, 'import'),
               ),
               ListTile(
                 enabled: selectedPreset != null,
                 leading: const Icon(Icons.upload_rounded),
-                title: const Text('导出当前预设'),
-                subtitle: Text(selectedPreset?.name ?? '未选择预设'),
+                title: Text(context.l10n.randomManager_exportCurrentPreset),
+                subtitle: Text(
+                  selectedPreset?.name ??
+                      context.l10n.randomManager_noPresetSelected,
+                ),
                 onTap: selectedPreset == null
                     ? null
                     : () => Navigator.pop(context, 'export'),
@@ -167,14 +171,17 @@ class _PromptConfigScreenState extends ConsumerState<PromptConfigScreen> {
             imported.id,
           );
       if (mounted) {
-        AppToast.success(context, '已导入预设 "${imported.name}"');
+        AppToast.success(
+          context,
+          context.l10n.randomManager_presetImported(imported.name),
+        );
       }
       return;
     }
 
     if (action == 'export') {
       if (selectedPreset == null) {
-        AppToast.warning(context, '请先选择预设');
+        AppToast.warning(context, context.l10n.randomManager_selectPresetFirst);
         return;
       }
       await PresetImportDialog.showExport(context, selectedPreset);
@@ -185,11 +192,14 @@ class _PromptConfigScreenState extends ConsumerState<PromptConfigScreen> {
     final selectedPreset =
         ref.read(randomPresetNotifierProvider).selectedPreset;
     if (selectedPreset == null) {
-      AppToast.warning(context, '请先选择预设');
+      AppToast.warning(context, context.l10n.randomManager_selectPresetFirst);
       return;
     }
     if (selectedPreset.isDefault) {
-      AppToast.warning(context, '默认预设为只读，请先新建或复制为自定义预设');
+      AppToast.warning(
+        context,
+        context.l10n.randomManager_defaultPresetReadonly,
+      );
       return;
     }
     await GlobalSettingsDialog.show(context);
@@ -238,7 +248,7 @@ class _GlobalSettingsButton extends StatelessWidget {
     return OutlinedButton.icon(
       onPressed: onPressed,
       icon: const Icon(Icons.manage_accounts_outlined),
-      label: const Text('全局人数设置'),
+      label: Text(context.l10n.randomManager_globalPeopleSettings),
     );
   }
 }
@@ -257,7 +267,7 @@ class _PreviewSection extends StatelessWidget {
           child: IconButton(
             onPressed: onClose,
             icon: const Icon(Icons.close),
-            tooltip: '关闭预览',
+            tooltip: context.l10n.randomManager_closePreview,
           ),
         ),
         const SizedBox(

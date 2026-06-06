@@ -6,15 +6,15 @@ extension AssistantTaskTypeLabel on AssistantTaskType {
   String get label {
     switch (this) {
       case AssistantTaskType.llm:
-        return '优化';
+        return 'Optimize';
       case AssistantTaskType.translate:
-        return '翻译';
+        return 'Translate';
       case AssistantTaskType.reverse:
-        return '反推';
+        return 'Reverse Prompt';
       case AssistantTaskType.characterReplace:
-        return '角色替换';
+        return 'Character Replace';
       case AssistantTaskType.custom:
-        return '自定义';
+        return 'Custom';
     }
   }
 }
@@ -797,40 +797,42 @@ class PromptAssistantConfigState {
       rules: [
         PromptRuleTemplate(
           id: 'opt_default',
-          name: '默认优化规则',
+          name: 'Default Optimize Rule',
           taskType: AssistantTaskType.llm,
-          content: '你是提示词优化助手。保留用户核心意图，补充可执行细节，输出单行逗号分隔提示词。',
+          content:
+              'You are a prompt optimization assistant. Preserve the user intent, add actionable visual details, and output a single comma-separated prompt line.',
           isDefault: true,
         ),
         PromptRuleTemplate(
           id: 'translate_default',
-          name: '默认翻译规则',
+          name: 'Default Translate Rule',
           taskType: AssistantTaskType.translate,
-          content: '你是翻译助手。识别原文语言，自动在中英间互译，仅返回译文，不要解释。',
+          content:
+              'You are a translation assistant. Detect the source language, translate between Chinese and English automatically, and return only the translation without explanation.',
           isDefault: true,
         ),
         PromptRuleTemplate(
           id: 'reverse_default',
-          name: '默认反推规则',
+          name: 'Default Reverse Prompt Rule',
           taskType: AssistantTaskType.reverse,
           content:
-              '你是图像反推助手。根据图片和可选 tagger 结果，输出适合 NovelAI 的英文逗号分隔提示词。保留主体、角色、画风、服装、动作、构图、光影和背景，不要解释。',
+              'You are an image reverse-prompt assistant. Based on the image and optional tagger results, output English comma-separated prompts suitable for NovelAI. Preserve subject, character, style, clothing, action, composition, lighting, and background. Do not explain.',
           isDefault: true,
         ),
         PromptRuleTemplate(
           id: 'character_replace_default',
-          name: '默认角色替换规则',
+          name: 'Default Character Replace Rule',
           taskType: AssistantTaskType.characterReplace,
           content:
-              '你是角色替换助手。将输入提示词中的原角色身份、发型、服装、外观替换为指定角色；保留动作、构图、背景、画风、镜头和质量词。仅输出替换后的单行提示词。',
+              'You are a character replacement assistant. Replace the original character identity, hairstyle, outfit, and appearance in the input prompt with the target character while preserving action, composition, background, style, camera, and quality tags. Output only the replaced single-line prompt.',
           isDefault: true,
         ),
         PromptRuleTemplate(
           id: 'custom_default',
-          name: '默认自定义规则',
+          name: 'Default Custom Rule',
           taskType: AssistantTaskType.custom,
           content:
-              '你是提示词改写助手。根据当前提示词、用户的自由需求和可选参考图片修改提示词。只输出最终可直接使用的单行提示词，不要解释。',
+              'You are a prompt rewriting assistant. Modify the prompt according to the current prompt, the user request, and optional reference images. Output only the final single-line prompt that can be used directly, without explanation.',
           isDefault: true,
         ),
       ],

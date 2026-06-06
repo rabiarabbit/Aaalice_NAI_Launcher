@@ -486,7 +486,7 @@ class _VibeTransferContentState extends ConsumerState<VibeTransferContent> {
         return;
       }
       if (!handledAny) {
-        AppToast.warning(context, '拖入源未提供可读取的图片或 Vibe 文件');
+        AppToast.warning(context, context.l10n.toast_dropNoReadableImageOrVibe);
       } else if (addedCount > 0) {
         final message = addedCount == 1
             ? context.l10n.drop_addedToVibe

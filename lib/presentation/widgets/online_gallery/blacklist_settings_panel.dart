@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/utils/localization_extension.dart';
 import '../../../data/services/danbooru_auth_service.dart';
 import '../../providers/online_gallery_blacklist_provider.dart';
 import '../autocomplete/autocomplete_controller.dart';
@@ -83,7 +84,7 @@ class _OnlineGalleryBlacklistSettingsPanelState
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    '在线画廊黑名单',
+                    context.l10n.onlineGallery_blacklistTitle,
                     style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: theme.colorScheme.primary,
@@ -99,7 +100,7 @@ class _OnlineGalleryBlacklistSettingsPanelState
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : const Icon(Icons.sync, size: 16),
-                  label: const Text('立即同步'),
+                  label: Text(context.l10n.dataSource_syncNow),
                   style: FilledButton.styleFrom(
                     visualDensity: VisualDensity.compact,
                   ),
@@ -108,7 +109,7 @@ class _OnlineGalleryBlacklistSettingsPanelState
             ),
             const SizedBox(height: 8),
             Text(
-              '包含黑名单标签的图片会在在线画廊中直接隐藏。',
+              context.l10n.onlineGallery_blacklistSubtitle,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -125,10 +126,11 @@ class _OnlineGalleryBlacklistSettingsPanelState
                     child: TextField(
                       controller: _tagController,
                       focusNode: _tagFocusNode,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         isDense: true,
-                        border: OutlineInputBorder(),
-                        hintText: '添加黑名单标签',
+                        border: const OutlineInputBorder(),
+                        hintText:
+                            context.l10n.onlineGallery_addBlacklistTagHint,
                       ),
                       onSubmitted: (_) => _addTag(),
                     ),
@@ -136,7 +138,7 @@ class _OnlineGalleryBlacklistSettingsPanelState
                 ),
                 const SizedBox(width: 8),
                 IconButton(
-                  tooltip: '添加',
+                  tooltip: context.l10n.common_add,
                   onPressed: _addTag,
                   icon: const Icon(Icons.add),
                 ),
@@ -145,7 +147,7 @@ class _OnlineGalleryBlacklistSettingsPanelState
             const SizedBox(height: 10),
             if (localTags.isEmpty)
               Text(
-                '暂无本地黑名单标签',
+                context.l10n.onlineGallery_noLocalBlacklistTags,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -173,8 +175,10 @@ class _OnlineGalleryBlacklistSettingsPanelState
             SwitchListTile.adaptive(
               contentPadding: EdgeInsets.zero,
               dense: true,
-              title: const Text('启动时自动同步'),
-              subtitle: const Text('默认开启，可随时关闭'),
+              title: Text(context.l10n.onlineGallery_autoSyncOnStartup),
+              subtitle: Text(
+                context.l10n.onlineGallery_autoSyncOnStartupSubtitle,
+              ),
               value: state.autoSyncOnStartup,
               onChanged: notifier.setAutoSyncOnStartup,
             ),
@@ -191,7 +195,7 @@ class _OnlineGalleryBlacklistSettingsPanelState
   Widget _buildSyncStatus(ThemeData theme, OnlineGalleryBlacklistState state) {
     if (state.lastSyncError != null && state.lastSyncError!.isNotEmpty) {
       return Text(
-        '上次同步失败: ${state.lastSyncError}',
+        context.l10n.onlineGallery_lastSyncFailed(state.lastSyncError!),
         style: theme.textTheme.bodySmall?.copyWith(
           color: theme.colorScheme.error,
         ),
@@ -200,7 +204,7 @@ class _OnlineGalleryBlacklistSettingsPanelState
 
     if (state.lastSyncAt == null) {
       return Text(
-        '尚未同步过 Danbooru 黑名单',
+        context.l10n.onlineGallery_neverSyncedBlacklist,
         style: theme.textTheme.bodySmall?.copyWith(
           color: theme.colorScheme.onSurfaceVariant,
         ),
@@ -213,7 +217,7 @@ class _OnlineGalleryBlacklistSettingsPanelState
         '${ts.hour.toString().padLeft(2, '0')}:${ts.minute.toString().padLeft(2, '0')}';
 
     return Text(
-      '上次同步: $text',
+      context.l10n.onlineGallery_lastSync(text),
       style: theme.textTheme.bodySmall?.copyWith(
         color: theme.colorScheme.onSurfaceVariant,
       ),
@@ -244,7 +248,7 @@ Future<void> showOnlineGalleryBlacklistDialog(
     builder: (context) {
       final isLoggedIn = ref.read(danbooruAuthProvider).isLoggedIn;
       return AlertDialog(
-        title: const Text('在线画廊黑名单设置'),
+        title: Text(context.l10n.onlineGallery_blacklistSettingsTitle),
         content: SizedBox(
           width: 700,
           child: SingleChildScrollView(
@@ -257,9 +261,9 @@ Future<void> showOnlineGalleryBlacklistDialog(
                     children: [
                       const Icon(Icons.info_outline, size: 16),
                       const SizedBox(width: 6),
-                      const Expanded(
+                      Expanded(
                         child: Text(
-                          '未登录 Danbooru，仍可使用本地黑名单；同步需要先登录。',
+                          context.l10n.onlineGallery_blacklistLoginHint,
                         ),
                       ),
                       TextButton(
@@ -270,7 +274,7 @@ Future<void> showOnlineGalleryBlacklistDialog(
                             builder: (_) => const DanbooruLoginDialog(),
                           );
                         },
-                        child: const Text('登录'),
+                        child: Text(context.l10n.onlineGallery_login),
                       ),
                     ],
                   ),
@@ -287,7 +291,7 @@ Future<void> showOnlineGalleryBlacklistDialog(
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('关闭'),
+            child: Text(context.l10n.common_close),
           ),
         ],
       );

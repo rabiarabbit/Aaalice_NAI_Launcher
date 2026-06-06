@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nai_launcher/core/utils/localization_extension.dart';
 
-import '../../../../core/utils/localization_extension.dart';
 import '../../../../data/models/gallery/nai_image_metadata.dart';
 import '../../../../data/models/prompt/prompt_config.dart';
 import '../../../../data/services/random_prompt_legacy_adapter.dart';
@@ -186,7 +186,7 @@ class _SaveAsPresetDialogState extends ConsumerState<SaveAsPresetDialog> {
     final name = _nameController.text.trim();
 
     if (name.isEmpty) {
-      AppToast.warning(context, '请输入预设名称');
+      AppToast.warning(context, context.l10n.toast_presetNameRequired);
       return;
     }
 
@@ -200,7 +200,7 @@ class _SaveAsPresetDialogState extends ConsumerState<SaveAsPresetDialog> {
       final configs = _buildConfigs(widget.metadata);
 
       if (configs.isEmpty) {
-        AppToast.warning(context, '请至少选择一项要保存的内容');
+        AppToast.warning(context, context.l10n.toast_selectPresetContent);
         setState(() => _isSaving = false);
         return;
       }
@@ -217,12 +217,12 @@ class _SaveAsPresetDialogState extends ConsumerState<SaveAsPresetDialog> {
       await notifier.addPreset(preset);
 
       if (mounted) {
-        AppToast.success(context, '预设保存成功');
+        AppToast.success(context, context.l10n.toast_presetSaved);
         Navigator.of(context).pop(true);
       }
     } catch (e) {
       if (mounted) {
-        AppToast.error(context, '保存失败: \$e');
+        AppToast.error(context, context.l10n.image_saveFailed(e.toString()));
       }
     } finally {
       if (mounted) {

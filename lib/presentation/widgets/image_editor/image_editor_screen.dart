@@ -138,7 +138,7 @@ class ImageEditorScreen extends StatefulWidget {
     this.initialFocusedInpaintEnabled = false,
     this.showMaskExport = true,
     this.mode = ImageEditorMode.edit,
-    this.title = '画板',
+    this.title = '',
     this.initialOutpaintCommitPending = false,
     this.initialShowLayerPanel = true,
     this.debugFailOutpaintSourceReplacement = false,
@@ -156,7 +156,7 @@ class ImageEditorScreen extends StatefulWidget {
     bool initialFocusedInpaintEnabled = false,
     bool showMaskExport = true,
     ImageEditorMode mode = ImageEditorMode.edit,
-    String title = '画板',
+    String? title,
   }) {
     return Navigator.push<ImageEditorResult>(
       context,
@@ -170,7 +170,7 @@ class ImageEditorScreen extends StatefulWidget {
           initialFocusedInpaintEnabled: initialFocusedInpaintEnabled,
           showMaskExport: showMaskExport,
           mode: mode,
-          title: title,
+          title: title ?? context.l10n.editor_defaultTitle,
         ),
       ),
     );
@@ -197,6 +197,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
   late bool _focusedInpaintEnabled;
   bool _isMaskFillMode = false;
   bool _isInitialized = false;
+  bool _didStartInitialization = false;
   bool _showLayerPanel = true;
   bool _isOutpaintCommitPending = false;
   String? _sourceLayerId;
@@ -347,6 +348,21 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
     _state.setPreviewPath(Path()..addRect(rect));
   }
 
+  String _editorTitle() =>
+      widget.title.isEmpty ? context.l10n.editor_defaultTitle : widget.title;
+
+  void _localizeDefaultLayerName() {
+    for (final layer in _state.layerManager.layers) {
+      if (layer.name == '\u56fe\u5c42 1' || layer.name == 'Layer 1') {
+        _state.layerManager.renameLayer(
+          layer.id,
+          context.l10n.editor_defaultDrawingLayerName,
+        );
+        return;
+      }
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -364,7 +380,15 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
         widget.initialFocusedInpaintEnabled || widget.existingFocusRect != null;
     _isOutpaintCommitPending = widget.initialOutpaintCommitPending;
     _showLayerPanel = widget.initialShowLayerPanel;
-    _initializeCanvas();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_didStartInitialization) {
+      _didStartInitialization = true;
+      unawaited(_initializeCanvas());
+    }
   }
 
   Future<void> _initializeCanvas() async {
@@ -374,7 +398,11 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
     } else {
       // 显示尺寸选择对话框或使用默认尺寸
       final size = widget.initialSize ?? const Size(1024, 1024);
-      _state.initNewCanvas(size);
+      _state.initNewCanvas(
+        size,
+        initialLayerName: context.l10n.editor_defaultDrawingLayerName,
+      );
+      _localizeDefaultLayerName();
       _focusedSelectionState.canvasSize = size;
 
       // 加载已有蒙版（如果有）
@@ -404,6 +432,8 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
   }
 
   Future<void> _loadInitialImage() async {
+    final defaultDrawingLayerName = context.l10n.editor_defaultDrawingLayerName;
+    final baseLayerName = context.l10n.editor_baseLayerName;
     ui.Codec? codec;
     try {
       codec = await ui.instantiateImageCodec(widget.initialImage!);
@@ -415,13 +445,14 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
           image.width.toDouble(),
           image.height.toDouble(),
         ),
+        initialLayerName: defaultDrawingLayerName,
       );
       _focusedSelectionState.canvasSize = _state.canvasSize;
 
       // 将图像添加为底图图层
       final sourceLayer = await _state.layerManager.addLayerFromImage(
         widget.initialImage!,
-        name: '底图',
+        name: baseLayerName,
       );
       _sourceLayerId = sourceLayer?.id;
       if (_isInpaintMode && sourceLayer != null) {
@@ -434,9 +465,11 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
         sourceLayer.locked = true;
       }
 
-      // 选中"图层 1"作为默认绘制图层（而非底图）
+      _localizeDefaultLayerName();
+
+      // Select the default drawing layer rather than the base image layer.
       final layer1 = _state.layerManager.layers.firstWhere(
-        (l) => l.name == '图层 1',
+        (l) => l.name == defaultDrawingLayerName,
         orElse: () => _state.layerManager.layers.last,
       );
       _state.layerManager.setActiveLayer(layer1.id);
@@ -448,7 +481,11 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
       image.dispose();
     } catch (e) {
       AppLogger.w('Failed to load initial image: $e', 'ImageEditor');
-      _state.initNewCanvas(widget.initialSize ?? const Size(1024, 1024));
+      _state.initNewCanvas(
+        widget.initialSize ?? const Size(1024, 1024),
+        initialLayerName: defaultDrawingLayerName,
+      );
+      _localizeDefaultLayerName();
       _focusedSelectionState.canvasSize = _state.canvasSize;
     } finally {
       codec?.dispose();
@@ -466,7 +503,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
       // 将已有蒙版添加为图层
       final layer = await _addMaskLayerAboveSource(
         overlayBytes,
-        name: '已有蒙版',
+        name: context.l10n.editor_existingMaskLayerName,
       );
 
       if (layer != null) {
@@ -502,7 +539,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
   Widget build(BuildContext context) {
     if (!_isInitialized) {
       return Scaffold(
-        appBar: AppBar(title: Text(widget.title)),
+        appBar: AppBar(title: Text(_editorTitle())),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
@@ -585,20 +622,20 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
   Widget _buildMobileLayout() {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(_editorTitle()),
         actions: [
           // 图层按钮
           IconButton(
             icon: const Icon(Icons.layers),
             onPressed: _showMobileLayerSheet,
-            tooltip: '图层',
+            tooltip: context.l10n.editor_layers,
           ),
           // 加载蒙版按钮
           if (_isInpaintMode)
             IconButton(
               icon: const Icon(Icons.upload_file),
               onPressed: _loadMask,
-              tooltip: '加载蒙版',
+              tooltip: context.l10n.editor_loadMask,
             ),
           if (_isInpaintMode)
             IconButton(
@@ -616,7 +653,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
           IconButton(
             icon: const Icon(Icons.check),
             onPressed: _canExportAndClose ? _exportAndClose : null,
-            tooltip: '完成',
+            tooltip: context.l10n.editor_done,
           ),
         ],
       ),
@@ -662,10 +699,10 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
           IconButton(
             icon: const Icon(Icons.arrow_back, size: 20),
             onPressed: () => _confirmExit(),
-            tooltip: '返回',
+            tooltip: context.l10n.editor_back,
           ),
 
-          Text(widget.title, style: theme.textTheme.titleSmall),
+          Text(_editorTitle(), style: theme.textTheme.titleSmall),
 
           const Spacer(),
 
@@ -693,7 +730,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
             IconButton(
               icon: const Icon(Icons.upload_file, size: 20),
               onPressed: _loadMask,
-              tooltip: '加载蒙版',
+              tooltip: context.l10n.editor_loadMask,
             ),
 
           if (_isInpaintMode)
@@ -723,14 +760,14 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
                 _showLayerPanel = !_showLayerPanel;
               });
             },
-            tooltip: '切换面板',
+            tooltip: context.l10n.editor_togglePanels,
           ),
 
           // 快捷键帮助
           IconButton(
             icon: const Icon(Icons.keyboard, size: 20),
             onPressed: _showShortcutHelp,
-            tooltip: '快捷键帮助',
+            tooltip: context.l10n.editor_shortcutHelpTitle,
           ),
 
           const ThemedDivider(
@@ -745,7 +782,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: FilledButton.icon(
               icon: const Icon(Icons.check, size: 18),
-              label: const Text('完成'),
+              label: Text(context.l10n.editor_done),
               onPressed: _canExportAndClose ? _exportAndClose : null,
               style: FilledButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -782,23 +819,30 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
           child: Row(
             children: [
               Text(
-                '缩放: ${(_state.canvasController.scale * 100).round()}%',
+                context.l10n.editor_statusZoom(
+                  (_state.canvasController.scale * 100).round(),
+                ),
                 style: theme.textTheme.bodySmall,
               ),
               const SizedBox(width: 16),
               Text(
-                '画布: ${_state.canvasSize.width.toInt()} x ${_state.canvasSize.height.toInt()}',
+                context.l10n.editor_statusCanvas(
+                  _state.canvasSize.width.toInt(),
+                  _state.canvasSize.height.toInt(),
+                ),
                 style: theme.textTheme.bodySmall,
               ),
               const SizedBox(width: 16),
               Text(
-                '图层: ${_state.layerManager.layerCount}',
+                context.l10n.editor_statusLayers(
+                  _state.layerManager.layerCount,
+                ),
                 style: theme.textTheme.bodySmall,
               ),
               if (_state.selectionPath != null) ...[
                 const SizedBox(width: 16),
                 Text(
-                  '有选区',
+                  context.l10n.editor_statusHasSelection,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.primary,
                   ),
@@ -808,7 +852,10 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
               if (_state.canvasController.rotation != 0) ...[
                 const SizedBox(width: 16),
                 Text(
-                  '旋转: ${(_state.canvasController.rotation * 180 / 3.14159265359).round()}°',
+                  context.l10n.editor_statusRotation(
+                    (_state.canvasController.rotation * 180 / 3.14159265359)
+                        .round(),
+                  ),
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.secondary,
                   ),
@@ -827,7 +874,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      '镜像',
+                      context.l10n.editor_statusMirrored,
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.secondary,
                       ),
@@ -898,11 +945,11 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.keyboard),
-            SizedBox(width: 8),
-            Text('快捷键帮助'),
+            const Icon(Icons.keyboard),
+            const SizedBox(width: 8),
+            Text(context.l10n.editor_shortcutHelpTitle),
           ],
         ),
         content: ConstrainedBox(
@@ -913,54 +960,61 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                _buildShortcutSection('绘画工具', [
-                  ('B', '画笔'),
-                  ('E', '橡皮擦'),
-                  ('P', '拾色器'),
-                  ('Alt 按住', '临时拾色器'),
+                _buildShortcutSection(context.l10n.editor_shortcutPaintTools, [
+                  ('B', context.l10n.editor_toolBrush),
+                  ('E', context.l10n.editor_toolEraser),
+                  ('P', context.l10n.editor_toolColorPicker),
+                  ('Alt', context.l10n.editor_shortcutTemporaryColorPicker),
                 ]),
-                _buildShortcutSection('选区工具', [
-                  ('M', '矩形选区'),
-                  ('U', '椭圆选区'),
-                  ('L', '套索选区'),
+                _buildShortcutSection(
+                    context.l10n.editor_shortcutSelectionTools, [
+                  ('M', context.l10n.editor_shortcutRectSelection),
+                  ('U', context.l10n.editor_shortcutEllipseSelection),
+                  ('L', context.l10n.editor_shortcutLassoSelection),
                 ]),
-                _buildShortcutSection('画布视图', [
-                  ('1', '100% 缩放'),
-                  ('2', '适应高度'),
-                  ('3', '适应宽度'),
-                  ('4', '向左旋转 15°'),
-                  ('5', '重置旋转'),
-                  ('6', '向右旋转 15°'),
-                  ('F', '水平镜像'),
-                  ('R', '重置视图'),
-                  ('滚轮', '缩放'),
-                  ('Ctrl+0', '100% 缩放'),
-                  ('Ctrl++', '放大'),
-                  ('Ctrl+-', '缩小'),
+                _buildShortcutSection(context.l10n.editor_shortcutCanvasView, [
+                  ('1', context.l10n.editor_shortcut100Zoom),
+                  ('2', context.l10n.editor_shortcutFitHeight),
+                  ('3', context.l10n.editor_shortcutFitWidth),
+                  ('4', context.l10n.editor_shortcutRotateLeft15),
+                  ('5', context.l10n.editor_shortcutResetRotation),
+                  ('6', context.l10n.editor_shortcutRotateRight15),
+                  ('F', context.l10n.editor_shortcutFlipHorizontal),
+                  ('R', context.l10n.editor_resetView),
+                  (context.l10n.editor_shortcutWheel, context.l10n.editor_zoom),
+                  ('Ctrl+0', context.l10n.editor_shortcut100Zoom),
+                  ('Ctrl++', context.l10n.editor_zoomIn),
+                  ('Ctrl+-', context.l10n.editor_zoomOut),
                 ]),
-                _buildShortcutSection('笔刷调整', [
-                  ('[', '减小笔刷'),
-                  (']', '增大笔刷'),
-                  ('I', '降低透明度'),
-                  ('O', '提高透明度'),
-                  ('Shift + 拖动', '调整笔刷大小'),
+                _buildShortcutSection(context.l10n.editor_shortcutBrushAdjust, [
+                  ('[', context.l10n.editor_shortcutBrushSmaller),
+                  (']', context.l10n.editor_shortcutBrushLarger),
+                  ('I', context.l10n.editor_shortcutOpacityLower),
+                  ('O', context.l10n.editor_shortcutOpacityHigher),
+                  ('Shift + Drag', context.l10n.editor_shortcutDragBrushSize),
                 ]),
-                _buildShortcutSection('颜色', [
-                  ('X', '交换前景/背景色'),
+                _buildShortcutSection(context.l10n.editor_shortcutColors, [
+                  ('X', context.l10n.editor_shortcutSwapColors),
                 ]),
-                _buildShortcutSection('画布操作', [
-                  ('空格 + 拖动', '平移画布'),
-                  ('中键拖动', '平移画布'),
+                _buildShortcutSection(
+                    context.l10n.editor_shortcutCanvasActions, [
+                  ('Space + Drag', context.l10n.editor_shortcutPanCanvas),
+                  ('Middle Drag', context.l10n.editor_shortcutPanCanvas),
                 ]),
-                _buildShortcutSection('历史操作', [
-                  ('Ctrl+Z', '撤销'),
-                  ('Ctrl+Shift+Z', '重做'),
-                  ('Ctrl+Y', '重做'),
+                _buildShortcutSection(
+                    context.l10n.editor_shortcutHistoryActions, [
+                  ('Ctrl+Z', context.l10n.editor_undo),
+                  ('Ctrl+Shift+Z', context.l10n.editor_redo),
+                  ('Ctrl+Y', context.l10n.editor_redo),
                 ]),
-                _buildShortcutSection('选区操作', [
-                  ('Delete', '清除选区内容'),
-                  ('Backspace', '清除选区内容'),
-                  ('Esc', '取消当前操作'),
+                _buildShortcutSection(
+                    context.l10n.editor_shortcutSelectionActions, [
+                  ('Delete', context.l10n.editor_shortcutClearSelectionContent),
+                  (
+                    'Backspace',
+                    context.l10n.editor_shortcutClearSelectionContent
+                  ),
+                  ('Esc', context.l10n.editor_shortcutCancelCurrentAction),
                 ]),
               ],
             ),
@@ -969,7 +1023,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('关闭'),
+            child: Text(context.l10n.common_close),
           ),
         ],
       ),
@@ -979,14 +1033,17 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
   Future<void> _showEffectsDialog() async {
     final layer = _state.layerManager.activeLayer;
     if (layer == null || layer.locked || !layer.hasContent) {
-      AppToast.warning(context, '请选择一个非锁定且有内容的图层');
+      AppToast.warning(
+        context,
+        context.l10n.editor_selectUnlockedLayerWithContent,
+      );
       return;
     }
 
     final sourceBytes = await _readLayerPng(layer);
     if (!mounted) return;
     if (sourceBytes == null) {
-      AppToast.error(context, '无法读取当前图层');
+      AppToast.error(context, context.l10n.editor_readCurrentLayerFailed);
       return;
     }
 
@@ -1094,12 +1151,12 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
                         children: [
                           Expanded(
                             child: Text(
-                              '本地后处理 / Effects',
+                              context.l10n.editor_localEffects,
                               style: Theme.of(context).textTheme.headlineSmall,
                             ),
                           ),
                           IconButton(
-                            tooltip: '关闭',
+                            tooltip: context.l10n.common_close,
                             onPressed: () => Navigator.pop(context, false),
                             icon: const Icon(Icons.close),
                           ),
@@ -1112,7 +1169,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               _buildEffectSection(
-                                title: '基础调整',
+                                title: context.l10n.editor_basicAdjustments,
                                 effects: const [
                                   EditorEffectType.brightness,
                                   EditorEffectType.contrast,
@@ -1125,7 +1182,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
                               ),
                               const SizedBox(height: 14),
                               _buildEffectSection(
-                                title: '风格与修复',
+                                title: context.l10n.editor_styleAndRepair,
                                 effects: const [
                                   EditorEffectType.grayscale,
                                   EditorEffectType.invert,
@@ -1139,8 +1196,9 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
                               ),
                               const SizedBox(height: 14),
                               _buildEffectSection(
-                                title: '旋转 / 翻转 / 裁剪',
-                                description: '几何操作已经独立出来，点击后会先生成预览，确认应用后才写回图层。',
+                                title: context.l10n.editor_transformCrop,
+                                description: context
+                                    .l10n.editor_transformCropDescription,
                                 effects: const [
                                   EditorEffectType.rotateLeft,
                                   EditorEffectType.rotateRight,
@@ -1178,7 +1236,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
                               ),
                               const SizedBox(height: 12),
                               Text(
-                                '预览不会修改原图；点击应用后才会把结果写入当前活动图层和撤销历史。',
+                                context.l10n.editor_effectPreviewHint,
                                 style: Theme.of(context).textTheme.bodyMedium,
                               ),
                             ],
@@ -1191,7 +1249,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
                         children: [
                           TextButton(
                             onPressed: () => Navigator.pop(context, false),
-                            child: const Text('取消'),
+                            child: Text(context.l10n.common_cancel),
                           ),
                           const SizedBox(width: 12),
                           FilledButton.icon(
@@ -1199,7 +1257,8 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
                                 ? null
                                 : () => Navigator.pop(context, true),
                             icon: const Icon(Icons.check),
-                            label: const Text('应用到当前图层'),
+                            label:
+                                Text(context.l10n.editor_applyToCurrentLayer),
                           ),
                         ],
                       ),
@@ -1342,7 +1401,9 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  '${_effectLabel(effectType)} 是一次性操作，没有强度滑条。',
+                  context.l10n.editor_oneShotEffectHint(
+                    _effectLabel(effectType),
+                  ),
                   style: theme.textTheme.bodyMedium,
                 ),
               ),
@@ -1369,7 +1430,9 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    '${_effectLabel(effectType)} 强度',
+                    context.l10n.editor_effectIntensity(
+                      _effectLabel(effectType),
+                    ),
                     style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -1382,7 +1445,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
                 const SizedBox(width: 8),
                 TextButton(
                   onPressed: onReset,
-                  child: const Text('重置'),
+                  child: Text(context.l10n.common_reset),
                 ),
               ],
             ),
@@ -1416,7 +1479,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
               children: [
                 Expanded(
                   child: _buildEffectPreviewPane(
-                    title: '原图',
+                    title: context.l10n.editor_original,
                     bytes: sourceBytes,
                     loading: false,
                     error: '',
@@ -1425,7 +1488,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
                 const SizedBox(height: 12),
                 Expanded(
                   child: _buildEffectPreviewPane(
-                    title: '效果预览',
+                    title: context.l10n.editor_effectPreview,
                     bytes: previewBytes,
                     loading: previewLoading,
                     error: previewError,
@@ -1442,7 +1505,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
             children: [
               Expanded(
                 child: _buildEffectPreviewPane(
-                  title: '原图',
+                  title: context.l10n.editor_original,
                   bytes: sourceBytes,
                   loading: false,
                   error: '',
@@ -1451,7 +1514,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
               const SizedBox(width: 14),
               Expanded(
                 child: _buildEffectPreviewPane(
-                  title: '效果预览',
+                  title: context.l10n.editor_effectPreview,
                   bytes: previewBytes,
                   loading: previewLoading,
                   error: previewError,
@@ -1549,7 +1612,10 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
   ) async {
     final layer = _state.layerManager.activeLayer;
     if (layer == null || layer.locked || !layer.hasContent) {
-      AppToast.warning(context, '请选择一个非锁定且有内容的图层');
+      AppToast.warning(
+        context,
+        context.l10n.editor_selectUnlockedLayerWithContent,
+      );
       return;
     }
 
@@ -1557,7 +1623,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
       final sourceBytes = await _readLayerPng(layer);
       if (!mounted) return;
       if (sourceBytes == null) {
-        AppToast.error(context, '无法读取当前图层');
+        AppToast.error(context, context.l10n.editor_readCurrentLayerFailed);
         return;
       }
 
@@ -1588,10 +1654,13 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
       );
       _state.layerManager.invalidateSnapshot();
       setState(() {});
-      AppToast.success(context, '已应用 ${_effectLabel(effectType)}');
+      AppToast.success(
+        context,
+        context.l10n.editor_effectApplied(_effectLabel(effectType)),
+      );
     } catch (e) {
       if (!mounted) return;
-      AppToast.error(context, '应用效果失败: $e');
+      AppToast.error(context, context.l10n.editor_applyEffectFailed(e));
     }
   }
 
@@ -1629,7 +1698,26 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
   }
 
   String _effectLabel(EditorEffectType type) {
-    return editorEffectLabel(type);
+    return switch (type) {
+      EditorEffectType.brightness => context.l10n.editor_effectBrightness,
+      EditorEffectType.contrast => context.l10n.editor_effectContrast,
+      EditorEffectType.saturation => context.l10n.editor_effectSaturation,
+      EditorEffectType.temperature => context.l10n.editor_effectTemperature,
+      EditorEffectType.gamma => context.l10n.editor_effectGamma,
+      EditorEffectType.grayscale => context.l10n.editor_effectGrayscale,
+      EditorEffectType.invert => context.l10n.editor_effectInvert,
+      EditorEffectType.sepia => context.l10n.editor_effectSepia,
+      EditorEffectType.denoise => context.l10n.editor_effectDenoise,
+      EditorEffectType.blur => context.l10n.editor_effectBlur,
+      EditorEffectType.sharpen => context.l10n.editor_effectSharpen,
+      EditorEffectType.cropToSelection =>
+        context.l10n.editor_effectCropToSelection,
+      EditorEffectType.rotateLeft => context.l10n.editor_effectRotateLeft,
+      EditorEffectType.rotateRight => context.l10n.editor_effectRotateRight,
+      EditorEffectType.flipHorizontal =>
+        context.l10n.editor_effectFlipHorizontal,
+      EditorEffectType.flipVertical => context.l10n.editor_effectFlipVertical,
+    };
   }
 
   double _defaultEffectIntensity(EditorEffectType type) {
@@ -1721,10 +1809,11 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
 
   /// 更改画布尺寸
   Future<void> _changeCanvasSize() async {
+    final l10n = context.l10n;
     final result = await CanvasSizeDialog.show(
       context,
       initialSize: _state.canvasSize,
-      title: '更改画布尺寸',
+      title: l10n.editor_changeCanvasSize,
     );
 
     if (result != null && result.size != _state.canvasSize) {
@@ -1736,12 +1825,12 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
         const maxSize = 4096;
 
         if (newWidth < minSize || newHeight < minSize) {
-          _showError('画布尺寸太小，最小尺寸为 $minSize x $minSize 像素');
+          _showError(l10n.editor_canvasTooSmall(minSize, minSize));
           return;
         }
 
         if (newWidth > maxSize || newHeight > maxSize) {
-          _showError('画布尺寸太大，最大尺寸为 $maxSize x $maxSize 像素');
+          _showError(l10n.editor_canvasTooLarge(maxSize, maxSize));
           return;
         }
 
@@ -1753,11 +1842,14 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
 
         // 显示成功消息
         if (mounted) {
-          AppToast.success(context, '画布已调整为 $newWidth x $newHeight');
+          AppToast.success(
+            context,
+            l10n.editor_canvasResized(newWidth, newHeight),
+          );
         }
       } catch (e) {
         // 显示错误信息
-        _showError('调整画布尺寸失败: $e');
+        _showError(l10n.editor_canvasResizeFailed(e));
         AppLogger.e('Failed to resize canvas: $e', 'ImageEditor');
       }
     }
@@ -1809,16 +1901,16 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
       final shouldExit = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('确认退出'),
-          content: const Text('有未保存的修改，确定要退出吗？'),
+          title: Text(context.l10n.editor_confirmExitTitle),
+          content: Text(context.l10n.editor_confirmExitContent),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('取消'),
+              child: Text(context.l10n.common_cancel),
             ),
             TextButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('退出'),
+              child: Text(context.l10n.editor_exit),
             ),
             FilledButton(
               onPressed: _canExportAndClose
@@ -1827,7 +1919,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
                       await _exportAndClose();
                     }
                   : null,
-              child: const Text('保存并退出'),
+              child: Text(context.l10n.editor_saveAndExit),
             ),
           ],
         ),
@@ -1966,7 +2058,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
 
       // 显示错误
       if (mounted) {
-        AppToast.error(context, '导出失败: $e');
+        AppToast.error(context, context.l10n.editor_exportFailed(e));
       }
     }
   }
@@ -2017,7 +2109,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
     });
 
     if (_isMaskFillMode) {
-      AppToast.info(context, '请点击封闭区域内部进行填充。');
+      AppToast.info(context, context.l10n.editor_clickInsideClosedRegion);
     }
   }
 
@@ -2025,6 +2117,8 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
     if (!_isInpaintMode || !mounted) {
       return;
     }
+    final l10n = context.l10n;
+    final maskLayerName = l10n.editor_maskLayerName;
 
     try {
       final canvasPoint = _state.canvasController.screenToCanvas(
@@ -2055,12 +2149,15 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
       }
       switch (fillResult.status) {
         case MaskFillRegionStatus.emptyMask:
-          AppToast.warning(context, '请先绘制封闭的蒙版轮廓。');
+          AppToast.warning(
+            context,
+            l10n.editor_drawClosedMaskOutlineFirst,
+          );
           return;
         case MaskFillRegionStatus.outOfBounds:
         case MaskFillRegionStatus.clickedMaskedPixel:
         case MaskFillRegionStatus.openRegion:
-          AppToast.info(context, '该位置没有可填充的封闭区域。');
+          AppToast.info(context, l10n.editor_noClosedRegionAtPosition);
           return;
         case MaskFillRegionStatus.filled:
           break;
@@ -2068,26 +2165,26 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
 
       final overlayBytes = fillResult.overlayBytes;
       if (overlayBytes == null) {
-        throw Exception('无法生成蒙版覆盖层');
+        throw Exception(l10n.editor_generateMaskOverlayFailed);
       }
       _removeAllMaskLayers();
       final layer = await _addMaskLayerAboveSource(
         overlayBytes,
-        name: '蒙版',
+        name: maskLayerName,
       );
       if (layer == null) {
-        throw Exception('无法更新蒙版图层');
+        throw Exception(l10n.editor_updateMaskLayerFailed);
       }
 
       _state.requestUiUpdate();
       if (mounted) {
         _isMaskFillMode = false;
         setState(() {});
-        AppToast.success(context, '封闭区域已填充为蒙版。');
+        AppToast.success(context, l10n.editor_closedRegionFilled);
       }
     } catch (e) {
       if (mounted) {
-        AppToast.error(context, '填充蒙版失败: $e');
+        AppToast.error(context, l10n.editor_fillMaskFailed(e));
       }
     }
   }
@@ -2261,6 +2358,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
       }
       return;
     }
+    final maskLayerName = context.l10n.editor_maskLayerName;
 
     final pendingGeometry = InpaintOutpaintUtils.tryResolveFrameGeometry(
       sourceWidth: _state.canvasSize.width.round(),
@@ -2394,7 +2492,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
               if (overlayBytes != null) {
                 maskLayer = await _addMaskLayerAboveSource(
                   overlayBytes,
-                  name: '蒙版',
+                  name: maskLayerName,
                 );
                 if (maskLayer == null) {
                   throw Exception('Unable to add outpaint mask layer.');
@@ -2440,7 +2538,9 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
                 _removeAllMaskLayers(preservedLayerIds: {maskLayer.id});
               } else {
                 _removeAllMaskLayers();
-                _addEmptyMaskLayerAboveSource(name: '蒙版');
+                _addEmptyMaskLayerAboveSource(
+                  name: maskLayerName,
+                );
               }
               _state.requestUiUpdate();
             } catch (_) {
@@ -2490,7 +2590,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
     _state.clearPreview();
     _focusedSelectionState.clear();
     _isMaskFillMode = false;
-    _addEmptyMaskLayerAboveSource(name: '蒙版');
+    _addEmptyMaskLayerAboveSource(name: context.l10n.editor_maskLayerName);
     _state.setToolById(_focusedInpaintEnabled ? 'rect_selection' : 'brush');
     _state.requestUiUpdate();
     setState(() {});
@@ -2672,10 +2772,10 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
           const SizedBox(height: 8),
           Text(
             !_focusedInpaintEnabled
-                ? '点击按钮后进入聚焦模式，再框选区域并绘制蒙版。'
+                ? context.l10n.editor_focusInactiveHint
                 : hasFocusArea
-                    ? '已选定聚焦区域，可继续用画笔编辑蒙版。'
-                    : '先框选聚焦区域，再切换画笔绘制蒙版。',
+                    ? context.l10n.editor_focusReadyHint
+                    : context.l10n.editor_focusNeedsSelectionHint,
             style: theme.textTheme.bodySmall,
           ),
           if (_focusedInpaintEnabled) ...[
@@ -2684,13 +2784,13 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
               children: [
                 _buildFocusModeButton(
                   icon: Icons.crop_square,
-                  label: '选区',
+                  label: context.l10n.editor_focusSelection,
                   toolId: 'rect_selection',
                 ),
                 const SizedBox(width: 8),
                 _buildFocusModeButton(
                   icon: Icons.brush_outlined,
-                  label: '画笔',
+                  label: context.l10n.editor_focusBrush,
                   toolId: 'brush',
                 ),
               ],
@@ -2710,12 +2810,14 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
                       }
                     : null,
                 icon: const Icon(Icons.clear, size: 16),
-                label: const Text('清除选区'),
+                label: Text(context.l10n.editor_clearSelection),
               ),
             ),
             const SizedBox(height: 12),
             Text(
-              'Minimum Context Area: ${_minimumContextMegaPixels.round()}',
+              context.l10n.editor_focusMinimumContextArea(
+                _minimumContextMegaPixels.round(),
+              ),
               style: theme.textTheme.labelMedium,
             ),
             Slider(
@@ -2730,7 +2832,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
               },
             ),
             Text(
-              '外框是实际送去 Focused Inpaint 的区域，内框是主要重绘区域；两框之间的带宽就是 Minimum Context Area。',
+              context.l10n.editor_focusContextHint,
               style: theme.textTheme.bodySmall,
             ),
           ],
@@ -2821,6 +2923,8 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
 
   /// 加载蒙版文件
   Future<void> _loadMaskFile() async {
+    final l10n = context.l10n;
+    final maskLayerName = l10n.editor_maskLayerName;
     try {
       final result = await FilePicker.platform.pickFiles(
         type: FileType.image,
@@ -2851,7 +2955,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
           if (mounted) {
             AppToast.error(
               context,
-              '不支持的文件格式: .$extension\n请选择图像文件（PNG、JPG、WEBP等）',
+              context.l10n.editor_unsupportedImageFormat(extension),
             );
           }
           return;
@@ -2868,7 +2972,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
         } catch (e) {
           AppLogger.e('Failed to read file: $e', 'ImageEditor');
           if (mounted) {
-            AppToast.error(context, '无法读取文件: $e');
+            AppToast.error(context, context.l10n.editor_readFileFailed(e));
           }
           return;
         }
@@ -2878,7 +2982,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
       if (bytes == null) {
         AppLogger.w('File bytes is null', 'ImageEditor');
         if (mounted) {
-          AppToast.error(context, '无法获取文件数据');
+          AppToast.error(context, l10n.editor_noFileData);
         }
         return;
       }
@@ -2887,7 +2991,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
       if (bytes.isEmpty) {
         AppLogger.w('File is empty (0 bytes)', 'ImageEditor');
         if (mounted) {
-          AppToast.error(context, '文件为空，请选择有效的图像文件');
+          AppToast.error(context, l10n.editor_emptyImageFile);
         }
         return;
       }
@@ -2898,7 +3002,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
         final sizeMB = (bytes.length / (1024 * 1024)).toStringAsFixed(1);
         AppLogger.w('File too large: ${bytes.length} bytes', 'ImageEditor');
         if (mounted) {
-          AppToast.error(context, '文件过大（$sizeMB MB），请选择小于 50MB 的图像');
+          AppToast.error(context, l10n.editor_fileTooLarge(sizeMB));
         }
         return;
       }
@@ -2906,13 +3010,13 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
       // 将蒙版添加为新图层
       final layer = await _addMaskLayerAboveSource(
         bytes,
-        name: '蒙版',
+        name: maskLayerName,
       );
 
       if (layer != null) {
         AppLogger.i('Mask layer added: ${layer.id}', 'ImageEditor');
         if (mounted) {
-          AppToast.success(context, '蒙版图层已添加');
+          AppToast.success(context, l10n.editor_maskLayerAdded);
         }
       } else {
         // 图像解码失败或格式不支持
@@ -2921,13 +3025,13 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
           'ImageEditor',
         );
         if (mounted) {
-          AppToast.error(context, '无法解析图像文件\n请确保文件未损坏且格式受支持');
+          AppToast.error(context, l10n.editor_parseImageFailed);
         }
       }
     } catch (e) {
       AppLogger.e('Unexpected error loading mask file: $e', 'ImageEditor');
       if (mounted) {
-        AppToast.error(context, '加载蒙版时发生错误: $e');
+        AppToast.error(context, l10n.editor_loadMaskFailed(e));
       }
     }
   }

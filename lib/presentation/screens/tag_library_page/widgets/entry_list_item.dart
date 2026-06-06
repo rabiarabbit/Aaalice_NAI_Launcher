@@ -269,7 +269,7 @@ class _EntryListItemState extends State<EntryListItem> {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        '拖到左侧分类归档',
+                        context.l10n.tagLibrary_dragToCategoryHint,
                         style: TextStyle(
                           fontSize: 10,
                           color: theme.colorScheme.outline,

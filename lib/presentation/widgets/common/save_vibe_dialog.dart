@@ -82,7 +82,7 @@ class _SaveVibeDialogState extends ConsumerState<SaveVibeDialog> {
     final tag = _tagController.text.trim();
     if (tag.isEmpty) return;
     if (_tags.contains(tag)) {
-      AppToast.warning(context, '标签已存在');
+      AppToast.warning(context, context.l10n.toast_tagAlreadyExists);
       return;
     }
     setState(() {
@@ -98,9 +98,10 @@ class _SaveVibeDialogState extends ConsumerState<SaveVibeDialog> {
   }
 
   Future<void> _save() async {
+    final l10n = context.l10n;
     final name = _nameController.text.trim();
     if (name.isEmpty) {
-      AppToast.warning(context, '请输入名称');
+      AppToast.warning(context, l10n.toast_nameRequired);
       return;
     }
 
@@ -120,7 +121,7 @@ class _SaveVibeDialogState extends ConsumerState<SaveVibeDialog> {
           tags: _tags,
         );
         if (result == null) {
-          throw Exception('保存组合失败');
+          throw Exception(l10n.toast_saveBundleFailed);
         }
       } else {
         // 保存单个条目
@@ -133,17 +134,17 @@ class _SaveVibeDialogState extends ConsumerState<SaveVibeDialog> {
         );
         final result = await notifier.saveEntry(entry);
         if (result == null) {
-          throw Exception('保存条目失败');
+          throw Exception(l10n.toast_saveEntryFailed);
         }
       }
 
       if (mounted) {
-        AppToast.success(context, '已保存到 Vibe 库');
+        AppToast.success(context, l10n.toast_savedToVibeLibrary);
         Navigator.of(context).pop(true);
       }
     } catch (e) {
       if (mounted) {
-        AppToast.error(context, '保存失败: $e');
+        AppToast.error(context, l10n.image_saveFailed(e.toString()));
       }
     } finally {
       if (mounted) {

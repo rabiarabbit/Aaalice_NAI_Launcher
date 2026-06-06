@@ -105,7 +105,7 @@ class LayerManager extends ChangeNotifier {
 
   /// 添加图层
   Layer addLayer({String? name, int? index}) {
-    final layerName = name ?? '图层 ${_layers.length + 1}';
+    final layerName = name ?? 'Layer ${_layers.length + 1}';
     final layer = Layer(name: layerName);
 
     if (index != null && index >= 0 && index <= _layers.length) {
@@ -149,7 +149,7 @@ class LayerManager extends ChangeNotifier {
     String? name,
     int? index,
   }) async {
-    final layerName = name ?? '导入的图像 ${_layers.length + 1}';
+    final layerName = name ?? 'Imported Image ${_layers.length + 1}';
     final layer = Layer(name: layerName);
 
     try {
@@ -187,7 +187,7 @@ class LayerManager extends ChangeNotifier {
   ///
   /// **重要：此方法会接管 [image] 的所有权，调用者不应再使用或释放该图像。**
   Layer addLayerFromUiImage(ui.Image image, {String? name}) {
-    final layerName = name ?? '导入的图像 ${_layers.length + 1}';
+    final layerName = name ?? 'Imported Image ${_layers.length + 1}';
     final layer = Layer(name: layerName);
 
     // 设置基础图像（接管所有权）
@@ -289,7 +289,7 @@ class LayerManager extends ChangeNotifier {
     if (visibleLayers.length < 2) return null;
 
     // 创建合并后的图层
-    final merged = Layer(name: '合并的图层');
+    final merged = Layer(name: 'Merged Layer');
 
     // 使用批量操作
     beginBatch();
@@ -324,7 +324,7 @@ class LayerManager extends ChangeNotifier {
   Layer? flattenAll() {
     if (_layers.isEmpty) return null;
 
-    final flattened = Layer(name: '背景');
+    final flattened = Layer(name: 'Background');
 
     // 使用批量操作
     beginBatch();

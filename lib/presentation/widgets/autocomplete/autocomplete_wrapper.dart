@@ -96,7 +96,7 @@ class AutocompleteWrapper extends ConsumerStatefulWidget {
     this.expands = false,
   }) : assert(
           strategy != null || asyncStrategy != null,
-          '必须提供 strategy 或 asyncStrategy',
+          'A strategy or asyncStrategy must be provided',
         );
 
   /// 便捷构造：使用本地标签策略

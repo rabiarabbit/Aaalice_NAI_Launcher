@@ -62,16 +62,16 @@ class ImageSendDestinationDialog extends StatelessWidget {
             _buildOption(
               context,
               icon: Icons.image,
-              title: '图生图',
-              subtitle: '使用此图片进行图像生成',
+              title: context.l10n.gallery_sendToImg2Img,
+              subtitle: context.l10n.gallery_useImageForGeneration,
               onTap: () => Navigator.of(context).pop(SendDestination.img2img),
             ),
             const SizedBox(height: 8),
             _buildOption(
               context,
               icon: Icons.manage_search_rounded,
-              title: '反推',
-              subtitle: '添加到画布反推模块',
+              title: context.l10n.gallery_sendToReversePromptTitle,
+              subtitle: context.l10n.gallery_addToReversePromptModule,
               onTap: () =>
                   Navigator.of(context).pop(SendDestination.reversePrompt),
             ),
@@ -81,7 +81,9 @@ class ImageSendDestinationDialog extends StatelessWidget {
               context,
               icon: Icons.style,
               title: 'Vibe Transfer',
-              subtitle: hasVibeData ? '提取并应用图片的风格/角色' : '此图片不包含 Vibe 数据',
+              subtitle: hasVibeData
+                  ? context.l10n.gallery_applyVibeFromImage
+                  : context.l10n.gallery_noVibeData,
               enabled: hasVibeData,
               onTap: hasVibeData
                   ? () =>
@@ -92,8 +94,8 @@ class ImageSendDestinationDialog extends StatelessWidget {
             _buildOption(
               context,
               icon: Icons.brush_outlined,
-              title: 'Krita',
-              subtitle: '发送到已连接的 Krita 插件',
+              title: context.l10n.gallery_sendToKrita,
+              subtitle: context.l10n.gallery_sendToConnectedKrita,
               onTap: () => Navigator.of(context).pop(SendDestination.krita),
             ),
           ],
@@ -102,7 +104,7 @@ class ImageSendDestinationDialog extends StatelessWidget {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('取消'),
+          child: Text(context.l10n.common_cancel),
         ),
       ],
     );

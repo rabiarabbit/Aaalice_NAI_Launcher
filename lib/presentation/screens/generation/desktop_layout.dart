@@ -131,7 +131,7 @@ class _DesktopGenerationLayoutState
             ref,
             generationState.displayImages.first.bytes,
           );
-          AppToast.info(context, '已打开图生图超分面板');
+          AppToast.info(context, context.l10n.img2img_upscalePanelOpened);
         }
       },
       // 已移除 Space 全屏预览快捷键，避免在提示词输入时误触发预览
@@ -244,7 +244,7 @@ class _DesktopGenerationLayoutState
   Future<void> _generateWithProtection() async {
     final currentParams = ref.read(generationParamsNotifierProvider);
     if (ref.read(kritaBridgeNotifierProvider).isBridgeGenerating) {
-      AppToast.warning(context, 'Krita Bridge 正在生成，请等待当前任务结束');
+      AppToast.warning(context, context.l10n.kritaBridge_busyGenerating);
       return;
     }
     if (currentParams.prompt.isEmpty) {

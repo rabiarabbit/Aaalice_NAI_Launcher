@@ -17,7 +17,7 @@ class LassoSelectionTool extends BaseSelectionTool {
   String get id => 'lasso_selection';
 
   @override
-  String get name => '套索选区';
+  String get name => 'Lasso Selection';
 
   @override
   IconData get icon => Icons.gesture;
@@ -26,7 +26,8 @@ class LassoSelectionTool extends BaseSelectionTool {
   LogicalKeyboardKey get shortcutKey => LogicalKeyboardKey.keyL;
 
   @override
-  String? get helpText => '按住鼠标拖动绘制自由形状选区，松开自动闭合';
+  String? get helpText =>
+      'Hold and drag to draw a freeform selection. Release to close it automatically.';
 
   @override
   void onPointerDown(PointerDownEvent event, EditorState state) {

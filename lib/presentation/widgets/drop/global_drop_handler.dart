@@ -226,7 +226,7 @@ class _GlobalDropHandlerState extends ConsumerState<GlobalDropHandler> {
         }
       }
       if (!handledAny && mounted) {
-        _showError('拖入源未提供可读取的图片文件或图片链接');
+        _showError(context.l10n.toast_unreadableDroppedImageSource);
       }
     } finally {
       // 关闭处理中提示
@@ -436,7 +436,10 @@ class _GlobalDropHandlerState extends ConsumerState<GlobalDropHandler> {
 
       if (currentCount + vibes.length > maxCount) {
         if (mounted) {
-          AppToast.warning(context, '风格参考已达上限 ($maxCount 张)');
+          AppToast.warning(
+            context,
+            context.l10n.toast_styleReferenceLimit(maxCount),
+          );
         }
         return;
       }
@@ -470,7 +473,7 @@ class _GlobalDropHandlerState extends ConsumerState<GlobalDropHandler> {
     AppLocalizations l10n,
   ) {
     if (currentCount > 0) {
-      return '已追加 $addedCount 个风格参考';
+      return l10n.toast_appendedStyleReferences(addedCount);
     }
     return addedCount == 1
         ? l10n.drop_addedToVibe
@@ -487,7 +490,10 @@ class _GlobalDropHandlerState extends ConsumerState<GlobalDropHandler> {
 
     if (currentState.vibeReferencesV4.length >= maxCount) {
       if (mounted) {
-        AppToast.warning(context, '风格参考已达上限 ($maxCount 张)');
+        AppToast.warning(
+          context,
+          context.l10n.toast_styleReferenceLimit(maxCount),
+        );
       }
       return;
     }
@@ -496,8 +502,8 @@ class _GlobalDropHandlerState extends ConsumerState<GlobalDropHandler> {
 
     if (mounted) {
       final message = currentState.vibeReferencesV4.isNotEmpty
-          ? '已追加 1 个风格参考（复用预编码 Vibe）'
-          : '已添加风格参考（复用预编码 Vibe，节省 2 Anlas）';
+          ? l10n.toast_appendedPreencodedVibe
+          : l10n.toast_addedPreencodedVibe;
       AppToast.success(context, message);
     }
   }
@@ -514,7 +520,7 @@ class _GlobalDropHandlerState extends ConsumerState<GlobalDropHandler> {
     if (invalidVibes.isNotEmpty) {
       AppToast.warning(
         context,
-        '${invalidVibes.length} 个 Vibe 缺少编码数据，无法保存',
+        l10n.toast_vibesMissingEncoding(invalidVibes.length),
       );
       return;
     }
@@ -596,12 +602,14 @@ class _GlobalDropHandlerState extends ConsumerState<GlobalDropHandler> {
         if (mounted) {
           AppToast.success(
             context,
-            isBundle ? '已保存 Bundle (${vibes.length} 个 Vibe)' : '已保存到 Vibe 库',
+            isBundle
+                ? l10n.toast_savedBundle(vibes.length)
+                : l10n.toast_savedToVibeLibrary,
           );
         }
       } catch (e) {
         if (mounted) {
-          AppToast.error(context, '保存失败: $e');
+          AppToast.error(context, context.l10n.image_saveFailed(e.toString()));
         }
       }
     }
@@ -629,7 +637,9 @@ class _GlobalDropHandlerState extends ConsumerState<GlobalDropHandler> {
     if (mounted) {
       AppToast.success(
         context,
-        hasExisting ? '已替换角色参考' : l10n.drop_addedToCharacterRef,
+        hasExisting
+            ? l10n.toast_replacedCharacterReference
+            : l10n.drop_addedToCharacterRef,
       );
     }
   }
@@ -672,7 +682,7 @@ class _GlobalDropHandlerState extends ConsumerState<GlobalDropHandler> {
       if (kDebugMode) {
         AppLogger.d('Error extracting metadata: $e', 'DropHandler');
       }
-      _showError('提取元数据失败: $e');
+      _showError(l10n.toast_extractMetadataFailed(e.toString()));
     }
   }
 
@@ -886,7 +896,7 @@ class _GlobalDropHandlerState extends ConsumerState<GlobalDropHandler> {
 
       if (metadata == null || metadata.prompt.isEmpty) {
         if (mounted) {
-          AppToast.warning(context, '未找到有效的提示词');
+          AppToast.warning(context, context.l10n.toast_noValidPromptFound);
         }
         return;
       }
@@ -898,13 +908,16 @@ class _GlobalDropHandlerState extends ConsumerState<GlobalDropHandler> {
         final displayPrompt = metadata.prompt.length > 50
             ? '${metadata.prompt.substring(0, 50)}...'
             : metadata.prompt;
-        AppToast.success(context, '已加入队列: $displayPrompt');
+        AppToast.success(
+          context,
+          context.l10n.toast_addedToQueue(displayPrompt),
+        );
       }
     } catch (e) {
       if (kDebugMode) {
         AppLogger.d('Error adding to queue: $e', 'DropHandler');
       }
-      _showError('提取提示词失败: $e');
+      _showError(l10n.toast_extractPromptFailed(e.toString()));
     }
   }
 

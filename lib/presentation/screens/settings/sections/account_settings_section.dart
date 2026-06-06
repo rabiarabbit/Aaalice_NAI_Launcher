@@ -44,7 +44,7 @@ class _AccountSettingsSectionState
     final accountId = authState.accountId;
 
     if (accountId == null) {
-      AppToast.info(context, '请先登录');
+      AppToast.info(context, context.l10n.settings_pleaseLoginFirst);
       return;
     }
 
@@ -52,7 +52,7 @@ class _AccountSettingsSectionState
     final account = accounts.where((a) => a.id == accountId).firstOrNull;
 
     if (account == null) {
-      AppToast.info(context, '未找到账号信息');
+      AppToast.info(context, context.l10n.settings_accountNotFound);
       return;
     }
 
@@ -64,6 +64,6 @@ class _AccountSettingsSectionState
 
   /// 导航到登录页面
   void _navigateToLogin(BuildContext context) {
-    AppToast.info(context, '请前往登录页面');
+    AppToast.info(context, context.l10n.settings_goToLoginPage);
   }
 }

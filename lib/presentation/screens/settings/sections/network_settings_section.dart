@@ -56,7 +56,7 @@ class NetworkSettingsSectionState
     }
 
     return SettingsCard(
-      title: '网络',
+      title: l10n.settings_network,
       icon: Icons.network_check,
       child: Column(
         children: [

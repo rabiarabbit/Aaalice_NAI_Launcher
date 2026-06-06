@@ -203,15 +203,15 @@ class _PostDetailDialogState extends ConsumerState<PostDetailDialog>
                 placeholder: (context, url) => const Center(
                   child: CircularProgressIndicator(color: Colors.white),
                 ),
-                errorWidget: (context, url, error) => const Center(
+                errorWidget: (context, url, error) => Center(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.error, color: Colors.white54, size: 48),
-                      SizedBox(height: 8),
+                      const Icon(Icons.error, color: Colors.white54, size: 48),
+                      const SizedBox(height: 8),
                       Text(
-                        'GIF加载失败',
-                        style: TextStyle(color: Colors.white54),
+                        context.l10n.onlineGallery_gifLoadFailed,
+                        style: const TextStyle(color: Colors.white54),
                       ),
                     ],
                   ),
@@ -233,15 +233,19 @@ class _PostDetailDialogState extends ConsumerState<PostDetailDialog>
                   placeholder: (context, url) => const Center(
                     child: CircularProgressIndicator(color: Colors.white),
                   ),
-                  errorWidget: (context, url, error) => const Center(
+                  errorWidget: (context, url, error) => Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.error, color: Colors.white54, size: 48),
-                        SizedBox(height: 8),
+                        const Icon(
+                          Icons.error,
+                          color: Colors.white54,
+                          size: 48,
+                        ),
+                        const SizedBox(height: 8),
                         Text(
-                          '加载失败',
-                          style: TextStyle(color: Colors.white54),
+                          context.l10n.onlineGallery_loadFailed,
+                          style: const TextStyle(color: Colors.white54),
                         ),
                       ],
                     ),
@@ -273,14 +277,21 @@ class _PostDetailDialogState extends ConsumerState<PostDetailDialog>
                     color: Colors.black.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(4),
                   ),
-                  child: const Row(
+                  child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.zoom_in, color: Colors.white54, size: 14),
-                      SizedBox(width: 4),
+                      const Icon(
+                        Icons.zoom_in,
+                        color: Colors.white54,
+                        size: 14,
+                      ),
+                      const SizedBox(width: 4),
                       Text(
-                        '双指缩放',
-                        style: TextStyle(color: Colors.white54, fontSize: 11),
+                        context.l10n.onlineGallery_pinchToZoom,
+                        style: const TextStyle(
+                          color: Colors.white54,
+                          fontSize: 11,
+                        ),
                       ),
                     ],
                   ),
@@ -370,7 +381,9 @@ class _PostDetailDialogState extends ConsumerState<PostDetailDialog>
               color: isFavorited ? Colors.red : null,
             ),
             iconSize: 22,
-            tooltip: isFavorited ? '取消收藏' : '收藏',
+            tooltip: isFavorited
+                ? context.l10n.common_unfavorite
+                : context.l10n.common_favorite,
           ),
         ],
       ),
@@ -471,7 +484,7 @@ class _PostDetailDialogState extends ConsumerState<PostDetailDialog>
           // 元标签
           if (widget.post.metaTags.isNotEmpty)
             _TagSection(
-              title: '元数据',
+              title: context.l10n.onlineGallery_metadata,
               tags: widget.post.metaTags,
               color: TagColors.meta,
               translationService: translationService,
@@ -511,7 +524,7 @@ class _PostDetailDialogState extends ConsumerState<PostDetailDialog>
                 child: OutlinedButton.icon(
                   onPressed: _sendToReversePrompt,
                   icon: const Icon(Icons.manage_search_rounded, size: 16),
-                  label: const Text('反推'),
+                  label: Text(context.l10n.reversePrompt_title),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 10),
                   ),
@@ -522,7 +535,7 @@ class _PostDetailDialogState extends ConsumerState<PostDetailDialog>
                 child: FilledButton.icon(
                   onPressed: _sendToGenerate,
                   icon: const Icon(Icons.send, size: 16),
-                  label: const Text('发送'),
+                  label: Text(context.l10n.onlineGallery_send),
                   style: FilledButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 10),
                   ),
@@ -538,7 +551,7 @@ class _PostDetailDialogState extends ConsumerState<PostDetailDialog>
                 child: OutlinedButton.icon(
                   onPressed: _addToQueue,
                   icon: const Icon(Icons.queue, size: 16),
-                  label: const Text('加入队列'),
+                  label: Text(context.l10n.onlineGallery_addToQueue),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 10),
                   ),
@@ -572,7 +585,7 @@ class _PostDetailDialogState extends ConsumerState<PostDetailDialog>
   /// 发送到生成页面
   void _sendToGenerate() {
     if (widget.post.tags.isEmpty) {
-      AppToast.info(context, '此图片没有标签信息');
+      AppToast.info(context, context.l10n.onlineGallery_noTagInfo);
       return;
     }
 
@@ -588,14 +601,17 @@ class _PostDetailDialogState extends ConsumerState<PostDetailDialog>
     Navigator.pop(context);
     context.go(AppRoutes.generation);
 
-    AppToast.success(context, '提示词已发送到生成页面');
+    AppToast.success(
+      context,
+      context.l10n.onlineGallery_promptSentToGeneration,
+    );
   }
 
   Future<void> _sendToReversePrompt() async {
     final imageUrl =
         widget.post.sampleUrl ?? widget.post.fileUrl ?? widget.post.previewUrl;
     if (imageUrl.isEmpty) {
-      AppToast.info(context, '此图片没有可用地址');
+      AppToast.info(context, context.l10n.onlineGallery_noImageUrl);
       return;
     }
     try {
@@ -609,16 +625,21 @@ class _PostDetailDialogState extends ConsumerState<PostDetailDialog>
       if (!mounted) return;
       Navigator.pop(context);
       context.go(AppRoutes.generation);
-      AppToast.success(context, '图片已发送到反推模块');
+      AppToast.success(context, context.l10n.onlineGallery_sentToReversePrompt);
     } catch (e) {
-      if (mounted) AppToast.error(context, '发送反推失败: $e');
+      if (mounted) {
+        AppToast.error(
+          context,
+          context.l10n.onlineGallery_reversePromptSendFailed('$e'),
+        );
+      }
     }
   }
 
   /// 加入队列
   Future<void> _addToQueue() async {
     if (widget.post.tags.isEmpty) {
-      AppToast.info(context, '此图片没有标签信息');
+      AppToast.info(context, context.l10n.onlineGallery_noTagInfo);
       return;
     }
 
@@ -633,9 +654,9 @@ class _PostDetailDialogState extends ConsumerState<PostDetailDialog>
 
     if (mounted) {
       if (added) {
-        AppToast.success(context, '已加入队列');
+        AppToast.success(context, context.l10n.onlineGallery_addedToQueue);
       } else {
-        AppToast.warning(context, '队列已满（最多50项）');
+        AppToast.warning(context, context.l10n.onlineGallery_queueFullMax);
       }
     }
   }

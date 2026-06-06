@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:nai_launcher/core/utils/localization_extension.dart';
 
 import '../../../../../../data/models/vibe/vibe_reference.dart';
 import '../../app_toast.dart';
@@ -62,7 +63,7 @@ class _VibeSectionState extends State<VibeSection> {
     }
 
     Clipboard.setData(ClipboardData(text: buffer.toString()));
-    AppToast.success(context, 'Vibe 数据已复制');
+    AppToast.success(context, context.l10n.toast_vibeDataCopied);
   }
 
   @override

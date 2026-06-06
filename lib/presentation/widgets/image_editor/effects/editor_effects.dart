@@ -24,22 +24,22 @@ enum EditorEffectType {
 
 String editorEffectLabel(EditorEffectType type) {
   return switch (type) {
-    EditorEffectType.brightness => '亮度',
-    EditorEffectType.contrast => '对比度',
-    EditorEffectType.saturation => '饱和度',
-    EditorEffectType.temperature => '色温',
-    EditorEffectType.gamma => '伽马',
-    EditorEffectType.grayscale => '灰度',
-    EditorEffectType.invert => '反相',
-    EditorEffectType.sepia => '复古棕褐',
-    EditorEffectType.denoise => '降噪',
-    EditorEffectType.blur => '高斯模糊',
-    EditorEffectType.sharpen => '锐化',
-    EditorEffectType.cropToSelection => '裁剪到选区',
-    EditorEffectType.rotateLeft => '向左旋转 90°',
-    EditorEffectType.rotateRight => '向右旋转 90°',
-    EditorEffectType.flipHorizontal => '水平翻转',
-    EditorEffectType.flipVertical => '垂直翻转',
+    EditorEffectType.brightness => 'Brightness',
+    EditorEffectType.contrast => 'Contrast',
+    EditorEffectType.saturation => 'Saturation',
+    EditorEffectType.temperature => 'Temperature',
+    EditorEffectType.gamma => 'Gamma',
+    EditorEffectType.grayscale => 'Grayscale',
+    EditorEffectType.invert => 'Invert',
+    EditorEffectType.sepia => 'Sepia',
+    EditorEffectType.denoise => 'Denoise',
+    EditorEffectType.blur => 'Gaussian Blur',
+    EditorEffectType.sharpen => 'Sharpen',
+    EditorEffectType.cropToSelection => 'Crop to Selection',
+    EditorEffectType.rotateLeft => 'Rotate Left 90°',
+    EditorEffectType.rotateRight => 'Rotate Right 90°',
+    EditorEffectType.flipHorizontal => 'Flip Horizontal',
+    EditorEffectType.flipVertical => 'Flip Vertical',
   };
 }
 
@@ -208,7 +208,7 @@ Map<String, Object?> runEditorEffectJobMessage(
 EditorEffectResult runEditorEffectJob(EditorEffectJob job) {
   var source = img.decodeImage(job.imageBytes);
   if (source == null) {
-    throw StateError('无法解码当前图层');
+    throw StateError('Failed to decode the current layer');
   }
 
   var cropRect = job.cropRect;
@@ -326,7 +326,7 @@ img.Image _applyTemperature(img.Image source, double intensity) {
 
 img.Image _cropToRect(img.Image source, EditorEffectCropRect? cropRect) {
   if (cropRect == null) {
-    throw StateError('裁剪到选区需要先创建一个选区');
+    throw StateError('Create a selection before cropping to selection');
   }
   return img.copyCrop(
     source,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../core/utils/localization_extension.dart';
 import '../core/editor_state.dart';
 import '../core/history_manager.dart';
 import 'color_picker_tool.dart';
@@ -21,7 +22,7 @@ class EraserTool extends EditorTool {
   String get id => 'eraser';
 
   @override
-  String get name => '橡皮擦';
+  String get name => 'Eraser';
 
   @override
   IconData get icon => Icons.cleaning_services;
@@ -168,7 +169,7 @@ class _EraserSettingsPanelState extends State<_EraserSettingsPanel> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           child: Text(
-            '橡皮擦设置',
+            context.l10n.editor_eraserSettings,
             style: theme.textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.bold,
             ),
@@ -183,7 +184,10 @@ class _EraserSettingsPanelState extends State<_EraserSettingsPanel> {
             children: [
               SizedBox(
                 width: 60,
-                child: Text('大小', style: theme.textTheme.bodySmall),
+                child: Text(
+                  context.l10n.editor_size,
+                  style: theme.textTheme.bodySmall,
+                ),
               ),
               Expanded(
                 child: SliderTheme(
@@ -245,7 +249,10 @@ class _EraserSettingsPanelState extends State<_EraserSettingsPanel> {
             children: [
               SizedBox(
                 width: 60,
-                child: Text('硬度', style: theme.textTheme.bodySmall),
+                child: Text(
+                  context.l10n.editor_hardness,
+                  style: theme.textTheme.bodySmall,
+                ),
               ),
               Expanded(
                 child: SliderTheme(

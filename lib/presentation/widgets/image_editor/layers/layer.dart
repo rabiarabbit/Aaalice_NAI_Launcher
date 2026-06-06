@@ -24,11 +24,11 @@ extension CanvasResizeModeExtension on CanvasResizeMode {
   String get label {
     switch (this) {
       case CanvasResizeMode.crop:
-        return '裁剪';
+        return 'Crop';
       case CanvasResizeMode.pad:
-        return '填充';
+        return 'Pad';
       case CanvasResizeMode.stretch:
-        return '拉伸';
+        return 'Stretch';
     }
   }
 }
@@ -64,29 +64,29 @@ extension LayerBlendModeExtension on LayerBlendMode {
   String get label {
     switch (this) {
       case LayerBlendMode.normal:
-        return '正常';
+        return 'Normal';
       case LayerBlendMode.multiply:
-        return '正片叠底';
+        return 'Multiply';
       case LayerBlendMode.screen:
-        return '滤色';
+        return 'Screen';
       case LayerBlendMode.overlay:
-        return '叠加';
+        return 'Overlay';
       case LayerBlendMode.darken:
-        return '变暗';
+        return 'Darken';
       case LayerBlendMode.lighten:
-        return '变亮';
+        return 'Lighten';
       case LayerBlendMode.colorDodge:
-        return '颜色减淡';
+        return 'Color Dodge';
       case LayerBlendMode.colorBurn:
-        return '颜色加深';
+        return 'Color Burn';
       case LayerBlendMode.hardLight:
-        return '强光';
+        return 'Hard Light';
       case LayerBlendMode.softLight:
-        return '柔光';
+        return 'Soft Light';
       case LayerBlendMode.difference:
-        return '差值';
+        return 'Difference';
       case LayerBlendMode.exclusion:
-        return '排除';
+        return 'Exclusion';
     }
   }
 
@@ -208,7 +208,7 @@ class Layer {
 
   Layer({
     String? id,
-    this.name = '新图层',
+    this.name = 'New Layer',
     this.visible = true,
     this.locked = false,
     this.opacity = 1.0,
@@ -886,7 +886,7 @@ class Layer {
   /// 注意：如果图层有 baseImage，需要调用 [cloneAsync] 来正确克隆基础图像
   Layer clone({String? newName}) {
     final cloned = Layer(
-      name: newName ?? '$name 副本',
+      name: newName ?? '$name Copy',
       visible: visible,
       locked: locked,
       opacity: opacity,

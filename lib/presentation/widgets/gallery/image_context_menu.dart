@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:path/path.dart' as path;
 
 import '../../../core/utils/file_explorer_utils.dart';
+import '../../../core/utils/localization_extension.dart';
 import '../../../data/models/gallery/local_image_record.dart';
 
 import '../common/app_toast.dart';
@@ -33,44 +34,47 @@ class ImageContextMenu {
       ),
       items: [
         if (metadata?.prompt.isNotEmpty == true)
-          const PopupMenuItem(
+          PopupMenuItem(
             value: 'copy_prompt',
             child: Row(
               children: [
-                Icon(Icons.content_copy, size: 18),
-                SizedBox(width: 8),
-                Text('复制 Prompt'),
+                const Icon(Icons.content_copy, size: 18),
+                const SizedBox(width: 8),
+                Text('${context.l10n.common_copy} Prompt'),
               ],
             ),
           ),
         if (metadata?.seed != null)
-          const PopupMenuItem(
+          PopupMenuItem(
             value: 'copy_seed',
             child: Row(
               children: [
-                Icon(Icons.tag, size: 18),
-                SizedBox(width: 8),
-                Text('复制 Seed'),
+                const Icon(Icons.tag, size: 18),
+                const SizedBox(width: 8),
+                Text('${context.l10n.common_copy} Seed'),
               ],
             ),
           ),
-        const PopupMenuItem(
+        PopupMenuItem(
           value: 'open_folder',
           child: Row(
             children: [
-              Icon(Icons.folder_open, size: 18),
-              SizedBox(width: 8),
-              Text('在文件夹中显示'),
+              const Icon(Icons.folder_open, size: 18),
+              const SizedBox(width: 8),
+              Text(context.l10n.localGallery_showInFolder),
             ],
           ),
         ),
-        const PopupMenuItem(
+        PopupMenuItem(
           value: 'delete',
           child: Row(
             children: [
-              Icon(Icons.delete_outline, size: 18, color: Colors.red),
-              SizedBox(width: 8),
-              Text('删除', style: TextStyle(color: Colors.red)),
+              const Icon(Icons.delete_outline, size: 18, color: Colors.red),
+              const SizedBox(width: 8),
+              Text(
+                context.l10n.common_delete,
+                style: const TextStyle(color: Colors.red),
+              ),
             ],
           ),
         ),
@@ -84,7 +88,7 @@ class ImageContextMenu {
         if (metadata?.fullPrompt.isNotEmpty == true) {
           await Clipboard.setData(ClipboardData(text: metadata!.fullPrompt));
           if (context.mounted) {
-            AppToast.info(context, 'Prompt 已复制');
+            AppToast.info(context, context.l10n.localGallery_promptCopied);
           }
         }
         break;
@@ -94,7 +98,7 @@ class ImageContextMenu {
             ClipboardData(text: metadata!.seed.toString()),
           );
           if (context.mounted) {
-            AppToast.info(context, 'Seed 已复制');
+            AppToast.info(context, context.l10n.localGallery_seedCopied);
           }
         }
         break;
@@ -117,7 +121,10 @@ class ImageContextMenu {
       await FileExplorerUtils.revealFile(filePath);
     } catch (e) {
       if (context.mounted) {
-        AppToast.info(context, '无法打开文件夹: $e');
+        AppToast.info(
+          context,
+          context.l10n.localGallery_cannotOpenFolder('$e'),
+        );
       }
     }
   }
@@ -133,14 +140,16 @@ class ImageContextMenu {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('确认删除'),
+        title: Text(context.l10n.common_confirmDelete),
         content: Text(
-          '确定要删除图片「${path.basename(record.path)}」吗？\n\n此操作无法撤销。',
+          context.l10n.localGallery_confirmDeleteImageContent(
+            path.basename(record.path),
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('取消'),
+            child: Text(context.l10n.common_cancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(context).pop(true),
@@ -148,7 +157,7 @@ class ImageContextMenu {
               backgroundColor: Theme.of(context).colorScheme.error,
               foregroundColor: Theme.of(context).colorScheme.onError,
             ),
-            child: const Text('删除'),
+            child: Text(context.l10n.common_delete),
           ),
         ],
       ),
@@ -162,12 +171,12 @@ class ImageContextMenu {
           onDeleted?.call();
           onRefresh?.call();
           if (context.mounted) {
-            AppToast.info(context, '图片已删除');
+            AppToast.info(context, context.l10n.localGallery_imageDeleted);
           }
         }
       } catch (e) {
         if (context.mounted) {
-          AppToast.info(context, '删除失败: $e');
+          AppToast.info(context, context.l10n.localGallery_deleteFailed('$e'));
         }
       }
     }

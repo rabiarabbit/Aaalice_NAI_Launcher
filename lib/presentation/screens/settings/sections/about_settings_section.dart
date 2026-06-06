@@ -32,7 +32,7 @@ class _AboutSettingsSectionState extends ConsumerState<AboutSettingsSection> {
     final fileLoggingEnabled = localStorageService.getFileLoggingEnabled();
 
     return SettingsCard(
-      title: '关于',
+      title: context.l10n.settings_about,
       icon: Icons.info,
       child: Column(
         children: [
@@ -44,10 +44,8 @@ class _AboutSettingsSectionState extends ConsumerState<AboutSettingsSection> {
           ),
           SwitchListTile(
             secondary: const Icon(Icons.article_outlined),
-            title: const Text('记录应用日志'),
-            subtitle: const Text(
-              '默认关闭；仅在排查问题时开启。开启后会写入 Documents/NAI_Launcher/logs，关闭后不再创建或写入日志文件。',
-            ),
+            title: Text(context.l10n.settings_fileLogging),
+            subtitle: Text(context.l10n.settings_fileLoggingSubtitle),
             value: fileLoggingEnabled,
             onChanged: (value) async {
               await AppLogger.setFileLoggingEnabled(value);

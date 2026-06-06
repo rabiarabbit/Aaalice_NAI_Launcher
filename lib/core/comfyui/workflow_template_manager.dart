@@ -148,7 +148,7 @@ class WorkflowTemplateManager {
       final data = imageData[slot.id];
       if (data == null) {
         if (slot.required) {
-          throw ArgumentError('必需的输入图像缺失: ${slot.label}');
+          throw ArgumentError('Required input image missing: ${slot.label}');
         }
         continue;
       }

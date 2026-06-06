@@ -33,14 +33,36 @@ abstract class BaseSelectionTool extends EditorTool {
   @override
   Widget buildSettingsPanel(BuildContext context, EditorState state) {
     return SelectionSettingsPanel(
-      title: name,
+      title: _localizedTitle(context),
       state: state,
-      helpText: helpText,
+      helpText: _localizedHelpText(context),
     );
   }
 
   /// 子类可重写：提供帮助文本
   String? get helpText => null;
+
+  String _localizedTitle(BuildContext context) {
+    switch (id) {
+      case 'rect_selection':
+        return context.l10n.editor_toolRectSelect;
+      case 'ellipse_selection':
+        return context.l10n.editor_toolEllipseSelect;
+      case 'lasso_selection':
+        return context.l10n.editor_toolLassoSelect;
+      default:
+        return name;
+    }
+  }
+
+  String? _localizedHelpText(BuildContext context) {
+    switch (id) {
+      case 'lasso_selection':
+        return context.l10n.editor_lassoSelectionHelp;
+      default:
+        return helpText;
+    }
+  }
 }
 
 /// 形状选区工具基类

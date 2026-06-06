@@ -131,7 +131,7 @@ class _PreciseReferencePanelState extends ConsumerState<PreciseReferencePanel> {
                     ),
                     const SizedBox(width: 2),
                     Text(
-                      '消耗点数',
+                      context.l10n.preciseRef_costBadge,
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w600,
@@ -221,7 +221,7 @@ class _PreciseReferencePanelState extends ConsumerState<PreciseReferencePanel> {
                 ),
                 label: Text(
                   _isFileDraggingOver
-                      ? '松开后添加精准参考'
+                      ? context.l10n.preciseRef_dropToAdd
                       : context.l10n.preciseRef_addReference,
                 ),
               ),
@@ -364,7 +364,7 @@ class _PreciseReferencePanelState extends ConsumerState<PreciseReferencePanel> {
       }
 
       if (files.isEmpty) {
-        AppToast.warning(context, '拖入源未提供可读取的图片文件或图片链接');
+        AppToast.warning(context, context.l10n.preciseRef_dropNoReadableImage);
         return;
       }
 
@@ -385,7 +385,10 @@ class _PreciseReferencePanelState extends ConsumerState<PreciseReferencePanel> {
       await Future.wait(addOperations);
 
       if (mounted) {
-        AppToast.success(context, '已添加 ${files.length} 个精准参考');
+        AppToast.success(
+          context,
+          context.l10n.preciseRef_addedCount(files.length),
+        );
       }
     } catch (e) {
       if (mounted) {
@@ -482,7 +485,7 @@ class _PreciseReferencePanelState extends ConsumerState<PreciseReferencePanel> {
         .clearPreciseReferences();
 
     if (mounted && count > 0) {
-      AppToast.success(context, '已删除 $count 个精准参考');
+      AppToast.success(context, context.l10n.preciseRef_removedCount(count));
     }
   }
 }

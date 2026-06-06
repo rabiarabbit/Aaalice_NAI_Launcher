@@ -150,7 +150,7 @@ class CloneStampTool extends EditorTool {
           layerId: activeLayer.id,
           newImageBytes: pngData.buffer.asUint8List(),
           newImage: result,
-          actionDescription: '仿制图章',
+          actionDescription: 'Clone Stamp',
         ),
         state,
       );
@@ -188,8 +188,7 @@ class CloneStampTool extends EditorTool {
 
     c.drawImage(layerImage, Offset.zero, Paint());
 
-    final clonePaint = Paint()
-      ..color = Color.fromRGBO(255, 255, 255, _opacity);
+    final clonePaint = Paint()..color = Color.fromRGBO(255, 255, 255, _opacity);
 
     _drawClonePoints(c, snapshot, points, offset, clonePaint);
 
@@ -239,10 +238,15 @@ class CloneStampTool extends EditorTool {
   void drawRealtimePreview(Canvas canvas, List<Offset> points) {
     if (_canvasSnapshot == null || _sourceOffset == null) return;
 
-    final clonePaint = Paint()
-      ..color = Color.fromRGBO(255, 255, 255, _opacity);
+    final clonePaint = Paint()..color = Color.fromRGBO(255, 255, 255, _opacity);
 
-    _drawClonePoints(canvas, _canvasSnapshot!, points, _sourceOffset!, clonePaint);
+    _drawClonePoints(
+      canvas,
+      _canvasSnapshot!,
+      points,
+      _sourceOffset!,
+      clonePaint,
+    );
   }
 
   @override
@@ -273,7 +277,7 @@ class CloneStampTool extends EditorTool {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                name,
+                context.l10n.editor_toolCloneStamp,
                 style: theme.textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),

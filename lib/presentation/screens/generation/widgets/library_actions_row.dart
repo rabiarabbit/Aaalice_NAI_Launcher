@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/utils/localization_extension.dart';
 import '../../../../data/models/vibe/vibe_reference.dart';
 
 /// 库操作按钮行（保存到库、从库导入）
@@ -24,7 +25,7 @@ class LibraryActionsRow extends StatelessWidget {
           child: OutlinedButton.icon(
             onPressed: vibes.isNotEmpty ? onSaveToLibrary : null,
             icon: const Icon(Icons.save_outlined, size: 16),
-            label: const Text('保存到库'),
+            label: Text(context.l10n.vibeLibrary_save),
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 8),
             ),
@@ -36,7 +37,7 @@ class LibraryActionsRow extends StatelessWidget {
           child: OutlinedButton.icon(
             onPressed: onImportFromLibrary,
             icon: const Icon(Icons.folder_open_outlined, size: 16),
-            label: const Text('从库导入'),
+            label: Text(context.l10n.vibe_addFromLibraryTitle),
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 8),
             ),

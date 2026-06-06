@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nai_launcher/core/utils/localization_extension.dart';
 
 import 'autocomplete_controller.dart';
 import 'generic_suggestion_tile.dart';
@@ -102,7 +103,9 @@ class GenericAutocompleteOverlay extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '${suggestions.length} 个结果',
+                        context.l10n.autocomplete_resultsCount(
+                          suggestions.length,
+                        ),
                         style: theme.textTheme.labelSmall?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                         ),
@@ -110,11 +113,23 @@ class GenericAutocompleteOverlay extends StatelessWidget {
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          _buildShortcutHint(theme, '↑↓/滚轮', '选择'),
+                          _buildShortcutHint(
+                            theme,
+                            context.l10n.autocomplete_keyNavigate,
+                            context.l10n.autocomplete_actionSelect,
+                          ),
                           const SizedBox(width: 12),
-                          _buildShortcutHint(theme, 'Enter/Tab', '确认'),
+                          _buildShortcutHint(
+                            theme,
+                            'Enter/Tab',
+                            context.l10n.autocomplete_actionConfirm,
+                          ),
                           const SizedBox(width: 12),
-                          _buildShortcutHint(theme, 'Esc', '关闭'),
+                          _buildShortcutHint(
+                            theme,
+                            'Esc',
+                            context.l10n.autocomplete_actionClose,
+                          ),
                         ],
                       ),
                     ],

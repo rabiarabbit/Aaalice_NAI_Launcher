@@ -86,7 +86,7 @@ class TagLibraryDropMenu extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '拖入图片',
+                          l10n.tagLibrary_droppedImage,
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w600,
                           ),
@@ -111,10 +111,10 @@ class TagLibraryDropMenu extends StatelessWidget {
               // 操作选项
               _ActionButton(
                 icon: Icons.add_box_outlined,
-                title: '创建新词条',
+                title: l10n.tagLibrary_createEntryFromImage,
                 subtitle: promptPreview != null
-                    ? '提示词已提取: "$promptPreview"'
-                    : '从图片创建新词条',
+                    ? l10n.tagLibrary_promptExtracted(promptPreview)
+                    : l10n.tagLibrary_createEntryFromImageSubtitle,
                 onTap: () =>
                     Navigator.of(context).pop(TagLibraryDropAction.create),
               ),
@@ -123,8 +123,8 @@ class TagLibraryDropMenu extends StatelessWidget {
 
               _ActionButton(
                 icon: Icons.image_search_outlined,
-                title: '更新现有词条预览图',
-                subtitle: '选择词条并替换其预览图',
+                title: l10n.tagLibrary_updateExistingThumbnail,
+                subtitle: l10n.tagLibrary_updateExistingThumbnailSubtitle,
                 onTap: () => Navigator.of(context)
                     .pop(TagLibraryDropAction.updateThumbnail),
               ),

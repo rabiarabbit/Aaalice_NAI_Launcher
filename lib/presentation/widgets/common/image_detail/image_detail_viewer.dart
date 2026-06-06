@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nai_launcher/core/utils/localization_extension.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../../../core/shortcuts/shortcuts.dart';
@@ -402,11 +403,11 @@ class _ImageDetailViewerState extends ConsumerState<ImageDetailViewer> {
     if (prompt != null && prompt.isNotEmpty) {
       Clipboard.setData(ClipboardData(text: prompt));
       if (context.mounted) {
-        AppToast.success(context, '已复制 Prompt');
+        AppToast.success(context, context.l10n.toast_imagePromptCopied);
       }
     } else {
       if (context.mounted) {
-        AppToast.warning(context, '此图片没有 Prompt');
+        AppToast.warning(context, context.l10n.toast_imageHasNoPrompt);
       }
     }
   }
@@ -423,7 +424,7 @@ class _ImageDetailViewerState extends ConsumerState<ImageDetailViewer> {
     // 查看器本身不直接处理删除，通过回调通知父组件
     // 这里显示一个提示，实际删除由调用方处理
     if (context.mounted) {
-      AppToast.info(context, '请使用界面删除按钮');
+      AppToast.info(context, context.l10n.toast_useDeleteButton);
     }
   }
 
@@ -661,6 +662,7 @@ class _ImageDetailViewerState extends ConsumerState<ImageDetailViewer> {
 
   /// 复制图像到剪贴板
   Future<void> _copyImageToClipboard(BuildContext context) async {
+    final l10n = context.l10n;
     File? tempFile;
     try {
       final imageBytes = await _currentImage.getImageBytes();
@@ -681,7 +683,7 @@ class _ImageDetailViewerState extends ConsumerState<ImageDetailViewer> {
       await tempFile.writeAsBytes(shareImage.bytes, flush: true);
 
       if (!await tempFile.exists()) {
-        throw Exception('临时文件创建失败');
+        throw Exception(l10n.toast_tempFileCreateFailed);
       }
 
       final result = await Process.run('powershell', [
@@ -696,7 +698,10 @@ class _ImageDetailViewerState extends ConsumerState<ImageDetailViewer> {
       if (result.exitCode != 0) {
         final errorOutput = result.stderr.toString();
         throw Exception(
-          'PowerShell 命令失败 (exitCode: ${result.exitCode}): $errorOutput',
+          l10n.toast_powershellCommandFailed(
+            result.exitCode,
+            errorOutput,
+          ),
         );
       }
 
@@ -704,11 +709,11 @@ class _ImageDetailViewerState extends ConsumerState<ImageDetailViewer> {
       await Future.delayed(const Duration(milliseconds: 500));
 
       if (context.mounted) {
-        AppToast.success(context, '已复制到剪贴板');
+        AppToast.success(context, l10n.image_copiedToClipboard);
       }
     } catch (e) {
       if (context.mounted) {
-        AppToast.error(context, '复制失败: $e');
+        AppToast.error(context, l10n.image_copyFailed(e.toString()));
       }
     } finally {
       // 清理临时文件
@@ -726,7 +731,7 @@ class _ImageDetailViewerState extends ConsumerState<ImageDetailViewer> {
   Future<void> _handleReuseMetadata(BuildContext context) async {
     final metadata = _currentImage.metadata;
     if (metadata == null || !metadata.hasData) {
-      AppToast.warning(context, '此图片没有元数据');
+      AppToast.warning(context, context.l10n.toast_imageHasNoMetadata);
       return;
     }
 

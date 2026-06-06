@@ -84,7 +84,11 @@ class DanbooruStrategy extends AutocompleteStrategy<TagSuggestion> {
   bool get isLoading => _ref.read(danbooruSuggestionNotifierProvider).isLoading;
 
   @override
-  Future<void> search(String text, int cursorPosition, {bool immediate = false}) async {
+  Future<void> search(
+    String text,
+    int cursorPosition, {
+    bool immediate = false,
+  }) async {
     // 获取当前正在输入的词
     final query = _config.replaceAll ? text.trim() : _getLastTag(text);
 

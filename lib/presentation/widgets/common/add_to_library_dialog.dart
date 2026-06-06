@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nai_launcher/core/utils/localization_extension.dart';
 
-import '../../../../core/utils/localization_extension.dart';
 import '../../../../core/utils/app_logger.dart';
 import '../../../../data/models/prompt/tag_category.dart';
 import '../../../../data/models/prompt/weighted_tag.dart';
@@ -118,7 +118,7 @@ class _AddToLibraryDialogState extends ConsumerState<AddToLibraryDialog> {
     final content = _contentController.text.trim();
 
     if (content.isEmpty) {
-      AppToast.warning(context, '内容不能为空');
+      AppToast.warning(context, context.l10n.toast_contentCannotBeEmpty);
       return;
     }
 
@@ -130,7 +130,7 @@ class _AddToLibraryDialogState extends ConsumerState<AddToLibraryDialog> {
       final currentLibrary = ref.read(tagLibraryNotifierProvider).library;
 
       if (currentLibrary == null) {
-        throw Exception('词库未加载');
+        throw Exception(context.l10n.toast_libraryNotLoaded);
       }
 
       // 解析内容（支持逗号分隔的多个标签）
@@ -141,7 +141,7 @@ class _AddToLibraryDialogState extends ConsumerState<AddToLibraryDialog> {
           .toList();
 
       if (tagNames.isEmpty) {
-        throw Exception('没有有效的标签内容');
+        throw Exception(context.l10n.toast_noValidTagContent);
       }
 
       // 确定目标分类
@@ -182,7 +182,9 @@ class _AddToLibraryDialogState extends ConsumerState<AddToLibraryDialog> {
         if (mounted) {
           AppToast.warning(
             context,
-            duplicateCount > 0 ? '所有标签已存在于词库中' : '没有可添加的标签',
+            duplicateCount > 0
+                ? context.l10n.toast_allTagsAlreadyExist
+                : context.l10n.toast_noAddableTags,
           );
         }
         setState(() => _isSaving = false);
@@ -207,17 +209,20 @@ class _AddToLibraryDialogState extends ConsumerState<AddToLibraryDialog> {
         if (duplicateCount > 0) {
           AppToast.success(
             context,
-            '已添加 $addedCount 个标签，跳过 $duplicateCount 个重复标签',
+            context.l10n.toast_addedTagsSkippedDuplicates(
+              addedCount,
+              duplicateCount,
+            ),
           );
         } else {
-          AppToast.success(context, '已添加到词库');
+          AppToast.success(context, context.l10n.toast_addedToLibrary);
         }
         Navigator.of(context).pop(true);
       }
     } catch (e, stackTrace) {
       AppLogger.e('Failed to add to library', e, stackTrace);
       if (mounted) {
-        AppToast.error(context, '添加失败: $e');
+        AppToast.error(context, context.l10n.toast_addFailed(e.toString()));
       }
     } finally {
       if (mounted) {

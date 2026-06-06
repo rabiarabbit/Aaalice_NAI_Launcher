@@ -790,11 +790,19 @@ class _HistoryPanelState extends ConsumerState<HistoryPanel> {
       });
 
       if (context.mounted) {
-        AppToast.success(context, isFavorite ? '已收藏' : '已取消收藏');
+        AppToast.success(
+          context,
+          isFavorite
+              ? context.l10n.toast_favorited
+              : context.l10n.toast_unfavorited,
+        );
       }
     } catch (e) {
       if (context.mounted) {
-        AppToast.error(context, '收藏状态更新失败: $e');
+        AppToast.error(
+          context,
+          context.l10n.toast_favoriteUpdateFailed(e.toString()),
+        );
       }
     } finally {
       _favoriteToggleLoadingIds.remove(image.id);
@@ -944,7 +952,10 @@ class _HistoryPanelState extends ConsumerState<HistoryPanel> {
         outputPath.endsWith('.zip') ? outputPath : '$outputPath.zip';
 
     // 显示打包进度
-    AppToast.info(context, '正在打包 ${_selectedIds.length} 张图片...');
+    AppToast.info(
+      context,
+      context.l10n.toast_packingImages(_selectedIds.length),
+    );
 
     try {
       // 先将选中的图片保存到临时目录
@@ -974,17 +985,23 @@ class _HistoryPanelState extends ConsumerState<HistoryPanel> {
 
       if (context.mounted) {
         if (success) {
-          AppToast.success(context, '已打包 ${selectedImages.length} 张图片');
+          AppToast.success(
+            context,
+            context.l10n.toast_packedImages(selectedImages.length),
+          );
           setState(() {
             _selectedIds.clear();
           });
         } else {
-          AppToast.error(context, '打包失败');
+          AppToast.error(context, context.l10n.toast_packFailed);
         }
       }
     } catch (e) {
       if (context.mounted) {
-        AppToast.error(context, '打包失败: $e');
+        AppToast.error(
+          context,
+          context.l10n.toast_packFailedWithError(e.toString()),
+        );
       }
     }
   }

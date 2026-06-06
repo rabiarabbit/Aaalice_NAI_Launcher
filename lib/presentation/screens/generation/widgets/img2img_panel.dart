@@ -20,6 +20,7 @@ import '../../../providers/image_generation_provider.dart';
 import '../../../providers/image_save_settings_provider.dart';
 import '../../../providers/generation/image_workflow_controller.dart';
 import '../../../services/image_workflow_launcher.dart';
+import '../../../utils/comfyui_workflow_l10n.dart';
 import '../../../widgets/common/app_toast.dart';
 import '../../../widgets/common/collapsible_image_panel.dart';
 import '../../../widgets/common/decoded_memory_image.dart';
@@ -436,15 +437,15 @@ class _Img2ImgPanelState extends ConsumerState<Img2ImgPanel> {
           ListTile(
             contentPadding: EdgeInsets.zero,
             title: Text(
-              'Focused Inpainting（聚焦重绘）',
+              context.l10n.img2img_focusedInpaint,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: Colors.white,
               ),
             ),
             subtitle: Text(
               workflow.focusedInpaintEnabled
-                  ? '已启用。请在重绘编辑器左上角按钮里调整聚焦区域与 Minimum Context Area。'
-                  : '默认是普通重绘；如需聚焦重绘，请在重绘编辑器左上角按钮中开启并框选区域。',
+                  ? context.l10n.img2img_focusedInpaintEnabledHint
+                  : context.l10n.img2img_focusedInpaintDisabledHint,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: Colors.white70,
                 height: 1.4,
@@ -464,7 +465,9 @@ class _Img2ImgPanelState extends ConsumerState<Img2ImgPanel> {
                 ),
               ),
               child: Text(
-                workflow.focusedInpaintEnabled ? '已启用' : '未启用',
+                workflow.focusedInpaintEnabled
+                    ? context.l10n.img2img_enabled
+                    : context.l10n.img2img_disabled,
                 style: theme.textTheme.labelMedium?.copyWith(
                   color: workflow.focusedInpaintEnabled
                       ? Colors.cyanAccent
@@ -746,7 +749,7 @@ class _Img2ImgPanelState extends ConsumerState<Img2ImgPanel> {
           const SizedBox(height: 12),
           if (isNai) ...[
             Text(
-              'NovelAI 云端超分 (固定 4× 放大)',
+              context.l10n.img2img_novelAiCloudUpscale,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: Colors.white70,
               ),
@@ -754,31 +757,31 @@ class _Img2ImgPanelState extends ConsumerState<Img2ImgPanel> {
           ] else ...[
             if (!comfyEnabled)
               Text(
-                '请先在「设置 → ComfyUI」中启用并连接服务器。',
+                context.l10n.img2img_comfyuiEnableHint,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: Colors.orangeAccent,
                 ),
               )
             else ...[
               Text(
-                '放大方式',
+                context.l10n.img2img_upscaleMode,
                 style:
                     theme.textTheme.bodyMedium?.copyWith(color: Colors.white),
               ),
               const SizedBox(height: 6),
               SegmentedButton<ComfyUpscaleModule>(
-                segments: const [
+                segments: [
                   ButtonSegment(
                     value: ComfyUpscaleModule.regular,
-                    label: Text('普通模型'),
-                    icon: Icon(Icons.auto_fix_high_outlined, size: 16),
+                    label: Text(context.l10n.img2img_upscaleRegularModel),
+                    icon: const Icon(Icons.auto_fix_high_outlined, size: 16),
                   ),
-                  ButtonSegment(
+                  const ButtonSegment(
                     value: ComfyUpscaleModule.seedvr2,
                     label: Text('SeedVR2'),
                     icon: Icon(Icons.video_settings_outlined, size: 16),
                   ),
-                  ButtonSegment(
+                  const ButtonSegment(
                     value: ComfyUpscaleModule.rtx,
                     label: Text('RTX'),
                     icon: Icon(Icons.memory_outlined, size: 16),
@@ -801,7 +804,7 @@ class _Img2ImgPanelState extends ConsumerState<Img2ImgPanel> {
               const SizedBox(height: 12),
               if (!isComfyRtx) ...[
                 Text(
-                  '超分模型',
+                  context.l10n.img2img_upscaleModel,
                   style:
                       theme.textTheme.bodyMedium?.copyWith(color: Colors.white),
                 ),
@@ -825,7 +828,7 @@ class _Img2ImgPanelState extends ConsumerState<Img2ImgPanel> {
                         (m) => DropdownMenuItem(
                           value: m,
                           child: Text(
-                            _friendlyModelName(m),
+                            _friendlyModelName(context, m),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -843,8 +846,8 @@ class _Img2ImgPanelState extends ConsumerState<Img2ImgPanel> {
                   const SizedBox(height: 6),
                   Text(
                     isComfySeedvr2
-                        ? '未发现 SeedVR2 模型，请刷新模型列表或检查 SeedVR2 节点/模型文件。'
-                        : '未发现普通超分模型，请刷新模型列表或检查 models/upscale_models。',
+                        ? context.l10n.img2img_noSeedvr2Models
+                        : context.l10n.img2img_noRegularUpscaleModels,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: Colors.orangeAccent,
                     ),
@@ -855,12 +858,13 @@ class _Img2ImgPanelState extends ConsumerState<Img2ImgPanel> {
               Text(
                 switch (comfyModule) {
                   ComfyUpscaleModule.seedvr2 when upscale.seedvr2Tiled =>
-                    '将使用 SeedVR2TilingUpscaler 分块超分流程。',
-                  ComfyUpscaleModule.seedvr2 => '将使用 SeedVR2VideoUpscaler 流程。',
+                    context.l10n.img2img_useSeedvr2TiledWorkflow,
+                  ComfyUpscaleModule.seedvr2 =>
+                    context.l10n.img2img_useSeedvr2Workflow,
                   ComfyUpscaleModule.regular =>
-                    '将使用 UpscaleModelLoader + ImageUpscaleWithModel 流程，并用 Lanczos 修正到目标倍率。',
+                    context.l10n.img2img_useRegularUpscaleWorkflow,
                   ComfyUpscaleModule.rtx =>
-                    '将使用 RTX Video Super Resolution 流程，无需选择模型。',
+                    context.l10n.img2img_useRtxUpscaleWorkflow,
                 },
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: Colors.white70,
@@ -874,7 +878,7 @@ class _Img2ImgPanelState extends ConsumerState<Img2ImgPanel> {
                         ref.read(comfyUISeedvr2ModelsProvider.notifier).fetch(),
                     icon: const Icon(Icons.refresh, size: 14),
                     label: Text(
-                      '刷新模型列表',
+                      context.l10n.img2img_refreshModelList,
                       style: theme.textTheme.labelSmall,
                     ),
                     style: TextButton.styleFrom(
@@ -923,7 +927,7 @@ class _Img2ImgPanelState extends ConsumerState<Img2ImgPanel> {
           FilledButton.icon(
             onPressed: canStart ? _runUpscale : null,
             icon: const Icon(Icons.play_arrow, size: 20),
-            label: const Text('开始超分'),
+            label: Text(context.l10n.img2img_startUpscale),
           ),
         ],
       ),
@@ -946,7 +950,7 @@ class _Img2ImgPanelState extends ConsumerState<Img2ImgPanel> {
           children: [
             Expanded(
               child: Text(
-                '放大倍数',
+                context.l10n.upscale_scale,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: Colors.white,
                 ),
@@ -1002,7 +1006,7 @@ class _Img2ImgPanelState extends ConsumerState<Img2ImgPanel> {
         children: [
           _buildUpscaleMetricBar(
             theme,
-            label: '速度',
+            label: context.l10n.img2img_metricSpeed,
             level: profile.speed,
             higherIsBetter: true,
             animationKey: '${profile.module.name}_speed',
@@ -1010,7 +1014,7 @@ class _Img2ImgPanelState extends ConsumerState<Img2ImgPanel> {
           const SizedBox(height: 6),
           _buildUpscaleMetricBar(
             theme,
-            label: '显存',
+            label: context.l10n.img2img_metricVram,
             level: profile.vram,
             higherIsBetter: false,
             animationKey: '${profile.module.name}_vram',
@@ -1018,7 +1022,7 @@ class _Img2ImgPanelState extends ConsumerState<Img2ImgPanel> {
           const SizedBox(height: 6),
           _buildUpscaleMetricBar(
             theme,
-            label: '效果',
+            label: context.l10n.img2img_metricQuality,
             level: profile.quality,
             higherIsBetter: true,
             animationKey: '${profile.module.name}_quality',
@@ -1149,16 +1153,16 @@ class _Img2ImgPanelState extends ConsumerState<Img2ImgPanel> {
           max: UpscaleWorkflowSettings.maxSeedvr2VaeTileSize,
           step: 64,
           onChanged: controller.updateSeedvr2VaeTileSize,
-          hint: '同时写入 SeedVR2 VAE MODEL 的 encode/decode tile size。',
+          hint: context.l10n.img2img_seedvr2VaeTileHint,
         ),
         SwitchListTile.adaptive(
           contentPadding: EdgeInsets.zero,
           title: Text(
-            '使用分块放大',
+            context.l10n.img2img_seedvr2UseTiledUpscale,
             style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white),
           ),
           subtitle: Text(
-            '启用后改用 SeedVR2TilingUpscaler，适合大图或显存压力较高的场景。',
+            context.l10n.img2img_seedvr2UseTiledUpscaleHint,
             style: theme.textTheme.bodySmall?.copyWith(
               color: Colors.white70,
               height: 1.35,
@@ -1170,13 +1174,13 @@ class _Img2ImgPanelState extends ConsumerState<Img2ImgPanel> {
         if (upscale.seedvr2Tiled)
           _buildIntegerSliderSection(
             theme,
-            label: '分块图块大小',
+            label: context.l10n.img2img_seedvr2TileSize,
             value: upscale.seedvr2TileSize,
             min: UpscaleWorkflowSettings.minSeedvr2TileSize,
             max: UpscaleWorkflowSettings.maxSeedvr2TileSize,
             step: 64,
             onChanged: controller.updateSeedvr2TileSize,
-            hint: '同时控制 SeedVR2TilingUpscaler 的 tile_width / tile_height。',
+            hint: context.l10n.img2img_seedvr2TileSizeHint,
           ),
       ],
     );
@@ -1244,7 +1248,7 @@ class _Img2ImgPanelState extends ConsumerState<Img2ImgPanel> {
     );
   }
 
-  static String _friendlyModelName(String filename) {
+  static String _friendlyModelName(BuildContext context, String filename) {
     final base = filename
         .replaceAll('.safetensors', '')
         .replaceAll('.ckpt', '')
@@ -1252,7 +1256,7 @@ class _Img2ImgPanelState extends ConsumerState<Img2ImgPanel> {
         .replaceAll('.pt', '');
     return isComfySeedvr2UpscaleModel(filename)
         ? 'SeedVR2 · $base'
-        : '普通模型 · $base';
+        : context.l10n.img2img_regularModelDescription(base);
   }
 
   static String _sourceLogSummary(ImageParams params, Uint8List src) {
@@ -1354,7 +1358,9 @@ class _Img2ImgPanelState extends ConsumerState<Img2ImgPanel> {
             addToDisplay: true,
           );
       AppLogger.i('NovelAI upscale result registered', _upscaleLogTag);
-      if (mounted) AppToast.success(context, 'NovelAI 超分完成');
+      if (mounted) {
+        AppToast.success(context, context.l10n.img2img_novelAiUpscaleComplete);
+      }
     } catch (e) {
       AppLogger.w('NovelAI upscale failed: $e', _upscaleLogTag);
       if (mounted) AppToast.error(context, e.toString());
@@ -1388,14 +1394,18 @@ class _Img2ImgPanelState extends ConsumerState<Img2ImgPanel> {
     );
     if (model == null) {
       AppLogger.w('SeedVR2 model is missing', _upscaleLogTag);
-      if (mounted) AppToast.error(context, '未选择可用的 SeedVR2 模型');
+      if (mounted) {
+        AppToast.error(context, context.l10n.img2img_noAvailableSeedvr2Model);
+      }
       return;
     }
     AppLogger.d('SeedVR2 source decode start', _upscaleLogTag);
     final decodedSource = img.decodeImage(src);
     if (decodedSource == null) {
       AppLogger.w('SeedVR2 source decode failed', _upscaleLogTag);
-      if (mounted) AppToast.error(context, '无法解码源图像');
+      if (mounted) {
+        AppToast.error(context, context.l10n.img2img_decodeSourceFailed);
+      }
       return;
     }
     AppLogger.d(
@@ -1487,7 +1497,10 @@ class _Img2ImgPanelState extends ConsumerState<Img2ImgPanel> {
     AppLogger.i('SeedVR2 result registered: ${outW}x$outH', _upscaleLogTag);
 
     if (mounted) {
-      AppToast.success(context, '超分完成 ($outW×$outH)，已加入预览列表');
+      AppToast.success(
+        context,
+        context.l10n.img2img_upscaleCompleteAdded(outW, outH),
+      );
     }
   }
 
@@ -1515,14 +1528,21 @@ class _Img2ImgPanelState extends ConsumerState<Img2ImgPanel> {
     );
     if (model == null) {
       AppLogger.w('Regular ComfyUI model is missing', _upscaleLogTag);
-      if (mounted) AppToast.error(context, '未选择可用的普通超分模型');
+      if (mounted) {
+        AppToast.error(
+          context,
+          context.l10n.img2img_noAvailableRegularUpscaleModel,
+        );
+      }
       return;
     }
     AppLogger.d('Regular ComfyUI source decode start', _upscaleLogTag);
     final decodedSource = img.decodeImage(src);
     if (decodedSource == null) {
       AppLogger.w('Regular ComfyUI source decode failed', _upscaleLogTag);
-      if (mounted) AppToast.error(context, '无法解码源图像');
+      if (mounted) {
+        AppToast.error(context, context.l10n.img2img_decodeSourceFailed);
+      }
       return;
     }
     AppLogger.d(
@@ -1592,7 +1612,10 @@ class _Img2ImgPanelState extends ConsumerState<Img2ImgPanel> {
     );
 
     if (mounted) {
-      AppToast.success(context, '普通模型超分完成 ($outW×$outH)，已加入预览列表');
+      AppToast.success(
+        context,
+        context.l10n.img2img_regularUpscaleCompleteAdded(outW, outH),
+      );
     }
   }
 
@@ -1611,7 +1634,9 @@ class _Img2ImgPanelState extends ConsumerState<Img2ImgPanel> {
     final decodedSource = img.decodeImage(src);
     if (decodedSource == null) {
       AppLogger.w('RTX source decode failed', _upscaleLogTag);
-      if (mounted) AppToast.error(context, '无法解码源图像');
+      if (mounted) {
+        AppToast.error(context, context.l10n.img2img_decodeSourceFailed);
+      }
       return;
     }
     AppLogger.d(
@@ -1673,7 +1698,10 @@ class _Img2ImgPanelState extends ConsumerState<Img2ImgPanel> {
     AppLogger.i('RTX result registered: ${outW}x$outH', _upscaleLogTag);
 
     if (mounted) {
-      AppToast.success(context, 'RTX 超分完成 ($outW×$outH)，已加入预览列表');
+      AppToast.success(
+        context,
+        context.l10n.img2img_rtxUpscaleCompleteAdded(outW, outH),
+      );
     }
   }
 
@@ -1756,7 +1784,7 @@ class _Img2ImgPanelState extends ConsumerState<Img2ImgPanel> {
       };
       return _OperationChip(
         icon: icon,
-        label: template.name,
+        label: template.localizedName(context),
         onPressed: () => ComfyUIWorkflowDialog.show(
           context,
           template: template,

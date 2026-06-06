@@ -50,7 +50,7 @@ class DragTargetWrapper extends ConsumerWidget {
         final currentCount =
             ref.read(generationParamsNotifierProvider).vibeReferencesV4.length;
         if (currentCount >= 16) {
-          AppToast.warning(context, '已达到最大数量 (16张)');
+          AppToast.warning(context, context.l10n.vibe_maxReached);
           return false;
         }
         panelNotifier.setDraggingOver(true);
@@ -262,17 +262,18 @@ class DragTargetWrapper extends ConsumerWidget {
                     final continueAnyway = await showDialog<bool>(
                       context: context,
                       builder: (context) => AlertDialog(
-                        title: const Text('编码失败'),
-                        content:
-                            const Text('图片编码失败，是否继续添加未编码的图片？\n\n生成时会再次尝试编码。'),
+                        title: Text(context.l10n.vibe_import_encodingFailed),
+                        content: Text(
+                          context.l10n.vibe_import_encodingFailedMessage,
+                        ),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.of(context).pop(false),
-                            child: const Text('取消'),
+                            child: Text(context.l10n.common_cancel),
                           ),
                           ElevatedButton(
                             onPressed: () => Navigator.of(context).pop(true),
-                            child: const Text('继续'),
+                            child: Text(context.l10n.common_continue),
                           ),
                         ],
                       ),
@@ -327,7 +328,8 @@ class DragTargetWrapper extends ConsumerWidget {
 
     return StatefulBuilder(
       builder: (context, setState) {
-        final confirmButtonText = encodeChecked ? '确认编码' : '仅添加图片';
+        final confirmButtonText =
+            encodeChecked ? l10n.vibeConfirmEncode : l10n.vibe_addImageOnly;
 
         return AlertDialog(
           title: Text(l10n.vibeNoEncodingWarning),
@@ -377,7 +379,7 @@ class DragTargetWrapper extends ConsumerWidget {
                     const SizedBox(width: 4),
                     Expanded(
                       child: Text(
-                        '立即编码（消耗 2 Anlas）',
+                        l10n.vibe_import_encodeNow,
                         style: theme.textTheme.bodyMedium,
                       ),
                     ),
@@ -410,7 +412,7 @@ class DragTargetWrapper extends ConsumerWidget {
                     const SizedBox(width: 4),
                     Expanded(
                       child: Text(
-                        '编码后自动保存到 Vibe 库',
+                        l10n.vibe_import_autoSave,
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: encodeChecked
                               ? null
@@ -454,11 +456,14 @@ class DragTargetWrapper extends ConsumerWidget {
     if (context.mounted) {
       String message;
       if (result.savedCount > 0 && result.reusedCount > 0) {
-        message = '新增 ${result.savedCount} 个，复用 ${result.reusedCount} 个';
+        message = context.l10n.vibe_saveToLibrary_mixed(
+          result.savedCount,
+          result.reusedCount,
+        );
       } else if (result.savedCount > 0) {
-        message = '已保存 ${result.savedCount} 个编码后的 Vibe 到库中';
+        message = context.l10n.vibe_saveToLibrary_saved(result.savedCount);
       } else {
-        message = '库中已存在 ${result.reusedCount} 个，已更新使用记录';
+        message = context.l10n.vibe_saveToLibrary_reused(result.reusedCount);
       }
       AppToast.success(context, message);
     }
@@ -490,7 +495,7 @@ class DragTargetWrapper extends ConsumerWidget {
         context: context,
         initialSelectedIds: const {},
         showReplaceOption: true,
-        title: '从库导入 Vibe',
+        title: context.l10n.vibe_import_title,
       );
 
       if (result == null || result.selectedEntries.isEmpty) return;
@@ -534,12 +539,15 @@ class DragTargetWrapper extends ConsumerWidget {
       await panelNotifier.loadRecentEntries();
 
       if (context.mounted) {
-        AppToast.success(context, '已导入 $totalAdded 个 Vibe');
+        AppToast.success(context, context.l10n.vibe_import_result(totalAdded));
       }
     } catch (e, stackTrace) {
       AppLogger.e('Failed to import from library', e, stackTrace);
       if (context.mounted) {
-        AppToast.error(context, '导入失败: $e');
+        AppToast.error(
+          context,
+          context.l10n.vibe_import_failedWithError(e.toString()),
+        );
       }
     } finally {
       span.finish(
@@ -573,9 +581,12 @@ class DragTargetWrapper extends ConsumerWidget {
 
       if (context.mounted) {
         if (success) {
-          AppToast.success(context, '已添加 Vibe: ${entry.displayName}');
+          AppToast.success(
+            context,
+            context.l10n.vibe_addedNamed(entry.displayName),
+          );
         } else {
-          AppToast.warning(context, '已达到最大数量 (16张)，请先移除一些 Vibe');
+          AppToast.warning(context, context.l10n.vibe_maxReachedRemoveSome);
         }
       }
     } finally {

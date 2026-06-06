@@ -8,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../core/utils/app_logger.dart';
+import '../../../core/utils/localization_extension.dart';
 import '../../../data/services/image_metadata_service.dart';
 import '../../../data/models/gallery/nai_image_metadata.dart';
 import '../../providers/tag_library_page_provider.dart';
@@ -32,6 +33,7 @@ class TagLibraryDropHandler {
     required String fileName,
     required Uint8List bytes,
   }) async {
+    final l10n = context.l10n;
     try {
       // 解析图片元数据（此步骤不涉及 context）
       final metadata = await ImageMetadataService().getMetadataFromBytes(bytes);
@@ -72,8 +74,9 @@ class TagLibraryDropHandler {
       }
     } catch (e, stack) {
       AppLogger.e('处理词库拖拽失败', e, stack, 'TagLibraryDropHandler');
-      // ignore: use_build_context_synchronously
-      await _showError(context, '处理图片失败: $e');
+      if (context.mounted) {
+        AppToast.error(context, l10n.toast_processImageFailed(e.toString()));
+      }
     }
   }
 
@@ -148,7 +151,7 @@ class TagLibraryDropHandler {
     final thumbnailPath = await _saveThumbnailToAppDir(bytes);
     if (thumbnailPath == null) {
       // ignore: use_build_context_synchronously
-      await _showError(context, '保存预览图失败');
+      await _showError(context, context.l10n.toast_savePreviewFailed);
       return;
     }
 
@@ -161,10 +164,12 @@ class TagLibraryDropHandler {
       updatedAt: DateTime.now(),
     );
 
-    await ref.read(tagLibraryPageNotifierProvider.notifier).updateEntry(updatedEntry);
+    await ref
+        .read(tagLibraryPageNotifierProvider.notifier)
+        .updateEntry(updatedEntry);
 
     if (context.mounted) {
-      AppToast.success(context, '预览图已更新');
+      AppToast.success(context, context.l10n.toast_previewUpdated);
     }
   }
 

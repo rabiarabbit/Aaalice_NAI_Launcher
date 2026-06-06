@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/utils/localization_extension.dart';
 import '../widgets/settings_card.dart';
 import '../widgets/shortcut_settings_panel.dart';
 
@@ -20,12 +21,12 @@ class _ShortcutSettingsSectionState
   @override
   Widget build(BuildContext context) {
     return SettingsCard(
-      title: '快捷键',
+      title: context.l10n.shortcut_settings_title,
       icon: Icons.keyboard,
       child: ListTile(
         leading: const Icon(Icons.keyboard_outlined),
-        title: const Text('快捷键'),
-        subtitle: const Text('自定义键盘快捷键'),
+        title: Text(context.l10n.shortcut_settings_title),
+        subtitle: Text(context.l10n.settings_shortcutsSubtitle),
         trailing: const Icon(Icons.chevron_right),
         onTap: () => ShortcutSettingsPanel.show(context),
       ),

@@ -160,13 +160,15 @@ class _MetadataImportDialogState extends State<MetadataImportDialog> {
 
   /// 构建快速预设按钮区域
   Widget _buildQuickPresets() {
+    final l10n = context.l10n;
+
     return Wrap(
       spacing: 8,
       runSpacing: 8,
       children: [
         ActionChip(
           avatar: const Icon(Icons.select_all, size: 18),
-          label: const Text('全部'),
+          label: Text(l10n.metadataImport_selectAll),
           onPressed: () => setState(() {
             _options = MetadataImportOptions.all();
             _initializeSelections();
@@ -174,7 +176,7 @@ class _MetadataImportDialogState extends State<MetadataImportDialog> {
         ),
         ActionChip(
           avatar: const Icon(Icons.text_fields, size: 18),
-          label: const Text('仅提示词'),
+          label: Text(l10n.metadataImport_promptsOnly),
           onPressed: () => setState(() {
             _options = MetadataImportOptions.promptsOnly();
             _initializeSelections();
@@ -182,7 +184,7 @@ class _MetadataImportDialogState extends State<MetadataImportDialog> {
         ),
         ActionChip(
           avatar: const Icon(Icons.tune, size: 18),
-          label: const Text('仅参数'),
+          label: Text(l10n.metadataImport_generationOnly),
           onPressed: () => setState(() {
             _options = MetadataImportOptions.generationOnly();
             _initializeSelections();
@@ -190,7 +192,7 @@ class _MetadataImportDialogState extends State<MetadataImportDialog> {
         ),
         ActionChip(
           avatar: const Icon(Icons.deselect, size: 18),
-          label: const Text('清空'),
+          label: Text(l10n.metadataImport_clear),
           onPressed: () =>
               setState(() => _options = MetadataImportOptions.none()),
         ),
@@ -200,16 +202,20 @@ class _MetadataImportDialogState extends State<MetadataImportDialog> {
 
   /// 构建提示词分组
   Widget _buildPromptSection() {
+    final l10n = context.l10n;
     final metadata = widget.metadata;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('提示词', Icons.text_fields),
+        _buildSectionTitle(
+          l10n.metadataImport_promptsSection,
+          Icons.text_fields,
+        ),
         const SizedBox(height: 8),
         // 主提示词
         _buildCheckboxTile(
-          title: '主提示词',
+          title: l10n.metadataImport_mainPrompt,
           subtitle: _truncateText(metadata.mainPrompt, 50),
           value: _options.importPrompt,
           hasData: metadata.prompt.isNotEmpty,
@@ -219,7 +225,7 @@ class _MetadataImportDialogState extends State<MetadataImportDialog> {
         // 固定词（带子选项）
         if (metadata.hasSeparatedFields) ...[
           _buildParentCheckboxTile(
-            title: '固定词',
+            title: l10n.metadataImport_fixedTags,
             value: _options.importFixedTags,
             hasData: metadata.fixedPrefixTags.isNotEmpty ||
                 metadata.fixedSuffixTags.isNotEmpty ||
@@ -231,8 +237,9 @@ class _MetadataImportDialogState extends State<MetadataImportDialog> {
             children: [
               if (metadata.fixedPrefixTags.isNotEmpty)
                 _buildChildCheckboxTile(
-                  title:
-                      '前缀: ${_truncateText(metadata.fixedPrefixTags.join(', '), 40)}',
+                  title: l10n.metadataImport_fixedPrefix(
+                    _truncateText(metadata.fixedPrefixTags.join(', '), 40),
+                  ),
                   value: _options.importFixedPrefix,
                   onChanged: _options.importFixedTags
                       ? (v) => setState(
@@ -243,8 +250,9 @@ class _MetadataImportDialogState extends State<MetadataImportDialog> {
                 ),
               if (metadata.fixedSuffixTags.isNotEmpty)
                 _buildChildCheckboxTile(
-                  title:
-                      '后缀: ${_truncateText(metadata.fixedSuffixTags.join(', '), 40)}',
+                  title: l10n.metadataImport_fixedSuffix(
+                    _truncateText(metadata.fixedSuffixTags.join(', '), 40),
+                  ),
                   value: _options.importFixedSuffix,
                   onChanged: _options.importFixedTags
                       ? (v) => setState(
@@ -255,8 +263,12 @@ class _MetadataImportDialogState extends State<MetadataImportDialog> {
                 ),
               if (metadata.fixedNegativePrefixTags.isNotEmpty)
                 _buildChildCheckboxTile(
-                  title:
-                      '负向前缀: ${_truncateText(metadata.fixedNegativePrefixTags.join(', '), 40)}',
+                  title: l10n.metadataImport_negativeFixedPrefix(
+                    _truncateText(
+                      metadata.fixedNegativePrefixTags.join(', '),
+                      40,
+                    ),
+                  ),
                   value: _options.importFixedPrefix,
                   onChanged: _options.importFixedTags
                       ? (v) => setState(
@@ -267,8 +279,12 @@ class _MetadataImportDialogState extends State<MetadataImportDialog> {
                 ),
               if (metadata.fixedNegativeSuffixTags.isNotEmpty)
                 _buildChildCheckboxTile(
-                  title:
-                      '负向后缀: ${_truncateText(metadata.fixedNegativeSuffixTags.join(', '), 40)}',
+                  title: l10n.metadataImport_negativeFixedSuffix(
+                    _truncateText(
+                      metadata.fixedNegativeSuffixTags.join(', '),
+                      40,
+                    ),
+                  ),
                   value: _options.importFixedSuffix,
                   onChanged: _options.importFixedTags
                       ? (v) => setState(
@@ -282,7 +298,9 @@ class _MetadataImportDialogState extends State<MetadataImportDialog> {
           // 质量词（带子选项）
           if (metadata.qualityTags.isNotEmpty)
             _buildParentCheckboxTile(
-              title: '质量词 (${metadata.qualityTags.length}个)',
+              title: l10n.metadataImport_qualityTagsCount(
+                metadata.qualityTags.length,
+              ),
               value: _options.importQualityTags,
               hasData: true,
               onChanged: (v) => setState(
@@ -313,7 +331,9 @@ class _MetadataImportDialogState extends State<MetadataImportDialog> {
           // 角色提示词（带子选项）
           if (metadata.characterInfos.isNotEmpty)
             _buildParentCheckboxTile(
-              title: '角色提示词 (${metadata.characterInfos.length}个)',
+              title: l10n.metadataImport_characterPromptsCount(
+                metadata.characterInfos.length,
+              ),
               value: _options.importCharacterPrompts,
               hasData: true,
               onChanged: (v) => setState(
@@ -323,8 +343,10 @@ class _MetadataImportDialogState extends State<MetadataImportDialog> {
                 final index = entry.key;
                 final character = entry.value;
                 return _buildChildCheckboxTile(
-                  title:
-                      '角色${index + 1}: ${_truncateText(character.prompt, 35)}',
+                  title: l10n.metadataImport_characterIndex(
+                    index + 1,
+                    _truncateText(character.prompt, 35),
+                  ),
                   value: _options.selectedCharacterIndices.contains(index),
                   onChanged: _options.importCharacterPrompts
                       ? (v) => setState(() {
@@ -350,7 +372,9 @@ class _MetadataImportDialogState extends State<MetadataImportDialog> {
           // 旧数据：只显示角色提示词总开关
           if (metadata.characterPrompts.isNotEmpty)
             _buildCheckboxTile(
-              title: '角色提示词 (${metadata.characterPrompts.length}个)',
+              title: l10n.metadataImport_characterPromptsCount(
+                metadata.characterPrompts.length,
+              ),
               value: _options.importCharacterPrompts,
               hasData: true,
               onChanged: (v) => setState(
@@ -360,7 +384,7 @@ class _MetadataImportDialogState extends State<MetadataImportDialog> {
         ],
         // 负向提示词
         _buildCheckboxTile(
-          title: '负向提示词',
+          title: l10n.metadataImport_negativePrompt,
           subtitle: _truncateText(metadata.displayNegativePrompt, 50),
           value: _options.importNegativePrompt,
           hasData: metadata.negativePrompt.isNotEmpty,
@@ -380,17 +404,22 @@ class _MetadataImportDialogState extends State<MetadataImportDialog> {
 
   /// 构建参考图分组
   Widget _buildReferenceSection() {
+    final l10n = context.l10n;
     final metadata = widget.metadata;
     final preciseReferences = metadata.preciseReferences;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('参考图', Icons.auto_awesome),
+        _buildSectionTitle(
+          l10n.metadataImport_referenceSection,
+          Icons.auto_awesome,
+        ),
         const SizedBox(height: 8),
         if (metadata.vibeReferences.isNotEmpty)
           _buildParentCheckboxTile(
-            title: 'Vibe Transfer (${metadata.vibeReferences.length}个)',
+            title:
+                'Vibe Transfer (${l10n.metadataImport_countUnit(metadata.vibeReferences.length)})',
             value: _options.importVibeReferences,
             hasData: true,
             onChanged: (v) => setState(
@@ -400,8 +429,11 @@ class _MetadataImportDialogState extends State<MetadataImportDialog> {
               final index = entry.key;
               final vibe = entry.value;
               return _buildChildCheckboxTile(
-                title:
-                    '${vibe.displayName} (强度 ${(vibe.strength * 100).toStringAsFixed(0)}%, 信息提取 ${(vibe.infoExtracted * 100).toStringAsFixed(0)}%)',
+                title: l10n.metadataImport_vibeDetail(
+                  vibe.displayName,
+                  (vibe.strength * 100).toStringAsFixed(0),
+                  (vibe.infoExtracted * 100).toStringAsFixed(0),
+                ),
                 value: _options.selectedVibeIndices.contains(index),
                 onChanged: _options.importVibeReferences
                     ? (v) => setState(() {
@@ -421,7 +453,9 @@ class _MetadataImportDialogState extends State<MetadataImportDialog> {
           ),
         if (preciseReferences.isNotEmpty)
           _buildParentCheckboxTile(
-            title: '精准参考 (${preciseReferences.length}个)',
+            title: l10n.metadataImport_preciseReferenceCount(
+              preciseReferences.length,
+            ),
             value: _options.importPreciseReferences,
             hasData: true,
             onChanged: (v) => setState(
@@ -431,8 +465,12 @@ class _MetadataImportDialogState extends State<MetadataImportDialog> {
               final index = entry.key;
               final reference = entry.value;
               return _buildChildCheckboxTile(
-                title:
-                    '参考${index + 1}: ${reference.type.toApiString()} (强度 ${(reference.strength * 100).toStringAsFixed(0)}%, 保真 ${(reference.fidelity * 100).toStringAsFixed(0)}%)',
+                title: l10n.metadataImport_preciseReferenceDetail(
+                  index + 1,
+                  reference.type.toApiString(),
+                  (reference.strength * 100).toStringAsFixed(0),
+                  (reference.fidelity * 100).toStringAsFixed(0),
+                ),
                 value: _options.selectedPreciseReferenceIndices.contains(index),
                 onChanged: _options.importPreciseReferences
                     ? (v) => setState(() {
@@ -634,7 +672,7 @@ class _MetadataImportDialogState extends State<MetadataImportDialog> {
             )
           : !hasData
               ? Text(
-                  '无数据',
+                  context.l10n.metadataImport_noData,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.outline,
                   ),

@@ -46,7 +46,7 @@ class PromptAssistantService {
     final config = _ref.read(promptAssistantConfigProvider);
     final provider = config.providers.firstWhere(
       (p) => p.id == providerId,
-      orElse: () => throw StateError('未找到服务商: $providerId'),
+      orElse: () => throw StateError('Provider not found: $providerId'),
     );
     final apiKey = await _ref
         .read(promptAssistantConfigProvider.notifier)
@@ -62,7 +62,8 @@ class PromptAssistantService {
       sessionId: sessionId,
       taskType: AssistantTaskType.llm,
       userContent: input,
-      userInstruction: '请优化这段图像生成提示词，保留原意并增强细节，输出单行结果。',
+      userInstruction:
+          'Optimize this image-generation prompt. Preserve the original intent, enhance details, and output a single-line result.',
     );
   }
 
@@ -72,8 +73,8 @@ class PromptAssistantService {
     String? targetLanguage,
   }) async* {
     final instruction = targetLanguage == null || targetLanguage.isEmpty
-        ? '请自动识别原文语言，在中文和英文之间互译，仅返回译文。'
-        : '请将文本翻译为$targetLanguage，仅返回译文。';
+        ? 'Automatically detect the source language and translate between Chinese and English. Return only the translation.'
+        : 'Translate the text into $targetLanguage. Return only the translation.';
     yield* _runTask(
       sessionId: sessionId,
       taskType: AssistantTaskType.translate,
@@ -88,12 +89,14 @@ class PromptAssistantService {
     String? taggerPrompt,
   }) async* {
     final text = StringBuffer(
-      '请反推这张图片，输出 NovelAI 可直接使用的英文逗号分隔提示词。',
+      'Reverse prompt this image and output English comma-separated prompts that can be used directly in NovelAI.',
     );
     final trimmedTags = taggerPrompt?.trim();
     if (trimmedTags != null && trimmedTags.isNotEmpty) {
       text
-        ..write('\n\n本地 ONNX tagger 初步结果如下，请结合图片判断取舍：\n')
+        ..write(
+          '\n\nLocal ONNX tagger preliminary results are below. Use the image to decide what to keep or discard:\n',
+        )
         ..write(trimmedTags);
     }
 
@@ -107,7 +110,8 @@ class PromptAssistantService {
           mimeType: _detectImageMime(imageBytes),
         ),
       ],
-      userInstruction: '请严格输出单行英文提示词，不要 Markdown，不要解释。优先保留可见元素，避免编造不可见角色信息。',
+      userInstruction:
+          'Strictly output one single-line English prompt. Do not use Markdown or explanations. Prioritize visible elements and avoid inventing unseen character information.',
     );
   }
 
@@ -118,10 +122,10 @@ class PromptAssistantService {
     List<PromptAssistantImageInput> images = const [],
   }) async* {
     final text = [
-      '当前提示词：',
+      'Current prompt:',
       currentPrompt.trim(),
       '',
-      '用户需求：',
+      'User request:',
       userRequest.trim(),
     ].join('\n');
 
@@ -136,7 +140,8 @@ class PromptAssistantService {
             mimeType: image.mimeType,
           ),
       ],
-      userInstruction: '请根据用户需求修改当前图像生成提示词，只输出最终可直接使用的单行提示词。',
+      userInstruction:
+          'Modify the current image-generation prompt according to the user request. Output only the final single-line prompt that can be used directly.',
     );
   }
 
@@ -167,7 +172,7 @@ class PromptAssistantService {
   }
 
   static const String characterReplacementInstruction =
-      '仅输出替换后的完整单行英文逗号分隔提示词，不要输出分析、解释、删除/保留清单或 Markdown。';
+      'Output only the complete replaced single-line English comma-separated prompt. Do not output analysis, explanations, remove/keep lists, or Markdown.';
 
   static String buildCharacterReplacementUserContent({
     required String sourcePrompt,
@@ -175,13 +180,13 @@ class PromptAssistantService {
     required String characterPrompt,
   }) {
     return [
-      '待替换提示词（以这一段为主，保留非角色内容）：',
+      'Source prompt to replace (use this as the main input and preserve non-character content):',
       sourcePrompt.trim(),
       '',
-      '目标角色名称：',
+      'Target character name:',
       characterName.trim(),
       '',
-      '目标角色提示词（只作为替换角色块）：',
+      'Target character prompt (use only as the replacement character block):',
       characterPrompt.trim(),
     ].join('\n');
   }
@@ -208,7 +213,7 @@ class PromptAssistantService {
     final enabledProviders = config.providers.where((p) => p.enabled).toList();
     if (enabledProviders.isEmpty) {
       throw StateError(
-        '没有可用的提示词助手服务商，请先在设置中添加并启用 OpenAI、Anthropic、Gemini、DeepSeek、LM Studio 或其他兼容服务商。',
+        'No prompt assistant provider is available. Add and enable OpenAI, Anthropic, Gemini, DeepSeek, LM Studio, or another compatible provider in Settings first.',
       );
     }
 
@@ -290,7 +295,7 @@ class PromptAssistantService {
       );
     }
     throw StateError(
-      '服务商 ${provider.name} 尚未配置模型，请先拉取模型列表或手动添加模型。',
+      'Provider ${provider.name} has no configured model. Pull the model list or add a model manually first.',
     );
   }
 

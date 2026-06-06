@@ -104,12 +104,12 @@ class _DanbooruPostCardState extends State<DanbooruPostCard> {
     try {
       _removeOverlay();
       final result = await FilePickerUtils.pickDirectoryModal(
-        dialogTitle: '选择下载目录',
+        dialogTitle: context.l10n.onlineGallery_chooseDownloadDirectory,
       );
       if (result == null) return;
 
       if (!mounted) return;
-      AppToast.info(context, '开始下载...');
+      AppToast.info(context, context.l10n.onlineGallery_downloadStarted);
 
       final file = await DanbooruImageCacheManager.instance.getSingleFile(url);
       final fileName = path.basename(Uri.parse(url).path);
@@ -118,11 +118,17 @@ class _DanbooruPostCardState extends State<DanbooruPostCard> {
       await file.copy(destination);
 
       if (mounted) {
-        AppToast.info(context, '已保存到: $destination');
+        AppToast.info(
+          context,
+          context.l10n.onlineGallery_savedToPath(destination),
+        );
       }
     } catch (e) {
       if (mounted) {
-        AppToast.info(context, '下载失败: $e');
+        AppToast.info(
+          context,
+          context.l10n.onlineGallery_downloadFailed('$e'),
+        );
       }
     }
   }
@@ -431,7 +437,9 @@ class _DanbooruPostCardState extends State<DanbooruPostCard> {
                               icon: widget.isFavorited
                                   ? Icons.favorite
                                   : Icons.favorite_border,
-                              tooltip: '收藏',
+                              tooltip: widget.isFavorited
+                                  ? context.l10n.common_unfavorite
+                                  : context.l10n.common_favorite,
                               iconColor: widget.isFavorited
                                   ? Colors.red
                                   : Colors.white,
@@ -440,12 +448,13 @@ class _DanbooruPostCardState extends State<DanbooruPostCard> {
                             ),
                             CardActionButtonConfig(
                               icon: Icons.download,
-                              tooltip: '下载原图',
+                              tooltip:
+                                  context.l10n.onlineGallery_downloadOriginal,
                               onPressed: _handleDownload,
                             ),
                             CardActionButtonConfig(
                               icon: Icons.playlist_add,
-                              tooltip: '添加到队列',
+                              tooltip: context.l10n.onlineGallery_addToQueue,
                               onPressed: () async {
                                 final task = ReplicationTask.create(
                                   prompt: widget.post.tags.join(', '),
@@ -459,16 +468,23 @@ class _DanbooruPostCardState extends State<DanbooruPostCard> {
                                     .add(task);
                                 if (context.mounted) {
                                   if (success) {
-                                    AppToast.info(context, '已添加到队列');
+                                    AppToast.info(
+                                      context,
+                                      context.l10n.onlineGallery_addedToQueue,
+                                    );
                                   } else {
-                                    AppToast.info(context, '队列已满');
+                                    AppToast.info(
+                                      context,
+                                      context.l10n.onlineGallery_queueFullMax,
+                                    );
                                   }
                                 }
                               },
                             ),
                             CardActionButtonConfig(
                               icon: Icons.send,
-                              tooltip: '发送到文生图',
+                              tooltip:
+                                  context.l10n.onlineGallery_sendToTextToImage,
                               onPressed: () {
                                 ref
                                     .read(
@@ -481,18 +497,25 @@ class _DanbooruPostCardState extends State<DanbooruPostCard> {
                                     )
                                     .set(prompt: widget.post.tags.join(', '));
                                 context.go('/');
-                                AppToast.info(context, '已发送到文生图');
+                                AppToast.info(
+                                  context,
+                                  context.l10n.onlineGallery_sentToTextToImage,
+                                );
                               },
                             ),
                             CardActionButtonConfig(
                               icon: Icons.manage_search_rounded,
-                              tooltip: '发送到反推',
+                              tooltip: context
+                                  .l10n.onlineGallery_sendToReversePrompt,
                               onPressed: () async {
                                 final imageUrl = widget.post.sampleUrl ??
                                     widget.post.fileUrl ??
                                     widget.post.previewUrl;
                                 if (imageUrl.isEmpty) {
-                                  AppToast.warning(context, '此图片没有可用地址');
+                                  AppToast.warning(
+                                    context,
+                                    context.l10n.onlineGallery_noImageUrl,
+                                  );
                                   return;
                                 }
                                 try {
@@ -508,18 +531,28 @@ class _DanbooruPostCardState extends State<DanbooruPostCard> {
                                       );
                                   if (context.mounted) {
                                     context.go('/');
-                                    AppToast.info(context, '已发送到反推模块');
+                                    AppToast.info(
+                                      context,
+                                      context.l10n
+                                          .onlineGallery_sentToReversePrompt,
+                                    );
                                   }
                                 } catch (e) {
                                   if (context.mounted) {
-                                    AppToast.error(context, '发送反推失败: $e');
+                                    AppToast.error(
+                                      context,
+                                      context.l10n
+                                          .onlineGallery_reversePromptSendFailed(
+                                        '$e',
+                                      ),
+                                    );
                                   }
                                 }
                               },
                             ),
                             CardActionButtonConfig(
                               icon: Icons.copy,
-                              tooltip: '复制标签',
+                              tooltip: context.l10n.onlineGallery_copyTags,
                               onPressed: () async {
                                 try {
                                   await Clipboard.setData(
@@ -528,7 +561,10 @@ class _DanbooruPostCardState extends State<DanbooruPostCard> {
                                     ),
                                   );
                                   if (context.mounted) {
-                                    AppToast.success(context, '已复制');
+                                    AppToast.success(
+                                      context,
+                                      context.l10n.onlineGallery_copied,
+                                    );
                                   }
                                 } catch (e) {
                                   // ignore

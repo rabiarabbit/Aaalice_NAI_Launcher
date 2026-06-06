@@ -1150,11 +1150,12 @@ class _SelectableImageCardState extends ConsumerState<SelectableImageCard>
   }
 
   Future<void> _saveImage(BuildContext context) async {
+    final l10n = context.l10n;
     try {
       final rootPath = await GalleryFolderRepository.instance.getRootPath();
       if (rootPath == null || rootPath.isEmpty) {
         if (context.mounted) {
-          AppToast.error(context, '未设置保存目录');
+          AppToast.error(context, l10n.toast_saveDirNotSet);
         }
         return;
       }
@@ -1169,23 +1170,24 @@ class _SelectableImageCardState extends ConsumerState<SelectableImageCard>
       await file.writeAsBytes(widget.imageBytes!);
 
       if (context.mounted) {
-        AppToast.success(context, '已保存到 ${saveDir.path}');
+        AppToast.success(context, l10n.toast_savedTo(saveDir.path));
       }
     } catch (e) {
       if (context.mounted) {
-        AppToast.error(context, '保存失败: $e');
+        AppToast.error(context, l10n.image_saveFailed(e.toString()));
       }
     }
   }
 
   Future<void> _copyImage(BuildContext context) async {
+    final l10n = context.l10n;
     try {
       final stripMetadata = ref
           .read(shareImageSettingsProvider)
           .effectiveStripMetadataForCopyAndDrag;
       final cache = _shareTransferCache ?? _createShareTransferCache();
       if (cache == null) {
-        throw StateError('图像数据不可用，无法复制');
+        throw StateError(l10n.toast_imageDataUnavailable);
       }
       _shareTransferCache = cache;
       final transferFile = await cache.prepareFile(
@@ -1206,7 +1208,10 @@ class _SelectableImageCardState extends ConsumerState<SelectableImageCard>
       if (result.exitCode != 0) {
         final errorOutput = result.stderr.toString();
         throw Exception(
-          'PowerShell 命令失败 (exitCode: ${result.exitCode}): $errorOutput',
+          l10n.toast_powershellCommandFailed(
+            result.exitCode,
+            errorOutput,
+          ),
         );
       }
 
@@ -1214,11 +1219,11 @@ class _SelectableImageCardState extends ConsumerState<SelectableImageCard>
       await Future.delayed(const Duration(milliseconds: 500));
 
       if (context.mounted) {
-        AppToast.success(context, '已复制到剪贴板');
+        AppToast.success(context, l10n.image_copiedToClipboard);
       }
     } catch (e) {
       if (context.mounted) {
-        AppToast.error(context, '复制失败: $e');
+        AppToast.error(context, l10n.image_copyFailed(e.toString()));
       }
     }
   }

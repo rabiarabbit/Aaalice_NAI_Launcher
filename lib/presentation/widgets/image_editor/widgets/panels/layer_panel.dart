@@ -92,7 +92,7 @@ class _LayerPanelState extends State<LayerPanel> {
         }
       }
     } catch (e) {
-      AppLogger.w('缩略图更新失败: $e', 'ImageEditor');
+      AppLogger.w('Thumbnail update failed: $e', 'ImageEditor');
     }
   }
 
@@ -124,7 +124,11 @@ class _LayerPanelState extends State<LayerPanel> {
               // 标题栏
               _LayerPanelHeader(
                 onAddLayer: () {
-                  state.layerManager.addLayer();
+                  state.layerManager.addLayer(
+                    name: context.l10n.editor_layerName(
+                      state.layerManager.layerCount + 1,
+                    ),
+                  );
                 },
                 onMergeDown: state.layerManager.layers.length > 1
                     ? () => state.layerManager.mergeDown()
@@ -140,7 +144,7 @@ class _LayerPanelState extends State<LayerPanel> {
                   child: layers.isEmpty
                       ? Center(
                           child: Text(
-                            '无图层',
+                            context.l10n.layer_empty,
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: theme.colorScheme.onSurfaceVariant,
                             ),
@@ -238,7 +242,7 @@ class _LayerPanelHeader extends StatelessWidget {
       child: Row(
         children: [
           Text(
-            '图层',
+            context.l10n.editor_layers,
             style: theme.textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.bold,
             ),
@@ -247,14 +251,14 @@ class _LayerPanelHeader extends StatelessWidget {
           // 添加图层
           IconButton(
             icon: const Icon(Icons.add, size: 20),
-            tooltip: '添加图层',
+            tooltip: context.l10n.layer_add,
             onPressed: onAddLayer,
             visualDensity: VisualDensity.compact,
           ),
           // 向下合并
           IconButton(
             icon: const Icon(Icons.merge, size: 20),
-            tooltip: '向下合并',
+            tooltip: context.l10n.layer_mergeDown,
             onPressed: onMergeDown,
             visualDensity: VisualDensity.compact,
           ),
@@ -366,7 +370,7 @@ class _LayerTileState extends State<_LayerTile>
                   ),
                   onPressed: widget.onVisibilityToggle,
                   visualDensity: VisualDensity.compact,
-                  tooltip: '可见性',
+                  tooltip: context.l10n.layer_visibility,
                 ),
 
                 // 锁定
@@ -377,7 +381,7 @@ class _LayerTileState extends State<_LayerTile>
                   ),
                   onPressed: widget.onLockToggle,
                   visualDensity: VisualDensity.compact,
-                  tooltip: '锁定',
+                  tooltip: context.l10n.layer_lock,
                 ),
 
                 // 图层名称

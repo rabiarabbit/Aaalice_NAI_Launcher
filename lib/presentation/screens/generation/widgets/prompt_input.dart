@@ -188,8 +188,10 @@ class _PromptInputWidgetState extends ConsumerState<PromptInputWidget> {
     // 显示提示
     if (mounted) {
       final message = clearExisting
-          ? '已替换角色提示词'
-          : '已追加角色提示词 (${ref.read(characterPromptNotifierProvider).characters.length}个角色)';
+          ? context.l10n.prompt_characterPromptReplaced
+          : context.l10n.prompt_characterPromptAppended(
+              ref.read(characterPromptNotifierProvider).characters.length,
+            );
       AppToast.success(context, message);
     }
   }
@@ -236,7 +238,9 @@ class _PromptInputWidgetState extends ConsumerState<PromptInputWidget> {
     // 显示提示
     if (mounted) {
       final charCount = result.characters.length;
-      final message = charCount > 0 ? '已分解：主提示词 + $charCount个角色' : '已应用到主提示词';
+      final message = charCount > 0
+          ? context.l10n.prompt_smartDecomposedWithCharacters(charCount)
+          : context.l10n.prompt_appliedToMainPrompt;
       AppToast.success(context, message);
     }
   }
@@ -335,12 +339,12 @@ class _PromptInputWidgetState extends ConsumerState<PromptInputWidget> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   SwitchListTile(
-                    title: const Text('启用提示词助手'),
+                    title: Text(context.l10n.promptAssistant_enableAssistant),
                     value: config.enabled,
                     onChanged: notifier.setEnabled,
                   ),
                   SwitchListTile(
-                    title: const Text('桌面右下角浮层'),
+                    title: Text(context.l10n.promptAssistant_desktopOverlay),
                     value: config.desktopOverlayEnabled,
                     onChanged: notifier.setDesktopOverlayEnabled,
                   ),
@@ -682,7 +686,10 @@ class _PromptInputWidgetState extends ConsumerState<PromptInputWidget> {
             .read(generationParamsNotifierProvider.notifier)
             .updatePrompt(globalPrompt);
         // 显示成功提示
-        AppToast.success(context, '已导入 ${characters.length} 个角色');
+        AppToast.success(
+          context,
+          context.l10n.prompt_importedCharacters(characters.length),
+        );
       },
       onChanged: (value) {
         ref.read(generationParamsNotifierProvider.notifier).updatePrompt(value);
@@ -838,7 +845,10 @@ class _PromptInputWidgetState extends ConsumerState<PromptInputWidget> {
               ref
                   .read(generationParamsNotifierProvider.notifier)
                   .updatePrompt(globalPrompt);
-              AppToast.success(context, '已导入 ${characters.length} 个角色');
+              AppToast.success(
+                context,
+                context.l10n.prompt_importedCharacters(characters.length),
+              );
             },
             onChanged: (value) {
               ref
@@ -1386,7 +1396,7 @@ class _NegativePromptTooltip extends StatelessWidget {
         if (hasPrefixes) ...[
           _buildSection(
             icon: Icons.arrow_forward_rounded,
-            label: '负向固定词前缀',
+            label: l10n.prompt_negativeFixedTagPrefix,
             color: theme.colorScheme.error,
             content: prefixes
                 .map((entry) => aliasResolver.resolveAliases(entry.content))
@@ -1412,7 +1422,7 @@ class _NegativePromptTooltip extends StatelessWidget {
         if (hasSuffixes) ...[
           _buildSection(
             icon: Icons.arrow_back_rounded,
-            label: '负向固定词后缀',
+            label: l10n.prompt_negativeFixedTagSuffix,
             color: theme.colorScheme.tertiary,
             content: suffixes
                 .map((entry) => aliasResolver.resolveAliases(entry.content))

@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../utils/queue_export_utils.dart';
+import '../../../core/utils/localization_extension.dart';
 import '../../providers/replication_queue_provider.dart';
 import '../common/app_toast.dart';
 
@@ -333,7 +334,7 @@ class _QueueExportDialogState extends ConsumerState<QueueExportDialog>
 
       if (mounted) {
         Navigator.pop(context);
-        AppToast.success(context, '导出成功');
+        AppToast.success(context, context.l10n.queue_exportSuccess);
       }
     } catch (e) {
       setState(() => _error = '导出失败: $e');
@@ -392,7 +393,7 @@ class _QueueExportDialogState extends ConsumerState<QueueExportDialog>
 
       if (mounted) {
         Navigator.pop(context);
-        AppToast.success(context, '成功导入 $added 个任务');
+        AppToast.success(context, context.l10n.queue_importSuccess(added));
       }
     } catch (e) {
       setState(() => _error = '导入失败: $e');

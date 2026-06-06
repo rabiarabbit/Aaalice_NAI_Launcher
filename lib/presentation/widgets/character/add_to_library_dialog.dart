@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:nai_launcher/core/utils/localization_extension.dart';
 import 'package:nai_launcher/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -86,7 +87,7 @@ class _AddToLibraryDialogState extends ConsumerState<AddToLibraryDialog> {
     } catch (e) {
       if (mounted) {
         setState(() => _isSaving = false);
-        AppToast.error(context, '保存失败: $e');
+        AppToast.error(context, context.l10n.image_saveFailed(e.toString()));
       }
     }
   }

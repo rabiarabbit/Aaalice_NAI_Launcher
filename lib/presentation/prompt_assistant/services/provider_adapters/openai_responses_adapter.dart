@@ -88,7 +88,7 @@ class OpenAiResponsesAdapter extends PromptAssistantProviderAdapter {
     if (raw is Map<String, dynamic>) {
       final error = extractErrorMessage(raw);
       if (error != null) {
-        throw StateError('LLM 服务返回错误：$error');
+        throw StateError('LLM service returned an error: $error');
       }
       final outputText = contentToText(raw['output_text']);
       if (outputText.isNotEmpty) return outputText;

@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/shortcuts/default_shortcuts.dart';
+import '../../../core/utils/localization_extension.dart';
 import '../../providers/local_gallery_provider.dart';
 import '../../providers/selection_mode_provider.dart';
 import '../bulk_action_bar.dart';
@@ -172,6 +173,7 @@ class _LocalGalleryToolbarState extends ConsumerState<LocalGalleryToolbar> {
     final state = ref.watch(localGalleryNotifierProvider);
     final selectionState = ref.watch(localGallerySelectionNotifierProvider);
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     final isDark = theme.brightness == Brightness.dark;
 
     // Show bulk action bar when in selection mode
@@ -215,38 +217,38 @@ class _LocalGalleryToolbarState extends ConsumerState<LocalGalleryToolbar> {
                 }
               }
             : null,
-        selectAllLabel: '选择本页',
-        deselectAllLabel: '取消本页',
-        selectAllAvailableLabel: '选择全部',
-        deselectAllAvailableLabel: '取消全部',
+        selectAllLabel: l10n.localGallery_selectCurrentPage,
+        deselectAllLabel: l10n.localGallery_deselectCurrentPage,
+        selectAllAvailableLabel: l10n.localGallery_selectAllResults,
+        deselectAllAvailableLabel: l10n.localGallery_deselectAllResults,
         actions: [
           BulkActionItem(
             icon: Icons.drive_file_move_outline,
-            label: '移动',
+            label: l10n.localGallery_moveSelected,
             onPressed: widget.onMoveToFolder,
             color: theme.colorScheme.secondary,
           ),
           BulkActionItem(
             icon: Icons.archive_outlined,
-            label: '打包',
+            label: l10n.localGallery_packSelected,
             onPressed: widget.onPackSelected,
             color: theme.colorScheme.tertiary,
           ),
           BulkActionItem(
             icon: Icons.edit_outlined,
-            label: '编辑',
+            label: l10n.localGallery_editMetadata,
             onPressed: widget.onEditMetadata,
             color: theme.colorScheme.primary,
           ),
           BulkActionItem(
             icon: Icons.playlist_add,
-            label: '收藏',
+            label: l10n.localGallery_addToCollection,
             onPressed: widget.onAddToCollection,
             color: theme.colorScheme.secondary,
           ),
           BulkActionItem(
             icon: Icons.delete_outline,
-            label: '删除',
+            label: l10n.common_delete,
             onPressed: widget.onDeleteSelected,
             color: theme.colorScheme.error,
             isDanger: true,
@@ -282,7 +284,7 @@ class _LocalGalleryToolbarState extends ConsumerState<LocalGalleryToolbar> {
                 children: [
                   // Title
                   Text(
-                    '本地画廊',
+                    l10n.localGallery_title,
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
@@ -329,8 +331,12 @@ class _LocalGalleryToolbarState extends ConsumerState<LocalGalleryToolbar> {
                     icon: state.isGroupedView
                         ? Icons.view_module
                         : Icons.calendar_today,
-                    label: state.isGroupedView ? '网格' : '日期',
-                    tooltip: state.isGroupedView ? '切换到网格视图' : '切换到日期分组视图',
+                    label: state.isGroupedView
+                        ? l10n.common_grid
+                        : l10n.common_date,
+                    tooltip: state.isGroupedView
+                        ? l10n.localGallery_switchToGridView
+                        : l10n.localGallery_switchToDateGroupedView,
                     shortcutId: ShortcutIds.jumpToDate,
                     isActive: state.isGroupedView,
                     onPressed: () {
@@ -348,8 +354,8 @@ class _LocalGalleryToolbarState extends ConsumerState<LocalGalleryToolbar> {
                   const SizedBox(width: 6),
                   CompactIconButton(
                     icon: Icons.tune,
-                    label: '筛选',
-                    tooltip: '打开筛选面板',
+                    label: l10n.common_filter,
+                    tooltip: l10n.localGallery_openFilterPanel,
                     shortcutId: ShortcutIds.openFilterPanel,
                     onPressed: () => showGalleryFilterPanel(context),
                   ),
@@ -358,8 +364,8 @@ class _LocalGalleryToolbarState extends ConsumerState<LocalGalleryToolbar> {
                     const SizedBox(width: 6),
                     CompactIconButton(
                       icon: Icons.filter_alt_off,
-                      label: '清除',
-                      tooltip: '清除筛选',
+                      label: l10n.common_clear,
+                      tooltip: l10n.localGallery_clearFilters,
                       shortcutId: ShortcutIds.clearFilter,
                       onPressed: () {
                         _searchController.clear();
@@ -385,8 +391,10 @@ class _LocalGalleryToolbarState extends ConsumerState<LocalGalleryToolbar> {
                       icon: widget.showCategoryPanel
                           ? Icons.view_sidebar
                           : Icons.view_sidebar_outlined,
-                      label: '分类',
-                      tooltip: widget.showCategoryPanel ? '隐藏分类面板' : '显示分类面板',
+                      label: l10n.common_categories,
+                      tooltip: widget.showCategoryPanel
+                          ? l10n.localGallery_hideCategoryPanel
+                          : l10n.localGallery_showCategoryPanel,
                       shortcutId: ShortcutIds.toggleCategoryPanel,
                       onPressed: widget.onToggleCategoryPanel,
                     ),
@@ -396,13 +404,13 @@ class _LocalGalleryToolbarState extends ConsumerState<LocalGalleryToolbar> {
                   if (widget.canUndo || widget.canRedo) ...[
                     CompactIconButton(
                       icon: Icons.undo,
-                      tooltip: '撤销',
+                      tooltip: l10n.common_undo,
                       onPressed: widget.canUndo ? widget.onUndo : null,
                     ),
                     const SizedBox(width: 4),
                     CompactIconButton(
                       icon: Icons.redo,
-                      tooltip: '重做',
+                      tooltip: l10n.common_redo,
                       onPressed: widget.canRedo ? widget.onRedo : null,
                     ),
                     const SizedBox(width: 6),
@@ -410,8 +418,8 @@ class _LocalGalleryToolbarState extends ConsumerState<LocalGalleryToolbar> {
                   // Multi-select
                   CompactIconButton(
                     icon: Icons.checklist,
-                    label: '多选',
-                    tooltip: '进入选择模式',
+                    label: l10n.common_multiSelect,
+                    tooltip: l10n.localGallery_enterSelectionMode,
                     shortcutId: ShortcutIds.enterSelectionMode,
                     onPressed: widget.onEnterSelectionMode,
                   ),
@@ -419,8 +427,8 @@ class _LocalGalleryToolbarState extends ConsumerState<LocalGalleryToolbar> {
                   // Open folder
                   CompactIconButton(
                     icon: Icons.folder_open,
-                    label: '文件夹',
-                    tooltip: '打开文件夹',
+                    label: l10n.common_folder,
+                    tooltip: l10n.shortcut_action_open_folder,
                     shortcutId: ShortcutIds.openFolder,
                     onPressed: widget.onOpenFolder,
                   ),
@@ -428,8 +436,8 @@ class _LocalGalleryToolbarState extends ConsumerState<LocalGalleryToolbar> {
                   // Refresh button
                   CompactIconButton(
                     icon: Icons.refresh,
-                    label: '刷新',
-                    tooltip: '刷新画廊\n\n自动检测新增/修改的图片并更新索引',
+                    label: l10n.common_refresh,
+                    tooltip: l10n.localGallery_refreshTooltip,
                     shortcutId: ShortcutIds.refreshGallery,
                     onPressed: widget.onRefresh,
                   ),
@@ -461,7 +469,7 @@ class _LocalGalleryToolbarState extends ConsumerState<LocalGalleryToolbar> {
         focusNode: _searchFocusNode,
         style: theme.textTheme.bodyMedium,
         decoration: InputDecoration(
-          hintText: '搜索文件名/Prompt，逗号分隔交集搜索...',
+          hintText: context.l10n.localGallery_searchFilenamePromptPlaceholder,
           hintStyle: TextStyle(
             color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
             fontSize: 13,
@@ -545,7 +553,7 @@ class _LocalGalleryToolbarState extends ConsumerState<LocalGalleryToolbar> {
           Padding(
             padding: const EdgeInsets.only(right: 2),
             child: Text(
-              '标签交集',
+              context.l10n.localGallery_tagIntersection,
               style: theme.textTheme.labelSmall?.copyWith(
                 color: theme.colorScheme.primary,
                 fontWeight: FontWeight.w600,
@@ -591,7 +599,7 @@ class _LocalGalleryToolbarState extends ConsumerState<LocalGalleryToolbar> {
                 state.filterCriteria.dateStart,
                 state.filterCriteria.dateEnd,
               )
-            : '日期过滤',
+            : context.l10n.localGallery_dateFilterButton,
         style: TextStyle(
           fontSize: 12,
           color: hasDateRange ? theme.colorScheme.primary : null,
@@ -727,9 +735,10 @@ class _LocalGalleryToolbarState extends ConsumerState<LocalGalleryToolbar> {
 
       // Show hint message
       if (context.mounted) {
+        final month = picked.month.toString().padLeft(2, '0');
         AppToast.info(
           context,
-          '已跳转到 ${picked.year}-${picked.month.toString().padLeft(2, '0')}',
+          context.l10n.localGallery_jumpedToMonth(picked.year, month),
         );
       }
     }

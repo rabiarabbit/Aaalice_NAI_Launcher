@@ -25,7 +25,11 @@ class CategoryCardList extends ConsumerWidget {
     final preset = presetState.selectedPreset;
 
     if (preset == null) {
-      return const Center(child: Text('请选择一个预设'));
+      return Center(
+        child: Text(
+          AppLocalizations.of(context)!.randomManager_selectPresetRequired,
+        ),
+      );
     }
 
     return ElevatedCard(
@@ -86,7 +90,11 @@ class CategoryCardGrid extends ConsumerWidget {
     final preset = presetState.selectedPreset;
 
     if (preset == null) {
-      return const Center(child: Text('请选择一个预设'));
+      return Center(
+        child: Text(
+          AppLocalizations.of(context)!.randomManager_selectPresetRequired,
+        ),
+      );
     }
 
     return ElevatedCard(

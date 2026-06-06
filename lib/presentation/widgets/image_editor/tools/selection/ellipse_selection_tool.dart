@@ -9,7 +9,7 @@ class EllipseSelectionTool extends ShapeSelectionTool {
   String get id => 'ellipse_selection';
 
   @override
-  String get name => '椭圆选区';
+  String get name => 'Ellipse Selection';
 
   @override
   IconData get icon => Icons.circle_outlined;

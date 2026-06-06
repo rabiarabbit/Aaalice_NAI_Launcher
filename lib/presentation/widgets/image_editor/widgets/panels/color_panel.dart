@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../core/utils/localization_extension.dart';
 import '../../core/editor_state.dart';
 import '../../../../../core/utils/app_logger.dart';
 import 'package:nai_launcher/presentation/widgets/common/themed_input.dart';
@@ -27,7 +28,7 @@ class ColorPanel extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                '颜色',
+                context.l10n.editor_colorPanelTitle,
                 style: theme.textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
@@ -284,7 +285,7 @@ class _ColorPickerDialogState extends State<_ColorPickerDialog> {
     final theme = Theme.of(context);
 
     return AlertDialog(
-      title: const Text('选择颜色'),
+      title: Text(context.l10n.editor_colorPickerTitle),
       content: SizedBox(
         width: 300,
         child: Column(
@@ -404,14 +405,14 @@ class _ColorPickerDialogState extends State<_ColorPickerDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('取消'),
+          child: Text(context.l10n.common_cancel),
         ),
         FilledButton(
           onPressed: () {
             widget.onColorChanged(_hsvColor.toColor());
             Navigator.pop(context);
           },
-          child: const Text('确定'),
+          child: Text(context.l10n.common_confirm),
         ),
       ],
     );

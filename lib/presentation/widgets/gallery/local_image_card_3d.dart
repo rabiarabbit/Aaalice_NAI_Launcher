@@ -8,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import '../../../core/cache/thumbnail_cache_service.dart';
 import '../../../core/utils/app_logger.dart';
 import '../../../core/utils/image_share_sanitizer.dart';
+import '../../../core/utils/localization_extension.dart';
 import '../../../data/models/gallery/local_image_record.dart';
 import '../../../data/services/thumbnail_service.dart';
 import '../../providers/share_image_settings_provider.dart';
@@ -196,10 +197,12 @@ class _LocalImageCard3DState extends ConsumerState<LocalImageCard3D>
       final bytes = await File(widget.record.path).readAsBytes();
       if (mounted) {
         ImageWorkflowLauncher.openUpscale(ref, bytes);
-        AppToast.info(context, '已载入图生图超分面板');
+        AppToast.info(context, context.l10n.gallery_upscalePanelLoaded);
       }
     } catch (e) {
-      if (mounted) AppToast.error(context, '读取图像失败: $e');
+      if (mounted) {
+        AppToast.error(context, context.l10n.gallery_readImageFailed('$e'));
+      }
     }
   }
 
@@ -208,7 +211,7 @@ class _LocalImageCard3DState extends ConsumerState<LocalImageCard3D>
     try {
       final sourceFile = File(widget.record.path);
       if (!await sourceFile.exists()) {
-        if (mounted) AppToast.error(context, '文件不存在');
+        if (mounted) AppToast.error(context, context.l10n.gallery_fileMissing);
         return;
       }
 
@@ -243,12 +246,16 @@ $image = [System.Drawing.Image]::FromFile("''';
         '$psCommand${tempFile.path}"); [System.Windows.Forms.Clipboard]::SetImage(\$image); \$image.Dispose();',
       ]);
 
-      if (result.exitCode != 0) throw Exception('PowerShell 命令失败');
+      if (result.exitCode != 0) throw Exception('PowerShell command failed');
 
       await Future.delayed(const Duration(milliseconds: 500));
-      if (mounted) AppToast.success(context, '已复制到剪贴板');
+      if (mounted) {
+        AppToast.success(context, context.l10n.gallery_copiedToClipboard);
+      }
     } catch (e) {
-      if (mounted) AppToast.error(context, '复制失败: $e');
+      if (mounted) {
+        AppToast.error(context, context.l10n.gallery_copyFailed('$e'));
+      }
     } finally {
       if (tempFile != null && await tempFile.exists()) {
         try {
@@ -435,7 +442,7 @@ $image = [System.Drawing.Image]::FromFile("''';
             ),
             const SizedBox(height: 8),
             Text(
-              '加载中...',
+              context.l10n.common_loading,
               style: TextStyle(color: Colors.grey[600], fontSize: 11),
             ),
           ],
@@ -454,7 +461,7 @@ $image = [System.Drawing.Image]::FromFile("''';
             Icon(Icons.broken_image, color: Colors.red[400], size: 40),
             const SizedBox(height: 8),
             Text(
-              '加载失败',
+              context.l10n.onlineGallery_loadFailed,
               style: TextStyle(color: Colors.red[300], fontSize: 12),
             ),
             const SizedBox(height: 4),
@@ -462,7 +469,7 @@ $image = [System.Drawing.Image]::FromFile("''';
               onPressed: _loadThumbnail,
               icon: Icon(Icons.refresh, color: Colors.red[300], size: 16),
               label: Text(
-                '重试',
+                context.l10n.common_retry,
                 style: TextStyle(color: Colors.red[300], fontSize: 11),
               ),
               style: TextButton.styleFrom(
@@ -905,16 +912,18 @@ class _SendToHomeMenu extends StatelessWidget {
                   _buildMenuItem(
                     context,
                     icon: Icons.text_fields,
-                    label: '文生图',
-                    subtitle: '套用参数',
+                    label: context.l10n.gallery_textToImage,
+                    subtitle: context.l10n.gallery_applyParams,
                     onTap: onSendToTxt2Img,
                   ),
                   Divider(height: 1, color: theme.colorScheme.outlineVariant),
                   _buildMenuItem(
                     context,
                     icon: Icons.image,
-                    label: '图生图',
-                    subtitle: onSendToImg2Img == null ? '不可用' : '载入源图',
+                    label: context.l10n.gallery_sendToImg2Img,
+                    subtitle: onSendToImg2Img == null
+                        ? context.l10n.gallery_unavailable
+                        : context.l10n.gallery_loadSourceImage,
                     enabled: onSendToImg2Img != null,
                     onTap: onSendToImg2Img,
                   ),
@@ -922,8 +931,8 @@ class _SendToHomeMenu extends StatelessWidget {
                   _buildMenuItem(
                     context,
                     icon: Icons.zoom_in,
-                    label: '放大',
-                    subtitle: '超分放大',
+                    label: context.l10n.gallery_upscale,
+                    subtitle: context.l10n.gallery_superResolutionUpscale,
                     onTap: onUpscale,
                   ),
                 ],

@@ -7,6 +7,7 @@ import 'package:path/path.dart' as p;
 import '../providers/cost_estimate_provider.dart';
 import '../providers/share_image_settings_provider.dart';
 import '../widgets/common/themed_confirm_dialog.dart';
+import '../../core/utils/localization_extension.dart';
 
 class AssetProtectionGuard {
   const AssetProtectionGuard._();
@@ -25,7 +26,7 @@ class AssetProtectionGuard {
     required WidgetRef ref,
     required String title,
     required String content,
-    String confirmText = '继续',
+    String? confirmText,
     IconData icon = Icons.shield_outlined,
   }) async {
     if (!ref
@@ -37,8 +38,8 @@ class AssetProtectionGuard {
       context: context,
       title: title,
       content: content,
-      confirmText: confirmText,
-      cancelText: '取消',
+      confirmText: confirmText ?? context.l10n.common_continue,
+      cancelText: context.l10n.common_cancel,
       type: ThemedConfirmDialogType.warning,
       icon: icon,
     );
@@ -53,12 +54,16 @@ class AssetProtectionGuard {
     if (!ref.read(shareImageSettingsProvider).effectiveWarnExternalImageSend) {
       return Future.value(true);
     }
+    final l10n = context.l10n;
     return ThemedConfirmDialog.show(
       context: context,
-      title: '保护模式：确认外部发送',
-      content: '即将把 $imageCount 张本地图片发送到 $targetName。图片会离开本地应用边界，请确认这符合你的预期。',
-      confirmText: '确认发送',
-      cancelText: '取消',
+      title: l10n.settings_confirmExternalSendTitle,
+      content: l10n.settings_confirmExternalSendContent(
+        imageCount,
+        targetName,
+      ),
+      confirmText: l10n.settings_confirmExternalSend,
+      cancelText: l10n.common_cancel,
       type: ThemedConfirmDialogType.warning,
       icon: Icons.cloud_upload_outlined,
     );
@@ -79,13 +84,16 @@ class AssetProtectionGuard {
       return Future.value(true);
     }
 
+    final l10n = context.l10n;
     return ThemedConfirmDialog.show(
       context: context,
-      title: '保护模式：Anlas 消耗较高',
-      content: '本次预计消耗 $estimatedCost Anlas，已达到或超过你设置的 '
-          '${settings.highAnlasCostThreshold} Anlas 警告阈值。请确认是否继续生成。',
-      confirmText: '继续生成',
-      cancelText: '取消',
+      title: l10n.settings_highAnlasCostTitle,
+      content: l10n.settings_highAnlasCostContent(
+        estimatedCost,
+        settings.highAnlasCostThreshold,
+      ),
+      confirmText: l10n.settings_continueGeneration,
+      cancelText: l10n.common_cancel,
       type: ThemedConfirmDialogType.warning,
       icon: Icons.toll_outlined,
     );

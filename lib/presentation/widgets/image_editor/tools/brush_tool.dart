@@ -35,56 +35,56 @@ class BrushPreset {
 /// 默认笔刷预设列表
 const List<BrushPreset> defaultBrushPresets = [
   BrushPreset(
-    name: '铅笔',
+    name: 'Pencil',
     icon: Icons.edit,
     size: 2,
     opacity: 1.0,
     hardness: 1.0,
   ),
   BrushPreset(
-    name: '细笔',
+    name: 'Fine Brush',
     icon: Icons.brush,
     size: 5,
     opacity: 1.0,
     hardness: 0.9,
   ),
   BrushPreset(
-    name: '标准笔刷',
+    name: 'Standard Brush',
     icon: Icons.brush_outlined,
     size: 20,
     opacity: 1.0,
     hardness: 0.8,
   ),
   BrushPreset(
-    name: '软笔刷',
+    name: 'Soft Brush',
     icon: Icons.blur_on,
     size: 30,
     opacity: 0.8,
     hardness: 0.3,
   ),
   BrushPreset(
-    name: '喷枪',
+    name: 'Airbrush',
     icon: Icons.blur_circular,
     size: 50,
     opacity: 0.5,
     hardness: 0.1,
   ),
   BrushPreset(
-    name: '马克笔',
+    name: 'Marker',
     icon: Icons.format_color_fill,
     size: 15,
     opacity: 0.7,
     hardness: 0.6,
   ),
   BrushPreset(
-    name: '粗笔刷',
+    name: 'Thick Brush',
     icon: Icons.format_paint,
     size: 80,
     opacity: 1.0,
     hardness: 0.7,
   ),
   BrushPreset(
-    name: '涂抹笔',
+    name: 'Smudge Brush',
     icon: Icons.gesture,
     size: 40,
     opacity: 0.6,
@@ -99,14 +99,14 @@ class BrushTool extends EditorTool {
   BrushSettings get settings => _settings;
 
   /// 当前选中的预设索引（-1 表示自定义/无选中）
-  int _selectedPresetIndex = 2; // 默认选中"标准笔刷"
+  int _selectedPresetIndex = 2; // Default to "Standard Brush".
   int get selectedPresetIndex => _selectedPresetIndex;
 
   @override
   String get id => 'brush';
 
   @override
-  String get name => '画笔';
+  String get name => 'Brush';
 
   @override
   IconData get icon => Icons.brush;
@@ -286,7 +286,7 @@ class _BrushSettingsPanelState extends State<_BrushSettingsPanel> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           child: Text(
-            '画笔设置',
+            context.l10n.editor_brushSettings,
             style: theme.textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.bold,
             ),
@@ -301,7 +301,7 @@ class _BrushSettingsPanelState extends State<_BrushSettingsPanel> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '笔刷预设',
+                context.l10n.editor_brushPresets,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -318,6 +318,7 @@ class _BrushSettingsPanelState extends State<_BrushSettingsPanel> {
                       padding: const EdgeInsets.only(right: 8),
                       child: _BrushPresetButton(
                         preset: preset,
+                        presetIndex: index,
                         isSelected: widget.tool.selectedPresetIndex == index,
                         onTap: () {
                           setState(() {
@@ -339,7 +340,7 @@ class _BrushSettingsPanelState extends State<_BrushSettingsPanel> {
 
         // 大小
         _SettingRow(
-          label: '大小',
+          label: context.l10n.editor_size,
           value: settings.size,
           min: 1,
           max: 500,
@@ -355,7 +356,7 @@ class _BrushSettingsPanelState extends State<_BrushSettingsPanel> {
 
         // 不透明度
         _SettingRow(
-          label: '不透明度',
+          label: context.l10n.editor_opacity,
           value: settings.opacity * 100,
           min: 0,
           max: 100,
@@ -370,7 +371,7 @@ class _BrushSettingsPanelState extends State<_BrushSettingsPanel> {
 
         // 硬度
         _SettingRow(
-          label: '硬度',
+          label: context.l10n.editor_hardness,
           value: settings.hardness * 100,
           min: 0,
           max: 100,
@@ -390,11 +391,13 @@ class _BrushSettingsPanelState extends State<_BrushSettingsPanel> {
 /// 笔刷预设按钮
 class _BrushPresetButton extends StatelessWidget {
   final BrushPreset preset;
+  final int presetIndex;
   final bool isSelected;
   final VoidCallback onTap;
 
   const _BrushPresetButton({
     required this.preset,
+    required this.presetIndex,
     required this.isSelected,
     required this.onTap,
   });
@@ -402,9 +405,10 @@ class _BrushPresetButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final presetName = _localizedPresetName(context);
 
     return Semantics(
-      label: preset.name,
+      label: presetName,
       hint: context.l10n.brushPreset_selectHint,
       button: true,
       selected: isSelected,
@@ -438,7 +442,7 @@ class _BrushPresetButton extends StatelessWidget {
               ),
               const SizedBox(height: 2),
               Text(
-                preset.name,
+                presetName,
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: isSelected
                       ? theme.colorScheme.onPrimaryContainer
@@ -453,6 +457,29 @@ class _BrushPresetButton extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _localizedPresetName(BuildContext context) {
+    switch (presetIndex) {
+      case 0:
+        return context.l10n.brushPreset_pencil;
+      case 1:
+        return context.l10n.brushPreset_fine;
+      case 2:
+        return context.l10n.brushPreset_standard;
+      case 3:
+        return context.l10n.brushPreset_soft;
+      case 4:
+        return context.l10n.brushPreset_airbrush;
+      case 5:
+        return context.l10n.brushPreset_marker;
+      case 6:
+        return context.l10n.brushPreset_thick;
+      case 7:
+        return context.l10n.brushPreset_smudge;
+      default:
+        return preset.name;
+    }
   }
 }
 

@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/comfyui/comfyui_models.dart';
 import '../../../../core/comfyui/workflow_template.dart';
+import '../../../../core/utils/localization_extension.dart';
+import '../../../utils/comfyui_workflow_l10n.dart';
 import '../../../providers/comfyui/comfyui_provider.dart';
 import '../../../widgets/common/app_toast.dart';
 import '../../../widgets/common/themed_input.dart';
@@ -54,11 +56,11 @@ class _ComfyUISettingsSectionState
             children: [
               SwitchListTile(
                 secondary: const Icon(Icons.power),
-                title: const Text('启用 ComfyUI 集成'),
+                title: Text(context.l10n.settings_comfyUiEnable),
                 subtitle: Text(
                   settings.enabled
-                      ? _connectionStatusText(connStatus)
-                      : '关闭后将隐藏本地超分等 ComfyUI 功能',
+                      ? _connectionStatusText(context, connStatus)
+                      : context.l10n.settings_comfyUiDisabledSubtitle,
                 ),
                 value: settings.enabled,
                 onChanged: (value) {
@@ -77,12 +79,12 @@ class _ComfyUISettingsSectionState
                       Expanded(
                         child: ThemedInput(
                           controller: _urlController,
-                          decoration: const InputDecoration(
-                            labelText: '服务器地址',
+                          decoration: InputDecoration(
+                            labelText: context.l10n.settings_comfyUiServerUrl,
                             hintText: 'http://127.0.0.1:8188',
-                            border: OutlineInputBorder(),
+                            border: const OutlineInputBorder(),
                             isDense: true,
-                            prefixIcon: Icon(Icons.dns_outlined),
+                            prefixIcon: const Icon(Icons.dns_outlined),
                           ),
                           onChanged: (value) {
                             ref
@@ -101,7 +103,7 @@ class _ComfyUISettingsSectionState
                                 child:
                                     CircularProgressIndicator(strokeWidth: 2),
                               )
-                            : const Text('测试连接'),
+                            : Text(context.l10n.settings_testConnection),
                       ),
                     ],
                   ),
@@ -125,7 +127,11 @@ class _ComfyUISettingsSectionState
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          _testResult == 'ok' ? '连接成功' : '连接失败: $_testResult',
+                          _testResult == 'ok'
+                              ? context.l10n.settings_comfyUiConnectionSuccess
+                              : context.l10n.settings_comfyUiConnectionFailed(
+                                  _testResult!,
+                                ),
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: _testResult == 'ok'
                                 ? Colors.green
@@ -142,7 +148,7 @@ class _ComfyUISettingsSectionState
                       color: Colors.green,
                       size: 12,
                     ),
-                    title: const Text('已连接'),
+                    title: Text(context.l10n.settings_comfyUiConnected),
                     subtitle: Text(settings.serverUrl),
                     trailing: TextButton(
                       onPressed: () {
@@ -150,7 +156,7 @@ class _ComfyUISettingsSectionState
                             .read(comfyUIConnectionProvider.notifier)
                             .disconnect();
                       },
-                      child: const Text('断开'),
+                      child: Text(context.l10n.settings_comfyUiDisconnect),
                     ),
                   ),
                 const SizedBox(height: 8),
@@ -163,7 +169,7 @@ class _ComfyUISettingsSectionState
         if (settings.enabled) ...[
           const SizedBox(height: 16),
           SettingsCard(
-            title: '工作流管理',
+            title: context.l10n.settings_comfyUiWorkflowManagement,
             icon: Icons.account_tree,
             child: Column(
               children: [
@@ -184,7 +190,7 @@ class _ComfyUISettingsSectionState
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          '内置工作流',
+                          context.l10n.settings_comfyUiBuiltinWorkflows,
                           style: theme.textTheme.labelMedium?.copyWith(
                             color: theme.colorScheme.onSurface
                                 .withValues(alpha: 0.5),
@@ -210,7 +216,7 @@ class _ComfyUISettingsSectionState
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        '自定义工作流',
+                        context.l10n.settings_comfyUiCustomWorkflows,
                         style: theme.textTheme.labelMedium?.copyWith(
                           color: theme.colorScheme.onSurface
                               .withValues(alpha: 0.5),
@@ -220,7 +226,7 @@ class _ComfyUISettingsSectionState
                       TextButton.icon(
                         onPressed: () => WorkflowImportWizard.show(context),
                         icon: const Icon(Icons.add, size: 18),
-                        label: const Text('导入'),
+                        label: Text(context.l10n.common_import),
                       ),
                     ],
                   ),
@@ -232,7 +238,7 @@ class _ComfyUISettingsSectionState
                       vertical: 12,
                     ),
                     child: Text(
-                      '暂无自定义工作流，点击「导入」添加 ComfyUI 工作流',
+                      context.l10n.settings_comfyUiNoCustomWorkflows,
                       style: theme.textTheme.bodySmall?.copyWith(
                         color:
                             theme.colorScheme.onSurface.withValues(alpha: 0.4),
@@ -251,13 +257,8 @@ class _ComfyUISettingsSectionState
   }
 
   Widget _buildWorkflowTile(ThemeData theme, WorkflowTemplate template) {
-    final categoryLabel = switch (template.category) {
-      WorkflowCategory.enhance => '增强/超分',
-      WorkflowCategory.img2img => '图生图',
-      WorkflowCategory.inpaint => '重绘',
-      WorkflowCategory.txt2img => '文生图',
-      WorkflowCategory.custom => '自定义',
-    };
+    final categoryLabel = template.category.localizedLabel(context);
+    final description = template.localizedDescription(context);
 
     return ListTile(
       leading: Icon(
@@ -266,16 +267,17 @@ class _ComfyUISettingsSectionState
             ? theme.colorScheme.primary
             : theme.colorScheme.tertiary,
       ),
-      title: Text(template.name),
+      title: Text(template.localizedName(context)),
       subtitle: Text(
-        '$categoryLabel · ${template.slots.length} 个槽位'
-        '${template.description.isNotEmpty ? " · ${template.description}" : ""}',
+        '$categoryLabel · '
+        '${context.l10n.settings_comfyUiSlotCount(template.slots.length)}'
+        '${description.isNotEmpty ? " · $description" : ""}',
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
       trailing: template.isBuiltin
           ? Chip(
-              label: const Text('内置'),
+              label: Text(context.l10n.settings_comfyUiBuiltin),
               labelStyle: theme.textTheme.bodySmall,
               padding: EdgeInsets.zero,
               visualDensity: VisualDensity.compact,
@@ -295,19 +297,23 @@ class _ComfyUISettingsSectionState
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('删除工作流'),
-        content: Text('确定要删除工作流「${template.name}」吗？此操作不可撤销。'),
+        title: Text(context.l10n.settings_comfyUiDeleteWorkflowTitle),
+        content: Text(
+          context.l10n.settings_comfyUiDeleteWorkflowContent(
+            template.localizedName(context),
+          ),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('取消'),
+            child: Text(context.l10n.common_cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
             style: FilledButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.error,
             ),
-            child: const Text('删除'),
+            child: Text(context.l10n.common_delete),
           ),
         ],
       ),
@@ -317,7 +323,12 @@ class _ComfyUISettingsSectionState
       await ref
           .read(comfyUIWorkflowsProvider.notifier)
           .removeCustomTemplate(template.id);
-      if (mounted) AppToast.success(context, '已删除: ${template.name}');
+      if (mounted) {
+        AppToast.success(
+          context,
+          context.l10n.settings_comfyUiDeleted(template.localizedName(context)),
+        );
+      }
     }
   }
 
@@ -332,11 +343,14 @@ class _ComfyUISettingsSectionState
           await ref.read(comfyUIConnectionProvider.notifier).testConnection();
       if (mounted) {
         setState(() {
-          _testResult = ok ? 'ok' : '服务器无响应';
+          _testResult = ok ? 'ok' : context.l10n.settings_comfyUiNoResponse;
           _isTesting = false;
         });
         if (ok) {
-          AppToast.success(context, 'ComfyUI 连接成功');
+          AppToast.success(
+            context,
+            'ComfyUI ${context.l10n.settings_comfyUiConnectionSuccess}',
+          );
         }
       }
     } catch (e) {
@@ -349,16 +363,19 @@ class _ComfyUISettingsSectionState
     }
   }
 
-  String _connectionStatusText(ComfyUIConnectionStatus status) {
+  String _connectionStatusText(
+    BuildContext context,
+    ComfyUIConnectionStatus status,
+  ) {
     switch (status) {
       case ComfyUIConnectionStatus.disconnected:
-        return '未连接';
+        return context.l10n.settings_comfyUiStatusDisconnected;
       case ComfyUIConnectionStatus.connecting:
-        return '正在连接...';
+        return context.l10n.settings_comfyUiStatusConnecting;
       case ComfyUIConnectionStatus.connected:
-        return '已连接';
+        return context.l10n.settings_comfyUiStatusConnected;
       case ComfyUIConnectionStatus.error:
-        return '连接异常';
+        return context.l10n.settings_comfyUiStatusError;
     }
   }
 }

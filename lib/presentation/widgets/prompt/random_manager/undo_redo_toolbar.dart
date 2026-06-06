@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/utils/localization_extension.dart';
 import '../../common/elevated_card.dart';
 
 /// 操作历史记录
@@ -93,14 +94,14 @@ class _UndoRedoToolbarState extends State<UndoRedoToolbar> {
       children: [
         _UndoRedoButton(
           icon: Icons.undo,
-          tooltip: '撤销 (Ctrl+Z)',
+          tooltip: '${context.l10n.common_undo} (Ctrl+Z)',
           enabled: widget.canUndo,
           onPressed: widget.onUndo,
         ),
         const SizedBox(width: 4),
         _UndoRedoButton(
           icon: Icons.redo,
-          tooltip: '重做 (Ctrl+Y)',
+          tooltip: '${context.l10n.common_redo} (Ctrl+Y)',
           enabled: widget.canRedo,
           onPressed: widget.onRedo,
         ),
@@ -122,7 +123,7 @@ class _UndoRedoToolbarState extends State<UndoRedoToolbar> {
           // 撤销按钮
           _UndoRedoButton(
             icon: Icons.undo,
-            tooltip: '撤销 (Ctrl+Z)',
+            tooltip: '${context.l10n.common_undo} (Ctrl+Z)',
             enabled: widget.canUndo,
             onPressed: widget.onUndo,
             badge: widget.showCounts && widget.undoCount > 0
@@ -139,7 +140,7 @@ class _UndoRedoToolbarState extends State<UndoRedoToolbar> {
           // 重做按钮
           _UndoRedoButton(
             icon: Icons.redo,
-            tooltip: '重做 (Ctrl+Y)',
+            tooltip: '${context.l10n.common_redo} (Ctrl+Y)',
             enabled: widget.canRedo,
             onPressed: widget.onRedo,
             badge: widget.showCounts && widget.redoCount > 0
@@ -262,8 +263,8 @@ class HistoryDropdown<T> extends StatelessWidget {
     required this.items,
     required this.itemBuilder,
     required this.onSelect,
-    this.title = '操作历史',
-    this.emptyMessage = '无历史记录',
+    this.title = '',
+    this.emptyMessage = '',
   });
 
   final List<T> items;
@@ -276,6 +277,11 @@ class HistoryDropdown<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final effectiveTitle =
+        title.isEmpty ? context.l10n.randomManager_operationHistory : title;
+    final effectiveEmptyMessage = emptyMessage.isEmpty
+        ? context.l10n.randomManager_noHistory
+        : emptyMessage;
 
     return Container(
       width: 280,
@@ -317,14 +323,14 @@ class HistoryDropdown<T> extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  title,
+                  effectiveTitle,
                   style: theme.textTheme.labelLarge?.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 const Spacer(),
                 Text(
-                  '${items.length} 项',
+                  '${items.length} ${context.l10n.common_items}',
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),
@@ -337,7 +343,7 @@ class HistoryDropdown<T> extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(24),
               child: Text(
-                emptyMessage,
+                effectiveEmptyMessage,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),

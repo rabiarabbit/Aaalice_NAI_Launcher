@@ -9,6 +9,7 @@ import '../../../../data/models/tag_library/tag_library_entry.dart';
 import '../../../providers/fixed_tags_provider.dart';
 import '../../../providers/layout_state_provider.dart';
 import '../../../providers/tag_library_page_provider.dart';
+import '../../../../core/utils/localization_extension.dart';
 import '../../../widgets/common/app_toast.dart';
 import '../../../widgets/common/themed_confirm_dialog.dart';
 import '../../../widgets/prompt/fixed_tag_edit_dialog.dart';
@@ -152,13 +153,16 @@ class _FixedTagsSidebarState extends ConsumerState<FixedTagsSidebar> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '固定词侧栏',
+                  context.l10n.fixedTags_sidebarTitle,
                   style: theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w800,
                   ),
                 ),
                 Text(
-                  '已启用 ${fixedState.enabledCount + fixedState.negativeEnabledCount} / ${fixedState.entries.length}',
+                  context.l10n.fixedTags_enabledCount(
+                    fixedState.enabledCount + fixedState.negativeEnabledCount,
+                    fixedState.entries.length,
+                  ),
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
@@ -167,7 +171,9 @@ class _FixedTagsSidebarState extends ConsumerState<FixedTagsSidebar> {
             ),
           ),
           IconButton(
-            tooltip: isListMode ? '切换网格视图' : '切换列表视图',
+            tooltip: isListMode
+                ? context.l10n.fixedTags_switchGridView
+                : context.l10n.fixedTags_switchListView,
             icon: Icon(
               isListMode ? Icons.grid_view_rounded : Icons.view_agenda_outlined,
               size: 18,
@@ -179,7 +185,7 @@ class _FixedTagsSidebarState extends ConsumerState<FixedTagsSidebar> {
             },
           ),
           PopupMenuButton<_AddAction>(
-            tooltip: '添加固定词',
+            tooltip: context.l10n.fixedTags_add,
             icon: const Icon(Icons.add_rounded, size: 20),
             onSelected: (action) {
               switch (action) {
@@ -197,23 +203,23 @@ class _FixedTagsSidebarState extends ConsumerState<FixedTagsSidebar> {
                   break;
               }
             },
-            itemBuilder: (context) => const [
+            itemBuilder: (context) => [
               PopupMenuItem(
                 value: _AddAction.positive,
-                child: Text('新增正向固定词'),
+                child: Text(context.l10n.fixedTags_addPositive),
               ),
               PopupMenuItem(
                 value: _AddAction.negative,
-                child: Text('新增负向固定词'),
+                child: Text(context.l10n.fixedTags_addNegative),
               ),
-              PopupMenuDivider(),
+              const PopupMenuDivider(),
               PopupMenuItem(
                 value: _AddAction.libraryPositive,
-                child: Text('从词库添加正向'),
+                child: Text(context.l10n.fixedTags_addPositiveFromLibrary),
               ),
               PopupMenuItem(
                 value: _AddAction.libraryNegative,
-                child: Text('从词库添加负向'),
+                child: Text(context.l10n.fixedTags_addNegativeFromLibrary),
               ),
             ],
           ),
@@ -228,12 +234,12 @@ class _FixedTagsSidebarState extends ConsumerState<FixedTagsSidebar> {
       child: TextField(
         controller: _searchController,
         decoration: InputDecoration(
-          hintText: '搜索名称或内容',
+          hintText: context.l10n.fixedTags_searchNameOrContent,
           prefixIcon: const Icon(Icons.search_rounded, size: 18),
           suffixIcon: _searchQuery.isEmpty
               ? null
               : IconButton(
-                  tooltip: '清空搜索',
+                  tooltip: context.l10n.fixedTags_clearSearch,
                   icon: const Icon(Icons.close_rounded, size: 16),
                   onPressed: () {
                     _searchController.clear();
@@ -271,7 +277,7 @@ class _FixedTagsSidebarState extends ConsumerState<FixedTagsSidebar> {
           runSpacing: 6,
           children: [
             _CategoryChip(
-              label: '已启用',
+              label: context.l10n.fixedTags_enabled,
               count: enabledCount,
               selected: _activeCategoryId == _enabledSectionId,
               color: theme.colorScheme.secondary,
@@ -328,14 +334,16 @@ class _FixedTagsSidebarState extends ConsumerState<FixedTagsSidebar> {
         children: [
           _SectionTitle(
             icon: Icons.bolt_rounded,
-            label: '已启用正向',
+            label: context.l10n.fixedTags_enabledPositive,
             count: enabledEntries.length,
             color: theme.colorScheme.secondary,
           ),
           const SizedBox(height: 8),
           if (enabledEntries.isEmpty)
             Text(
-              _searchQuery.isEmpty ? '暂无启用的正向固定词' : '没有匹配的启用固定词',
+              _searchQuery.isEmpty
+                  ? context.l10n.fixedTags_emptyEnabledPositive
+                  : context.l10n.fixedTags_noMatchingEnabled,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -484,13 +492,13 @@ class _FixedTagsSidebarState extends ConsumerState<FixedTagsSidebar> {
                 Expanded(
                   child: _SectionTitle(
                     icon: Icons.block_rounded,
-                    label: '负向固定词',
+                    label: context.l10n.fixedTags_negativeTitle,
                     count: entries.length,
                     color: theme.colorScheme.error,
                   ),
                 ),
                 IconButton(
-                  tooltip: '新增负向固定词',
+                  tooltip: context.l10n.fixedTags_addNegative,
                   icon: const Icon(Icons.add_rounded, size: 18),
                   onPressed: () =>
                       _addEntry(promptType: FixedTagPromptType.negative),
@@ -502,7 +510,9 @@ class _FixedTagsSidebarState extends ConsumerState<FixedTagsSidebar> {
             child: entries.isEmpty
                 ? Center(
                     child: Text(
-                      _searchQuery.isEmpty ? '暂无负向固定词' : '没有匹配的负向固定词',
+                      _searchQuery.isEmpty
+                          ? context.l10n.fixedTags_emptyNegative
+                          : context.l10n.fixedTags_noMatchingNegative,
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
@@ -912,15 +922,15 @@ class _FixedTagsSidebarState extends ConsumerState<FixedTagsSidebar> {
           categoryId: entry.categoryId,
         );
     if (!mounted) return;
-    AppToast.success(context, '已添加到固定词侧栏');
+    AppToast.success(context, context.l10n.fixedTags_addedToSidebar);
   }
 
   Future<void> _deleteEntry(FixedTagEntry entry) async {
     final confirmed = await ThemedConfirmDialog.show(
       context: context,
-      title: '删除固定词',
-      content: '确定要删除“${entry.displayName}”吗？',
-      confirmText: '删除',
+      title: context.l10n.fixedTags_deleteTitle,
+      content: context.l10n.fixedTags_deleteConfirm(entry.displayName),
+      confirmText: context.l10n.common_delete,
       type: ThemedConfirmDialogType.danger,
     );
     if (!confirmed || !mounted) return;
@@ -960,7 +970,7 @@ class _FixedTagsSidebarState extends ConsumerState<FixedTagsSidebar> {
       sections.add(
         _PositiveSection(
           id: categoryId!,
-          name: '未知分类',
+          name: context.l10n.fixedTags_unknownCategory,
           entries: entries,
           color: _categoryColor(categoryId),
         ),
@@ -973,7 +983,7 @@ class _FixedTagsSidebarState extends ConsumerState<FixedTagsSidebar> {
       sections.add(
         _PositiveSection(
           id: _uncategorizedSectionId,
-          name: '未分类',
+          name: context.l10n.fixedTags_uncategorized,
           entries: uncategorized,
           color: Theme.of(context).colorScheme.outline,
         ),

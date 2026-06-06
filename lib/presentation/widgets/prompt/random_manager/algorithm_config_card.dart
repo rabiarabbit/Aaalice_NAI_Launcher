@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/utils/localization_extension.dart';
 import '../../../providers/random_preset_provider.dart';
 import '../../../../data/models/prompt/algorithm_config.dart';
 import '../../../../data/models/prompt/character_count_config.dart';
 import '../../../../data/models/prompt/random_preset.dart';
 import '../../common/elevated_card.dart';
+import 'random_config_l10n.dart';
 import 'random_manager_widgets.dart';
 
 /// 算法配置卡片组件
@@ -84,6 +86,7 @@ class _AlgorithmConfigCardState extends ConsumerState<AlgorithmConfigCard> {
 
   Widget _buildHeader(BuildContext context, ColorScheme colorScheme) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
 
     return InkWell(
       onTap: () => setState(() => _isExpanded = !_isExpanded),
@@ -121,7 +124,7 @@ class _AlgorithmConfigCardState extends ConsumerState<AlgorithmConfigCard> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    '算法配置',
+                    l10n.randomManager_algorithmConfig,
                     style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: colorScheme.primary,
@@ -158,6 +161,7 @@ class _AlgorithmConfigCardState extends ConsumerState<AlgorithmConfigCard> {
   Widget _buildCompactView(BuildContext context, AlgorithmConfig config) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = context.l10n;
 
     final characterConfig = config.effectiveCharacterCountConfig;
     final countCategories = characterConfig.categories
@@ -211,7 +215,7 @@ class _AlgorithmConfigCardState extends ConsumerState<AlgorithmConfigCard> {
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    '角色数量分布',
+                    l10n.naiAlgorithm_characterCount,
                     style: theme.textTheme.labelSmall?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: colorScheme.onSurfaceVariant,
@@ -224,11 +228,7 @@ class _AlgorithmConfigCardState extends ConsumerState<AlgorithmConfigCard> {
                 final index = entry.key;
                 final category = entry.value;
                 final weight = category.weight;
-                final label = category.count == 0
-                    ? '无人物'
-                    : category.count < 0
-                        ? category.label
-                        : '${category.count}人';
+                final label = l10n.characterCountLabel(category);
                 final widthRatio = maxWeight > 0 ? weight / maxWeight : 0.0;
                 final color = barColors[index % barColors.length];
 
@@ -272,7 +272,7 @@ class _AlgorithmConfigCardState extends ConsumerState<AlgorithmConfigCard> {
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    '单人性别选项',
+                    l10n.randomManager_soloGenderOptions,
                     style: theme.textTheme.labelSmall?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: colorScheme.onSurfaceVariant,
@@ -295,21 +295,21 @@ class _AlgorithmConfigCardState extends ConsumerState<AlgorithmConfigCard> {
                       _GenderSegment(
                         flex: female,
                         color: Colors.pink.shade400,
-                        label: '女',
+                        label: l10n.randomManager_femaleShort,
                         value: female,
                         total: total,
                       ),
                       _GenderSegment(
                         flex: male,
                         color: Colors.blue.shade400,
-                        label: '男',
+                        label: l10n.randomManager_maleShort,
                         value: male,
                         total: total,
                       ),
                       _GenderSegment(
                         flex: other,
                         color: Colors.purple.shade400,
-                        label: '其他',
+                        label: l10n.randomManager_other,
                         value: other,
                         total: total,
                       ),
@@ -324,19 +324,19 @@ class _AlgorithmConfigCardState extends ConsumerState<AlgorithmConfigCard> {
                 children: [
                   ChartLegendItem(
                     icon: Icons.female,
-                    label: '女',
+                    label: l10n.randomManager_femaleShort,
                     value: female,
                     color: Colors.pink.shade400,
                   ),
                   ChartLegendItem(
                     icon: Icons.male,
-                    label: '男',
+                    label: l10n.randomManager_maleShort,
                     value: male,
                     color: Colors.blue.shade400,
                   ),
                   ChartLegendItem(
                     icon: Icons.transgender,
-                    label: '其他',
+                    label: l10n.randomManager_other,
                     value: other,
                     color: Colors.purple.shade400,
                   ),
@@ -356,6 +356,7 @@ class _AlgorithmConfigCardState extends ConsumerState<AlgorithmConfigCard> {
   ) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = context.l10n;
     final isReadOnly = widget.isPresetDefault || preset.isDefault;
     final characterConfig = config.effectiveCharacterCountConfig;
     final countCategories = characterConfig.categories
@@ -383,16 +384,12 @@ class _AlgorithmConfigCardState extends ConsumerState<AlgorithmConfigCard> {
         // 角色数量权重滑块
         SectionHeader(
           icon: Icons.people_outline,
-          title: '角色数量权重',
+          title: l10n.randomManager_characterCountWeight,
           color: colorScheme.primary,
         ),
         const SizedBox(height: 12),
         ...countCategories.map((category) {
-          final label = category.count == 0
-              ? '无人物'
-              : category.count < 0
-                  ? category.label
-                  : '${category.count} 人';
+          final label = l10n.characterCountLabel(category);
           return _WeightSlider(
             label: label,
             value: category.weight,
@@ -411,7 +408,7 @@ class _AlgorithmConfigCardState extends ConsumerState<AlgorithmConfigCard> {
         // 性别权重滑块
         SectionHeader(
           icon: Icons.wc_outlined,
-          title: '性别权重',
+          title: l10n.randomManager_genderWeight,
           color: colorScheme.secondary,
         ),
         const SizedBox(height: 12),
@@ -423,7 +420,7 @@ class _AlgorithmConfigCardState extends ConsumerState<AlgorithmConfigCard> {
                     ? Colors.purple.shade400
                     : Colors.pink.shade400;
             return _WeightSlider(
-              label: option.label,
+              label: l10n.characterTagOptionLabel(option),
               value: option.weight,
               color: color,
               enabled: !isReadOnly,
@@ -441,7 +438,7 @@ class _AlgorithmConfigCardState extends ConsumerState<AlgorithmConfigCard> {
         // 全局设置
         SectionHeader(
           icon: Icons.settings_applications_outlined,
-          title: '全局设置',
+          title: l10n.randomManager_globalSettings,
           color: colorScheme.tertiary,
         ),
         const SizedBox(height: 12),
@@ -456,13 +453,15 @@ class _AlgorithmConfigCardState extends ConsumerState<AlgorithmConfigCard> {
     AlgorithmConfig config,
     bool isReadOnly,
   ) {
+    final l10n = context.l10n;
+
     return Column(
       children: [
         // 季节性词库开关
         _SettingRow(
           icon: Icons.celebration_outlined,
-          label: '启用季节性词库',
-          subtitle: '圣诞节、万圣节等特殊日期词库',
+          label: l10n.randomManager_enableSeasonalWordlists,
+          subtitle: l10n.randomManager_enableSeasonalWordlistsDesc,
           trailing: Switch(
             value: config.enableSeasonalWordlists,
             onChanged: isReadOnly
@@ -478,7 +477,7 @@ class _AlgorithmConfigCardState extends ConsumerState<AlgorithmConfigCard> {
         // 全局强调概率
         _SettingRow(
           icon: Icons.highlight_outlined,
-          label: '全局强调概率',
+          label: l10n.randomManager_globalEmphasisProbability,
           subtitle: '${(config.globalEmphasisProbability * 100).toInt()}%',
           trailing: SizedBox(
             width: 120,

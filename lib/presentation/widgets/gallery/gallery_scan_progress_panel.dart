@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/utils/localization_extension.dart';
 import '../../providers/gallery_scan_progress_provider.dart';
 
 /// 画廊扫描进度面板
@@ -16,6 +17,7 @@ class GalleryScanProgressPanel extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final scanState = ref.watch(galleryScanProgressProvider);
     final theme = Theme.of(context);
+    final l10n = context.l10n;
 
     // 只有在扫描中或刚完成时显示
     if (!scanState.isScanning) {
@@ -58,7 +60,7 @@ class GalleryScanProgressPanel extends ConsumerWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  '正在缓存元数据...',
+                  l10n.localGallery_cachingMetadata,
                   style: theme.textTheme.labelMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: theme.colorScheme.onSurface,
@@ -121,7 +123,7 @@ class GalleryScanProgressPanel extends ConsumerWidget {
           ),
           const SizedBox(height: 12),
           // 元数据缓存统计
-          _buildMetadataStatsCard(theme, stats),
+          _buildMetadataStatsCard(context, theme, stats),
           // 当前文件名
           if (stats.currentFile.isNotEmpty)
             _buildCurrentFile(theme, stats.currentFile),
@@ -131,7 +133,12 @@ class GalleryScanProgressPanel extends ConsumerWidget {
   }
 
   /// 构建元数据缓存统计卡片
-  Widget _buildMetadataStatsCard(ThemeData theme, MetadataCacheStats stats) {
+  Widget _buildMetadataStatsCard(
+    BuildContext context,
+    ThemeData theme,
+    MetadataCacheStats stats,
+  ) {
+    final l10n = context.l10n;
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
@@ -149,7 +156,7 @@ class GalleryScanProgressPanel extends ConsumerWidget {
               ),
               const SizedBox(width: 6),
               Text(
-                '元数据缓存统计',
+                l10n.localGallery_metadataCacheStats,
                 style: theme.textTheme.labelSmall?.copyWith(
                   fontWeight: FontWeight.w600,
                   color: theme.colorScheme.primary,
@@ -164,7 +171,7 @@ class GalleryScanProgressPanel extends ConsumerWidget {
               Expanded(
                 child: _buildStatColumn(
                   theme,
-                  label: '总图片',
+                  label: l10n.localGallery_totalImages,
                   value: '${stats.totalImages}',
                   icon: Icons.photo_library_outlined,
                 ),
@@ -172,7 +179,7 @@ class GalleryScanProgressPanel extends ConsumerWidget {
               Expanded(
                 child: _buildStatColumn(
                   theme,
-                  label: '有元数据',
+                  label: l10n.localGallery_withMetadata,
                   value: '${stats.withMetadata}',
                   icon: Icons.check_circle_outline,
                   valueColor: Colors.green,
@@ -181,7 +188,7 @@ class GalleryScanProgressPanel extends ConsumerWidget {
               Expanded(
                 child: _buildStatColumn(
                   theme,
-                  label: '跳过',
+                  label: l10n.localGallery_skipped,
                   value: '${stats.skipped}',
                   icon: Icons.skip_next_outlined,
                   valueColor: Colors.orange,
@@ -190,7 +197,7 @@ class GalleryScanProgressPanel extends ConsumerWidget {
               Expanded(
                 child: _buildStatColumn(
                   theme,
-                  label: '剩余',
+                  label: l10n.localGallery_remaining,
                   value: '${stats.remaining}',
                   icon: Icons.pending_outlined,
                   valueColor: theme.colorScheme.outline,
