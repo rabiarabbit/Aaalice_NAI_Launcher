@@ -62,27 +62,6 @@ class ComputeGate {
   }
 }
 
-/// 兼容旧调用名的包装器。
-///
-/// 旧名容易误导为“常驻 isolate 池”；实际行为只是通过 [ComputeGate]
-/// 限制每次 Isolate.run 的并发。
-@Deprecated('Use ComputeGate. IsolatePool does not reuse isolates.')
-class IsolatePool {
-  static final IsolatePool _instance = IsolatePool._internal();
-  factory IsolatePool() => _instance;
-  IsolatePool._internal();
-
-  final ComputeGate _gate = ComputeGate();
-
-  Future<T> run<T>(Future<T> Function() task) {
-    return _gate.runIsolate(task);
-  }
-
-  Future<T> runSync<T>(T Function() task) {
-    return _gate.runIsolate(task);
-  }
-}
-
 /// 信号量实现，用于控制并发数量
 class _Semaphore {
   final int maxCount;

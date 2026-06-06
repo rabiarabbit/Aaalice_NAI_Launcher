@@ -12,14 +12,19 @@ import 'scan_config.dart';
 enum ScanStatus {
   /// 空闲 - 初始状态
   idle,
+
   /// 扫描中
   scanning,
+
   /// 已暂停
   paused,
+
   /// 已完成
   completed,
+
   /// 出错
   error,
+
   /// 已取消
   cancelled,
 }
@@ -54,7 +59,11 @@ extension ScanStatusExtension on ScanStatus {
   bool get canResume => this == ScanStatus.paused;
 
   /// 是否可以开始新扫描
-  bool get canStart => this == ScanStatus.idle || this == ScanStatus.completed || this == ScanStatus.error || this == ScanStatus.cancelled;
+  bool get canStart =>
+      this == ScanStatus.idle ||
+      this == ScanStatus.completed ||
+      this == ScanStatus.error ||
+      this == ScanStatus.cancelled;
 }
 
 /// 进度信息
@@ -78,7 +87,8 @@ class ScanProgressInfo {
   final Duration? estimatedRemaining;
 
   /// 进度百分比 (0-100)
-  double get percentage => total > 0 ? (processed / total * 100).clamp(0, 100) : 0;
+  double get percentage =>
+      total > 0 ? (processed / total * 100).clamp(0, 100) : 0;
 
   const ScanProgressInfo({
     this.processed = 0,
@@ -385,10 +395,10 @@ class ScanStateManager {
   bool _shouldCancel = false;
   bool _isScanning = false;
   ScanType? _currentScanType;
-  
+
   // 互斥锁，防止并发扫描
   final _scanLock = Lock();
-  
+
   // 数据库统计（用于显示已有数据）
   int _existingInDatabase = 0;
   int _metadataCacheCount = 0;
@@ -409,44 +419,44 @@ class ScanStateManager {
   bool get isScanning => _isScanning;
   int get existingInDatabase => _existingInDatabase;
   int get metadataCacheCount => _metadataCacheCount;
-  
+
   /// 增加元数据缓存计数
   void incrementMetadataCacheCount() {
     _metadataCacheCount++;
     // 触发进度流更新，让UI刷新元数据计数
     _progressController.add(_progress);
   }
-  
+
   // 跳过的文件计数
   int _skippedCount = 0;
   int get skippedCount => _skippedCount;
-  
+
   /// 增加跳过计数
   void incrementSkippedCount() {
     _skippedCount++;
     _progressController.add(_progress);
   }
-  
+
   /// 重置跳过计数
   void resetSkippedCount() {
     _skippedCount = 0;
   }
-  
+
   // 失败的文件计数
   int _failedCount = 0;
   int get failedCount => _failedCount;
-  
+
   /// 增加失败计数
   void incrementFailedCount() {
     _failedCount++;
     _progressController.add(_progress);
   }
-  
+
   /// 重置失败计数
   void resetFailedCount() {
     _failedCount = 0;
   }
-  
+
   /// 设置元数据缓存计数
   void setMetadataCacheCount(int count) {
     _metadataCacheCount = count;
@@ -475,11 +485,11 @@ class ScanStateManager {
   }
 
   /// 开始扫描
-  /// 
+  ///
   /// [total] 预估的总文件数，用于进度显示
   /// [existingInDatabase] 数据库中已有的图片数量
   /// [metadataCacheCount] 元数据缓存数量
-  /// 
+  ///
   /// 使用互斥锁保证原子性，防止并发扫描
   Future<bool> startScanAsync({
     ScanType? type,
@@ -511,49 +521,13 @@ class ScanStateManager {
       _progressController.add(_progress);
       _statisticsController.add(_statistics);
 
-      logInfo('扫描开始', details: '类型: ${type?.name ?? "unknown"}, 路径: $rootPath, 总数: $total, 已有: $existingInDatabase, 有元数据: $_metadataCacheCount');
+      logInfo(
+        '扫描开始',
+        details:
+            '类型: ${type?.name ?? "unknown"}, 路径: $rootPath, 总数: $total, 已有: $existingInDatabase, 有元数据: $_metadataCacheCount',
+      );
       return true;
     });
-  }
-  
-  /// 同步版本的 startScan（用于需要同步调用的场景）
-  /// 
-  /// ⚠️ 警告：此方法不保证原子性，仅用于向后兼容。
-  /// 新代码应该使用 [startScanAsync]
-  /// 
-  /// @deprecated 使用 [startScanAsync] 代替
-  @Deprecated('使用 startScanAsync 代替，此方法存在竞态条件风险')
-  bool startScan({
-    ScanType? type,
-    String? rootPath,
-    int total = 0,
-    int existingInDatabase = 0,
-    int metadataCacheCount = 0,
-  }) {
-    // 防止并发扫描
-    if (_isScanning) {
-      logWarning('扫描已在进行中，忽略新的扫描请求');
-      return false;
-    }
-
-    _isScanning = true;
-    _currentScanType = type;
-    _existingInDatabase = existingInDatabase;
-    _metadataCacheCount = metadataCacheCount;
-    _skippedCount = 0; // 重置跳过计数
-    _failedCount = 0; // 重置失败计数
-    _status = ScanStatus.scanning;
-    _progress = ScanProgressInfo(total: total);
-    _statistics = ScanStatistics(startTime: DateTime.now());
-    _shouldPause = false;
-    _shouldCancel = false;
-
-    _statusController.add(_status);
-    _progressController.add(_progress);
-    _statisticsController.add(_statistics);
-
-    logInfo('扫描开始', details: '类型: ${type?.name ?? "unknown"}, 路径: $rootPath, 总数: $total, 已有: $existingInDatabase, 有元数据: $_metadataCacheCount');
-    return true;
   }
 
   /// 暂停扫描
@@ -584,7 +558,7 @@ class ScanStateManager {
   }
 
   /// 完成扫描
-  /// 
+  ///
   /// 只清除与当前扫描类型匹配的检查点，避免不同类型扫描互相干扰
   void completeScan() {
     _isScanning = false;
@@ -593,11 +567,12 @@ class ScanStateManager {
     _statusController.add(_status);
     _statisticsController.add(_statistics);
     logInfo(
-        '扫描完成',
-        details: '耗时: ${_statistics.duration.inSeconds}s, '
-            '扫描: ${_statistics.filesScanned}, '
-            '新增: ${_statistics.filesAdded}, '
-            '更新: ${_statistics.filesUpdated}',);
+      '扫描完成',
+      details: '耗时: ${_statistics.duration.inSeconds}s, '
+          '扫描: ${_statistics.filesScanned}, '
+          '新增: ${_statistics.filesAdded}, '
+          '更新: ${_statistics.filesUpdated}',
+    );
     // 只清除与当前扫描类型匹配的检查点
     _clearCheckpointIfTypeMatches(_currentScanType);
     _currentScanType = null;
@@ -732,7 +707,10 @@ class ScanStateManager {
     try {
       await initialize(); // 确保已初始化
       await _box?.put(_checkpointKey, jsonEncode(checkpoint.toJson()));
-      AppLogger.i('Checkpoint saved: ${checkpoint.processedPaths.length} files, type: ${checkpoint.scanType.name}', 'ScanStateManager');
+      AppLogger.i(
+        'Checkpoint saved: ${checkpoint.processedPaths.length} files, type: ${checkpoint.scanType.name}',
+        'ScanStateManager',
+      );
     } catch (e) {
       AppLogger.w('Failed to save checkpoint: $e', 'ScanStateManager');
     }
@@ -766,7 +744,7 @@ class ScanStateManager {
   }
 
   /// 如果检查点类型匹配，则清除检查点
-  /// 
+  ///
   /// 用于避免不同类型扫描互相清除检查点
   Future<void> _clearCheckpointIfTypeMatches(ScanType? type) async {
     if (type == null) {
@@ -777,7 +755,10 @@ class ScanStateManager {
       final checkpoint = await loadCheckpoint();
       if (checkpoint != null && checkpoint.scanType == type) {
         await _box?.delete(_checkpointKey);
-        AppLogger.d('Cleared checkpoint for scan type: ${type.name}', 'ScanStateManager');
+        AppLogger.d(
+          'Cleared checkpoint for scan type: ${type.name}',
+          'ScanStateManager',
+        );
       }
     } catch (e) {
       AppLogger.w('Failed to clear checkpoint by type: $e', 'ScanStateManager');
@@ -859,20 +840,24 @@ typedef UnifiedScanProgressCallback = void Function(ScanProgressInfo progress);
 /// 进度回调转换器
 ///
 /// 将旧的回调格式转换为新的统一格式
-ScanProgressCallback adaptProgressCallback(UnifiedScanProgressCallback? callback) {
+ScanProgressCallback adaptProgressCallback(
+  UnifiedScanProgressCallback? callback,
+) {
   return ({
     required int processed,
     required int total,
     String? currentFile,
     required String phase,
-    int? filesSkipped,  // 新增：传递跳过的文件数
+    int? filesSkipped, // 新增：传递跳过的文件数
   }) {
-    callback?.call(ScanProgressInfo(
-      processed: processed,
-      total: total,
-      currentFile: currentFile,
-      phase: _adaptPhase(phase),
-    ),);
+    callback?.call(
+      ScanProgressInfo(
+        processed: processed,
+        total: total,
+        currentFile: currentFile,
+        phase: _adaptPhase(phase),
+      ),
+    );
   };
 }
 
@@ -885,12 +870,12 @@ ScanPhase _adaptPhase(String phase) {
 }
 
 /// 旧的进度回调类型（保持兼容）
-/// 
+///
 /// 改进：添加 filesSkipped 参数，让UI可以显示包含跳过文件的总进度
 typedef ScanProgressCallback = void Function({
   required int processed,
   required int total,
   String? currentFile,
   required String phase,
-  int? filesSkipped,  // 新增：跳过的文件数
+  int? filesSkipped, // 新增：跳过的文件数
 });
