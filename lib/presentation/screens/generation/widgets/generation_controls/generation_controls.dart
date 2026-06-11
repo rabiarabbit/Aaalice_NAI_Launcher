@@ -29,7 +29,6 @@ class GenerationControls extends ConsumerStatefulWidget {
 }
 
 class _GenerationControlsState extends ConsumerState<GenerationControls> {
-  bool _isHovering = false;
   bool _showAddToQueueButton = false;
 
   @override
@@ -43,8 +42,8 @@ class _GenerationControlsState extends ConsumerState<GenerationControls> {
     final isGenerating =
         isLauncherGenerating || kritaBridgeState.isBridgeGenerating;
 
-    // 悬浮时显示取消，否则显示生成中
-    final showCancel = isLauncherGenerating && _isHovering;
+    // 生成中常驻显示取消入口（与移动端一致）
+    final showCancel = isLauncherGenerating;
 
     final randomMode = ref.watch(randomPromptModeProvider);
 
@@ -200,14 +199,12 @@ class _GenerationControlsState extends ConsumerState<GenerationControls> {
       onEnter: (_) {
         if (!_showAddToQueueButton && shouldShowFloatingButton) {
           setState(() {
-            _isHovering = true;
             _showAddToQueueButton = true;
           });
         }
       },
       onExit: (_) {
         setState(() {
-          _isHovering = false;
           _showAddToQueueButton = false;
         });
       },
