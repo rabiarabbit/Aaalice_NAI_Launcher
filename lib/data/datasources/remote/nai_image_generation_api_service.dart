@@ -111,7 +111,8 @@ class NAIImageGenerationApiService {
         ? effectiveParams.preciseReferences
         : <PreciseReference>[];
 
-    _currentCancelToken = CancelToken();
+    final cancelToken = CancelToken();
+    _currentCancelToken = cancelToken;
 
     try {
       // 0. 采样器版本映射
@@ -262,7 +263,7 @@ class NAIImageGenerationApiService {
       final response = await _dio.post(
         _endpointService.imageUrl(ApiConstants.generateImageEndpoint),
         data: requestData,
-        cancelToken: _currentCancelToken,
+        cancelToken: cancelToken,
         onReceiveProgress: onProgress,
         options: Options(
           responseType: ResponseType.bytes,
@@ -286,7 +287,9 @@ class NAIImageGenerationApiService {
       // 返回图像和 Vibe 编码哈希映射
       return (images, vibeEncodingMap);
     } finally {
-      _currentCancelToken = null;
+      if (identical(_currentCancelToken, cancelToken)) {
+        _currentCancelToken = null;
+      }
     }
   }
 
@@ -353,7 +356,8 @@ class NAIImageGenerationApiService {
         ? effectiveParams.preciseReferences
         : <PreciseReference>[];
 
-    _currentCancelToken = CancelToken();
+    final cancelToken = CancelToken();
+    _currentCancelToken = cancelToken;
 
     try {
       final requestBuildResult = await NAIImageRequestBuilder(
@@ -477,7 +481,7 @@ class NAIImageGenerationApiService {
       final response = await _dio.post<ResponseBody>(
         _endpointService.imageUrl(ApiConstants.generateImageStreamEndpoint),
         data: requestData,
-        cancelToken: _currentCancelToken,
+        cancelToken: cancelToken,
         options: Options(
           responseType: ResponseType.stream,
           headers: {
@@ -495,7 +499,7 @@ class NAIImageGenerationApiService {
       final int totalSteps = effectiveParams.steps;
 
       await for (final chunk in responseStream) {
-        if (_currentCancelToken?.isCancelled ?? false) {
+        if (cancelToken.isCancelled) {
           yield ImageStreamChunk.error('Cancelled');
           return;
         }
@@ -715,7 +719,9 @@ class NAIImageGenerationApiService {
       AppLogger.e('Stream generation failed: $e', 'ImgGen');
       yield ImageStreamChunk.error(e.toString());
     } finally {
-      _currentCancelToken = null;
+      if (identical(_currentCancelToken, cancelToken)) {
+        _currentCancelToken = null;
+      }
     }
   }
 
