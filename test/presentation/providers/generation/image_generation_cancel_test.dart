@@ -231,6 +231,55 @@ void main() {
     expect(state.history, isEmpty);
     expect(state.errorMessage, contains('Cancelled'));
   });
+
+  test('single generation must not complete when stream and fallback are empty',
+      () async {
+    final mockApiService = MockNAIImageGenerationApiService();
+
+    when(
+      () => mockApiService.generateImage(
+        any(),
+        onProgress: any(named: 'onProgress'),
+        focusedInpaintEnabled: any(named: 'focusedInpaintEnabled'),
+        minimumContextMegaPixels: any(named: 'minimumContextMegaPixels'),
+        focusedSelectionRect: any(named: 'focusedSelectionRect'),
+      ),
+    ).thenAnswer((_) async => (<Uint8List>[], <int, String>{}));
+    when(
+      () => mockApiService.generateImageStream(
+        any(),
+        focusedInpaintEnabled: any(named: 'focusedInpaintEnabled'),
+        minimumContextMegaPixels: any(named: 'minimumContextMegaPixels'),
+        focusedSelectionRect: any(named: 'focusedSelectionRect'),
+      ),
+    ).thenAnswer((_) => const Stream<ImageStreamChunk>.empty());
+    when(() => mockApiService.cancelGeneration()).thenReturn(null);
+
+    final container = ProviderContainer(
+      overrides: [
+        naiImageGenerationApiServiceProvider.overrideWithValue(mockApiService),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container
+        .read(notificationSettingsNotifierProvider.notifier)
+        .setSoundEnabled(false);
+
+    final notifier = container.read(imageGenerationNotifierProvider.notifier);
+    final params = container.read(generationParamsNotifierProvider).copyWith(
+          prompt: '1girl',
+          nSamples: 1,
+        );
+
+    await notifier.generate(params);
+
+    final state = container.read(imageGenerationNotifierProvider);
+    expect(state.status, GenerationStatus.error);
+    expect(state.currentImages, isEmpty);
+    expect(state.displayImages, isEmpty);
+    expect(state.history, isEmpty);
+    expect(state.errorMessage, contains('No images returned'));
+  });
 }
 
 Uint8List _validImageBytes({

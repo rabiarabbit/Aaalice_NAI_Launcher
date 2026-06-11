@@ -1071,6 +1071,9 @@ class ImageGenerationNotifier extends _$ImageGenerationNotifier {
           generationRunId,
         );
         if (_shouldAbortGenerationRun(generationRunId)) return;
+        if (imageBytes.isEmpty) {
+          throw Exception('No images returned from generation');
+        }
         final generatedList = imageBytes
             .map(
               (b) => GeneratedImage.create(
@@ -1139,6 +1142,9 @@ class ImageGenerationNotifier extends _$ImageGenerationNotifier {
           generationRunId,
         );
         if (_shouldAbortGenerationRun(generationRunId)) return;
+        if (imageBytes.isEmpty) {
+          throw Exception('No images returned from generation');
+        }
         final generatedList = imageBytes
             .map(
               (b) => GeneratedImage.create(
@@ -1192,6 +1198,9 @@ class ImageGenerationNotifier extends _$ImageGenerationNotifier {
             generationRunId,
           );
           if (_shouldAbortGenerationRun(generationRunId)) return;
+          if (imageBytes.isEmpty) {
+            throw Exception('No images returned from generation');
+          }
           final generatedList = imageBytes
               .map(
                 (b) => GeneratedImage.create(

@@ -56,6 +56,59 @@ void main() {
     );
     await secondHandled;
   });
+
+  test('completed older stream request must not clear newer cancel token',
+      () async {
+    final adapter = _PendingDioAdapter();
+    final dio = Dio()..httpClientAdapter = adapter;
+    final endpointService = NaiApiEndpointService();
+    final service = NAIImageGenerationApiService(
+      dio,
+      NAIImageEnhancementApiService(dio, endpointService),
+      endpointService,
+    );
+
+    final first = service
+        .generateImageStream(const ImageParams(prompt: 'first stream'))
+        .drain<Object?>();
+    final firstHandled = first.then<Object?>((_) => null).catchError(
+          (_) => null,
+        );
+    await _waitForRequestCount(adapter, 1);
+
+    final second = service
+        .generateImageStream(const ImageParams(prompt: 'second stream'))
+        .drain<Object?>();
+    final secondHandled = second.then<Object?>((_) => null).catchError(
+          (_) => null,
+        );
+    await _waitForRequestCount(adapter, 2);
+
+    adapter.requests[0].completeWithError(
+      DioException(
+        requestOptions: adapter.requests[0].options,
+        type: DioExceptionType.cancel,
+      ),
+    );
+    await firstHandled;
+
+    service.cancelGeneration();
+
+    expect(
+      await adapter.requests[1].cancelledWithin(
+        const Duration(milliseconds: 100),
+      ),
+      isTrue,
+    );
+
+    adapter.requests[1].completeWithError(
+      DioException(
+        requestOptions: adapter.requests[1].options,
+        type: DioExceptionType.cancel,
+      ),
+    );
+    await secondHandled;
+  });
 }
 
 Future<void> _waitForRequestCount(
