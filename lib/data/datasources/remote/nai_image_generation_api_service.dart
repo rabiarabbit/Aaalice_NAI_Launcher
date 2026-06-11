@@ -332,7 +332,31 @@ class NAIImageGenerationApiService {
     bool focusedInpaintEnabled = false,
     double minimumContextMegaPixels = 88.0,
     Rect? focusedSelectionRect,
+  }) {
+    final cancelToken = CancelToken();
+    _currentCancelToken = cancelToken;
+
+    return _generateImageStreamWithToken(
+      params,
+      cancelToken: cancelToken,
+      focusedInpaintEnabled: focusedInpaintEnabled,
+      minimumContextMegaPixels: minimumContextMegaPixels,
+      focusedSelectionRect: focusedSelectionRect,
+    );
+  }
+
+  Stream<ImageStreamChunk> _generateImageStreamWithToken(
+    ImageParams params, {
+    required CancelToken cancelToken,
+    bool focusedInpaintEnabled = false,
+    double minimumContextMegaPixels = 88.0,
+    Rect? focusedSelectionRect,
   }) async* {
+    if (cancelToken.isCancelled) {
+      yield ImageStreamChunk.error('Cancelled');
+      return;
+    }
+
     final focusedRequest = _prepareFocusedInpaint(
       params,
       enabled: focusedInpaintEnabled,
@@ -356,10 +380,12 @@ class NAIImageGenerationApiService {
         ? effectiveParams.preciseReferences
         : <PreciseReference>[];
 
-    final cancelToken = CancelToken();
-    _currentCancelToken = cancelToken;
-
     try {
+      if (cancelToken.isCancelled) {
+        yield ImageStreamChunk.error('Cancelled');
+        return;
+      }
+
       final requestBuildResult = await NAIImageRequestBuilder(
         params: effectiveParams,
         encodeVibe: _enhancementService.encodeVibe,
@@ -798,7 +824,10 @@ class NAIImageGenerationApiService {
 }
 
 /// NAIImageGenerationApiService Provider
-@riverpod
+///
+/// keepAlive：服务持有进行中请求的 `_currentCancelToken`，
+/// cancelGeneration() 必须命中发起请求的同一实例，否则取消落空。
+@Riverpod(keepAlive: true)
 NAIImageGenerationApiService naiImageGenerationApiService(Ref ref) {
   final dio = ref.watch(dioClientProvider);
   final enhancementService = ref.watch(naiImageEnhancementApiServiceProvider);

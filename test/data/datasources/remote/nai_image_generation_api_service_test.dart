@@ -109,6 +109,42 @@ void main() {
     );
     await secondHandled;
   });
+
+  test('stream cancelled before listen must not start a request', () async {
+    final adapter = _PendingDioAdapter();
+    final dio = Dio()..httpClientAdapter = adapter;
+    final endpointService = NaiApiEndpointService();
+    final service = NAIImageGenerationApiService(
+      dio,
+      NAIImageEnhancementApiService(dio, endpointService),
+      endpointService,
+    );
+
+    final stream = service.generateImageStream(
+      const ImageParams(prompt: 'cancel before listen'),
+    );
+    service.cancelGeneration();
+
+    final chunksFuture = stream.toList();
+    await _waitForOptionalRequest(adapter);
+    if (adapter.requests.isNotEmpty) {
+      adapter.requests.single.completeWithEmptyStream();
+    }
+    final chunks = await chunksFuture.timeout(
+      const Duration(milliseconds: 100),
+    );
+
+    expect(adapter.requests, isEmpty);
+    expect(chunks, hasLength(1));
+    expect(chunks.single.error, contains('Cancelled'));
+  });
+}
+
+Future<void> _waitForOptionalRequest(_PendingDioAdapter adapter) async {
+  for (var attempt = 0; attempt < 10; attempt += 1) {
+    if (adapter.requests.isNotEmpty) return;
+    await Future<void>.delayed(const Duration(milliseconds: 10));
+  }
 }
 
 Future<void> _waitForRequestCount(
@@ -170,6 +206,18 @@ class _PendingRequest {
         200,
         headers: {
           Headers.contentTypeHeader: ['application/x-zip-compressed'],
+        },
+      ),
+    );
+  }
+
+  void completeWithEmptyStream() {
+    response.complete(
+      ResponseBody.fromBytes(
+        const <int>[],
+        200,
+        headers: {
+          Headers.contentTypeHeader: ['application/x-msgpack'],
         },
       ),
     );

@@ -2,12 +2,14 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:image/image.dart' as img;
 import 'package:mocktail/mocktail.dart';
 import 'package:nai_launcher/core/constants/storage_keys.dart';
+import 'package:nai_launcher/core/network/dio_client.dart';
 import 'package:nai_launcher/data/datasources/remote/nai_image_generation_api_service.dart';
 import 'package:nai_launcher/data/models/image/image_params.dart';
 import 'package:nai_launcher/data/models/image/image_stream_chunk.dart';
@@ -16,6 +18,41 @@ import 'package:nai_launcher/presentation/providers/notification_settings_provid
 
 class MockNAIImageGenerationApiService extends Mock
     implements NAIImageGenerationApiService {}
+
+/// 记录请求与取消状态的假 HTTP 适配器。
+///
+/// 响应永不返回，模拟仍在服务器上运行的 NAI 生成请求。
+class _RecordingHttpAdapter implements HttpClientAdapter {
+  final List<bool> cancelled = [];
+
+  int get requestCount => cancelled.length;
+
+  @override
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<Uint8List>? requestStream,
+    Future<void>? cancelFuture,
+  ) {
+    final index = cancelled.length;
+    cancelled.add(false);
+    cancelFuture?.whenComplete(() => cancelled[index] = true);
+    return Completer<ResponseBody>().future;
+  }
+
+  @override
+  void close({bool force = false}) {}
+}
+
+Future<void> _pumpUntil(
+  bool Function() condition, {
+  String? reason,
+}) async {
+  for (var i = 0; i < 400; i++) {
+    if (condition()) return;
+    await Future<void>.delayed(const Duration(milliseconds: 5));
+  }
+  fail(reason ?? 'Condition not met within timeout');
+}
 
 void main() {
   late Directory hiveTempDir;
@@ -279,6 +316,55 @@ void main() {
     expect(state.displayImages, isEmpty);
     expect(state.history, isEmpty);
     expect(state.errorMessage, contains('No images returned'));
+  });
+
+  test('cancel must abort the in-flight HTTP request', () async {
+    // 不替换 naiImageGenerationApiServiceProvider：走真实服务链路，
+    // 复现 generate() 与 cancel() 分别 ref.read 服务实例的生产行为。
+    final adapter = _RecordingHttpAdapter();
+    final container = ProviderContainer(
+      overrides: [
+        dioClientProvider.overrideWithValue(
+          Dio()..httpClientAdapter = adapter,
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container
+        .read(notificationSettingsNotifierProvider.notifier)
+        .setSoundEnabled(false);
+
+    final notifier = container.read(imageGenerationNotifierProvider.notifier);
+    final params = container.read(generationParamsNotifierProvider).copyWith(
+          prompt: '1girl',
+          nSamples: 1,
+        );
+
+    final firstGeneration = notifier.generate(params);
+    await _pumpUntil(
+      () => adapter.requestCount >= 1,
+      reason: 'first generation never reached the HTTP layer',
+    );
+
+    notifier.cancel();
+    await _pumpUntil(
+      () => adapter.cancelled.first,
+      reason: 'cancel() must cancel the CancelToken of the in-flight request; '
+          'otherwise the orphaned generation keeps holding the NAI '
+          'per-account concurrency slot and later generations fail with 429',
+    );
+    await firstGeneration;
+
+    final secondGeneration = notifier.generate(params);
+    await _pumpUntil(
+      () => adapter.requestCount >= 2,
+      reason: 'generation after cancel never reached the HTTP layer',
+    );
+    expect(adapter.cancelled[1], isFalse);
+
+    notifier.cancel();
+    await _pumpUntil(() => adapter.cancelled[1]);
+    await secondGeneration;
   });
 }
 
