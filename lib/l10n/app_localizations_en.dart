@@ -4230,6 +4230,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get drop_img2img => 'Image to Image';
 
   @override
+  String get drop_reversePrompt => 'Reverse Prompt';
+
+  @override
   String get drop_vibeTransfer => 'Vibe Transfer';
 
   @override
@@ -4240,6 +4243,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get drop_addedToImg2Img => 'Added to Image to Image';
+
+  @override
+  String get drop_addedToReversePrompt => 'Added to Reverse Prompt';
 
   @override
   String get drop_addedToVibe => 'Added to Vibe Transfer';

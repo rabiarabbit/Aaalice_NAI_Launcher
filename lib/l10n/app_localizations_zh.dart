@@ -4094,6 +4094,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get drop_img2img => '图生图';
 
   @override
+  String get drop_reversePrompt => '反推';
+
+  @override
   String get drop_vibeTransfer => '风格迁移';
 
   @override
@@ -4104,6 +4107,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get drop_addedToImg2Img => '已添加到图生图';
+
+  @override
+  String get drop_addedToReversePrompt => '已添加到反推';
 
   @override
   String get drop_addedToVibe => '已添加到风格迁移';

@@ -7706,6 +7706,12 @@ abstract class AppLocalizations {
   /// **'Image to Image'**
   String get drop_img2img;
 
+  /// No description provided for @drop_reversePrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Reverse Prompt'**
+  String get drop_reversePrompt;
+
   /// No description provided for @drop_vibeTransfer.
   ///
   /// In en, this message translates to:
@@ -7729,6 +7735,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Added to Image to Image'**
   String get drop_addedToImg2Img;
+
+  /// No description provided for @drop_addedToReversePrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Added to Reverse Prompt'**
+  String get drop_addedToReversePrompt;
 
   /// No description provided for @drop_addedToVibe.
   ///

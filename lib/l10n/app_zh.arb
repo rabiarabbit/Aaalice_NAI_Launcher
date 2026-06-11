@@ -1631,10 +1631,12 @@
   "drop_processing": "正在解析图片...",
   "drop_processingSubtitle": "请稍候",
   "drop_img2img": "图生图",
+  "drop_reversePrompt": "反推",
   "drop_vibeTransfer": "风格迁移",
   "drop_characterReference": "精准参考",
   "drop_unsupportedFormat": "不支持的文件格式",
   "drop_addedToImg2Img": "已添加到图生图",
+  "drop_addedToReversePrompt": "已添加到反推",
   "drop_addedToVibe": "已添加到风格迁移",
   "drop_addedMultipleToVibe": "已添加 {count} 个风格参考",
   "@drop_addedMultipleToVibe": {

@@ -259,6 +259,9 @@ test/presentation/screens/prompt_config/*
 !test/presentation/screens/prompt_config/random_config_screen_test.dart
 !test/presentation/widgets/
 test/presentation/widgets/*
+!test/presentation/widgets/drop/
+test/presentation/widgets/drop/*
+!test/presentation/widgets/drop/image_destination_dialog_test.dart
 !test/presentation/widgets/common/
 test/presentation/widgets/common/*
 !test/presentation/widgets/common/thumbnail_display_test.dart

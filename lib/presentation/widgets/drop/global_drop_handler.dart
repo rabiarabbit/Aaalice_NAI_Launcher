@@ -27,6 +27,7 @@ import '../../providers/fixed_tags_provider.dart';
 import '../../providers/generation/image_workflow_controller.dart';
 import '../../providers/image_generation_provider.dart';
 import '../../providers/replication_queue_provider.dart';
+import '../../providers/reverse_prompt_provider.dart';
 import '../../providers/vibe_library_provider.dart';
 import '../../router/app_router.dart';
 import '../../utils/dropped_file_reader.dart';
@@ -367,6 +368,10 @@ class _GlobalDropHandlerState extends ConsumerState<GlobalDropHandler> {
         _handleImg2Img(bytes, l10n);
         break;
 
+      case ImageDestination.reversePrompt:
+        await _handleReversePrompt(fileName, bytes, l10n);
+        break;
+
       case ImageDestination.vibeTransfer:
         await _handleVibeTransfer(fileName, bytes, notifier, l10n);
         break;
@@ -417,6 +422,21 @@ class _GlobalDropHandlerState extends ConsumerState<GlobalDropHandler> {
 
     if (mounted) {
       AppToast.success(context, l10n.drop_addedToImg2Img);
+    }
+  }
+
+  Future<void> _handleReversePrompt(
+    String fileName,
+    Uint8List bytes,
+    AppLocalizations l10n,
+  ) async {
+    await ref.read(reversePromptProvider.notifier).addImage(
+          bytes,
+          name: fileName,
+        );
+
+    if (mounted) {
+      AppToast.success(context, l10n.drop_addedToReversePrompt);
     }
   }
 
