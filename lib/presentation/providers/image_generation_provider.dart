@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:dio/dio.dart';
 import 'package:image/image.dart' as img;
 import 'package:path/path.dart' as p;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -274,6 +275,7 @@ class ImageGenerationNotifier extends _$ImageGenerationNotifier {
     final random = Random();
     int generatedImages = 0;
     Object? lastBatchError;
+    DateTime? concurrencyDeadline;
 
     // 当前使用的参数（可能会被抽卡模式修改）
     ImageParams currentParams = preparedParams;
@@ -361,6 +363,21 @@ class ImageGenerationNotifier extends _$ImageGenerationNotifier {
           }
           // 点数消耗由 AnlasBalanceWatcher 自动监听余额变化记录
           return;
+        }
+        // 并发限制：等待 NAI 释放额度后重试当前批次（取消可随时中断）
+        if (_isConcurrencyLimited(e)) {
+          concurrencyDeadline ??=
+              DateTime.now().add(_concurrencyRetryBudget);
+          if (DateTime.now().isBefore(concurrencyDeadline)) {
+            AppLogger.w(
+              'NAI 并发限制(429)，${_concurrencyRetryInterval.inSeconds}s 后自动重试第 ${batch + 1} 批',
+              'Generation',
+            );
+            await Future.delayed(_concurrencyRetryInterval);
+            if (_shouldAbortGenerationRun(generationRunId)) return;
+            batch--;
+            continue;
+          }
         }
         // 本批次失败，继续下一批
         lastBatchError = e;
@@ -698,6 +715,17 @@ class ImageGenerationNotifier extends _$ImageGenerationNotifier {
   bool _isRemoteCancelledError(dynamic error, int generationRunId) =>
       !_shouldAbortGenerationRun(generationRunId) && _hasCancelledText(error);
 
+  /// NAI 并发限制（429）自动等待重试。
+  /// 取消生成后服务器仍会占用账号并发额度直至孤儿任务结束，
+  /// 期间新请求会立即 429；自动等待释放而不是直接报错。
+  static const Duration _concurrencyRetryInterval = Duration(seconds: 3);
+  static const Duration _concurrencyRetryBudget = Duration(seconds: 90);
+
+  bool _isConcurrencyLimited(dynamic error) {
+    if (error is DioException) return error.response?.statusCode == 429;
+    return error.toString().contains('API_ERROR_429');
+  }
+
   /// 检查错误是否为流式不支持
   bool _isStreamingNotAllowed(String error) {
     final lower = error.toLowerCase();
@@ -735,6 +763,7 @@ class ImageGenerationNotifier extends _$ImageGenerationNotifier {
       } catch (e) {
         if (_isCancelledError(e, generationRunId)) rethrow;
         if (_isRemoteCancelledError(e, generationRunId)) rethrow;
+        if (_isConcurrencyLimited(e)) rethrow; // 交给上层等待并发额度释放
 
         if (retry < _maxRetries) {
           AppLogger.w(
@@ -909,6 +938,7 @@ class ImageGenerationNotifier extends _$ImageGenerationNotifier {
         } catch (e) {
           if (_isCancelledError(e, generationRunId)) return images;
           if (_isRemoteCancelledError(e, generationRunId)) rethrow;
+          if (_isConcurrencyLimited(e)) rethrow; // 交给上层等待并发额度释放
 
           if (_isStreamingNotAllowed(e.toString())) {
             AppLogger.w(
@@ -954,8 +984,9 @@ class ImageGenerationNotifier extends _$ImageGenerationNotifier {
     ImageParams params,
     int current,
     int total,
-    int generationRunId,
-  ) async {
+    int generationRunId, {
+    DateTime? concurrencyDeadline,
+  }) async {
     if (_shouldAbortGenerationRun(generationRunId)) return;
 
     state = state.copyWith(
@@ -1038,6 +1069,26 @@ class ImageGenerationNotifier extends _$ImageGenerationNotifier {
             );
             streamingNotAllowed = true;
             break;
+          }
+          if (_isConcurrencyLimited(chunk.error ?? '') &&
+              DateTime.now().isBefore(
+                concurrencyDeadline ??=
+                    DateTime.now().add(_concurrencyRetryBudget),
+              )) {
+            // 并发限制：等待 NAI 释放额度后自动重试（取消可随时中断）
+            AppLogger.w(
+              'NAI 并发限制(429)，${_concurrencyRetryInterval.inSeconds}s 后自动重试',
+              'Generation',
+            );
+            await Future.delayed(_concurrencyRetryInterval);
+            if (_shouldAbortGenerationRun(generationRunId)) return;
+            return _generateSingle(
+              params,
+              current,
+              total,
+              generationRunId,
+              concurrencyDeadline: concurrencyDeadline,
+            );
           }
           state = state.copyWith(
             status: GenerationStatus.error,
@@ -1187,6 +1238,25 @@ class ImageGenerationNotifier extends _$ImageGenerationNotifier {
             clearStreamPreview: true,
           );
         }
+      } else if (_isConcurrencyLimited(e) &&
+          DateTime.now().isBefore(
+            concurrencyDeadline ??=
+                DateTime.now().add(_concurrencyRetryBudget),
+          )) {
+        // 并发限制：等待 NAI 释放额度后自动重试（取消可随时中断）
+        AppLogger.w(
+          'NAI 并发限制(429)，${_concurrencyRetryInterval.inSeconds}s 后自动重试',
+          'Generation',
+        );
+        await Future.delayed(_concurrencyRetryInterval);
+        if (_shouldAbortGenerationRun(generationRunId)) return;
+        return _generateSingle(
+          params,
+          current,
+          total,
+          generationRunId,
+          concurrencyDeadline: concurrencyDeadline,
+        );
       } else if (_isStreamingNotAllowed(e.toString())) {
         AppLogger.w(
           'Streaming not allowed (exception), falling back to non-stream API',

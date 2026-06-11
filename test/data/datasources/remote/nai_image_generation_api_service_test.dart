@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:nai_launcher/core/network/nai_api_endpoint.dart';
 import 'package:nai_launcher/core/network/nai_api_endpoint_service.dart';
 import 'package:nai_launcher/data/datasources/remote/nai_image_enhancement_api_service.dart';
 import 'package:nai_launcher/data/datasources/remote/nai_image_generation_api_service.dart';
@@ -137,6 +139,66 @@ void main() {
     expect(adapter.requests, isEmpty);
     expect(chunks, hasLength(1));
     expect(chunks.single.error, contains('Cancelled'));
+  });
+
+  test('cancelGeneration must abort the connection on the wire', () async {
+    // 真实 socket 验证：取消必须让服务器观察到连接断开，
+    // 否则 NovelAI 不会释放账号并发额度，后续请求持续 429。
+    final server = await ServerSocket.bind(InternetAddress.loopbackIPv4, 0);
+    addTearDown(() => server.close());
+
+    final requestReceived = Completer<void>();
+    final connectionClosed = Completer<void>();
+    server.listen((socket) {
+      socket.listen(
+        (_) {
+          if (!requestReceived.isCompleted) requestReceived.complete();
+        },
+        onDone: () {
+          if (!connectionClosed.isCompleted) connectionClosed.complete();
+        },
+        onError: (_) {
+          if (!connectionClosed.isCompleted) connectionClosed.complete();
+        },
+      );
+    });
+
+    // 与 imageGenerationDioClient 一致：默认 HTTP/1.1 适配器
+    final dio = Dio();
+    final endpointService = NaiApiEndpointService()
+      ..setCurrent(
+        NaiApiEndpointConfig.fromInput(
+          mainBaseUrl: '127.0.0.1:${server.port}',
+        ),
+      );
+    final service = NAIImageGenerationApiService(
+      dio,
+      NAIImageEnhancementApiService(dio, endpointService),
+      endpointService,
+    );
+
+    final generation = service
+        .generateImageStream(const ImageParams(prompt: 'abort on wire'))
+        .drain<Object?>()
+        .then<Object?>((_) => null)
+        .catchError((_) => null);
+
+    // 服务器已收到请求但故意不响应（模拟 NAI 正在排队出图）
+    await requestReceived.future.timeout(const Duration(seconds: 10));
+    expect(connectionClosed.isCompleted, isFalse);
+
+    service.cancelGeneration();
+
+    await connectionClosed.future.timeout(
+      const Duration(seconds: 3),
+      onTimeout: () => fail(
+        'cancelGeneration() did not abort the connection: the server never '
+        'observed a disconnect, so NovelAI would keep the per-account '
+        'generation slot busy',
+      ),
+    );
+
+    await generation;
   });
 }
 

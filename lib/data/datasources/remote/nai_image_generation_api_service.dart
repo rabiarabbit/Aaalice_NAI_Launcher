@@ -316,7 +316,13 @@ class NAIImageGenerationApiService {
 
   /// 取消当前生成
   void cancelGeneration() {
-    _currentCancelToken?.cancel('User cancelled');
+    final token = _currentCancelToken;
+    // WARNING 级：release 文件日志可见，用于排查取消是否命中在途请求
+    AppLogger.w(
+      'cancelGeneration: hasInFlightToken=${token != null}',
+      'ImgGen',
+    );
+    token?.cancel('User cancelled');
     _currentCancelToken = null;
   }
 
@@ -829,7 +835,8 @@ class NAIImageGenerationApiService {
 /// cancelGeneration() 必须命中发起请求的同一实例，否则取消落空。
 @Riverpod(keepAlive: true)
 NAIImageGenerationApiService naiImageGenerationApiService(Ref ref) {
-  final dio = ref.watch(dioClientProvider);
+  // 生成请求必须可中断（释放 NAI 并发额度），使用 HTTP/1.1 专用客户端
+  final dio = ref.watch(imageGenerationDioClientProvider);
   final enhancementService = ref.watch(naiImageEnhancementApiServiceProvider);
   final endpointService = ref.watch(naiApiEndpointServiceProvider);
   return NAIImageGenerationApiService(

@@ -58,6 +58,39 @@ Dio dioClient(Ref ref) {
   return dio;
 }
 
+/// 图像生成专用 Dio Provider
+///
+/// 始终使用默认 HTTP/1.1 适配器，不用 HTTP/2：
+/// Http2Adapter 在响应到达前取消请求时不会终止 HTTP/2 流
+/// （上游在 2.5.2 移除了 client stream termination），
+/// NovelAI 收不到中止信号会继续生成并占用账号并发额度，
+/// 导致取消后的新请求全部立即 429。
+/// 默认适配器通过 HttpClientRequest.abort() 在任意阶段真正中断请求。
+@Riverpod(keepAlive: true)
+Dio imageGenerationDioClient(Ref ref) {
+  // 监听代理设置变化触发重建：默认适配器在创建 HttpClient 时
+  // 才读取 HttpOverrides.global，代理变更后需要新实例
+  ref.watch(currentProxyAddressProvider);
+
+  final dio = Dio(
+    BaseOptions(
+      connectTimeout: ApiConstants.connectTimeout,
+      receiveTimeout: ApiConstants.receiveTimeout,
+      headers: ApiConstants.defaultHeaders,
+    ),
+  );
+
+  dio.interceptors.add(AuthInterceptor(ref));
+  dio.interceptors.add(ErrorInterceptor());
+
+  AppLogger.d(
+    'Image generation Dio using HTTP/1.1 adapter (abortable)',
+    'NETWORK',
+  );
+
+  return dio;
+}
+
 /// 认证拦截器 - 自动添加 Bearer Token 并支持 401 自动刷新
 class AuthInterceptor extends Interceptor {
   final Ref _ref;

@@ -324,7 +324,7 @@ void main() {
     final adapter = _RecordingHttpAdapter();
     final container = ProviderContainer(
       overrides: [
-        dioClientProvider.overrideWithValue(
+        imageGenerationDioClientProvider.overrideWithValue(
           Dio()..httpClientAdapter = adapter,
         ),
       ],
@@ -365,6 +365,128 @@ void main() {
     notifier.cancel();
     await _pumpUntil(() => adapter.cancelled[1]);
     await secondGeneration;
+  });
+
+  test('429 concurrency limit must auto-retry until the slot frees', () async {
+    final mockApiService = MockNAIImageGenerationApiService();
+    final freshImage = _validImageBytes(width: 512, height: 768);
+    var streamCall = 0;
+
+    when(
+      () => mockApiService.generateImage(
+        any(),
+        onProgress: any(named: 'onProgress'),
+        focusedInpaintEnabled: any(named: 'focusedInpaintEnabled'),
+        minimumContextMegaPixels: any(named: 'minimumContextMegaPixels'),
+        focusedSelectionRect: any(named: 'focusedSelectionRect'),
+      ),
+    ).thenAnswer((_) async => (<Uint8List>[], <int, String>{}));
+    when(
+      () => mockApiService.generateImageStream(
+        any(),
+        focusedInpaintEnabled: any(named: 'focusedInpaintEnabled'),
+        minimumContextMegaPixels: any(named: 'minimumContextMegaPixels'),
+        focusedSelectionRect: any(named: 'focusedSelectionRect'),
+      ),
+    ).thenAnswer((_) {
+      streamCall += 1;
+      if (streamCall == 1) {
+        // 模拟孤儿任务仍占用 NAI 并发额度
+        return Stream.value(
+          ImageStreamChunk.error(
+            'API_ERROR_429|A previous request is still being processed',
+          ),
+        );
+      }
+      return Stream.value(ImageStreamChunk.complete(freshImage));
+    });
+    when(() => mockApiService.cancelGeneration()).thenReturn(null);
+
+    final container = ProviderContainer(
+      overrides: [
+        naiImageGenerationApiServiceProvider.overrideWithValue(mockApiService),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container
+        .read(notificationSettingsNotifierProvider.notifier)
+        .setSoundEnabled(false);
+
+    final notifier = container.read(imageGenerationNotifierProvider.notifier);
+    final params = container.read(generationParamsNotifierProvider).copyWith(
+          prompt: '1girl',
+          nSamples: 1,
+        );
+
+    await notifier.generate(params);
+
+    final state = container.read(imageGenerationNotifierProvider);
+    expect(streamCall, 2);
+    expect(state.status, GenerationStatus.completed);
+    expect(state.currentImages, hasLength(1));
+    expect(state.currentImages.single.bytes, orderedEquals(freshImage));
+  });
+
+  test('cancel during 429 wait must stop retrying', () async {
+    final mockApiService = MockNAIImageGenerationApiService();
+    var streamCall = 0;
+
+    when(
+      () => mockApiService.generateImage(
+        any(),
+        onProgress: any(named: 'onProgress'),
+        focusedInpaintEnabled: any(named: 'focusedInpaintEnabled'),
+        minimumContextMegaPixels: any(named: 'minimumContextMegaPixels'),
+        focusedSelectionRect: any(named: 'focusedSelectionRect'),
+      ),
+    ).thenAnswer((_) async => (<Uint8List>[], <int, String>{}));
+    when(
+      () => mockApiService.generateImageStream(
+        any(),
+        focusedInpaintEnabled: any(named: 'focusedInpaintEnabled'),
+        minimumContextMegaPixels: any(named: 'minimumContextMegaPixels'),
+        focusedSelectionRect: any(named: 'focusedSelectionRect'),
+      ),
+    ).thenAnswer((_) {
+      streamCall += 1;
+      return Stream.value(
+        ImageStreamChunk.error(
+          'API_ERROR_429|A previous request is still being processed',
+        ),
+      );
+    });
+    when(() => mockApiService.cancelGeneration()).thenReturn(null);
+
+    final container = ProviderContainer(
+      overrides: [
+        naiImageGenerationApiServiceProvider.overrideWithValue(mockApiService),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container
+        .read(notificationSettingsNotifierProvider.notifier)
+        .setSoundEnabled(false);
+
+    final notifier = container.read(imageGenerationNotifierProvider.notifier);
+    final params = container.read(generationParamsNotifierProvider).copyWith(
+          prompt: '1girl',
+          nSamples: 1,
+        );
+
+    final generation = notifier.generate(params);
+    await _pumpUntil(() => streamCall >= 1);
+
+    // 此刻位于 429 等待期内，取消必须终止自动重试
+    notifier.cancel();
+    await generation;
+
+    expect(
+      container.read(imageGenerationNotifierProvider).status,
+      GenerationStatus.cancelled,
+    );
+    final callsAfterCancel = streamCall;
+    await Future<void>.delayed(const Duration(milliseconds: 3500));
+    expect(streamCall, callsAfterCancel);
   });
 }
 
