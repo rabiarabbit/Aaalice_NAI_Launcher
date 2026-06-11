@@ -273,6 +273,7 @@ class ImageGenerationNotifier extends _$ImageGenerationNotifier {
     final allImages = <GeneratedImage>[];
     final random = Random();
     int generatedImages = 0;
+    Object? lastBatchError;
 
     // 当前使用的参数（可能会被抽卡模式修改）
     ImageParams currentParams = preparedParams;
@@ -362,12 +363,26 @@ class ImageGenerationNotifier extends _$ImageGenerationNotifier {
           return;
         }
         // 本批次失败，继续下一批
+        lastBatchError = e;
         AppLogger.e('生成第 ${batch + 1} 批失败: $e');
         generatedImages += batchSize;
       }
     }
 
     if (!_isCurrentGenerationRun(generationRunId)) return;
+
+    if (!_isCancelled && allImages.isEmpty) {
+      state = state.copyWith(
+        status: GenerationStatus.error,
+        errorMessage:
+            lastBatchError?.toString() ?? 'No images returned from generation',
+        progress: 0.0,
+        currentImage: 0,
+        totalImages: 0,
+        clearStreamPreview: true,
+      );
+      return;
+    }
 
     // 完成（不再随机，保持图像和提示词对应）
     state = state.copyWith(
@@ -666,11 +681,22 @@ class ImageGenerationNotifier extends _$ImageGenerationNotifier {
   }
 
   /// 检查错误是否为取消操作
-  bool _isCancelledError(dynamic error, [int? generationRunId]) =>
-      (generationRunId == null
-          ? _isCancelled
-          : _shouldAbortGenerationRun(generationRunId)) ||
+  bool _hasCancelledText(dynamic error) =>
       error.toString().toLowerCase().contains('cancelled');
+
+  bool _isCancelledError(dynamic error, [int? generationRunId]) {
+    final runWasCancelled = generationRunId == null
+        ? _isCancelled
+        : _shouldAbortGenerationRun(generationRunId);
+    if (runWasCancelled) return true;
+
+    // Current generation paths have run ids. Do not convert a remote
+    // "Cancelled" error into a user cancellation unless this run is stale.
+    return generationRunId == null && _hasCancelledText(error);
+  }
+
+  bool _isRemoteCancelledError(dynamic error, int generationRunId) =>
+      !_shouldAbortGenerationRun(generationRunId) && _hasCancelledText(error);
 
   /// 检查错误是否为流式不支持
   bool _isStreamingNotAllowed(String error) {
@@ -708,6 +734,7 @@ class ImageGenerationNotifier extends _$ImageGenerationNotifier {
         return result;
       } catch (e) {
         if (_isCancelledError(e, generationRunId)) rethrow;
+        if (_isRemoteCancelledError(e, generationRunId)) rethrow;
 
         if (retry < _maxRetries) {
           AppLogger.w(
@@ -881,6 +908,7 @@ class ImageGenerationNotifier extends _$ImageGenerationNotifier {
           }
         } catch (e) {
           if (_isCancelledError(e, generationRunId)) return images;
+          if (_isRemoteCancelledError(e, generationRunId)) rethrow;
 
           if (_isStreamingNotAllowed(e.toString())) {
             AppLogger.w(
@@ -912,6 +940,7 @@ class ImageGenerationNotifier extends _$ImageGenerationNotifier {
             if (_shouldAbortGenerationRun(generationRunId)) return images;
           } else {
             AppLogger.e('生成第 ${currentStart + i} 张图像失败: $e');
+            rethrow;
           }
         }
       }

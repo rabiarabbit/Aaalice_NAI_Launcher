@@ -113,6 +113,124 @@ void main() {
     expect(state.history, hasLength(1));
     expect(state.history.single.bytes, orderedEquals(freshImage));
   });
+
+  test('immediate cancel before stream starts must not poison next generation',
+      () async {
+    final mockApiService = MockNAIImageGenerationApiService();
+    final stream = StreamController<ImageStreamChunk>();
+    final freshImage = _validImageBytes(width: 640, height: 960);
+    var streamCall = 0;
+
+    when(
+      () => mockApiService.generateImage(
+        any(),
+        onProgress: any(named: 'onProgress'),
+        focusedInpaintEnabled: any(named: 'focusedInpaintEnabled'),
+        minimumContextMegaPixels: any(named: 'minimumContextMegaPixels'),
+        focusedSelectionRect: any(named: 'focusedSelectionRect'),
+      ),
+    ).thenAnswer((_) async => (<Uint8List>[], <int, String>{}));
+    when(
+      () => mockApiService.generateImageStream(
+        any(),
+        focusedInpaintEnabled: any(named: 'focusedInpaintEnabled'),
+        minimumContextMegaPixels: any(named: 'minimumContextMegaPixels'),
+        focusedSelectionRect: any(named: 'focusedSelectionRect'),
+      ),
+    ).thenAnswer((_) {
+      streamCall += 1;
+      return stream.stream;
+    });
+    when(() => mockApiService.cancelGeneration()).thenReturn(null);
+
+    final container = ProviderContainer(
+      overrides: [
+        naiImageGenerationApiServiceProvider.overrideWithValue(mockApiService),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container
+        .read(notificationSettingsNotifierProvider.notifier)
+        .setSoundEnabled(false);
+
+    final notifier = container.read(imageGenerationNotifierProvider.notifier);
+    final params = container.read(generationParamsNotifierProvider).copyWith(
+          prompt: '1girl',
+          width: 512,
+          height: 768,
+        );
+
+    final cancelledGeneration = notifier.generate(params);
+    notifier.cancel();
+    await cancelledGeneration;
+
+    final secondGeneration = notifier.generate(
+      params.copyWith(width: 640, height: 960),
+    );
+    await Future<void>.delayed(Duration.zero);
+
+    expect(streamCall, 1);
+
+    stream.add(ImageStreamChunk.complete(freshImage));
+    await stream.close();
+    await secondGeneration;
+
+    final state = container.read(imageGenerationNotifierProvider);
+    expect(state.status, GenerationStatus.completed);
+    expect(state.currentImages, hasLength(1));
+    expect(state.currentImages.single.bytes, orderedEquals(freshImage));
+    expect(state.history, hasLength(1));
+    expect(state.history.single.bytes, orderedEquals(freshImage));
+  });
+
+  test(
+      'non-cancelled batch cancelled error must surface instead of completing empty',
+      () async {
+    final mockApiService = MockNAIImageGenerationApiService();
+
+    when(
+      () => mockApiService.generateImage(
+        any(),
+        onProgress: any(named: 'onProgress'),
+        focusedInpaintEnabled: any(named: 'focusedInpaintEnabled'),
+        minimumContextMegaPixels: any(named: 'minimumContextMegaPixels'),
+        focusedSelectionRect: any(named: 'focusedSelectionRect'),
+      ),
+    ).thenAnswer((_) async => (<Uint8List>[], <int, String>{}));
+    when(
+      () => mockApiService.generateImageStream(
+        any(),
+        focusedInpaintEnabled: any(named: 'focusedInpaintEnabled'),
+        minimumContextMegaPixels: any(named: 'minimumContextMegaPixels'),
+        focusedSelectionRect: any(named: 'focusedSelectionRect'),
+      ),
+    ).thenAnswer((_) => Stream.value(ImageStreamChunk.error('Cancelled')));
+    when(() => mockApiService.cancelGeneration()).thenReturn(null);
+
+    final container = ProviderContainer(
+      overrides: [
+        naiImageGenerationApiServiceProvider.overrideWithValue(mockApiService),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container
+        .read(notificationSettingsNotifierProvider.notifier)
+        .setSoundEnabled(false);
+
+    final notifier = container.read(imageGenerationNotifierProvider.notifier);
+    final params = container.read(generationParamsNotifierProvider).copyWith(
+          prompt: '1girl',
+          nSamples: 2,
+        );
+
+    await notifier.generate(params);
+
+    final state = container.read(imageGenerationNotifierProvider);
+    expect(state.status, GenerationStatus.error);
+    expect(state.currentImages, isEmpty);
+    expect(state.history, isEmpty);
+    expect(state.errorMessage, contains('Cancelled'));
+  });
 }
 
 Uint8List _validImageBytes({

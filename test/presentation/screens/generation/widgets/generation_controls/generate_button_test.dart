@@ -115,4 +115,22 @@ void main() {
     expect(find.text(l10n.generation_generating), findsOneWidget);
     expect(find.byIcon(Icons.stop), findsNothing);
   });
+
+  testWidgets('generating without cancel does not trigger onCancel on tap',
+      (tester) async {
+    var generateCalled = false;
+    var cancelCalled = false;
+    await pumpButton(
+      tester,
+      isGenerating: true,
+      showCancel: false,
+      onGenerate: () => generateCalled = true,
+      onCancel: () => cancelCalled = true,
+    );
+
+    await tester.tap(find.byType(FilledButton));
+
+    expect(generateCalled, isFalse);
+    expect(cancelCalled, isFalse);
+  });
 }
