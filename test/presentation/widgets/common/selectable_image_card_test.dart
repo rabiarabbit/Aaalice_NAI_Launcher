@@ -69,6 +69,43 @@ void main() {
     expect(find.text('放大'), findsOneWidget);
   });
 
+  testWidgets('context menu closes before invoking route launching actions',
+      (tester) async {
+    final navigatorKey = GlobalKey<NavigatorState>();
+
+    await tester.pumpWidget(
+      _buildCardApp(
+        navigatorKey: navigatorKey,
+        onInpaint: () {
+          navigatorKey.currentState!.push(
+            MaterialPageRoute<void>(
+              builder: (_) => const Scaffold(
+                body: Text('inpaint route'),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+
+    final center = tester.getCenter(find.byType(SelectableImageCard));
+    final gesture = await tester.startGesture(
+      center,
+      kind: PointerDeviceKind.mouse,
+      buttons: kSecondaryMouseButton,
+    );
+    addTearDown(gesture.removePointer);
+    await tester.pumpAndSettle();
+    await gesture.up();
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('局部重绘'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('inpaint route'), findsOneWidget);
+    expect(find.byType(ProContextMenu), findsNothing);
+  });
+
   testWidgets('hover actions should expose generation destination shortcuts',
       (tester) async {
     await tester.pumpWidget(
@@ -206,6 +243,7 @@ Widget _buildCardApp({
   VoidCallback? onImageToImage,
   VoidCallback? onVibeTransfer,
   VoidCallback? onPreciseReference,
+  GlobalKey<NavigatorState>? navigatorKey,
 }) {
   final bytes = Uint8List.fromList(
     img.encodePng(img.Image(width: 32, height: 32)),
@@ -213,6 +251,7 @@ Widget _buildCardApp({
 
   return ProviderScope(
     child: MaterialApp(
+      navigatorKey: navigatorKey,
       locale: const Locale('zh'),
       supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: AppLocalizations.localizationsDelegates,

@@ -120,7 +120,6 @@ class _ContextMenuItemState extends State<_ContextMenuItem> {
       onExit: (_) => setState(() => _isHovered = false),
       child: GestureDetector(
         onTap: () {
-          widget.item.onTap?.call();
           widget.onSelect(widget.item);
         },
         child: AnimatedContainer(
