@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import '../../../core/utils/localization_extension.dart';
 import '../../themes/design_tokens.dart';
 
 /// 毛玻璃弹窗容器
@@ -133,6 +134,7 @@ class GlassAlertDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
 
     return GlassDialog(
       width: 320,
@@ -177,7 +179,7 @@ class GlassAlertDialog extends StatelessWidget {
                         foregroundColor: theme.colorScheme.onError,
                       )
                     : null,
-                child: Text(confirmText ?? '确定'),
+                child: Text(confirmText ?? l10n.common_confirm),
               ),
             ],
           ),

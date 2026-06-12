@@ -95,7 +95,7 @@ class _ParameterPanelState extends ConsumerState<ParameterPanel> {
                           .isBridgeGenerating) {
                         AppToast.warning(
                           context,
-                          'Krita Bridge 正在生成，请等待当前任务结束',
+                          context.l10n.kritaBridge_busyGenerating,
                         );
                         return;
                       }

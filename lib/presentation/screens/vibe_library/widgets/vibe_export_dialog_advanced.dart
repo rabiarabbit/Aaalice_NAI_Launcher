@@ -79,9 +79,9 @@ class _VibeExportDialogAdvancedState
   String _getDialogTitle() {
     if (_isSingleBundle) {
       final entry = widget.entries.first;
-      return '导出 Bundle: ${entry.displayName}';
+      return 'Export Bundle: ${entry.displayName}';
     }
-    return '导出 Vibe (${widget.entries.length} 个选中)';
+    return 'Export Vibes (${widget.entries.length} selected)';
   }
 
   @override
@@ -290,7 +290,7 @@ class _VibeExportDialogAdvancedState
                       onPressed:
                           _validateExportOptions().isValid ? _export : null,
                       icon: const Icon(Icons.file_upload),
-                      label: const Text('导出'),
+                      label: Text(context.l10n.common_export),
                     ),
                   ],
                 ),
@@ -327,7 +327,7 @@ class _VibeExportDialogAdvancedState
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  '导出方式',
+                  'Export Method',
                   style: theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
@@ -340,12 +340,12 @@ class _VibeExportDialogAdvancedState
             segments: const [
               ButtonSegment<bool>(
                 value: true,
-                label: Text('整个 Bundle'),
+                label: Text('Whole Bundle'),
                 icon: Icon(Icons.folder_zip),
               ),
               ButtonSegment<bool>(
                 value: false,
-                label: Text('内部 Vibe'),
+                label: Text('Internal Vibe'),
                 icon: Icon(Icons.layers),
               ),
             ],
@@ -360,8 +360,8 @@ class _VibeExportDialogAdvancedState
           const SizedBox(height: 8),
           Text(
             _exportWholeBundle
-                ? '导出为 .naiv4vibebundle 文件，包含所有 $count 个 vibe'
-                : '选择 bundle 内部的 vibe 单独导出为 .naiv4vibe 文件（共 $count 个）',
+                ? 'Export as a .naiv4vibebundle file containing all $count vibes'
+                : 'Select internal bundle vibes to export separately as .naiv4vibe files ($count total)',
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.outline,
             ),
@@ -399,7 +399,7 @@ class _VibeExportDialogAdvancedState
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  '选择要导出的 Vibe',
+                  'Select Vibes to export',
                   style: theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
@@ -416,7 +416,9 @@ class _VibeExportDialogAdvancedState
                   });
                 },
                 child: Text(
-                  _selectedInternalVibes.every((v) => v) ? '全不选' : '全选',
+                  _selectedInternalVibes.every((v) => v)
+                      ? context.l10n.common_deselectAll
+                      : context.l10n.common_selectAll,
                 ),
               ),
             ],
@@ -488,7 +490,8 @@ class _VibeExportDialogAdvancedState
               },
             ),
           ),
-          if (_errorMessage != null && _errorMessage!.contains('请至少选择一个')) ...[
+          if (_errorMessage != null &&
+              _errorMessage!.contains('Select at least one')) ...[
             const SizedBox(height: 8),
             Text(
               _errorMessage!,
@@ -521,8 +524,8 @@ class _VibeExportDialogAdvancedState
       icon: Icons.folder_zip_outlined,
       title: isBundle ? 'Export Bundle' : 'Export as Files',
       subtitle: isBundle
-          ? '导出为 .naiv4vibebundle 文件'
-          : '导出为 .naiv4vibe 或 .naiv4vibebundle 文件',
+          ? 'Export as a .naiv4vibebundle file'
+          : 'Export as .naiv4vibe or .naiv4vibebundle files',
       child: _exportBundle
           ? Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -536,8 +539,9 @@ class _VibeExportDialogAdvancedState
                   onChanged: (value) {
                     setState(() => _bundleIncludeThumbnail = value ?? true);
                   },
-                  title: '包含缩略图',
-                  subtitle: '导出文件中包含预览缩略图',
+                  title: context.l10n.vibe_export_include_thumbnails,
+                  subtitle:
+                      context.l10n.vibe_export_include_thumbnails_subtitle,
                 ),
                 const SizedBox(height: 8),
                 _buildCheckbox(
@@ -545,8 +549,9 @@ class _VibeExportDialogAdvancedState
                   onChanged: (value) {
                     setState(() => _bundleCompress = value ?? false);
                   },
-                  title: '压缩数据',
-                  subtitle: '使用压缩减少文件大小（推荐用于批量导出）',
+                  title: 'Compress data',
+                  subtitle:
+                      'Use compression to reduce file size (recommended for batch export)',
                 ),
               ],
             )
@@ -579,8 +584,8 @@ class _VibeExportDialogAdvancedState
       icon: Icons.image_outlined,
       title: 'Export as PNG',
       subtitle: isBundleInternalExport
-          ? '从 bundle 导出单个 vibe 时不支持嵌入图片'
-          : '将 Vibe 数据嵌入到 PNG 图片元数据中导出',
+          ? 'Embedding into an image is not supported when exporting a single internal bundle vibe'
+          : 'Embed Vibe data into PNG metadata',
       child: _embedIntoImage
           ? Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -590,7 +595,7 @@ class _VibeExportDialogAdvancedState
                 const SizedBox(height: 12),
                 if (isBatchPngExport) ...[
                   Text(
-                    '批量导出会使用每个 Vibe 的第一张可用图片；没有图片的条目会自动跳过',
+                    'Batch export uses each Vibe\'s first available image. Entries without images are skipped automatically.',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.outline,
                       fontStyle: FontStyle.italic,
@@ -598,7 +603,7 @@ class _VibeExportDialogAdvancedState
                   ),
                 ] else if (_carrierImageOptions.isNotEmpty) ...[
                   Text(
-                    '导出载体图',
+                    'Export carrier image',
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
@@ -650,7 +655,7 @@ class _VibeExportDialogAdvancedState
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : const Icon(Icons.folder_open),
-                    label: const Text('选择外部 PNG 图片...'),
+                    label: const Text('Select external PNG image...'),
                   ),
                 ] else if (!isBatchPngExport) ...[
                   Row(
@@ -689,7 +694,7 @@ class _VibeExportDialogAdvancedState
                             TextButton.icon(
                               onPressed: _isValidatingImage ? null : _pickImage,
                               icon: const Icon(Icons.refresh, size: 16),
-                              label: const Text('更换'),
+                              label: Text(context.l10n.common_change),
                               style: TextButton.styleFrom(
                                 padding: EdgeInsets.zero,
                                 minimumSize: Size.zero,
@@ -704,7 +709,7 @@ class _VibeExportDialogAdvancedState
                   if (_selectedImagePath != null) ...[
                     const SizedBox(height: 8),
                     Text(
-                      '当前使用外部 PNG 作为导出载体图',
+                      'Using an external PNG as the export carrier image',
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.outline,
                         fontStyle: FontStyle.italic,
@@ -730,7 +735,7 @@ class _VibeExportDialogAdvancedState
       },
       icon: Icons.code,
       title: 'Export as Encodings',
-      subtitle: '以编码形式导出数据（JSON 或 Base64）',
+      subtitle: 'Export data as encodings (JSON or Base64)',
       child: _exportEncoding
           ? Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -760,8 +765,8 @@ class _VibeExportDialogAdvancedState
                 const SizedBox(height: 8),
                 Text(
                   _encodingAsJson
-                      ? '导出为格式化的 JSON 文件，便于阅读和编辑'
-                      : '导出为纯 Base64 编码，便于复制和分享',
+                      ? 'Export as a formatted JSON file for easier reading and editing'
+                      : 'Export as plain Base64 for copying and sharing',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.outline,
                   ),
@@ -867,14 +872,15 @@ class _VibeExportDialogAdvancedState
     if (!_exportBundle && !_embedIntoImage && !_exportEncoding) {
       return const _ValidationResult(
         isValid: false,
-        errorMessage: '请至少选择一种导出方式',
+        errorMessage: 'Select at least one export method',
       );
     }
 
     if (_embedIntoImage && widget.entries.length > 1) {
       return const _ValidationResult(
         isValid: false,
-        errorMessage: '批量 Vibe 导出不支持嵌入到 PNG，请在单个 Vibe 导出界面使用',
+        errorMessage:
+            'Batch Vibe export does not support embedding into PNG. Use the single Vibe export screen.',
       );
     }
 
@@ -882,7 +888,7 @@ class _VibeExportDialogAdvancedState
     if (_embedIntoImage && _currentCarrierImageBytes() == null) {
       return const _ValidationResult(
         isValid: false,
-        errorMessage: '请选择一个 PNG 载体图用于导出',
+        errorMessage: 'Select a PNG carrier image for export',
       );
     }
 
@@ -892,7 +898,7 @@ class _VibeExportDialogAdvancedState
       if (!hasSelection) {
         return const _ValidationResult(
           isValid: false,
-          errorMessage: '请至少选择一个要导出的内部 vibe',
+          errorMessage: 'Select at least one internal vibe to export',
         );
       }
     }
@@ -908,7 +914,7 @@ class _VibeExportDialogAdvancedState
       final result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['png'],
-        dialogTitle: '选择 PNG 图片',
+        dialogTitle: 'Select PNG image',
       );
 
       if (result != null && result.files.isNotEmpty) {
@@ -926,7 +932,7 @@ class _VibeExportDialogAdvancedState
               bytes[2] != 0x4E ||
               bytes[3] != 0x47) {
             setState(() {
-              _errorMessage = '选择的文件不是有效的 PNG 图片';
+              _errorMessage = 'The selected file is not a valid PNG image';
               _isValidatingImage = false;
             });
             return;
@@ -941,7 +947,7 @@ class _VibeExportDialogAdvancedState
       }
     } catch (e) {
       setState(() {
-        _errorMessage = '选择图片失败: $e';
+        _errorMessage = 'Failed to select image: $e';
       });
     } finally {
       setState(() => _isValidatingImage = false);
@@ -953,7 +959,7 @@ class _VibeExportDialogAdvancedState
     setState(() {
       _isExporting = true;
       _progress = 0.0;
-      _statusMessage = '准备导出...';
+      _statusMessage = 'Preparing export...';
     });
 
     try {
@@ -967,7 +973,7 @@ class _VibeExportDialogAdvancedState
 
       // 导出 Bundle
       if (_exportBundle) {
-        setState(() => _statusMessage = '正在导出 Bundle...');
+        setState(() => _statusMessage = 'Exporting Bundle...');
         final bundlePath = await _exportBundleFile();
         if (bundlePath != null) {
           results.add('Bundle: $bundlePath');
@@ -978,10 +984,10 @@ class _VibeExportDialogAdvancedState
 
       // 嵌入图片
       if (_embedIntoImage) {
-        setState(() => _statusMessage = '正在嵌入图片...');
+        setState(() => _statusMessage = 'Embedding image...');
         final embedPath = await _embedIntoImageFile();
         if (embedPath != null) {
-          results.add('图片: $embedPath');
+          results.add('Image: $embedPath');
         }
         completed++;
         setState(() => _progress = completed / total);
@@ -989,10 +995,10 @@ class _VibeExportDialogAdvancedState
 
       // 导出编码
       if (_exportEncoding) {
-        setState(() => _statusMessage = '正在导出编码...');
+        setState(() => _statusMessage = 'Exporting encoding...');
         final encodingPath = await _exportEncodingFile();
         if (encodingPath != null) {
-          results.add('编码: $encodingPath');
+          results.add('Encoding: $encodingPath');
         }
         completed++;
         setState(() => _progress = 1.0);
@@ -1008,7 +1014,7 @@ class _VibeExportDialogAdvancedState
       if (mounted) {
         setState(() {
           _isExporting = false;
-          _errorMessage = '导出失败: $e';
+          _errorMessage = 'Export failed: $e';
         });
       }
     }
@@ -1047,7 +1053,7 @@ class _VibeExportDialogAdvancedState
     final filePath = entry.filePath;
 
     if (filePath == null || filePath.isEmpty) {
-      throw Exception('Bundle 文件路径为空');
+      throw Exception('Bundle file path is empty');
     }
 
     final storageService = VibeFileStorageService();
@@ -1063,7 +1069,7 @@ class _VibeExportDialogAdvancedState
 
     final outputDirectory = selectedIndices.length > 1
         ? await FilePicker.platform.getDirectoryPath(
-            dialogTitle: '选择 Vibe 导出目录',
+            dialogTitle: 'Select Vibe export folder',
           )
         : null;
     if (selectedIndices.length > 1 &&
@@ -1076,8 +1082,8 @@ class _VibeExportDialogAdvancedState
     for (var i = 0; i < selectedIndices.length; i++) {
       final index = selectedIndices[i];
       setState(
-        () =>
-            _statusMessage = '正在提取 vibe ${i + 1}/${selectedIndices.length}...',
+        () => _statusMessage =
+            'Extracting vibe ${i + 1}/${selectedIndices.length}...',
       );
 
       final vibe = await storageService.extractVibeFromBundle(filePath, index);
@@ -1127,11 +1133,11 @@ class _VibeExportDialogAdvancedState
         fileName: fileName,
       );
     } on InvalidImageFormatException catch (e) {
-      throw Exception('无效的图片格式: ${e.message}');
+      throw Exception('Invalid image format: ${e.message}');
     } on VibeEmbedException catch (e) {
-      throw Exception('嵌入失败: ${e.message}');
+      throw Exception('Embed failed: ${e.message}');
     } catch (e) {
-      throw Exception('嵌入图片失败: $e');
+      throw Exception('Failed to embed image: $e');
     }
   }
 
@@ -1179,7 +1185,7 @@ class _VibeExportDialogAdvancedState
         : 'vibe_encodings_$extension';
 
     final savePath = await FilePicker.platform.saveFile(
-      dialogTitle: '保存编码文件',
+      dialogTitle: 'Save encoding file',
       fileName: fileName,
       type: FileType.custom,
       allowedExtensions: [extension],

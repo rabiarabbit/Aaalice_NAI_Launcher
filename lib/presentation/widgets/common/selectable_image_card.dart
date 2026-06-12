@@ -1200,7 +1200,7 @@ class _SelectableImageCardState extends ConsumerState<SelectableImageCard>
             if (widget.onSendToKrita != null)
               _HoverActionButton(
                 icon: Icons.brush_outlined,
-                tooltip: '发送到 Krita',
+                tooltip: context.l10n.gallery_sendToKritaAction,
                 onTap: widget.onSendToKrita,
               ),
             if (widget.onSaveToLibrary != null)
@@ -1389,7 +1389,7 @@ class _SelectableImageCardState extends ConsumerState<SelectableImageCard>
       items.add(
         ProMenuItem(
           id: 'save',
-          label: '保存图片',
+          label: context.l10n.shortcut_action_save_image,
           icon: Icons.save_alt,
           onTap: () => _saveImage(context),
         ),
@@ -1400,7 +1400,7 @@ class _SelectableImageCardState extends ConsumerState<SelectableImageCard>
       items.add(
         ProMenuItem(
           id: 'copy',
-          label: '复制图片',
+          label: context.l10n.shortcut_action_copy_image,
           icon: Icons.copy,
           onTap: () => _copyImage(context),
         ),
@@ -1412,7 +1412,7 @@ class _SelectableImageCardState extends ConsumerState<SelectableImageCard>
       items.add(
         ProMenuItem(
           id: 'open_folder',
-          label: '在文件夹中打开',
+          label: context.l10n.shortcut_action_open_folder,
           icon: Icons.folder_open,
           onTap: widget.onOpenInExplorer!,
         ),
@@ -1538,7 +1538,7 @@ class _SelectableImageCardState extends ConsumerState<SelectableImageCard>
         items.add(
           ProMenuItem(
             id: 'send_to_krita',
-            label: '发送到 Krita',
+            label: context.l10n.gallery_sendToKritaAction,
             icon: Icons.brush_outlined,
             onTap: widget.onSendToKrita!,
           ),

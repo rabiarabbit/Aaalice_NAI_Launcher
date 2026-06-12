@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:nai_launcher/core/utils/localization_extension.dart';
+
 import '../../../../widgets/common/themed_divider.dart';
 import '../../../../widgets/common/elevated_card.dart';
 
@@ -21,6 +23,7 @@ class DiyGuideDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = context.l10n;
 
     return Dialog(
       shape: RoundedRectangleBorder(
@@ -78,7 +81,7 @@ class DiyGuideDialog extends StatelessWidget {
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
-                              '本指南介绍了 DIY 系统的核心概念和高级功能，帮助您构建强大的动态提示词库。',
+                              l10n.diyGuide_intro,
                               style: theme.textTheme.bodyMedium?.copyWith(
                                 color: colorScheme.onSurface,
                               ),
@@ -89,89 +92,82 @@ class DiyGuideDialog extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     // 功能指南卡片
-                    const _GuideSection(
-                      title: '层级结构 (Hierarchy)',
+                    _GuideSection(
+                      title: l10n.diyGuide_hierarchyTitle,
                       icon: Icons.account_tree_rounded,
                       color: Colors.blue,
-                      description: 'DIY 系统采用三级分类结构来组织提示词，便于管理和检索。',
-                      example:
-                          'Category (分类): 角色特征\n  └─ Group (分组): 发型\n      └─ Tag (标签): 长发, 短发, 双马尾',
+                      description: l10n.diyGuide_hierarchyDescription,
+                      example: l10n.diyGuide_hierarchyExample,
                     ),
-                    const _GuideSection(
-                      title: '选择模式 (Selection Mode)',
+                    _GuideSection(
+                      title: l10n.diyGuide_selectionModeTitle,
                       icon: Icons.select_all_rounded,
                       color: Colors.green,
-                      description: '决定从一个分组(Group)中选取多少个标签。',
-                      example:
-                          '• Random (随机): 每次随机选取一个 (如：随机发色)\n• All (全选): 选取组内所有标签 (如：固定特征组合)',
+                      description: l10n.diyGuide_selectionModeDescription,
+                      example: l10n.diyGuide_selectionModeExample,
                     ),
-                    const _GuideSection(
-                      title: '权重控制 (Weight)',
+                    _GuideSection(
+                      title: l10n.diyGuide_weightTitle,
                       icon: Icons.fitness_center_rounded,
                       color: Colors.orange,
-                      description: '调整特定提示词在生成过程中的影响力。',
-                      example:
-                          '• 增强: {masterpiece} = 1.05倍权重\n• 强力增强: {{{masterpiece}}} = 1.16倍权重\n• 减弱: [bad hands] = 0.95倍权重',
+                      description: l10n.diyGuide_weightDescription,
+                      example: l10n.diyGuide_weightExample,
                     ),
-                    const _GuideSection(
-                      title: '性别限制 (Gender)',
+                    _GuideSection(
+                      title: l10n.diyGuide_genderTitle,
                       icon: Icons.wc_rounded,
                       color: Colors.pink,
-                      description: '限制标签仅对特定性别的角色生效，避免生成错误的特征。',
-                      example:
-                          '• Female: 仅女性角色可用 (如：裙子)\n• Male: 仅男性角色可用 (如：胡须)\n• Any: 通用 (如：T恤)',
+                      description: l10n.diyGuide_genderDescription,
+                      example: l10n.diyGuide_genderExample,
                     ),
-                    const _GuideSection(
-                      title: '作用域 (Scope)',
+                    _GuideSection(
+                      title: l10n.diyGuide_scopeTitle,
                       icon: Icons.layers_rounded,
                       color: Colors.purple,
-                      description: '定义标签是作用于角色本身、背景环境还是全局画面。',
-                      example:
-                          '• Character: 角色特征 (眼睛, 头发)\n• Background: 环境描述 (蓝天, 室内)\n• Global: 画风, 质量词 (best quality)',
+                      description: l10n.diyGuide_scopeDescription,
+                      example: l10n.diyGuide_scopeExample,
                     ),
-                    const _GuideSection(
-                      title: '条件分支 (Conditional)',
+                    _GuideSection(
+                      title: l10n.diyGuide_conditionalTitle,
                       icon: Icons.call_split_rounded,
                       color: Colors.teal,
-                      description: '基于已选标签或其他条件来动态决定后续标签。',
-                      example:
-                          'IF (已选 "下雨")\n  THEN {添加 "雨伞", "湿衣服"}\n  ELSE {添加 "晴朗"}',
+                      description: l10n.diyGuide_conditionalDescription,
+                      example: l10n.diyGuide_conditionalExample,
                     ),
-                    const _GuideSection(
-                      title: '依赖引用 (Dependencies)',
+                    _GuideSection(
+                      title: l10n.diyGuide_dependenciesTitle,
                       icon: Icons.link_rounded,
                       color: Colors.indigo,
-                      description: '建立标签间的关联，选中一个标签时自动引入相关联的其他标签。',
-                      example: '选中 "JK制服" -> 自动引入 "学校背景", "书包"',
+                      description: l10n.diyGuide_dependenciesDescription,
+                      example: l10n.diyGuide_dependenciesExample,
                     ),
-                    const _GuideSection(
-                      title: '可见性规则 (Visibility)',
+                    _GuideSection(
+                      title: l10n.diyGuide_visibilityTitle,
                       icon: Icons.visibility_rounded,
                       color: Colors.cyan,
-                      description: '控制标签在界面上的显示条件，或在生成时的生效条件。',
-                      example: '仅当选中 "魔法少女" 分类时，显示 "魔杖" 选项组',
+                      description: l10n.diyGuide_visibilityDescription,
+                      example: l10n.diyGuide_visibilityExample,
                     ),
-                    const _GuideSection(
-                      title: '时间条件 (Time)',
+                    _GuideSection(
+                      title: l10n.diyGuide_timeTitle,
                       icon: Icons.schedule_rounded,
                       color: Colors.amber,
-                      description: '根据现实时间或设定的模拟时间触发特定标签。',
-                      example:
-                          '• 06:00-18:00 -> 添加 "daylight"\n• 18:00-06:00 -> 添加 "night"',
+                      description: l10n.diyGuide_timeDescription,
+                      example: l10n.diyGuide_timeExample,
                     ),
-                    const _GuideSection(
-                      title: '后处理规则 (Post-processing)',
+                    _GuideSection(
+                      title: l10n.diyGuide_postProcessingTitle,
                       icon: Icons.auto_fix_high_rounded,
                       color: Colors.deepOrange,
-                      description: '在提示词生成最后阶段进行文本替换或清理。',
-                      example: '将所有 "blue eyes" 替换为 "azure eyes" 以获得更独特的描述',
+                      description: l10n.diyGuide_postProcessingDescription,
+                      example: l10n.diyGuide_postProcessingExample,
                     ),
-                    const _GuideSection(
-                      title: '强调概率 (Emphasis)',
+                    _GuideSection(
+                      title: l10n.diyGuide_emphasisTitle,
                       icon: Icons.format_bold_rounded,
                       color: Colors.brown,
-                      description: '为标签随机添加权重符号的概率，增加结果的多样性。',
-                      example: '设置 30% 概率: 约有 1/3 的机会输出 {tag}, 2/3 的机会输出 tag',
+                      description: l10n.diyGuide_emphasisDescription,
+                      example: l10n.diyGuide_emphasisExample,
                     ),
                   ],
                 ),
@@ -188,6 +184,7 @@ class DiyGuideDialog extends StatelessWidget {
   Widget _buildHeader(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = context.l10n;
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -233,13 +230,13 @@ class DiyGuideDialog extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'DIY 功能指南',
+                  l10n.diyGuide_title,
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 Text(
-                  '了解高级功能，创建专属词库',
+                  l10n.diyGuide_subtitle,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),
@@ -262,6 +259,7 @@ class DiyGuideDialog extends StatelessWidget {
   Widget _buildFooter(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = context.l10n;
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -278,7 +276,7 @@ class DiyGuideDialog extends StatelessWidget {
           FilledButton.icon(
             onPressed: () => Navigator.pop(context),
             icon: const Icon(Icons.check_rounded, size: 18),
-            label: const Text('明白了'),
+            label: Text(l10n.common_gotIt),
             style: FilledButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             ),
@@ -392,7 +390,7 @@ class _GuideSection extends StatelessWidget {
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
-                            '示例',
+                            context.l10n.diyGuide_exampleLabel,
                             style: theme.textTheme.labelSmall?.copyWith(
                               color: color,
                               fontWeight: FontWeight.bold,

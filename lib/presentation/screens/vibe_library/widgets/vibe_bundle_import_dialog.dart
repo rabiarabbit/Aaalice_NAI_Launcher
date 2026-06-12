@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 
 import '../../../../core/utils/app_logger.dart';
+import '../../../../core/utils/localization_extension.dart';
 import '../../../../data/models/vibe/vibe_reference.dart';
 
 enum BundleImportOption {
@@ -217,7 +218,7 @@ class _VibeBundleImportDialogState extends State<VibeBundleImportDialog> {
         const SizedBox(width: 12),
         Expanded(
           child: Text(
-            '导入 Vibe Bundle',
+            'Import Vibe Bundle',
             style: theme.textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.w600,
             ),
@@ -226,7 +227,7 @@ class _VibeBundleImportDialogState extends State<VibeBundleImportDialog> {
         IconButton(
           icon: const Icon(Icons.close),
           onPressed: _cancel,
-          tooltip: '取消',
+          tooltip: context.l10n.common_cancel,
         ),
       ],
     );
@@ -270,7 +271,7 @@ class _VibeBundleImportDialogState extends State<VibeBundleImportDialog> {
               _buildInfoChip(
                 theme,
                 icon: Icons.waves,
-                label: '${widget.vibeCount} 个 Vibe',
+                label: '${widget.vibeCount} Vibes',
               ),
               const SizedBox(width: 12),
               if (widget.createdAt != null)
@@ -334,7 +335,7 @@ class _VibeBundleImportDialogState extends State<VibeBundleImportDialog> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '选择导入方式',
+            'Choose import method',
             style: theme.textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.w600,
             ),
@@ -344,24 +345,25 @@ class _VibeBundleImportDialogState extends State<VibeBundleImportDialog> {
             theme,
             option: BundleImportOption.keepAsBundle,
             icon: Icons.folder_zip,
-            title: '作为整体导入',
-            subtitle: '保持 bundle 结构，作为一个条目导入库中',
+            title: 'Import as whole',
+            subtitle:
+                'Keep the bundle structure and import it as one library entry',
           ),
           const SizedBox(height: 8),
           _buildOptionTile(
             theme,
             option: BundleImportOption.split,
             icon: Icons.splitscreen,
-            title: '拆分为独立条目',
-            subtitle: '将每个 vibe 作为独立的库条目导入',
+            title: 'Split into separate entries',
+            subtitle: 'Import each vibe as a separate library entry',
           ),
           const SizedBox(height: 8),
           _buildOptionTile(
             theme,
             option: BundleImportOption.importSelected,
             icon: Icons.checklist,
-            title: '选择要导入的 vibes',
-            subtitle: '只导入您选中的部分 vibe',
+            title: 'Select vibes to import',
+            subtitle: 'Import only the selected vibes',
           ),
         ],
       ),
@@ -443,7 +445,7 @@ class _VibeBundleImportDialogState extends State<VibeBundleImportDialog> {
     return Row(
       children: [
         Text(
-          '选择要导入的 Vibes',
+          'Select Vibes to import',
           style: theme.textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.w600,
           ),
@@ -451,11 +453,11 @@ class _VibeBundleImportDialogState extends State<VibeBundleImportDialog> {
         const Spacer(),
         TextButton(
           onPressed: allSelected ? null : _selectAll,
-          child: const Text('全选'),
+          child: Text(context.l10n.common_selectAll),
         ),
         TextButton(
           onPressed: noneSelected ? null : _selectNone,
-          child: const Text('全不选'),
+          child: Text(context.l10n.common_deselectAll),
         ),
       ],
     );
@@ -470,7 +472,9 @@ class _VibeBundleImportDialogState extends State<VibeBundleImportDialog> {
       children: [
         Expanded(
           child: Text(
-            isSelectable ? '选择并设置每个 Vibe 的参数' : '设置每个 Vibe 的参数',
+            isSelectable
+                ? 'Select and configure each Vibe\'s parameters'
+                : 'Configure each Vibe\'s parameters',
             style: theme.textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.w600,
             ),
@@ -479,11 +483,11 @@ class _VibeBundleImportDialogState extends State<VibeBundleImportDialog> {
         if (isSelectable) ...[
           TextButton(
             onPressed: allSelected ? null : _selectAll,
-            child: const Text('全选'),
+            child: Text(context.l10n.common_selectAll),
           ),
           TextButton(
             onPressed: noneSelected ? null : _selectNone,
-            child: const Text('全不选'),
+            child: Text(context.l10n.common_deselectAll),
           ),
         ],
       ],
@@ -571,7 +575,7 @@ class _VibeBundleImportDialogState extends State<VibeBundleImportDialog> {
                   const SizedBox(height: 8),
                   _buildParamSlider(
                     theme,
-                    label: '强度',
+                    label: context.l10n.vibe_strength,
                     value: _strengthValues[index],
                     min: VibeReference.minStrength,
                     max: VibeReference.maxStrength,
@@ -584,7 +588,7 @@ class _VibeBundleImportDialogState extends State<VibeBundleImportDialog> {
                   const SizedBox(height: 6),
                   _buildParamSlider(
                     theme,
-                    label: '信息提取',
+                    label: context.l10n.vibe_infoExtracted,
                     value: _infoExtractedValues[index],
                     min: VibeReference.minInfoExtracted,
                     max: VibeReference.maxInfoExtracted,
@@ -887,19 +891,19 @@ class _VibeBundleImportDialogState extends State<VibeBundleImportDialog> {
       children: [
         if (_selectedOption == BundleImportOption.importSelected) ...[
           Text(
-            '已选择 ${_selectedIndices.length}/${widget.vibeCount} 个',
+            '${_selectedIndices.length}/${widget.vibeCount} selected',
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.outline,
             ),
           ),
           const SizedBox(width: 16),
         ],
-        TextButton(onPressed: _cancel, child: const Text('取消')),
+        TextButton(onPressed: _cancel, child: Text(context.l10n.common_cancel)),
         const SizedBox(width: 8),
         FilledButton.icon(
           onPressed: canConfirm ? _confirm : null,
           icon: const Icon(Icons.download),
-          label: const Text('导入'),
+          label: Text(context.l10n.common_import),
         ),
       ],
     );

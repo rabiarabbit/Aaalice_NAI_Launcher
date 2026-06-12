@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nai_launcher/core/utils/localization_extension.dart';
 
 import '../../../core/utils/comfyui_prompt_parser.dart';
 import '../../../core/utils/comfyui_prompt_parser/models/comfyui_parse_result.dart';
@@ -61,6 +62,7 @@ class _ComfyuiImportDialogState extends State<ComfyuiImportDialog> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     final characters = widget.parseResult.characters;
 
     return AlertDialog(
@@ -79,8 +81,8 @@ class _ComfyuiImportDialogState extends State<ComfyuiImportDialog> {
             ),
           ),
           const SizedBox(width: 12),
-          const Expanded(
-            child: Text('检测到 ComfyUI 多角色提示词'),
+          Expanded(
+            child: Text(l10n.comfyImport_detectedTitle),
           ),
         ],
       ),
@@ -114,7 +116,7 @@ class _ComfyuiImportDialogState extends State<ComfyuiImportDialog> {
 
             // 角色列表
             Text(
-              '角色列表 (${characters.length})',
+              l10n.comfyImport_characterList(characters.length),
               style: theme.textTheme.titleSmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -140,8 +142,8 @@ class _ComfyuiImportDialogState extends State<ComfyuiImportDialog> {
                 onChanged: (value) {
                   setState(() => _usePosition = value ?? true);
                 },
-                title: const Text('使用位置信息'),
-                subtitle: const Text('将 ComfyUI 区域映射为 NAI 角色位置'),
+                title: Text(l10n.comfyImport_usePositionInfo),
+                subtitle: Text(l10n.comfyImport_usePositionInfoSubtitle),
                 controlAffinity: ListTileControlAffinity.leading,
                 contentPadding: EdgeInsets.zero,
                 dense: true,
@@ -153,7 +155,7 @@ class _ComfyuiImportDialogState extends State<ComfyuiImportDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('取消'),
+          child: Text(l10n.common_cancel),
         ),
         FilledButton(
           onPressed: () {
@@ -165,7 +167,7 @@ class _ComfyuiImportDialogState extends State<ComfyuiImportDialog> {
               ),
             );
           },
-          child: Text('转换 ${characters.length} 个角色'),
+          child: Text(l10n.comfyImport_convertCharacters(characters.length)),
         ),
       ],
     );
@@ -174,13 +176,13 @@ class _ComfyuiImportDialogState extends State<ComfyuiImportDialog> {
   String _getSyntaxTypeName(ComfyuiSyntaxType type) {
     switch (type) {
       case ComfyuiSyntaxType.couple:
-        return 'COUPLE 语法';
+        return context.l10n.comfyImport_syntaxCouple;
       case ComfyuiSyntaxType.andMask:
-        return 'AND+MASK 语法';
+        return context.l10n.comfyImport_syntaxAndMask;
       case ComfyuiSyntaxType.pipe:
-        return '竖线格式';
+        return context.l10n.comfyImport_syntaxPipe;
       case ComfyuiSyntaxType.unknown:
-        return '未知语法';
+        return context.l10n.comfyImport_syntaxUnknown;
     }
   }
 }
@@ -218,7 +220,7 @@ class _GlobalPromptCard extends StatelessWidget {
               ),
               const SizedBox(width: 6),
               Text(
-                '全局提示词',
+                context.l10n.comfyImport_globalPrompt,
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: theme.colorScheme.primary,
                   fontWeight: FontWeight.w600,

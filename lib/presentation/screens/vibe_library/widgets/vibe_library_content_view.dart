@@ -78,9 +78,24 @@ class _VibeLibraryContentViewState
     // 空状态处理
     if (entries.isEmpty) {
       final emptyInfo = _getEmptyStateInfo(state);
+      final l10n = context.l10n;
       return VibeLibraryEmptyView(
-        title: emptyInfo.title,
-        subtitle: emptyInfo.subtitle ?? '',
+        title: switch (emptyInfo.reason) {
+          EmptyStateReason.searchNoResults => l10n.vibeLibrary_emptySearchTitle,
+          EmptyStateReason.noFavorites => l10n.vibeLibrary_emptyFavoritesTitle,
+          EmptyStateReason.noItemsInCategory =>
+            l10n.vibeLibrary_emptyCategoryTitle,
+          EmptyStateReason.defaultEmpty => l10n.vibeLibrary_emptyNoMatchesTitle,
+        },
+        subtitle: switch (emptyInfo.reason) {
+          EmptyStateReason.searchNoResults =>
+            l10n.vibeLibrary_emptySearchSubtitle,
+          EmptyStateReason.noFavorites =>
+            l10n.vibeLibrary_emptyFavoritesSubtitle,
+          EmptyStateReason.noItemsInCategory =>
+            l10n.vibeLibrary_emptyCategorySubtitle,
+          EmptyStateReason.defaultEmpty => '',
+        },
         iconName: emptyInfo.iconName,
       );
     }
@@ -624,10 +639,10 @@ class _VibeLibraryContentViewState
   ) async {
     final confirmed = await ThemedConfirmDialog.show(
       context: context,
-      title: '确认删除',
-      content: '确定要删除 "${entry.displayName}" 吗？此操作无法撤销。',
-      confirmText: '删除',
-      cancelText: '取消',
+      title: context.l10n.common_confirmDelete,
+      content: context.l10n.common_deleteItemConfirm(entry.displayName),
+      confirmText: context.l10n.common_delete,
+      cancelText: context.l10n.common_cancel,
       type: ThemedConfirmDialogType.danger,
       icon: Icons.delete_forever_outlined,
     );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nai_launcher/core/utils/localization_extension.dart';
 
 import '../../../providers/danbooru_preview_provider.dart';
 import '../../../widgets/common/hover_preview_card.dart';
@@ -29,7 +30,7 @@ class TagGroupPreviewContent extends ConsumerWidget {
     final colorScheme = theme.colorScheme;
 
     if (preview.tagCount == 0) {
-      return const PreviewCardError(message: '暂无标签数据');
+      return PreviewCardError(message: context.l10n.danbooruPreview_noTagData);
     }
 
     return Container(
@@ -63,7 +64,7 @@ class TagGroupPreviewContent extends ConsumerWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            '${preview.tagCount} 个标签',
+            context.l10n.tagGroup_tagCount(preview.tagCount),
             style: theme.textTheme.bodySmall?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),
@@ -71,7 +72,7 @@ class TagGroupPreviewContent extends ConsumerWidget {
           const SizedBox(height: 12),
           // 热门标签
           Text(
-            '热门标签',
+            context.l10n.statistics_chartTopTags,
             style: theme.textTheme.labelSmall?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),
@@ -113,7 +114,7 @@ class PoolPreviewContent extends ConsumerWidget {
     final colorScheme = theme.colorScheme;
 
     if (preview.postCount == 0 && preview.name.isEmpty) {
-      return const PreviewCardError(message: '暂无 Pool 数据');
+      return PreviewCardError(message: context.l10n.danbooruPreview_noPoolData);
     }
 
     return Container(
@@ -145,7 +146,9 @@ class PoolPreviewContent extends ConsumerWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            '${_formatNumber(preview.postCount)} 个帖子',
+            context.l10n.danbooruPreview_postCount(
+              _formatNumber(preview.postCount),
+            ),
             style: theme.textTheme.bodySmall?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),

@@ -17,11 +17,11 @@ extension WarmupPhaseExtension on WarmupPhase {
   String get displayName {
     switch (this) {
       case WarmupPhase.critical:
-        return '初始化';
+        return 'critical';
       case WarmupPhase.quick:
-        return '加载中';
+        return 'quick';
       case WarmupPhase.background:
-        return '后台更新';
+        return 'background';
     }
   }
 

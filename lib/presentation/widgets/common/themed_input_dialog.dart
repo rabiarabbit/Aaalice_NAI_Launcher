@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nai_launcher/core/utils/localization_extension.dart';
 import 'package:nai_launcher/presentation/widgets/common/themed_input.dart';
 
 /// 通用输入对话框
@@ -32,10 +33,10 @@ class ThemedInputDialog extends StatefulWidget {
   final String? Function(String)? validator;
 
   /// 确认按钮文字
-  final String confirmText;
+  final String? confirmText;
 
   /// 取消按钮文字
-  final String cancelText;
+  final String? cancelText;
 
   /// 是否多行输入
   final bool multiline;
@@ -50,8 +51,8 @@ class ThemedInputDialog extends StatefulWidget {
     this.hintText,
     this.initialValue,
     this.validator,
-    this.confirmText = '确定',
-    this.cancelText = '取消',
+    this.confirmText,
+    this.cancelText,
     this.multiline = false,
     this.maxLines = 5,
   });
@@ -66,8 +67,8 @@ class ThemedInputDialog extends StatefulWidget {
     String? hintText,
     String? initialValue,
     String? Function(String)? validator,
-    String confirmText = '确定',
-    String cancelText = '取消',
+    String? confirmText,
+    String? cancelText,
     bool multiline = false,
     int maxLines = 5,
   }) {
@@ -138,6 +139,9 @@ class _ThemedInputDialogState extends State<ThemedInputDialog> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
+    final confirmText = widget.confirmText ?? l10n.common_confirm;
+    final cancelText = widget.cancelText ?? l10n.common_cancel;
 
     return AlertDialog(
       backgroundColor: theme.colorScheme.surfaceContainerHigh,
@@ -176,13 +180,13 @@ class _ThemedInputDialogState extends State<ThemedInputDialog> {
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
           child: Text(
-            widget.cancelText,
+            cancelText,
             style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
           ),
         ),
         FilledButton(
           onPressed: _canSubmit ? _submit : null,
-          child: Text(widget.confirmText),
+          child: Text(confirmText),
         ),
       ],
     );

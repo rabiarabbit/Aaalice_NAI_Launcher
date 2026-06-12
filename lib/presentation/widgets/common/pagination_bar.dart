@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:nai_launcher/core/utils/localization_extension.dart';
 import 'package:nai_launcher/presentation/widgets/common/themed_input.dart';
 
 /// Enhanced pagination bar with complete navigation features
@@ -199,13 +200,15 @@ class _PaginationBarState extends State<PaginationBar> {
   }
 
   Widget _buildPageNavigation(ThemeData theme, ColorScheme colorScheme) {
+    final l10n = context.l10n;
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         // First page
         _buildNavButton(
           icon: Icons.first_page,
-          tooltip: '首页',
+          tooltip: l10n.pagination_firstPage,
           onPressed:
               widget.currentPage > 0 ? () => widget.onPageChanged(0) : null,
         ),
@@ -213,7 +216,7 @@ class _PaginationBarState extends State<PaginationBar> {
         // Previous page
         _buildNavButton(
           icon: Icons.chevron_left,
-          tooltip: '上一页',
+          tooltip: l10n.pagination_previousPage,
           onPressed: widget.currentPage > 0
               ? () => widget.onPageChanged(widget.currentPage - 1)
               : null,
@@ -229,7 +232,7 @@ class _PaginationBarState extends State<PaginationBar> {
         // Next page
         _buildNavButton(
           icon: Icons.chevron_right,
-          tooltip: '下一页',
+          tooltip: l10n.pagination_nextPage,
           onPressed: widget.currentPage < widget.totalPages - 1
               ? () => widget.onPageChanged(widget.currentPage + 1)
               : null,
@@ -238,7 +241,7 @@ class _PaginationBarState extends State<PaginationBar> {
         // Last page
         _buildNavButton(
           icon: Icons.last_page,
-          tooltip: '末页',
+          tooltip: l10n.pagination_lastPage,
           onPressed: widget.currentPage < widget.totalPages - 1
               ? () => widget.onPageChanged(widget.totalPages - 1)
               : null,
@@ -389,7 +392,7 @@ class _PaginationBarState extends State<PaginationBar> {
     }
 
     return Tooltip(
-      message: '跳转到页面',
+      message: context.l10n.pagination_jumpToPage,
       child: InkWell(
         onTap: widget.totalPages > 1 ? _startEditing : null,
         borderRadius: BorderRadius.circular(6),
@@ -411,7 +414,7 @@ class _PaginationBarState extends State<PaginationBar> {
               ),
               const SizedBox(width: 4),
               Text(
-                '跳转',
+                context.l10n.pagination_jump,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),
@@ -428,7 +431,7 @@ class _PaginationBarState extends State<PaginationBar> {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          '每页',
+          context.l10n.pagination_itemsPerPage,
           style: theme.textTheme.bodySmall?.copyWith(
             color: colorScheme.onSurfaceVariant,
           ),
@@ -465,7 +468,7 @@ class _PaginationBarState extends State<PaginationBar> {
         ),
         const SizedBox(width: 4),
         Text(
-          '项',
+          context.l10n.pagination_itemUnit,
           style: theme.textTheme.bodySmall?.copyWith(
             color: colorScheme.onSurfaceVariant,
           ),

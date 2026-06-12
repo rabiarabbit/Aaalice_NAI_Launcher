@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/utils/app_logger.dart';
+import '../../core/utils/localization_extension.dart';
 import '../../data/models/online_gallery/danbooru_post.dart';
 
 /// 帖子悬浮提示组件
@@ -23,7 +24,7 @@ class PostTooltip extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Tooltip(
-      richMessage: _buildTooltipContent(post),
+      richMessage: _buildTooltipContent(context, post),
       waitDuration: const Duration(milliseconds: 500),
       showDuration: const Duration(seconds: 10),
       preferBelow: false,
@@ -44,8 +45,9 @@ class PostTooltip extends ConsumerWidget {
 
   /// 构建提示内容（简化版，标签不显示翻译以避免同步查询问题）
   /// 翻译可以通过点击查看详情获取
-  TextSpan _buildTooltipContent(DanbooruPost post) {
+  TextSpan _buildTooltipContent(BuildContext context, DanbooruPost post) {
     final List<InlineSpan> spans = [];
+    final l10n = context.l10n;
 
     // 基本信息
     spans.add(
@@ -115,9 +117,9 @@ class PostTooltip extends ConsumerWidget {
     if (post.artistTags.isNotEmpty) {
       spans.add(const TextSpan(text: '\n\n'));
       spans.add(
-        const TextSpan(
-          text: '🎨 艺术家\n',
-          style: TextStyle(
+        TextSpan(
+          text: '🎨 ${l10n.onlineGallery_artists}\n',
+          style: const TextStyle(
             color: Color(0xFFFF8A8A),
             fontSize: 11,
             fontWeight: FontWeight.bold,
@@ -138,9 +140,9 @@ class PostTooltip extends ConsumerWidget {
     if (post.characterTags.isNotEmpty) {
       spans.add(const TextSpan(text: '\n\n'));
       spans.add(
-        const TextSpan(
-          text: '👤 角色\n',
-          style: TextStyle(
+        TextSpan(
+          text: '👤 ${l10n.onlineGallery_characters}\n',
+          style: const TextStyle(
             color: Color(0xFF8AFF8A),
             fontSize: 11,
             fontWeight: FontWeight.bold,
@@ -173,9 +175,9 @@ class PostTooltip extends ConsumerWidget {
     if (post.copyrightTags.isNotEmpty) {
       spans.add(const TextSpan(text: '\n\n'));
       spans.add(
-        const TextSpan(
-          text: '📺 作品\n',
-          style: TextStyle(
+        TextSpan(
+          text: '📺 ${l10n.onlineGallery_copyrights}\n',
+          style: const TextStyle(
             color: Color(0xFFCC8AFF),
             fontSize: 11,
             fontWeight: FontWeight.bold,
@@ -198,9 +200,9 @@ class PostTooltip extends ConsumerWidget {
     if (post.generalTags.isNotEmpty) {
       spans.add(const TextSpan(text: '\n\n'));
       spans.add(
-        const TextSpan(
-          text: '🏷 标签\n',
-          style: TextStyle(
+        TextSpan(
+          text: '🏷 ${l10n.onlineGallery_tags}\n',
+          style: const TextStyle(
             color: Color(0xFF8AC8FF),
             fontSize: 11,
             fontWeight: FontWeight.bold,

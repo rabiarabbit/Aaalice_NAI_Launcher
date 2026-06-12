@@ -242,7 +242,7 @@ class _AddToLibraryDialogState extends ConsumerState<AddToLibraryDialog> {
         children: [
           Icon(Icons.library_add, color: colorScheme.primary),
           const SizedBox(width: 8),
-          const Text('添加到词库'),
+          Text(l10n.tagLibrary_addToLibrary),
         ],
       ),
       content: SizedBox(
@@ -254,7 +254,7 @@ class _AddToLibraryDialogState extends ConsumerState<AddToLibraryDialog> {
             children: [
               // 内容预览
               Text(
-                '内容预览',
+                l10n.tagLibrary_contentPreview,
                 style: theme.textTheme.labelMedium?.copyWith(
                   color: colorScheme.primary,
                   fontWeight: FontWeight.w600,
@@ -287,14 +287,14 @@ class _AddToLibraryDialogState extends ConsumerState<AddToLibraryDialog> {
               TextField(
                 controller: _nameController,
                 decoration: InputDecoration(
-                  labelText: '显示名称（可选）',
-                  hintText: '输入名称以便识别',
+                  labelText: 'Display name (optional)',
+                  hintText: 'Enter a name to identify it',
                   prefixIcon: const Icon(Icons.label_outline),
                   border: const OutlineInputBorder(),
                   suffixIcon: IconButton(
                     icon: const Icon(Icons.clear),
                     onPressed: () => _nameController.clear(),
-                    tooltip: '清除',
+                    tooltip: l10n.common_clear,
                   ),
                 ),
               ),
@@ -307,21 +307,24 @@ class _AddToLibraryDialogState extends ConsumerState<AddToLibraryDialog> {
 
                   return DropdownButtonFormField<String?>(
                     initialValue: _selectedCategoryId,
-                    decoration: const InputDecoration(
-                      labelText: '目标分类',
-                      prefixIcon: Icon(Icons.folder_outlined),
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: 'Target Category',
+                      prefixIcon: const Icon(Icons.folder_outlined),
+                      border: const OutlineInputBorder(),
                     ),
                     items: [
-                      const DropdownMenuItem(
+                      DropdownMenuItem(
                         value: null,
-                        child: Text('未分类'),
+                        child: Text(l10n.tagLibrary_uncategorized),
                       ),
                       ...categories.map((category) {
                         return DropdownMenuItem(
                           value: category.name,
                           child: Text(
-                            TagSubCategoryHelper.getDisplayName(category),
+                            TagSubCategoryHelper.getDisplayName(
+                              category,
+                              locale: l10n.localeName,
+                            ),
                           ),
                         );
                       }),
@@ -338,14 +341,14 @@ class _AddToLibraryDialogState extends ConsumerState<AddToLibraryDialog> {
               TextField(
                 controller: _tagController,
                 decoration: InputDecoration(
-                  labelText: '添加标签',
-                  hintText: '输入标签后按回车添加',
+                  labelText: l10n.tag_addTag,
+                  hintText: 'Enter a tag and press Enter to add',
                   prefixIcon: const Icon(Icons.tag),
                   border: const OutlineInputBorder(),
                   suffixIcon: IconButton(
                     icon: const Icon(Icons.add),
                     onPressed: _addTag,
-                    tooltip: '添加标签',
+                    tooltip: l10n.tag_addTag,
                   ),
                 ),
                 onSubmitted: (_) => _addTag(),
@@ -387,7 +390,7 @@ class _AddToLibraryDialogState extends ConsumerState<AddToLibraryDialog> {
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
               : const Icon(Icons.save, size: 18),
-          label: Text(_isSaving ? '保存中...' : l10n.common_save),
+          label: Text(_isSaving ? l10n.common_saving : l10n.common_save),
         ),
       ],
     );

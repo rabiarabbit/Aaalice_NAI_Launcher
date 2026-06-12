@@ -50,6 +50,7 @@ class _ThirdPartyApiLoginCardState
   Widget build(BuildContext context) {
     final authState = ref.watch(authNotifierProvider);
     final theme = Theme.of(context);
+    final l10n = context.l10n;
 
     return Form(
       key: _formKey,
@@ -57,7 +58,7 @@ class _ThirdPartyApiLoginCardState
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           FloatingLabelInput(
-            label: '第三方 API 站点',
+            label: l10n.auth_thirdPartyApiSite,
             controller: _mainApiController,
             hintText: 'https://example.com/api',
             prefixIcon: Icons.public_outlined,
@@ -68,9 +69,9 @@ class _ThirdPartyApiLoginCardState
           ),
           const SizedBox(height: 16),
           FloatingLabelInput(
-            label: '图像 API 站点（可选）',
+            label: l10n.auth_imageApiSiteOptional,
             controller: _imageApiController,
-            hintText: '留空则使用同一个第三方 API 站点',
+            hintText: l10n.auth_imageApiSiteHint,
             prefixIcon: Icons.image_outlined,
             keyboardType: TextInputType.url,
             textInputAction: TextInputAction.next,
@@ -78,11 +79,9 @@ class _ThirdPartyApiLoginCardState
           ),
           const SizedBox(height: 16),
           FloatingLabelInput(
-            label: context.l10n.auth_nicknameOptional
-                .replaceAll('（可选）', '')
-                .replaceAll('(optional)', ''),
+            label: l10n.settings_nickname,
             controller: _nicknameController,
-            hintText: '例如：自建站点 / 镜像站点',
+            hintText: l10n.auth_thirdPartyNicknameHint,
             prefixIcon: Icons.person_outline,
             textInputAction: TextInputAction.next,
             required: true,
@@ -97,7 +96,7 @@ class _ThirdPartyApiLoginCardState
           FloatingLabelInput(
             label: 'API Token',
             controller: _tokenController,
-            hintText: '请输入第三方站点提供的 API Token',
+            hintText: l10n.auth_thirdPartyTokenHint,
             prefixIcon: Icons.vpn_key_outlined,
             obscureText: _obscureToken,
             textInputAction: TextInputAction.done,
@@ -135,7 +134,7 @@ class _ThirdPartyApiLoginCardState
           ),
           const SizedBox(height: 12),
           Text(
-            '第三方站点需兼容 NovelAI 的 /user/subscription 与图像生成相关 API；Token 将按 Bearer 方式发送。',
+            l10n.auth_thirdPartyCompatibilityHint,
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -193,7 +192,7 @@ class _ThirdPartyApiLoginCardState
 
   String? _validateMainApiUrl(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return '请输入第三方 API 站点地址';
+      return context.l10n.auth_thirdPartyApiSiteRequired;
     }
 
     try {

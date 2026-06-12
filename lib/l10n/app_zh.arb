@@ -35,6 +35,22 @@
   "common_added": "已添加",
   "common_new": "新建",
   "common_confirmDelete": "确认删除",
+  "common_confirmClear": "确认清空",
+  "common_gotIt": "知道了",
+  "common_deleteItemConfirm": "确定要删除「{itemName}」吗？此操作不可撤销。",
+  "@common_deleteItemConfirm": {
+    "placeholders": {
+      "itemName": {}
+    }
+  },
+  "common_clearAllItemsConfirm": "确定要清空所有 {count} 个{itemType}吗？此操作不可撤销。",
+  "@common_clearAllItemsConfirm": {
+    "placeholders": {
+      "count": {},
+      "itemType": {}
+    }
+  },
+  "common_clearInputConfirm": "确定要清空输入内容吗？",
   "common_settings": "设置",
   "common_today": "今天",
   "common_yesterday": "昨天",
@@ -120,6 +136,13 @@
   "auth_tokenInvalid": "Token 格式无效，应以 pst- 开头",
   "auth_nicknameOptional": "昵称（可选）",
   "auth_nicknameHint": "为此账号设置一个便于识别的名称",
+  "auth_thirdPartyApiSite": "第三方 API 站点",
+  "auth_imageApiSiteOptional": "图像 API 站点（可选）",
+  "auth_imageApiSiteHint": "留空则使用同一个第三方 API 站点",
+  "auth_thirdPartyNicknameHint": "例如：自建站点 / 镜像站点",
+  "auth_thirdPartyTokenHint": "请输入第三方站点提供的 API Token",
+  "auth_thirdPartyCompatibilityHint": "第三方站点需兼容 NovelAI 的 /user/subscription 与图像生成相关 API；Token 将按 Bearer 方式发送。",
+  "auth_thirdPartyApiSiteRequired": "请输入第三方 API 站点地址",
   "auth_saveAccount": "保存此账号",
   "auth_validateAndLogin": "验证并登录",
   "auth_tokenGuide": "从 NovelAI 账户设置获取 Token",
@@ -232,6 +255,8 @@
   "settings_pathSavedRestartRequired": "路径已更新，重启后生效",
   "settings_accountProfile": "账号资料",
   "settings_accountType": "账号类型",
+  "settings_thirdPartyApiAccount": "第三方站点 API",
+  "settings_apiSite": "API 站点",
   "settings_notLoggedIn": "登录后可设置头像和昵称",
   "settings_goToLogin": "去登录",
   "settings_tapToChangeAvatar": "点击更换头像",
@@ -1039,6 +1064,7 @@
   "gallery_applyVibeFromImage": "提取并应用图片的风格/角色",
   "gallery_noVibeData": "此图片不包含 Vibe 数据",
   "gallery_sendToKrita": "Krita",
+  "gallery_sendToKritaAction": "发送到 Krita",
   "gallery_sendToConnectedKrita": "发送到已连接的 Krita 插件",
   "gallery_upscalePanelLoaded": "已载入图生图超分面板",
   "gallery_readImageFailed": "读取图像失败: {error}",
@@ -1563,6 +1589,9 @@
   "warmup_cooccurrenceInit": "初始化共现数据...",
   "warmup_translationInit": "初始化翻译数据...",
   "warmup_danbooruTagsInit": "初始化 Danbooru 标签...",
+  "warmup_dataMigration": "迁移 Hive / Vibe / 图片数据...",
+  "warmup_galleryDataSource": "初始化画廊索引...",
+  "warmup_checkAndRecoverData": "检查数据完整性...",
   "warmup_group_dataSourceInitialization": "初始化数据源服务...",
   "warmup_group_dataSourceInitialization_complete": "数据源服务就绪",
 
@@ -3378,14 +3407,19 @@
   "localGallery_filterBySteps": "按步数筛选",
   "localGallery_filterByCfg": "按 CFG 筛选",
   "localGallery_filterByResolution": "按分辨率筛选",
+  "localGallery_filterSubtitle": "精确筛选您的图片集合",
   "localGallery_model": "模型",
+  "localGallery_modelHint": "输入模型名称...",
   "localGallery_sampler": "采样器",
+  "localGallery_samplerHint": "输入采样器名称...",
   "localGallery_steps": "步数",
   "localGallery_cfgScale": "CFG 强度",
   "localGallery_resolution": "分辨率",
+  "localGallery_resolutionHint": "宽度x高度 (如: 1024x1024)",
   "localGallery_any": "任意",
   "localGallery_custom": "自定义",
   "localGallery_to": "至",
+  "localGallery_activeFiltersSet": "已设置筛选",
   "localGallery_applyFilters": "应用筛选",
   "localGallery_resetAdvancedFilters": "重置高级筛选",
   "localGallery_exportMetadata": "导出元数据",
@@ -4401,6 +4435,16 @@
   "queue_importStrategyReplace": "替换",
   "queue_importStrategyReplaceDesc": "清空现有队列，使用导入的任务替换",
   "queue_supportedFormats": "支持的格式：",
+  "queue_supportedFormatJson": "• JSON 文件 (.json)",
+  "queue_supportedFormatCsv": "• CSV 文件 (.csv)",
+  "queue_supportedFormatText": "• 纯文本文件 (.txt) - 每行一个提示词",
+  "queue_shareSubject": "队列导出",
+  "queue_unsupportedFileFormat": "不支持的文件格式: {extension}",
+  "@queue_unsupportedFileFormat": {
+    "placeholders": {
+      "extension": {}
+    }
+  },
   "queue_exportSuccess": "导出成功",
   "queue_exportFailed": "导出失败：{error}",
   "@queue_exportFailed": {
@@ -4798,6 +4842,18 @@
   "shortcut_help_title": "快捷键帮助",
   "shortcut_help_search": "搜索快捷键...",
   "shortcut_help_customize": "自定义快捷键",
+  "shortcut_help_all": "全部",
+  "shortcut_help_tip": "提示：按 F1 或 ? 键可随时打开此帮助对话框",
+  "shortcut_help_fabTooltip": "快捷键帮助 (F1)",
+  "shortcut_editor_recordingInline": "按快捷键...",
+  "shortcut_editor_pressEscToCancel": "按 Esc 取消",
+  "shortcut_editor_clickToRecord": "点击开始录制",
+  "shortcut_editor_conflictWith": "此快捷键与 \"{action}\" 冲突",
+  "@shortcut_editor_conflictWith": {
+    "placeholders": {
+      "action": {}
+    }
+  },
 
   "vibeLibrary_title": "Vibe 库",
   "vibeLibrary_categories": "分类",
@@ -5747,6 +5803,167 @@
   "@common_hoursAgo": {
     "placeholders": {
       "hours": {}
+    }
+  },
+  "common_saving": "保存中...",
+  "common_pleaseWait": "请稍候",
+  "common_change": "更换",
+  "common_expand": "展开",
+  "common_collapse": "收起",
+
+  "vibeLibrary_emptySearchTitle": "未找到匹配的 Vibe",
+  "vibeLibrary_emptySearchSubtitle": "尝试其他关键词",
+  "vibeLibrary_emptyFavoritesTitle": "暂无收藏的 Vibe",
+  "vibeLibrary_emptyFavoritesSubtitle": "点击心形图标收藏 Vibe",
+  "vibeLibrary_emptyCategoryTitle": "该分类下暂无 Vibe",
+  "vibeLibrary_emptyCategorySubtitle": "尝试切换到\"全部 Vibe\"查看所有内容",
+  "vibeLibrary_emptyNoMatchesTitle": "无匹配结果",
+  "vibeLibrary_emptySaveFromGenerationHint": "从生成页面保存Vibe到库中",
+
+  "vibe_nameRequired": "名称不能为空",
+  "vibe_import_namingTitle": "命名 Vibe",
+  "vibe_import_nameConflictOverwrite": "该名称已存在，将被覆盖",
+  "vibe_previewLoadFailed": "预览加载失败",
+  "vibe_import_applyToRemainingFiles": "应用到后续所有文件",
+  "vibe_import_applyNamingToRemainingFiles": "使用此命名规则处理剩余文件",
+  "vibe_encodeImageTitle": "编码图片为 Vibe",
+  "vibe_imagePreview": "图片预览",
+  "vibe_encodeStartButton": "开始编码",
+  "vibe_encodeImageInProgress": "正在编码图片...",
+  "vibe_encodeErrorImage": "图片: {fileName}",
+  "@vibe_encodeErrorImage": {
+    "placeholders": {
+      "fileName": {}
+    }
+  },
+  "vibe_encodeErrorMessage": "错误: {error}",
+  "@vibe_encodeErrorMessage": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "vibe_encodeSkipImage": "跳过此图",
+
+  "detail_sendToImg2Img": "发送到图生图",
+  "detail_sendToReversePrompt": "发送到反推",
+  "detail_loadingImage": "加载图片中...",
+  "detail_imageLoadFailed": "无法加载图片",
+  "detail_noImage": "无图片",
+  "detail_parsingMetadata": "正在解析元数据...",
+  "detail_noMetadata": "此图片无元数据",
+  "detail_metadata": "元数据",
+  "detail_imageDetails": "图片详情",
+  "detail_basicInfo": "基本信息",
+  "detail_fileName": "文件名",
+  "detail_modifiedTime": "修改时间",
+  "detail_fileSize": "文件大小",
+  "detail_noContent": "(无内容)",
+  "detail_savePreset": "保存预设",
+  "detail_copyLabel": "复制{label}",
+  "@detail_copyLabel": {
+    "placeholders": {
+      "label": {}
+    }
+  },
+  "detail_copyCharacterPrompt": "复制角色提示词",
+  "detail_copyAllVibeData": "复制全部 Vibe 数据",
+  "detail_saveToVibeLibrary": "保存到 Vibe 库",
+
+  "pagination_firstPage": "首页",
+  "pagination_previousPage": "上一页",
+  "pagination_nextPage": "下一页",
+  "pagination_lastPage": "末页",
+  "pagination_jumpToPage": "跳转到页面",
+  "pagination_jump": "跳转",
+  "pagination_itemsPerPage": "每页",
+  "pagination_itemUnit": "项",
+
+  "diyGuide_title": "DIY 功能指南",
+  "diyGuide_subtitle": "了解高级功能，创建专属词库",
+  "diyGuide_intro": "本指南介绍了 DIY 系统的核心概念和高级功能，帮助您构建强大的动态提示词库。",
+  "diyGuide_exampleLabel": "示例",
+  "diyGuide_hierarchyTitle": "层级结构 (Hierarchy)",
+  "diyGuide_hierarchyDescription": "DIY 系统采用三级分类结构来组织提示词，便于管理和检索。",
+  "diyGuide_hierarchyExample": "Category (分类): 角色特征\n  -> Group (分组): 发型\n      -> Tag (标签): 长发, 短发, 双马尾",
+  "diyGuide_selectionModeTitle": "选择模式 (Selection Mode)",
+  "diyGuide_selectionModeDescription": "决定从一个分组(Group)中选取多少个标签。",
+  "diyGuide_selectionModeExample": "• Random (随机): 每次随机选取一个 (如：随机发色)\n• All (全选): 选取组内所有标签 (如：固定特征组合)",
+  "diyGuide_weightTitle": "权重控制 (Weight)",
+  "diyGuide_weightDescription": "调整特定提示词在生成过程中的影响力。",
+  "diyGuide_weightExample": "• 增强: 用花括号包裹 masterpiece = 1.05 倍权重\n• 强力增强: 三层花括号包裹 masterpiece = 1.16 倍权重\n• 减弱: [bad hands] = 0.95 倍权重",
+  "diyGuide_genderTitle": "性别限制 (Gender)",
+  "diyGuide_genderDescription": "限制标签仅对特定性别的角色生效，避免生成错误的特征。",
+  "diyGuide_genderExample": "• Female: 仅女性角色可用 (如：裙子)\n• Male: 仅男性角色可用 (如：胡须)\n• Any: 通用 (如：T恤)",
+  "diyGuide_scopeTitle": "作用域 (Scope)",
+  "diyGuide_scopeDescription": "定义标签是作用于角色本身、背景环境还是全局画面。",
+  "diyGuide_scopeExample": "• Character: 角色特征 (眼睛, 头发)\n• Background: 环境描述 (蓝天, 室内)\n• Global: 画风, 质量词 (best quality)",
+  "diyGuide_conditionalTitle": "条件分支 (Conditional)",
+  "diyGuide_conditionalDescription": "基于已选标签或其他条件来动态决定后续标签。",
+  "diyGuide_conditionalExample": "IF (已选 \"下雨\")\n  THEN 添加 \"雨伞\", \"湿衣服\"\n  ELSE 添加 \"晴朗\"",
+  "diyGuide_dependenciesTitle": "依赖引用 (Dependencies)",
+  "diyGuide_dependenciesDescription": "建立标签间的关联，选中一个标签时自动引入相关联的其他标签。",
+  "diyGuide_dependenciesExample": "选中 \"JK制服\" -> 自动引入 \"学校背景\", \"书包\"",
+  "diyGuide_visibilityTitle": "可见性规则 (Visibility)",
+  "diyGuide_visibilityDescription": "控制标签在界面上的显示条件，或在生成时的生效条件。",
+  "diyGuide_visibilityExample": "仅当选中 \"魔法少女\" 分类时，显示 \"魔杖\" 选项组",
+  "diyGuide_timeTitle": "时间条件 (Time)",
+  "diyGuide_timeDescription": "根据现实时间或设定的模拟时间触发特定标签。",
+  "diyGuide_timeExample": "• 06:00-18:00 -> 添加 \"daylight\"\n• 18:00-06:00 -> 添加 \"night\"",
+  "diyGuide_postProcessingTitle": "后处理规则 (Post-processing)",
+  "diyGuide_postProcessingDescription": "在提示词生成最后阶段进行文本替换或清理。",
+  "diyGuide_postProcessingExample": "将所有 \"blue eyes\" 替换为 \"azure eyes\" 以获得更独特的描述",
+  "diyGuide_emphasisTitle": "强调概率 (Emphasis)",
+  "diyGuide_emphasisDescription": "为标签随机添加权重符号的概率，增加结果的多样性。",
+  "diyGuide_emphasisExample": "设置 30% 概率: 约有 1/3 的机会输出加权 tag，2/3 的机会输出普通 tag",
+
+  "naiRules_title": "NAI 随机规则说明",
+  "naiRules_characterCountProbability": "角色数量概率",
+  "naiRules_solo": "1人 (Solo)",
+  "naiRules_duo": "2人 (Duo)",
+  "naiRules_trio": "3人 (Trio)",
+  "naiRules_group": "4人 (Group)",
+  "naiRules_genderRules": "性别规则",
+  "naiRules_female": "女性 (Female)",
+  "naiRules_male": "男性 (Male)",
+  "naiRules_mixed": "混合/其他 (Mixed)",
+  "naiRules_categoryProbability": "类别概率",
+  "naiRules_dynamicTagWeightTitle": "标签权重动态调整",
+  "naiRules_dynamicTagWeightSubtitle": "包含动作、服饰、表情、背景等多个维度的随机组合，根据画面主题动态调整各类别的抽取权重",
+  "naiRules_specialMechanisms": "特殊机制",
+  "naiRules_tagStrengthening": "强调机制 (Tag Strengthening)",
+  "naiRules_seasonalLibraryTitle": "季节词库",
+  "naiRules_seasonalLibrarySubtitle": "自动匹配季节特征，包含季节性服饰、天气、光照效果和环境氛围",
+  "naiRules_v4CharacterPositioning": "V4 多角色位置",
+  "naiRules_smartPositionTitle": "智能位置分配",
+  "naiRules_smartPositionSubtitle": "在 V4 模型下，使用 character positioning 语法精确控制多角色站位",
+
+  "comfyImport_detectedTitle": "检测到 ComfyUI 多角色提示词",
+  "comfyImport_characterList": "角色列表 ({count})",
+  "@comfyImport_characterList": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "comfyImport_usePositionInfo": "使用位置信息",
+  "comfyImport_usePositionInfoSubtitle": "将 ComfyUI 区域映射为 NAI 角色位置",
+  "comfyImport_convertCharacters": "转换 {count} 个角色",
+  "@comfyImport_convertCharacters": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "comfyImport_syntaxCouple": "COUPLE 语法",
+  "comfyImport_syntaxAndMask": "AND+MASK 语法",
+  "comfyImport_syntaxPipe": "竖线格式",
+  "comfyImport_syntaxUnknown": "未知语法",
+  "comfyImport_globalPrompt": "全局提示词",
+
+  "danbooruPreview_noTagData": "暂无标签数据",
+  "danbooruPreview_noPoolData": "暂无 Pool 数据",
+  "danbooruPreview_postCount": "{count} 个帖子",
+  "@danbooruPreview_postCount": {
+    "placeholders": {
+      "count": {}
     }
   },
 

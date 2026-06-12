@@ -35,9 +35,7 @@ class VibeLibraryCategoryState with _$VibeLibraryCategoryState {
     if (selectedCategoryId == null) {
       return null;
     }
-    return categories
-        .cast<VibeLibraryCategory?>()
-        .firstWhere(
+    return categories.cast<VibeLibraryCategory?>().firstWhere(
           (c) => c?.id == selectedCategoryId,
           orElse: () => null,
         );
@@ -85,7 +83,7 @@ class VibeLibraryCategoryNotifier extends _$VibeLibraryCategoryNotifier {
       AppLogger.e('加载Vibe库分类失败', e, stackTrace);
       state = state.copyWith(
         isLoading: false,
-        error: '加载分类失败: $e',
+        error: 'Failed to load categories: $e',
       );
     }
   }
@@ -106,7 +104,7 @@ class VibeLibraryCategoryNotifier extends _$VibeLibraryCategoryNotifier {
     String? parentId,
   }) async {
     if (name.trim().isEmpty) {
-      state = state.copyWith(error: '分类名称不能为空');
+      state = state.copyWith(error: 'Category name cannot be empty');
       return null;
     }
 
@@ -115,7 +113,7 @@ class VibeLibraryCategoryNotifier extends _$VibeLibraryCategoryNotifier {
       if (parentId != null) {
         final parentExists = await _storageService.categoryExists(parentId);
         if (!parentExists) {
-          state = state.copyWith(error: '父分类不存在');
+          state = state.copyWith(error: 'Parent category does not exist');
           return null;
         }
       }
@@ -142,7 +140,7 @@ class VibeLibraryCategoryNotifier extends _$VibeLibraryCategoryNotifier {
       return category;
     } catch (e, stackTrace) {
       AppLogger.e('创建Vibe库分类失败', e, stackTrace);
-      state = state.copyWith(error: '创建分类失败: $e');
+      state = state.copyWith(error: 'Failed to create category: $e');
       return null;
     }
   }
@@ -153,13 +151,13 @@ class VibeLibraryCategoryNotifier extends _$VibeLibraryCategoryNotifier {
     String newName,
   ) async {
     if (newName.trim().isEmpty) {
-      state = state.copyWith(error: '分类名称不能为空');
+      state = state.copyWith(error: 'Category name cannot be empty');
       return null;
     }
 
     final category = state.categories.findById(categoryId);
     if (category == null) {
-      state = state.copyWith(error: '分类不存在');
+      state = state.copyWith(error: 'Category does not exist');
       return null;
     }
 
@@ -183,7 +181,7 @@ class VibeLibraryCategoryNotifier extends _$VibeLibraryCategoryNotifier {
       return null;
     } catch (e, stackTrace) {
       AppLogger.e('重命名Vibe库分类失败', e, stackTrace);
-      state = state.copyWith(error: '重命名分类失败: $e');
+      state = state.copyWith(error: 'Failed to rename category: $e');
       return null;
     }
   }
@@ -195,14 +193,16 @@ class VibeLibraryCategoryNotifier extends _$VibeLibraryCategoryNotifier {
   ) async {
     final category = state.categories.findById(categoryId);
     if (category == null) {
-      state = state.copyWith(error: '分类不存在');
+      state = state.copyWith(error: 'Category does not exist');
       return null;
     }
 
     // 检查循环引用
     if (newParentId != null &&
         state.categories.wouldCreateCycle(categoryId, newParentId)) {
-      state = state.copyWith(error: '不能将分类移动到其子分类下');
+      state = state.copyWith(
+        error: 'Cannot move a category under its descendant',
+      );
       return null;
     }
 
@@ -226,7 +226,7 @@ class VibeLibraryCategoryNotifier extends _$VibeLibraryCategoryNotifier {
       return null;
     } catch (e, stackTrace) {
       AppLogger.e('移动Vibe库分类失败', e, stackTrace);
-      state = state.copyWith(error: '移动分类失败: $e');
+      state = state.copyWith(error: 'Failed to move category: $e');
       return null;
     }
   }
@@ -238,14 +238,16 @@ class VibeLibraryCategoryNotifier extends _$VibeLibraryCategoryNotifier {
   }) async {
     final category = state.categories.findById(categoryId);
     if (category == null) {
-      state = state.copyWith(error: '分类不存在');
+      state = state.copyWith(error: 'Category does not exist');
       return false;
     }
 
     // 检查是否有子分类
     final children = state.categories.getChildren(categoryId);
     if (children.isNotEmpty) {
-      state = state.copyWith(error: '请先删除该分类下的子分类');
+      state = state.copyWith(
+        error: 'Delete this category\'s subcategories first',
+      );
       return false;
     }
 
@@ -277,7 +279,7 @@ class VibeLibraryCategoryNotifier extends _$VibeLibraryCategoryNotifier {
       return false;
     } catch (e, stackTrace) {
       AppLogger.e('删除Vibe库分类失败', e, stackTrace);
-      state = state.copyWith(error: '删除分类失败: $e');
+      state = state.copyWith(error: 'Failed to delete category: $e');
       return false;
     }
   }
@@ -328,7 +330,7 @@ class VibeLibraryCategoryNotifier extends _$VibeLibraryCategoryNotifier {
       AppLogger.d('Vibe库分类重新排序完成');
     } catch (e, stackTrace) {
       AppLogger.e('重新排序Vibe库分类失败', e, stackTrace);
-      state = state.copyWith(error: '重新排序失败: $e');
+      state = state.copyWith(error: 'Failed to reorder categories: $e');
     }
   }
 

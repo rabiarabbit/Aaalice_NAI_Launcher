@@ -694,7 +694,7 @@ class _TaskTooltipContent extends StatelessWidget {
 
             // 完整提示词
             Text(
-              '正向提示词',
+              context.l10n.prompt_positivePrompt,
               style: theme.textTheme.labelSmall?.copyWith(
                 color: theme.colorScheme.primary,
                 fontWeight: FontWeight.w600,
@@ -718,7 +718,7 @@ class _TaskTooltipContent extends StatelessWidget {
             if (task.negativePrompt.isNotEmpty) ...[
               const SizedBox(height: 10),
               Text(
-                '负向提示词',
+                context.l10n.prompt_negativePrompt,
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: Colors.orange,
                   fontWeight: FontWeight.w600,

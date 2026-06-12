@@ -31,11 +31,11 @@ extension VibeExportFormatExtension on VibeExportFormat {
   String get displayName {
     switch (this) {
       case VibeExportFormat.single:
-        return '单独文件 (.naiv4vibe)';
+        return 'Single file (.naiv4vibe)';
       case VibeExportFormat.bundle:
-        return '打包文件 (.naiv4vibebundle)';
+        return 'Bundle file (.naiv4vibebundle)';
       case VibeExportFormat.embeddedPng:
-        return '嵌入到 PNG';
+        return 'Embed into PNG';
     }
   }
 
@@ -53,11 +53,11 @@ extension VibeExportFormatExtension on VibeExportFormat {
   String get description {
     switch (this) {
       case VibeExportFormat.single:
-        return '每个 Vibe 导出为独立文件，适合分享单个 Vibe';
+        return 'Export each Vibe as a separate file, suitable for sharing one Vibe';
       case VibeExportFormat.bundle:
-        return '多个 Vibe 打包为一个文件，适合批量备份';
+        return 'Pack multiple Vibes into one file, suitable for batch backup';
       case VibeExportFormat.embeddedPng:
-        return '将单个 Vibe 数据嵌入 PNG 图片元数据中导出';
+        return 'Export a single Vibe by embedding its data into PNG metadata';
     }
   }
 }
@@ -187,7 +187,7 @@ class _VibeExportDialogState extends ConsumerState<VibeExportDialog> {
                   ),
                   const SizedBox(width: 12),
                   Text(
-                    '导出 Vibe',
+                    context.l10n.vibe_export_title,
                     style: theme.textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
@@ -264,7 +264,7 @@ class _VibeExportDialogState extends ConsumerState<VibeExportDialog> {
                       onPressed: _selectedEntryIds.isEmpty ? null : _export,
                       icon: const Icon(Icons.file_download),
                       label: Text(
-                        '导出 (${_selectedEntryIds.length} 个)',
+                        'Export (${_selectedEntryIds.length})',
                       ),
                     ),
                   ],
@@ -292,7 +292,7 @@ class _VibeExportDialogState extends ConsumerState<VibeExportDialog> {
       child: Row(
         children: [
           _StatItem(
-            label: '可导出',
+            label: 'Exportable',
             value: '${_selectedEntryIds.length}/$exportableCount',
             icon: Icons.check_circle_outline,
             color: theme.colorScheme.primary,
@@ -300,14 +300,14 @@ class _VibeExportDialogState extends ConsumerState<VibeExportDialog> {
           const SizedBox(width: 24),
           if (unexportableCount > 0)
             _StatItem(
-              label: '不可导出',
+              label: 'Not exportable',
               value: '$unexportableCount',
               icon: Icons.error_outline,
               color: theme.colorScheme.error,
             ),
           const Spacer(),
           _StatItem(
-            label: '分类',
+            label: context.l10n.common_category,
             value: '${_selectedCategoryIds.length}/${widget.categories.length}',
             icon: Icons.folder_outlined,
             color: theme.colorScheme.outline,
@@ -331,7 +331,8 @@ class _VibeExportDialogState extends ConsumerState<VibeExportDialog> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('导出格式', style: theme.textTheme.titleSmall),
+          Text(context.l10n.vibe_export_format,
+              style: theme.textTheme.titleSmall),
           const SizedBox(height: 8),
           ...formats.map((format) {
             final isSelected = _exportFormat == format;
@@ -411,7 +412,7 @@ class _VibeExportDialogState extends ConsumerState<VibeExportDialog> {
       children: [
         if (options.isNotEmpty) ...[
           Text(
-            'PNG 载体图',
+            'PNG carrier image',
             style: theme.textTheme.bodySmall?.copyWith(
               fontWeight: FontWeight.w600,
             ),
@@ -446,7 +447,7 @@ class _VibeExportDialogState extends ConsumerState<VibeExportDialog> {
           const SizedBox(height: 12),
         ] else ...[
           Text(
-            '当前 Vibe 没有可直接使用的 PNG 载体图，可选择外部 PNG 图片作为载体。',
+            'This Vibe has no directly usable PNG carrier image. You can choose an external PNG image as the carrier.',
             style: theme.textTheme.bodySmall?.copyWith(
               color: colorScheme.outline,
               fontStyle: FontStyle.italic,
@@ -461,8 +462,8 @@ class _VibeExportDialogState extends ConsumerState<VibeExportDialog> {
               icon: const Icon(Icons.image_search_outlined),
               label: Text(
                 _selectedExternalCarrierImagePath == null
-                    ? '选择外部 PNG 图片...'
-                    : '更换外部 PNG 图片...',
+                    ? 'Select external PNG image...'
+                    : 'Change external PNG image...',
               ),
             ),
             if (_selectedExternalCarrierImagePath != null &&
@@ -476,7 +477,7 @@ class _VibeExportDialogState extends ConsumerState<VibeExportDialog> {
                     _carrierImageErrorMessage = null;
                   });
                 },
-                child: const Text('改用 Vibe 图片'),
+                child: const Text('Use Vibe image instead'),
               ),
             ],
           ],
@@ -484,7 +485,7 @@ class _VibeExportDialogState extends ConsumerState<VibeExportDialog> {
         if (_selectedExternalCarrierImagePath != null) ...[
           const SizedBox(height: 8),
           Text(
-            '当前使用外部 PNG: ${_fileNameFromPath(_selectedExternalCarrierImagePath!)}',
+            'Using external PNG: ${_fileNameFromPath(_selectedExternalCarrierImagePath!)}',
             style: theme.textTheme.bodySmall?.copyWith(
               color: colorScheme.primary,
             ),
@@ -519,7 +520,7 @@ class _VibeExportDialogState extends ConsumerState<VibeExportDialog> {
       final result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['png'],
-        dialogTitle: '选择 PNG 图片',
+        dialogTitle: 'Select PNG image',
         withData: true,
       );
 
@@ -535,7 +536,8 @@ class _VibeExportDialogState extends ConsumerState<VibeExportDialog> {
         setState(() {
           _selectedExternalCarrierImageBytes = null;
           _selectedExternalCarrierImagePath = null;
-          _carrierImageErrorMessage = '选择的文件不是有效的 PNG 图片';
+          _carrierImageErrorMessage =
+              'The selected file is not a valid PNG image';
         });
         return;
       }
@@ -548,7 +550,8 @@ class _VibeExportDialogState extends ConsumerState<VibeExportDialog> {
     } catch (e, stack) {
       AppLogger.e('选择 PNG 载体图失败', e, stack, 'VibeExportDialog');
       if (mounted) {
-        setState(() => _carrierImageErrorMessage = '选择 PNG 图片失败: $e');
+        setState(
+            () => _carrierImageErrorMessage = 'Failed to select PNG image: $e');
       }
     }
   }
@@ -612,12 +615,12 @@ class _VibeExportDialogState extends ConsumerState<VibeExportDialog> {
 
     return Row(
       children: [
-        Text('选择要导出的 Vibe', style: theme.textTheme.titleSmall),
+        Text('Select Vibes to export', style: theme.textTheme.titleSmall),
         const Spacer(),
         TextButton.icon(
           onPressed: allSelected ? null : _selectAll,
           icon: const Icon(Icons.select_all, size: 18),
-          label: const Text('全选'),
+          label: Text(context.l10n.common_selectAll),
           style: TextButton.styleFrom(
             padding: const EdgeInsets.symmetric(horizontal: 8),
           ),
@@ -627,7 +630,7 @@ class _VibeExportDialogState extends ConsumerState<VibeExportDialog> {
               ? null
               : _selectNone,
           icon: const Icon(Icons.deselect, size: 18),
-          label: const Text('全不选'),
+          label: Text(context.l10n.common_deselectAll),
           style: TextButton.styleFrom(
             padding: const EdgeInsets.symmetric(horizontal: 8),
           ),
@@ -747,7 +750,7 @@ class _VibeExportDialogState extends ConsumerState<VibeExportDialog> {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  '未分类',
+                  context.l10n.vibeLibrary_uncategorized,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w500,
                     color: theme.colorScheme.outline,
@@ -1031,7 +1034,7 @@ class _VibeExportDialogState extends ConsumerState<VibeExportDialog> {
                       _SourceTypeBadge(sourceType: entry.sourceType),
                       const SizedBox(width: 8),
                       Text(
-                        '强度: ${(entry.strength * 100).toInt()}%',
+                        'Strength: ${(entry.strength * 100).toInt()}%',
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.outline,
                         ),
@@ -1076,7 +1079,7 @@ class _VibeExportDialogState extends ConsumerState<VibeExportDialog> {
     setState(() {
       _isExporting = true;
       _progress = 0;
-      _progressMessage = '准备导出...';
+      _progressMessage = 'Preparing export...';
     });
 
     try {
@@ -1110,7 +1113,7 @@ class _VibeExportDialogState extends ConsumerState<VibeExportDialog> {
       final entry = entries.first;
       setState(() {
         _progress = 0.5;
-        _progressMessage = '正在导出: ${entry.displayName}';
+        _progressMessage = 'Exporting: ${entry.displayName}';
       });
 
       final exportedPath = await VibeExportUtils.exportToNaiv4Vibe(
@@ -1125,14 +1128,14 @@ class _VibeExportDialogState extends ConsumerState<VibeExportDialog> {
 
       setState(() {
         _progress = 1.0;
-        _progressMessage = '导出完成: $exportedPath';
+        _progressMessage = 'Export complete: $exportedPath';
       });
       return true;
     }
 
     // 选择保存目录
     final result = await FilePicker.platform.getDirectoryPath(
-      dialogTitle: '选择保存目录',
+      dialogTitle: 'Select export folder',
     );
 
     if (result == null) {
@@ -1148,7 +1151,7 @@ class _VibeExportDialogState extends ConsumerState<VibeExportDialog> {
       final entry = entries[i];
       setState(() {
         _progress = i / total;
-        _progressMessage = '正在导出: ${entry.displayName}';
+        _progressMessage = 'Exporting: ${entry.displayName}';
       });
 
       final vibeRef = entry.toVibeReference();
@@ -1170,7 +1173,8 @@ class _VibeExportDialogState extends ConsumerState<VibeExportDialog> {
 
     setState(() {
       _progress = 1.0;
-      _progressMessage = '导出完成: $successCount 成功, $failCount 失败';
+      _progressMessage =
+          'Export complete: $successCount succeeded, $failCount failed';
     });
     return successCount > 0;
   }
@@ -1197,7 +1201,7 @@ class _VibeExportDialogState extends ConsumerState<VibeExportDialog> {
 
     setState(() {
       _progress = 0.5;
-      _progressMessage = '正在嵌入 PNG: ${entry.displayName}';
+      _progressMessage = 'Embedding PNG: ${entry.displayName}';
     });
 
     final exportedPath = await VibeExportUtils.exportToEmbeddedPng(
@@ -1213,7 +1217,7 @@ class _VibeExportDialogState extends ConsumerState<VibeExportDialog> {
 
     setState(() {
       _progress = 1.0;
-      _progressMessage = '导出完成: $exportedPath';
+      _progressMessage = 'Export complete: $exportedPath';
     });
     return true;
   }
@@ -1222,7 +1226,7 @@ class _VibeExportDialogState extends ConsumerState<VibeExportDialog> {
   Future<bool> _exportAsBundle(List<VibeLibraryEntry> entries) async {
     setState(() {
       _progress = 0.3;
-      _progressMessage = '正在打包 ${entries.length} 个 Vibe...';
+      _progressMessage = 'Packing ${entries.length} Vibes...';
     });
 
     // 转换为 VibeReference 列表
@@ -1230,7 +1234,7 @@ class _VibeExportDialogState extends ConsumerState<VibeExportDialog> {
 
     setState(() {
       _progress = 0.6;
-      _progressMessage = '正在生成 bundle 文件...';
+      _progressMessage = 'Generating bundle file...';
     });
 
     // 导出 bundle
@@ -1247,7 +1251,7 @@ class _VibeExportDialogState extends ConsumerState<VibeExportDialog> {
 
     setState(() {
       _progress = 1.0;
-      _progressMessage = '导出完成: $exportedPath';
+      _progressMessage = 'Export complete: $exportedPath';
     });
     return true;
   }

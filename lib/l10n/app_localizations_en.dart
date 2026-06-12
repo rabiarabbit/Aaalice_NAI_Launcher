@@ -108,6 +108,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get common_confirmDelete => 'Confirm Delete';
 
   @override
+  String get common_confirmClear => 'Confirm Clear';
+
+  @override
+  String get common_gotIt => 'Got it';
+
+  @override
+  String common_deleteItemConfirm(Object itemName) {
+    return 'Delete \"$itemName\"? This action cannot be undone.';
+  }
+
+  @override
+  String common_clearAllItemsConfirm(Object count, Object itemType) {
+    return 'Clear all $count $itemType? This action cannot be undone.';
+  }
+
+  @override
+  String get common_clearInputConfirm => 'Clear the input content?';
+
+  @override
   String get common_settings => 'Settings';
 
   @override
@@ -341,6 +360,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get auth_nicknameHint => 'Set a recognizable name for this account';
+
+  @override
+  String get auth_thirdPartyApiSite => 'Third-party API Site';
+
+  @override
+  String get auth_imageApiSiteOptional => 'Image API Site (optional)';
+
+  @override
+  String get auth_imageApiSiteHint =>
+      'Leave empty to use the same third-party API site';
+
+  @override
+  String get auth_thirdPartyNicknameHint =>
+      'For example: self-hosted site / mirror site';
+
+  @override
+  String get auth_thirdPartyTokenHint =>
+      'Enter the API token from the third-party site';
+
+  @override
+  String get auth_thirdPartyCompatibilityHint =>
+      'The third-party site must be compatible with NovelAI subscription and image-generation APIs. The token will be sent as a Bearer token.';
+
+  @override
+  String get auth_thirdPartyApiSiteRequired => 'Enter third-party API site URL';
 
   @override
   String get auth_saveAccount => 'Save this account';
@@ -651,6 +695,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_accountType => 'Account Type';
+
+  @override
+  String get settings_thirdPartyApiAccount => 'Third-party Site API';
+
+  @override
+  String get settings_apiSite => 'API Site';
 
   @override
   String get settings_notLoggedIn => 'Log in to set avatar and nickname';
@@ -2699,6 +2749,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gallery_sendToKrita => 'Krita';
 
   @override
+  String get gallery_sendToKritaAction => 'Send to Krita';
+
+  @override
   String get gallery_sendToConnectedKrita =>
       'Send to the connected Krita plugin';
 
@@ -4052,6 +4105,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get warmup_danbooruTagsInit => 'Initializing Danbooru tags...';
+
+  @override
+  String get warmup_dataMigration => 'Migrating Hive / Vibe / image data...';
+
+  @override
+  String get warmup_galleryDataSource => 'Initializing gallery index...';
+
+  @override
+  String get warmup_checkAndRecoverData => 'Checking data integrity...';
 
   @override
   String get warmup_group_dataSourceInitialization =>
@@ -7501,10 +7563,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get localGallery_filterByResolution => 'Filter by Resolution';
 
   @override
+  String get localGallery_filterSubtitle =>
+      'Precisely filter your image collection';
+
+  @override
   String get localGallery_model => 'Model';
 
   @override
+  String get localGallery_modelHint => 'Enter model name...';
+
+  @override
   String get localGallery_sampler => 'Sampler';
+
+  @override
+  String get localGallery_samplerHint => 'Enter sampler name...';
 
   @override
   String get localGallery_steps => 'Steps';
@@ -7516,6 +7588,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get localGallery_resolution => 'Resolution';
 
   @override
+  String get localGallery_resolutionHint => 'Width x height (e.g. 1024x1024)';
+
+  @override
   String get localGallery_any => 'Any';
 
   @override
@@ -7523,6 +7598,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get localGallery_to => 'to';
+
+  @override
+  String get localGallery_activeFiltersSet => 'Filters set';
 
   @override
   String get localGallery_applyFilters => 'Apply Filters';
@@ -9531,6 +9609,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get queue_supportedFormats => 'Supported formats:';
 
   @override
+  String get queue_supportedFormatJson => '• JSON file (.json)';
+
+  @override
+  String get queue_supportedFormatCsv => '• CSV file (.csv)';
+
+  @override
+  String get queue_supportedFormatText =>
+      '• Plain text file (.txt) - one prompt per line';
+
+  @override
+  String get queue_shareSubject => 'Queue Export';
+
+  @override
+  String queue_unsupportedFileFormat(Object extension) {
+    return 'Unsupported file format: $extension';
+  }
+
+  @override
   String get queue_exportSuccess => 'Export successful';
 
   @override
@@ -10270,6 +10366,30 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get shortcut_help_customize => 'Customize Shortcuts';
+
+  @override
+  String get shortcut_help_all => 'All';
+
+  @override
+  String get shortcut_help_tip =>
+      'Tip: press F1 or ? anytime to open this help dialog';
+
+  @override
+  String get shortcut_help_fabTooltip => 'Keyboard Shortcuts Help (F1)';
+
+  @override
+  String get shortcut_editor_recordingInline => 'Press shortcut...';
+
+  @override
+  String get shortcut_editor_pressEscToCancel => 'Press Esc to cancel';
+
+  @override
+  String get shortcut_editor_clickToRecord => 'Click to start recording';
+
+  @override
+  String shortcut_editor_conflictWith(Object action) {
+    return 'This shortcut conflicts with \"$action\"';
+  }
 
   @override
   String get drop_extractMetadata => 'Extract Metadata';
@@ -12132,6 +12252,424 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String common_hoursAgo(Object hours) {
     return '$hours hours ago';
+  }
+
+  @override
+  String get common_saving => 'Saving...';
+
+  @override
+  String get common_pleaseWait => 'Please wait';
+
+  @override
+  String get common_change => 'Change';
+
+  @override
+  String get common_expand => 'Expand';
+
+  @override
+  String get common_collapse => 'Collapse';
+
+  @override
+  String get vibeLibrary_emptySearchTitle => 'No matching Vibes';
+
+  @override
+  String get vibeLibrary_emptySearchSubtitle => 'Try a different keyword';
+
+  @override
+  String get vibeLibrary_emptyFavoritesTitle => 'No favorite Vibes yet';
+
+  @override
+  String get vibeLibrary_emptyFavoritesSubtitle =>
+      'Click the heart icon to favorite a Vibe';
+
+  @override
+  String get vibeLibrary_emptyCategoryTitle => 'No Vibes in this category';
+
+  @override
+  String get vibeLibrary_emptyCategorySubtitle =>
+      'Switch to \"All Vibes\" to see all entries';
+
+  @override
+  String get vibeLibrary_emptyNoMatchesTitle => 'No matching results';
+
+  @override
+  String get vibeLibrary_emptySaveFromGenerationHint =>
+      'Save Vibes from the generation page to add them to the library';
+
+  @override
+  String get vibe_nameRequired => 'Name is required';
+
+  @override
+  String get vibe_import_namingTitle => 'Name Vibe';
+
+  @override
+  String get vibe_import_nameConflictOverwrite =>
+      'This name already exists and will be overwritten';
+
+  @override
+  String get vibe_previewLoadFailed => 'Failed to load preview';
+
+  @override
+  String get vibe_import_applyToRemainingFiles =>
+      'Apply to all remaining files';
+
+  @override
+  String get vibe_import_applyNamingToRemainingFiles =>
+      'Use this naming rule for the remaining files';
+
+  @override
+  String get vibe_encodeImageTitle => 'Encode Image as Vibe';
+
+  @override
+  String get vibe_imagePreview => 'Image preview';
+
+  @override
+  String get vibe_encodeStartButton => 'Start Encoding';
+
+  @override
+  String get vibe_encodeImageInProgress => 'Encoding image...';
+
+  @override
+  String vibe_encodeErrorImage(Object fileName) {
+    return 'Image: $fileName';
+  }
+
+  @override
+  String vibe_encodeErrorMessage(Object error) {
+    return 'Error: $error';
+  }
+
+  @override
+  String get vibe_encodeSkipImage => 'Skip this image';
+
+  @override
+  String get detail_sendToImg2Img => 'Send to Image-to-Image';
+
+  @override
+  String get detail_sendToReversePrompt => 'Send to Reverse Prompt';
+
+  @override
+  String get detail_loadingImage => 'Loading image...';
+
+  @override
+  String get detail_imageLoadFailed => 'Failed to load image';
+
+  @override
+  String get detail_noImage => 'No image';
+
+  @override
+  String get detail_parsingMetadata => 'Parsing metadata...';
+
+  @override
+  String get detail_noMetadata => 'This image has no metadata';
+
+  @override
+  String get detail_metadata => 'Metadata';
+
+  @override
+  String get detail_imageDetails => 'Image Details';
+
+  @override
+  String get detail_basicInfo => 'Basic Info';
+
+  @override
+  String get detail_fileName => 'File Name';
+
+  @override
+  String get detail_modifiedTime => 'Modified';
+
+  @override
+  String get detail_fileSize => 'File Size';
+
+  @override
+  String get detail_noContent => '(No content)';
+
+  @override
+  String get detail_savePreset => 'Save Preset';
+
+  @override
+  String detail_copyLabel(Object label) {
+    return 'Copy $label';
+  }
+
+  @override
+  String get detail_copyCharacterPrompt => 'Copy Character Prompt';
+
+  @override
+  String get detail_copyAllVibeData => 'Copy all Vibe data';
+
+  @override
+  String get detail_saveToVibeLibrary => 'Save to Vibe Library';
+
+  @override
+  String get pagination_firstPage => 'First page';
+
+  @override
+  String get pagination_previousPage => 'Previous page';
+
+  @override
+  String get pagination_nextPage => 'Next page';
+
+  @override
+  String get pagination_lastPage => 'Last page';
+
+  @override
+  String get pagination_jumpToPage => 'Jump to page';
+
+  @override
+  String get pagination_jump => 'Jump';
+
+  @override
+  String get pagination_itemsPerPage => 'Per page';
+
+  @override
+  String get pagination_itemUnit => 'items';
+
+  @override
+  String get diyGuide_title => 'DIY Feature Guide';
+
+  @override
+  String get diyGuide_subtitle =>
+      'Learn advanced features and create your own library';
+
+  @override
+  String get diyGuide_intro =>
+      'This guide explains the core concepts and advanced features of the DIY system, helping you build powerful dynamic prompt libraries.';
+
+  @override
+  String get diyGuide_exampleLabel => 'Example';
+
+  @override
+  String get diyGuide_hierarchyTitle => 'Hierarchy';
+
+  @override
+  String get diyGuide_hierarchyDescription =>
+      'The DIY system uses a three-level category structure to organize prompts for easier management and lookup.';
+
+  @override
+  String get diyGuide_hierarchyExample =>
+      'Category: Character features\n  -> Group: Hairstyle\n      -> Tag: long hair, short hair, twintails';
+
+  @override
+  String get diyGuide_selectionModeTitle => 'Selection Mode';
+
+  @override
+  String get diyGuide_selectionModeDescription =>
+      'Controls how many tags are selected from a group.';
+
+  @override
+  String get diyGuide_selectionModeExample =>
+      '• Random: select one item each time, such as a random hair color\n• All: select every tag in the group, such as a fixed feature set';
+
+  @override
+  String get diyGuide_weightTitle => 'Weight Control';
+
+  @override
+  String get diyGuide_weightDescription =>
+      'Adjusts the influence of specific prompts during generation.';
+
+  @override
+  String get diyGuide_weightExample =>
+      '• Boost: curly brackets around masterpiece = 1.05x weight\n• Strong boost: triple curly brackets around masterpiece = 1.16x weight\n• Weaken: [bad hands] = 0.95x weight';
+
+  @override
+  String get diyGuide_genderTitle => 'Gender Restriction';
+
+  @override
+  String get diyGuide_genderDescription =>
+      'Limits tags to specific character genders to avoid incompatible generated features.';
+
+  @override
+  String get diyGuide_genderExample =>
+      '• Female: only female characters, such as skirt\n• Male: only male characters, such as beard\n• Any: universal, such as T-shirt';
+
+  @override
+  String get diyGuide_scopeTitle => 'Scope';
+
+  @override
+  String get diyGuide_scopeDescription =>
+      'Defines whether a tag applies to the character, background, or the whole image.';
+
+  @override
+  String get diyGuide_scopeExample =>
+      '• Character: character features, such as eyes and hair\n• Background: environment descriptions, such as blue sky and indoors\n• Global: art style and quality tags, such as best quality';
+
+  @override
+  String get diyGuide_conditionalTitle => 'Conditional Branch';
+
+  @override
+  String get diyGuide_conditionalDescription =>
+      'Dynamically chooses later tags based on selected tags or other conditions.';
+
+  @override
+  String get diyGuide_conditionalExample =>
+      'IF selected \"rain\"\n  THEN add \"umbrella\" and \"wet clothes\"\n  ELSE add \"sunny\"';
+
+  @override
+  String get diyGuide_dependenciesTitle => 'Dependencies';
+
+  @override
+  String get diyGuide_dependenciesDescription =>
+      'Creates links between tags so related tags are automatically introduced when one tag is selected.';
+
+  @override
+  String get diyGuide_dependenciesExample =>
+      'Selecting \"JK uniform\" -> automatically adds \"school background\" and \"school bag\"';
+
+  @override
+  String get diyGuide_visibilityTitle => 'Visibility Rules';
+
+  @override
+  String get diyGuide_visibilityDescription =>
+      'Controls when tags are shown in the UI or become active during generation.';
+
+  @override
+  String get diyGuide_visibilityExample =>
+      'Only show the \"magic wand\" option group when the \"magical girl\" category is selected';
+
+  @override
+  String get diyGuide_timeTitle => 'Time Condition';
+
+  @override
+  String get diyGuide_timeDescription =>
+      'Triggers specific tags based on real time or configured simulated time.';
+
+  @override
+  String get diyGuide_timeExample =>
+      '• 06:00-18:00 -> add \"daylight\"\n• 18:00-06:00 -> add \"night\"';
+
+  @override
+  String get diyGuide_postProcessingTitle => 'Post-processing Rules';
+
+  @override
+  String get diyGuide_postProcessingDescription =>
+      'Runs text replacement or cleanup at the final stage of prompt generation.';
+
+  @override
+  String get diyGuide_postProcessingExample =>
+      'Replace every \"blue eyes\" with \"azure eyes\" for a more distinctive description';
+
+  @override
+  String get diyGuide_emphasisTitle => 'Emphasis Probability';
+
+  @override
+  String get diyGuide_emphasisDescription =>
+      'Randomly adds weight syntax to tags to increase output variety.';
+
+  @override
+  String get diyGuide_emphasisExample =>
+      'Set a 30% probability: about 1/3 of outputs use a weighted tag and 2/3 output the plain tag';
+
+  @override
+  String get naiRules_title => 'NAI Random Rules';
+
+  @override
+  String get naiRules_characterCountProbability =>
+      'Character Count Probability';
+
+  @override
+  String get naiRules_solo => '1 person (Solo)';
+
+  @override
+  String get naiRules_duo => '2 people (Duo)';
+
+  @override
+  String get naiRules_trio => '3 people (Trio)';
+
+  @override
+  String get naiRules_group => '4 people (Group)';
+
+  @override
+  String get naiRules_genderRules => 'Gender Rules';
+
+  @override
+  String get naiRules_female => 'Female';
+
+  @override
+  String get naiRules_male => 'Male';
+
+  @override
+  String get naiRules_mixed => 'Mixed / Other';
+
+  @override
+  String get naiRules_categoryProbability => 'Category Probability';
+
+  @override
+  String get naiRules_dynamicTagWeightTitle => 'Dynamic Tag Weight Adjustment';
+
+  @override
+  String get naiRules_dynamicTagWeightSubtitle =>
+      'Randomly combines multiple dimensions such as action, clothing, expression, and background, then adjusts category weights based on the image theme.';
+
+  @override
+  String get naiRules_specialMechanisms => 'Special Mechanisms';
+
+  @override
+  String get naiRules_tagStrengthening => 'Tag Strengthening';
+
+  @override
+  String get naiRules_seasonalLibraryTitle => 'Seasonal Library';
+
+  @override
+  String get naiRules_seasonalLibrarySubtitle =>
+      'Automatically matches seasonal features, including seasonal clothing, weather, lighting, and atmosphere.';
+
+  @override
+  String get naiRules_v4CharacterPositioning =>
+      'V4 Multi-character Positioning';
+
+  @override
+  String get naiRules_smartPositionTitle => 'Smart Position Assignment';
+
+  @override
+  String get naiRules_smartPositionSubtitle =>
+      'With V4 models, character positioning syntax is used to precisely control multi-character placement.';
+
+  @override
+  String get comfyImport_detectedTitle =>
+      'Detected ComfyUI multi-character prompt';
+
+  @override
+  String comfyImport_characterList(Object count) {
+    return 'Character List ($count)';
+  }
+
+  @override
+  String get comfyImport_usePositionInfo => 'Use position information';
+
+  @override
+  String get comfyImport_usePositionInfoSubtitle =>
+      'Map ComfyUI regions to NAI character positions';
+
+  @override
+  String comfyImport_convertCharacters(Object count) {
+    return 'Convert $count characters';
+  }
+
+  @override
+  String get comfyImport_syntaxCouple => 'COUPLE syntax';
+
+  @override
+  String get comfyImport_syntaxAndMask => 'AND+MASK syntax';
+
+  @override
+  String get comfyImport_syntaxPipe => 'Pipe format';
+
+  @override
+  String get comfyImport_syntaxUnknown => 'Unknown syntax';
+
+  @override
+  String get comfyImport_globalPrompt => 'Global Prompt';
+
+  @override
+  String get danbooruPreview_noTagData => 'No tag data';
+
+  @override
+  String get danbooruPreview_noPoolData => 'No Pool data';
+
+  @override
+  String danbooruPreview_postCount(Object count) {
+    return '$count posts';
   }
 
   @override

@@ -64,7 +64,7 @@ class QueueExportUtils {
 
       return [];
     } catch (e) {
-      throw FormatException('无效的 JSON 格式: $e');
+      throw FormatException('Invalid JSON format: $e');
     }
   }
 
@@ -160,7 +160,7 @@ class QueueExportUtils {
 enum ExportFormat {
   json('JSON', 'json'),
   csv('CSV', 'csv'),
-  text('纯文本', 'txt');
+  text('Plain Text', 'txt');
 
   final String displayName;
   final String extension;
@@ -170,8 +170,8 @@ enum ExportFormat {
 
 /// 导入策略
 enum ImportStrategy {
-  merge('合并', '将导入的任务添加到现有队列末尾'),
-  replace('覆盖', '清空现有队列，使用导入的任务替换');
+  merge('Merge', 'Add imported tasks to end of existing queue'),
+  replace('Replace', 'Clear existing queue and replace with imported');
 
   final String displayName;
   final String description;

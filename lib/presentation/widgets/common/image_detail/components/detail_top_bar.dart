@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../../core/utils/localization_extension.dart';
 import '../../../../../data/models/gallery/local_image_record.dart';
 import '../../../../providers/local_gallery_provider.dart';
 import '../../animated_favorite_button.dart';
@@ -37,6 +38,7 @@ class DetailTopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final metadata = currentImage.metadata;
 
     return Container(
@@ -62,7 +64,7 @@ class DetailTopBar extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.close, color: Colors.white),
             onPressed: onClose,
-            tooltip: '关闭',
+            tooltip: l10n.common_close,
           ),
 
           const SizedBox(width: 16),
@@ -98,7 +100,7 @@ class DetailTopBar extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.save_alt, color: Colors.white),
               onPressed: onSave,
-              tooltip: '保存',
+              tooltip: l10n.common_save,
             ),
 
           // 复用参数按钮
@@ -106,7 +108,7 @@ class DetailTopBar extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.input, color: Colors.white),
               onPressed: onReuseMetadata,
-              tooltip: '复用参数',
+              tooltip: l10n.shortcut_action_reuse_params,
             ),
 
           // 发送到图生图
@@ -114,7 +116,7 @@ class DetailTopBar extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.image_search, color: Colors.white),
               onPressed: onSendToImg2Img,
-              tooltip: '发送到图生图',
+              tooltip: l10n.detail_sendToImg2Img,
             ),
 
           // 发送到反推模块
@@ -122,7 +124,7 @@ class DetailTopBar extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.auto_fix_high, color: Colors.white),
               onPressed: onSendToReversePrompt,
-              tooltip: '发送到反推',
+              tooltip: l10n.detail_sendToReversePrompt,
             ),
 
           // 复制图像按钮
@@ -130,7 +132,7 @@ class DetailTopBar extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.copy, color: Colors.white),
               onPressed: onCopyImage,
-              tooltip: '复制图像',
+              tooltip: l10n.shortcut_action_copy_image,
             ),
 
           // 收藏按钮（仅本地图库显示）

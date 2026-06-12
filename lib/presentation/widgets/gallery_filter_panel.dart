@@ -242,7 +242,7 @@ class _GalleryFilterPanelState extends ConsumerState<GalleryFilterPanel>
                           children: [
                             _buildModernTextField(
                               controller: _modelController,
-                              hintText: '输入模型名称...',
+                              hintText: l10n.localGallery_modelHint,
                               theme: theme,
                               isDark: isDark,
                               colorScheme: colorScheme,
@@ -272,7 +272,7 @@ class _GalleryFilterPanelState extends ConsumerState<GalleryFilterPanel>
                           children: [
                             _buildModernTextField(
                               controller: _samplerController,
-                              hintText: '输入采样器名称...',
+                              hintText: l10n.localGallery_samplerHint,
                               theme: theme,
                               isDark: isDark,
                               colorScheme: colorScheme,
@@ -351,7 +351,7 @@ class _GalleryFilterPanelState extends ConsumerState<GalleryFilterPanel>
                           children: [
                             _buildModernTextField(
                               controller: _resolutionController,
-                              hintText: '宽度x高度 (如: 1024x1024)',
+                              hintText: l10n.localGallery_resolutionHint,
                               theme: theme,
                               isDark: isDark,
                               colorScheme: colorScheme,
@@ -432,7 +432,7 @@ class _GalleryFilterPanelState extends ConsumerState<GalleryFilterPanel>
                   ),
                 ),
                 Text(
-                  '精确筛选您的图片集合',
+                  l10n.localGallery_filterSubtitle,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),
@@ -763,7 +763,7 @@ class _GalleryFilterPanelState extends ConsumerState<GalleryFilterPanel>
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    '已设置筛选',
+                    l10n.localGallery_activeFiltersSet,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: colorScheme.tertiary,
                       fontWeight: FontWeight.w500,
