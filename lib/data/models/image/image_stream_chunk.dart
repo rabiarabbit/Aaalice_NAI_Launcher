@@ -17,6 +17,9 @@ class ImageStreamChunk {
   /// 最终图像数据
   final Uint8List? finalImage;
 
+  /// 多样本流式生成中的样本索引（NovelAI `samp_ix`）。
+  final int sampleIndex;
+
   /// 当前步数
   final int? currentStep;
 
@@ -31,6 +34,7 @@ class ImageStreamChunk {
     this.progress = 0.0,
     this.isComplete = false,
     this.finalImage,
+    this.sampleIndex = 0,
     this.currentStep,
     this.totalSteps,
     this.error,
@@ -39,12 +43,14 @@ class ImageStreamChunk {
   /// 创建进度更新块
   factory ImageStreamChunk.progress({
     required double progress,
+    int sampleIndex = 0,
     int? currentStep,
     int? totalSteps,
     Uint8List? previewImage,
   }) {
     return ImageStreamChunk(
       progress: progress,
+      sampleIndex: sampleIndex,
       currentStep: currentStep,
       totalSteps: totalSteps,
       previewImage: previewImage,
@@ -52,9 +58,10 @@ class ImageStreamChunk {
   }
 
   /// 创建完成块
-  factory ImageStreamChunk.complete(Uint8List image) {
+  factory ImageStreamChunk.complete(Uint8List image, {int sampleIndex = 0}) {
     return ImageStreamChunk(
       finalImage: image,
+      sampleIndex: sampleIndex,
       progress: 1.0,
       isComplete: true,
     );

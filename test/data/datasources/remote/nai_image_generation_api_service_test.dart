@@ -5,6 +5,8 @@ import 'dart:typed_data';
 import 'package:archive/archive.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:image/image.dart' as img;
+import 'package:msgpack_dart/msgpack_dart.dart' as msgpack;
 import 'package:nai_launcher/core/network/nai_api_endpoint.dart';
 import 'package:nai_launcher/core/network/nai_api_endpoint_service.dart';
 import 'package:nai_launcher/data/datasources/remote/nai_image_enhancement_api_service.dart';
@@ -141,6 +143,178 @@ void main() {
     expect(chunks.single.error, contains('Cancelled'));
   });
 
+  test('stream completes only from final event image', () async {
+    final adapter = _PendingDioAdapter();
+    final dio = Dio()..httpClientAdapter = adapter;
+    final endpointService = NaiApiEndpointService();
+    final service = NAIImageGenerationApiService(
+      dio,
+      NAIImageEnhancementApiService(dio, endpointService),
+      endpointService,
+    );
+
+    final chunksFuture = service
+        .generateImageStream(const ImageParams(prompt: 'final'))
+        .toList();
+    await _waitForRequestCount(adapter, 1);
+
+    final preview = Uint8List.fromList([1, 2, 3]);
+    final finalImage = Uint8List.fromList([9, 8, 7]);
+    adapter.requests.single.completeWithMsgpackMessages([
+      {
+        'event_type': 'intermediate',
+        'samp_ix': 0,
+        'step_ix': 0,
+        'image': preview,
+      },
+      {
+        'event_type': 'final',
+        'samp_ix': 0,
+        'image': finalImage,
+      },
+    ]);
+
+    final chunks = await chunksFuture.timeout(const Duration(seconds: 2));
+
+    expect(chunks, hasLength(2));
+    expect(chunks.first.hasPreview, isTrue);
+    expect(chunks.first.sampleIndex, 0);
+    expect(chunks.first.previewImage, orderedEquals(preview));
+    expect(chunks.last.hasFinalImage, isTrue);
+    expect(chunks.last.sampleIndex, 0);
+    expect(chunks.last.finalImage, orderedEquals(finalImage));
+  });
+
+  test('stream ending without final event returns error', () async {
+    final adapter = _PendingDioAdapter();
+    final dio = Dio()..httpClientAdapter = adapter;
+    final endpointService = NaiApiEndpointService();
+    final service = NAIImageGenerationApiService(
+      dio,
+      NAIImageEnhancementApiService(dio, endpointService),
+      endpointService,
+    );
+
+    final chunksFuture = service
+        .generateImageStream(const ImageParams(prompt: 'missing final'))
+        .toList();
+    await _waitForRequestCount(adapter, 1);
+
+    final preview = Uint8List.fromList([1, 2, 3]);
+    adapter.requests.single.completeWithMsgpackMessages([
+      {
+        'event_type': 'intermediate',
+        'samp_ix': 0,
+        'step_ix': 0,
+        'image': preview,
+      },
+    ]);
+
+    final chunks = await chunksFuture.timeout(const Duration(seconds: 2));
+
+    expect(chunks, hasLength(2));
+    expect(chunks.first.previewImage, orderedEquals(preview));
+    expect(chunks.last.hasError, isTrue);
+    expect(chunks.last.error, contains('No final image'));
+    expect(chunks.last.hasFinalImage, isFalse);
+  });
+
+  test('stream preserves sample indexes for multi-sample finals', () async {
+    final adapter = _PendingDioAdapter();
+    final dio = Dio()..httpClientAdapter = adapter;
+    final endpointService = NaiApiEndpointService();
+    final service = NAIImageGenerationApiService(
+      dio,
+      NAIImageEnhancementApiService(dio, endpointService),
+      endpointService,
+    );
+
+    final chunksFuture = service
+        .generateImageStream(const ImageParams(prompt: 'multi', nSamples: 2))
+        .toList();
+    await _waitForRequestCount(adapter, 1);
+
+    final first = Uint8List.fromList([1]);
+    final second = Uint8List.fromList([2]);
+    adapter.requests.single.completeWithMsgpackMessages([
+      {
+        'event_type': 'final',
+        'samp_ix': 1,
+        'image': second,
+      },
+      {
+        'event_type': 'final',
+        'samp_ix': 0,
+        'image': first,
+      },
+    ]);
+
+    final chunks = await chunksFuture.timeout(const Duration(seconds: 2));
+
+    expect(chunks, hasLength(2));
+    expect(chunks[0].sampleIndex, 1);
+    expect(chunks[0].finalImage, orderedEquals(second));
+    expect(chunks[1].sampleIndex, 0);
+    expect(chunks[1].finalImage, orderedEquals(first));
+    expect(chunks.any((chunk) => chunk.hasError), isFalse);
+  });
+
+  test('stream inpaint final preserves source outside composite mask',
+      () async {
+    final adapter = _PendingDioAdapter();
+    final dio = Dio()..httpClientAdapter = adapter;
+    final endpointService = NaiApiEndpointService();
+    final service = NAIImageGenerationApiService(
+      dio,
+      NAIImageEnhancementApiService(dio, endpointService),
+      endpointService,
+    );
+
+    final source = _solidPng(width: 256, height: 256, r: 10, g: 20, b: 30);
+    final mask = _rectMaskPng(
+      width: 256,
+      height: 256,
+      x: 120,
+      y: 120,
+      rectWidth: 16,
+      rectHeight: 16,
+    );
+    final generated =
+        _solidPng(width: 256, height: 256, r: 200, g: 210, b: 220);
+
+    final chunksFuture = service
+        .generateImageStream(
+          ImageParams(
+            action: ImageGenerationAction.infill,
+            model: 'nai-diffusion-4-5-full-inpainting',
+            width: 256,
+            height: 256,
+            sourceImage: source,
+            maskImage: mask,
+          ),
+        )
+        .toList();
+    await _waitForRequestCount(adapter, 1);
+
+    adapter.requests.single.completeWithMsgpackMessages([
+      {
+        'event_type': 'final',
+        'samp_ix': 0,
+        'image': generated,
+      },
+    ]);
+
+    final chunks = await chunksFuture.timeout(const Duration(seconds: 2));
+    final decoded = img.decodeImage(chunks.single.finalImage!)!;
+
+    expect(decoded.getPixel(0, 0).r.toInt(), equals(10));
+    expect(decoded.getPixel(0, 0).g.toInt(), equals(20));
+    expect(decoded.getPixel(0, 0).b.toInt(), equals(30));
+    expect(decoded.getPixel(128, 128).r.toInt(), greaterThan(190));
+    expect(decoded.getPixel(128, 128).g.toInt(), greaterThan(200));
+    expect(decoded.getPixel(128, 128).b.toInt(), greaterThan(210));
+  });
+
   test('cancelGeneration must abort the connection on the wire', () async {
     // 真实 socket 验证：取消必须让服务器观察到连接断开，
     // 否则 NovelAI 不会释放账号并发额度，后续请求持续 429。
@@ -238,6 +412,36 @@ class _PendingDioAdapter implements HttpClientAdapter {
   void close({bool force = false}) {}
 }
 
+Uint8List _solidPng({
+  required int width,
+  required int height,
+  required int r,
+  required int g,
+  required int b,
+}) {
+  final image = img.Image(width: width, height: height);
+  img.fill(image, color: img.ColorRgb8(r, g, b));
+  return Uint8List.fromList(img.encodePng(image));
+}
+
+Uint8List _rectMaskPng({
+  required int width,
+  required int height,
+  required int x,
+  required int y,
+  required int rectWidth,
+  required int rectHeight,
+}) {
+  final mask = img.Image(width: width, height: height);
+  img.fill(mask, color: img.ColorRgba8(0, 0, 0, 255));
+  for (var py = y; py < y + rectHeight; py++) {
+    for (var px = x; px < x + rectWidth; px++) {
+      mask.setPixelRgba(px, py, 255, 255, 255, 255);
+    }
+  }
+  return Uint8List.fromList(img.encodePng(mask));
+}
+
 class _PendingRequest {
   _PendingRequest(this.options, Future<void>? cancelFuture) {
     cancelFuture?.then((_) {
@@ -277,6 +481,29 @@ class _PendingRequest {
     response.complete(
       ResponseBody.fromBytes(
         const <int>[],
+        200,
+        headers: {
+          Headers.contentTypeHeader: ['application/x-msgpack'],
+        },
+      ),
+    );
+  }
+
+  void completeWithMsgpackMessages(List<Map<String, Object?>> messages) {
+    final bytes = <int>[];
+    for (final message in messages) {
+      final encoded = msgpack.serialize(message);
+      final length = encoded.length;
+      bytes
+        ..add((length >> 24) & 0xFF)
+        ..add((length >> 16) & 0xFF)
+        ..add((length >> 8) & 0xFF)
+        ..add(length & 0xFF)
+        ..addAll(encoded);
+    }
+    response.complete(
+      ResponseBody.fromBytes(
+        Uint8List.fromList(bytes),
         200,
         headers: {
           Headers.contentTypeHeader: ['application/x-msgpack'],

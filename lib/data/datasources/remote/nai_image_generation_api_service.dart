@@ -14,6 +14,7 @@ import '../../../core/network/nai_api_endpoint_service.dart';
 import '../../../core/network/request_builders/nai_image_request_builder.dart';
 import '../../../core/utils/app_logger.dart';
 import '../../../core/utils/focused_inpaint_utils.dart';
+import '../../../core/utils/inpaint_mask_utils.dart';
 import '../../../core/utils/nai_api_utils.dart';
 import '../../../core/utils/zip_utils.dart';
 import '../../models/image/image_params.dart';
@@ -275,8 +276,9 @@ class NAIImageGenerationApiService {
 
       // 6. 解压 ZIP 响应
       final zipBytes = response.data as Uint8List;
-      final images = _compositeFocusedImages(
+      final images = _compositeInpaintImages(
         ZipUtils.extractAllImages(zipBytes),
+        params,
         focusedRequest,
       );
 
@@ -527,7 +529,10 @@ class NAIImageGenerationApiService {
       final responseStream = response.data!.stream;
       final buffer = <int>[];
       int messageCount = 0;
-      Uint8List? latestPreview;
+      final latestPreviews = <int, Uint8List>{};
+      final completedSamples = <int>{};
+      final expectedSamples =
+          effectiveParams.nSamples <= 0 ? 1 : effectiveParams.nSamples;
       final int totalSteps = effectiveParams.steps;
 
       await for (final chunk in responseStream) {
@@ -569,9 +574,19 @@ class NAIImageGenerationApiService {
 
               // NovelAI 流式消息格式:
               // {event_type, samp_ix, step_ix, gen_id, sigma, image}
-              final _ = msg['event_type']; // eventType 预留用于未来功能
-              final stepIx = msg['step_ix'] as int?;
+              final eventType = msg['event_type']?.toString();
+              final sampleIndex = _optionalInt(msg['samp_ix']) ?? 0;
+              final stepIx = _optionalInt(msg['step_ix']);
               final imageData = msg['image'];
+
+              if (eventType == 'error' || msg.containsKey('error')) {
+                final errorMessage = msg['message'] ??
+                    msg['error'] ??
+                    'Stream generation failed';
+                AppLogger.e('Stream error: $errorMessage', 'Stream');
+                yield ImageStreamChunk.error(errorMessage.toString());
+                return;
+              }
 
               // 提取图像数据
               Uint8List? imageBytes;
@@ -591,27 +606,49 @@ class NAIImageGenerationApiService {
               }
 
               if (imageBytes != null && imageBytes.isNotEmpty) {
-                latestPreview =
-                    _compositeFocusedImage(imageBytes, focusedRequest);
-                final currentStep = (stepIx ?? messageCount) + 1;
-                final progress = currentStep / totalSteps;
-                AppLogger.d(
-                  'Stream preview: step $currentStep/$totalSteps, ${imageBytes.length} bytes',
-                  'Stream',
-                );
-                yield ImageStreamChunk.progress(
-                  progress: progress.clamp(0.0, 0.99),
-                  currentStep: currentStep,
-                  totalSteps: totalSteps,
-                  previewImage: latestPreview,
-                );
-              }
+                if (eventType == 'final') {
+                  final compositedImage = _compositeInpaintImage(
+                    imageBytes,
+                    params,
+                    focusedRequest,
+                  );
+                  completedSamples.add(sampleIndex);
+                  AppLogger.d(
+                    'Stream final: sample $sampleIndex, ${imageBytes.length} bytes',
+                    'Stream',
+                  );
+                  yield ImageStreamChunk.complete(
+                    compositedImage,
+                    sampleIndex: sampleIndex,
+                  );
+                  continue;
+                }
 
-              // 检查错误
-              if (msg.containsKey('error')) {
-                AppLogger.e('Stream error: ${msg['error']}', 'Stream');
-                yield ImageStreamChunk.error(msg['error'].toString());
-                return;
+                if (eventType == null ||
+                    eventType.isEmpty ||
+                    eventType == 'intermediate') {
+                  final compositedImage =
+                      _compositeFocusedImage(imageBytes, focusedRequest);
+                  latestPreviews[sampleIndex] = compositedImage;
+                  final currentStep = (stepIx ?? messageCount) + 1;
+                  final progress = currentStep / totalSteps;
+                  AppLogger.d(
+                    'Stream preview: sample $sampleIndex, step $currentStep/$totalSteps, ${imageBytes.length} bytes',
+                    'Stream',
+                  );
+                  yield ImageStreamChunk.progress(
+                    progress: progress.clamp(0.0, 0.99),
+                    sampleIndex: sampleIndex,
+                    currentStep: currentStep,
+                    totalSteps: totalSteps,
+                    previewImage: compositedImage,
+                  );
+                } else {
+                  AppLogger.d(
+                    'Ignoring stream image for event_type=$eventType',
+                    'Stream',
+                  );
+                }
               }
             }
           } catch (e) {
@@ -638,7 +675,7 @@ class NAIImageGenerationApiService {
             final images = ZipUtils.extractAllImages(bytes);
             if (images.isNotEmpty) {
               yield ImageStreamChunk.complete(
-                _compositeFocusedImage(images.first, focusedRequest),
+                _compositeInpaintImage(images.first, params, focusedRequest),
               );
               return;
             }
@@ -662,21 +699,23 @@ class NAIImageGenerationApiService {
                   final data = msg['data'];
                   if (data is Uint8List) {
                     yield ImageStreamChunk.complete(
-                      _compositeFocusedImage(data, focusedRequest),
+                      _compositeInpaintImage(data, params, focusedRequest),
                     );
                     return;
                   } else if (data is List<int>) {
                     yield ImageStreamChunk.complete(
-                      _compositeFocusedImage(
+                      _compositeInpaintImage(
                         Uint8List.fromList(data),
+                        params,
                         focusedRequest,
                       ),
                     );
                     return;
                   } else if (data is String) {
                     yield ImageStreamChunk.complete(
-                      _compositeFocusedImage(
+                      _compositeInpaintImage(
                         Uint8List.fromList(base64Decode(data)),
+                        params,
                         focusedRequest,
                       ),
                     );
@@ -687,28 +726,19 @@ class NAIImageGenerationApiService {
             }
           }
 
-          // 如果有最新预览，将其作为最终结果（兜底）
-          if (latestPreview != null) {
-            AppLogger.d(
-              'Stream fallback: using latest preview as final',
-              'Stream',
-            );
-            yield ImageStreamChunk.complete(latestPreview);
-          } else {
-            yield ImageStreamChunk.error('No image received from stream');
-          }
+          yield ImageStreamChunk.error('No final image received from stream');
         } catch (e) {
           AppLogger.e('Failed to parse final stream data: $e', 'Stream');
-          if (latestPreview != null) {
-            yield ImageStreamChunk.complete(latestPreview);
-          } else {
-            yield ImageStreamChunk.error('Failed to parse response');
-          }
+          yield ImageStreamChunk.error('Failed to parse response');
         }
-      } else if (latestPreview != null) {
-        // buffer 为空但有预览，使用最后的预览作为最终结果
-        AppLogger.d('Stream complete: using latest preview', 'Stream');
-        yield ImageStreamChunk.complete(latestPreview);
+      } else if (completedSamples.length < expectedSamples) {
+        AppLogger.w(
+          'Stream ended without final image for all samples '
+              '(${completedSamples.length}/$expectedSamples); '
+              'previews=${latestPreviews.length}',
+          'Stream',
+        );
+        yield ImageStreamChunk.error('No final image received from stream');
       }
     } on DioException catch (e) {
       if (e.type == DioExceptionType.cancel) {
@@ -805,17 +835,50 @@ class NAIImageGenerationApiService {
     );
   }
 
-  List<Uint8List> _compositeFocusedImages(
+  List<Uint8List> _compositeInpaintImages(
     List<Uint8List> images,
+    ImageParams params,
     FocusedInpaintRequest? focusedRequest,
   ) {
-    if (focusedRequest == null) {
-      return images;
+    return images
+        .map(
+          (imageBytes) => _compositeInpaintImage(
+            imageBytes,
+            params,
+            focusedRequest,
+          ),
+        )
+        .toList(growable: false);
+  }
+
+  Uint8List _compositeInpaintImage(
+    Uint8List imageBytes,
+    ImageParams params,
+    FocusedInpaintRequest? focusedRequest,
+  ) {
+    if (focusedRequest != null) {
+      return focusedRequest.compositeGeneratedImage(imageBytes);
+    }
+    if (params.action != ImageGenerationAction.infill ||
+        params.sourceImage == null ||
+        params.maskImage == null) {
+      return imageBytes;
     }
 
-    return images
-        .map((imageBytes) => focusedRequest.compositeGeneratedImage(imageBytes))
-        .toList(growable: false);
+    final compositeMask =
+        InpaintMaskUtils.prepareGeneratedImageCompositeMaskBytes(
+      params.maskImage!,
+      targetWidth: params.width,
+      targetHeight: params.height,
+      closingIterations: params.inpaintMaskClosingIterations,
+      expansionIterations: params.inpaintMaskExpansionIterations,
+    );
+    return InpaintMaskUtils.compositeGeneratedImage(
+      sourceImage: params.sourceImage!,
+      maskImage: compositeMask,
+      generatedImage: imageBytes,
+      normalizeMask: false,
+    );
   }
 
   Uint8List _compositeFocusedImage(
@@ -826,6 +889,12 @@ class NAIImageGenerationApiService {
       return imageBytes;
     }
     return focusedRequest.compositeGeneratedImage(imageBytes);
+  }
+
+  int? _optionalInt(Object? value) {
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    return null;
   }
 }
 

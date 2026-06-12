@@ -414,11 +414,12 @@ class NAIImageRequestBuilder {
     if (params.action == ImageGenerationAction.infill &&
         params.sourceImage != null &&
         params.maskImage != null) {
-      final normalizedMask = InpaintMaskUtils.prepareRequestMaskBytes(
+      final normalizedMask = InpaintMaskUtils.prepareNovelAiRequestMaskBytes(
         params.maskImage!,
+        targetWidth: params.width,
+        targetHeight: params.height,
         closingIterations: params.inpaintMaskClosingIterations,
         expansionIterations: params.inpaintMaskExpansionIterations,
-        alignToLatentGrid: params.isV4Model,
       );
       requestParameters['image'] = base64Encode(params.sourceImage!);
       requestParameters['mask'] = base64Encode(normalizedMask);

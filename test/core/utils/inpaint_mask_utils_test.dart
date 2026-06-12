@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -104,6 +105,65 @@ void main() {
       expect(decoded.getPixel(15, 15).r.toInt(), equals(255));
       expect(decoded.getPixel(7, 9).r.toInt(), equals(0));
       expect(decoded.getPixel(9, 7).r.toInt(), equals(0));
+    });
+
+    test(
+        'prepareNovelAiRequestMaskBytes should match browser nearest latent sampling',
+        () {
+      final source = img.Image(width: 16, height: 16, numChannels: 4);
+      img.fill(source, color: img.ColorRgba8(0, 0, 0, 255));
+      source.setPixelRgba(4, 4, 255, 255, 255, 255);
+      source.setPixelRgba(12, 12, 255, 255, 255, 255);
+
+      final result = InpaintMaskUtils.prepareNovelAiRequestMaskBytes(
+        Uint8List.fromList(img.encodePng(source)),
+        targetWidth: 16,
+        targetHeight: 16,
+      );
+      final decoded = img.decodeImage(result)!;
+
+      expect(decoded.getPixel(0, 0).r.toInt(), equals(255));
+      expect(decoded.getPixel(7, 7).r.toInt(), equals(255));
+      expect(decoded.getPixel(8, 8).r.toInt(), equals(255));
+      expect(decoded.getPixel(15, 15).r.toInt(), equals(255));
+      expect(decoded.getPixel(8, 0).r.toInt(), equals(0));
+      expect(decoded.getPixel(0, 8).r.toInt(), equals(0));
+    });
+
+    test(
+        'prepareGeneratedImageCompositeMaskBytes should match NovelAI worker mask samples',
+        () {
+      final mask = _buildParityMask(width: 256, height: 192);
+
+      final result = InpaintMaskUtils.prepareGeneratedImageCompositeMaskBytes(
+        Uint8List.fromList(img.encodePng(mask)),
+        targetWidth: 256,
+        targetHeight: 192,
+      );
+      final decoded = img.decodeImage(result)!;
+
+      expect(_rgbaAt(decoded, 0, 0), equals((r: 62, g: 62, b: 62, a: 62)));
+      expect(
+        _rgbaAt(decoded, 20, 80),
+        equals((r: 254, g: 254, b: 254, a: 254)),
+      );
+      expect(
+        _rgbaAt(decoded, 32, 48),
+        equals((r: 249, g: 249, b: 249, a: 249)),
+      );
+      expect(
+        _rgbaAt(decoded, 80, 80),
+        equals((r: 255, g: 255, b: 255, a: 255)),
+      );
+      expect(
+        _rgbaAt(decoded, 126, 92),
+        equals((r: 255, g: 255, b: 255, a: 255)),
+      );
+      expect(
+        _rgbaAt(decoded, 180, 70),
+        equals((r: 236, g: 236, b: 236, a: 236)),
+      );
+      expect(_rgbaAt(decoded, 244, 180), equals((r: 0, g: 0, b: 0, a: 0)));
     });
 
     test('fillClosedMaskRegions should fill enclosed transparent holes', () {
@@ -360,4 +420,41 @@ void main() {
       expect(decoded.getPixel(3, 3).a.toInt(), equals(0));
     });
   });
+}
+
+({int r, int g, int b, int a}) _rgbaAt(img.Image image, int x, int y) {
+  final pixel = image.getPixel(x, y);
+  return (
+    r: pixel.r.toInt(),
+    g: pixel.g.toInt(),
+    b: pixel.b.toInt(),
+    a: pixel.a.toInt(),
+  );
+}
+
+img.Image _buildParityMask({required int width, required int height}) {
+  final image = img.Image(width: width, height: height, numChannels: 4);
+  for (var y = 0; y < height; y++) {
+    for (var x = 0; x < width; x++) {
+      final masked = _isParityMasked(x, y);
+      final value = masked ? 255 : 0;
+      image.setPixelRgba(x, y, value, value, value, 255);
+    }
+  }
+  return image;
+}
+
+bool _isParityMasked(int x, int y) {
+  final wobble = 1 +
+      0.13 * math.sin(y / 6.0) +
+      0.08 * math.cos(x / 8.0) +
+      0.05 * math.sin((x + y) / 9.0);
+  final dx = (x - 126) / 48;
+  final dy = (y - 92) / 31;
+  final blob = dx * dx + dy * dy < wobble;
+  final leftPatch = x >= 34 && x <= 76 && y >= 48 && y <= 86;
+  final thinStroke =
+      (x - y).abs() <= 2 && x >= 148 && x <= 206 && y >= 40 && y <= 98;
+  final lowerPatch = x >= 92 && x <= 146 && y >= 132 && y <= 154;
+  return blob || leftPatch || thinStroke || lowerPatch;
 }

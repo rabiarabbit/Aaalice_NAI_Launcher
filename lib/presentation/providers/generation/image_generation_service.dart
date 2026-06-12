@@ -62,7 +62,10 @@ typedef GenerationProgressCallback = void Function(
 });
 
 /// 批量生成结果（包含图像和 vibe encodings）
-typedef _BatchGenerationResult = ({List<GeneratedImage> images, Map<String, String> vibeEncodings});
+typedef _BatchGenerationResult = ({
+  List<GeneratedImage> images,
+  Map<String, String> vibeEncodings
+});
 
 /// 图像生成服务
 ///
@@ -157,7 +160,8 @@ class ImageGenerationService {
     ImageParams params, {
     required int batchCount,
     required int batchSize,
-    void Function(int batchIndex, int currentImage, int totalImages)? onBatchStart,
+    void Function(int batchIndex, int currentImage, int totalImages)?
+        onBatchStart,
     GenerationProgressCallback? onProgress,
     void Function(List<GeneratedImage> batchImages)? onBatchComplete,
   }) async {
@@ -240,7 +244,7 @@ class ImageGenerationService {
     GenerationProgressCallback? onProgress,
   }) async {
     bool streamingNotAllowed = false;
-    Uint8List? finalImage;
+    final finalImages = <int, Uint8List>{};
 
     try {
       final stream = _apiService.generateImageStream(params);
@@ -272,17 +276,23 @@ class ImageGenerationService {
         }
 
         if (chunk.isComplete && chunk.hasFinalImage) {
-          finalImage = chunk.finalImage;
+          finalImages[chunk.sampleIndex] = chunk.finalImage!;
         }
       }
 
       // 如果流式成功返回图像
-      if (finalImage != null && !_isCancelled) {
-        final generatedImage = GeneratedImage.create(
-          finalImage,
-          width: params.width,
-          height: params.height,
-        );
+      if (finalImages.isNotEmpty && !_isCancelled) {
+        final orderedImages = finalImages.entries.toList()
+          ..sort((a, b) => a.key.compareTo(b.key));
+        final generatedImages = orderedImages
+            .map(
+              (entry) => GeneratedImage.create(
+                entry.value,
+                width: params.width,
+                height: params.height,
+              ),
+            )
+            .toList();
         // 注意：Streaming API 的响应中不包含 vibe encodings 数据
         // 只有非流式 API (generateImage) 会返回 vibe encodings
         // 这是 NovelAI API 的已知限制，非本实现问题
@@ -295,12 +305,12 @@ class ImageGenerationService {
         // 由于 vibe encodings 主要用于保存和复用 Vibe Transfer 特征，
         // 而大多数用户更重视流式预览体验，因此此处优先保证流式功能
         return ImageGenerationResult(
-          images: [generatedImage],
+          images: generatedImages,
         );
       }
 
       // 流式不支持或未完成，回退到非流式
-      if (streamingNotAllowed || finalImage == null) {
+      if (streamingNotAllowed || finalImages.isEmpty) {
         return _generateWithRetry(params);
       }
 
@@ -357,7 +367,8 @@ class ImageGenerationService {
         try {
           // 使用非流式回退
           if (useNonStreamFallback) {
-            final (fallbackImages, fallbackVibes) = await _apiService.generateImage(
+            final (fallbackImages, fallbackVibes) =
+                await _apiService.generateImage(
               singleParams,
               onProgress: (_, __) {},
             );
@@ -376,7 +387,8 @@ class ImageGenerationService {
 
           // 尝试流式生成
           bool streamingNotAllowed = false;
-          await for (final chunk in _apiService.generateImageStream(singleParams)) {
+          await for (final chunk
+              in _apiService.generateImageStream(singleParams)) {
             if (_isCancelled) break;
 
             if (chunk.hasError) {
@@ -404,7 +416,8 @@ class ImageGenerationService {
 
           // 流式不支持，使用非流式回退
           if (streamingNotAllowed) {
-            final (fallbackImages, fallbackVibes) = await _apiService.generateImage(
+            final (fallbackImages, fallbackVibes) =
+                await _apiService.generateImage(
               singleParams,
               onProgress: (_, __) {},
             );
@@ -425,7 +438,8 @@ class ImageGenerationService {
           }
 
           // 流式未返回图像，尝试非流式
-          final (fallbackImages, fallbackVibes) = await _apiService.generateImage(
+          final (fallbackImages, fallbackVibes) =
+              await _apiService.generateImage(
             singleParams,
             onProgress: (_, __) {},
           );
@@ -444,7 +458,8 @@ class ImageGenerationService {
           if (_isStreamingNotAllowed(e.toString())) {
             useNonStreamFallback = true;
             try {
-              final (fallbackImages, fallbackVibes) = await _apiService.generateImage(
+              final (fallbackImages, fallbackVibes) =
+                  await _apiService.generateImage(
                 singleParams,
                 onProgress: (_, __) {},
               );
@@ -475,11 +490,13 @@ class ImageGenerationService {
       }
 
       if (image != null) {
-        images.add(GeneratedImage.create(
-          image,
-          width: params.width,
-          height: params.height,
-        ),);
+        images.add(
+          GeneratedImage.create(
+            image,
+            width: params.width,
+            height: params.height,
+          ),
+        );
         // 合并当前图像的 vibe encodings
         // imageVibeEncodings 的 key 已经是 '${currentIndex}_${vibeIndex}' 格式
         if (imageVibeEncodings.isNotEmpty) {
@@ -501,17 +518,20 @@ class ImageGenerationService {
         );
 
         final images = imageBytes
-            .map((b) => GeneratedImage.create(
-                  b,
-                  width: params.width,
-                  height: params.height,
-                ),)
+            .map(
+              (b) => GeneratedImage.create(
+                b,
+                width: params.width,
+                height: params.height,
+              ),
+            )
             .toList();
 
         // 将 API 返回的 Map<int, String> 转换为 Map<String, String>
         // key 格式: '0_${vibeIndex}'（单张生成使用索引 0）
         final convertedVibeEncodings = {
-          for (final entry in vibeEncodings.entries) '0_${entry.key}': entry.value,
+          for (final entry in vibeEncodings.entries)
+            '0_${entry.key}': entry.value,
         };
 
         return ImageGenerationResult(

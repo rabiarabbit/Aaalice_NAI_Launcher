@@ -1,5 +1,6 @@
 import 'dart:collection';
 import 'dart:isolate';
+import 'dart:math' as math;
 import 'dart:typed_data';
 import 'package:image/image.dart' as img;
 
@@ -343,13 +344,16 @@ class InpaintMaskUtils {
     required Uint8List sourceImage,
     required Uint8List maskImage,
     required Uint8List generatedImage,
+    bool normalizeMask = true,
   }) {
     img.Image? source;
     img.Image? mask;
     img.Image? generated;
     try {
       source = img.decodeImage(sourceImage);
-      mask = img.decodeImage(normalizeMaskBytes(maskImage));
+      mask = img.decodeImage(
+        normalizeMask ? normalizeMaskBytes(maskImage) : maskImage,
+      );
       generated = img.decodeImage(generatedImage);
     } catch (_) {
       return generatedImage;
@@ -385,6 +389,74 @@ class InpaintMaskUtils {
     );
 
     return Uint8List.fromList(img.encodePng(composed));
+  }
+
+  /// 构建用于 final inpaint 写回的客户端合成蒙版。
+  ///
+  /// 官网当前流程会关闭服务端 `add_original_image`，再用膨胀、放大、
+  /// 柔化后的 mask 在客户端把生成图贴回原图。这样未选区域不会吃到
+  /// 服务端整图 VAE 往返，同时蒙版边缘比硬二值贴回更不容易出接缝。
+  static Uint8List prepareGeneratedImageCompositeMaskBytes(
+    Uint8List bytes, {
+    required int targetWidth,
+    required int targetHeight,
+    int closingIterations = 0,
+    int expansionIterations = 0,
+    int latentGridSize = 8,
+    int latentDilationIterations = 4,
+    int blurRadius = 20,
+    int blurIterations = 2,
+  }) {
+    final latentMaskBytes = prepareNovelAiLatentMaskBytes(
+      bytes,
+      targetWidth: targetWidth,
+      targetHeight: targetHeight,
+      closingIterations: closingIterations,
+      expansionIterations: expansionIterations,
+      latentGridSize: latentGridSize,
+    );
+    final latentMask = img.decodeImage(latentMaskBytes);
+    if (latentMask == null) {
+      return latentMaskBytes;
+    }
+    final latentWidth = latentMask.width;
+    final latentHeight = latentMask.height;
+    var binaryMask = _createBinaryMask(latentMask);
+    if (latentDilationIterations > 0) {
+      binaryMask = _dilateMask(
+        binaryMask,
+        latentWidth,
+        latentHeight,
+        latentDilationIterations,
+      );
+    }
+
+    var compositeMask = _binaryMaskToImage(
+      binaryMask,
+      latentWidth,
+      latentHeight,
+    );
+    if (latentGridSize > 1) {
+      compositeMask = _scaleImageByInteger(compositeMask, latentGridSize);
+    }
+    if (compositeMask.width != targetWidth ||
+        compositeMask.height != targetHeight) {
+      compositeMask = _resizeNearestCanvasLike(
+        compositeMask,
+        width: targetWidth,
+        height: targetHeight,
+      );
+    }
+    if (blurRadius > 0 && blurIterations > 0) {
+      compositeMask = _officialWorkerBlur(
+        compositeMask,
+        radius: blurRadius,
+        iterations: blurIterations,
+      );
+    }
+    compositeMask = _alphaMatchRed(compositeMask);
+
+    return Uint8List.fromList(img.encodePng(compositeMask));
   }
 
   /// 从 inpaint 返回图中提取透明补丁层。
@@ -502,6 +574,112 @@ class InpaintMaskUtils {
     return _encodeBinaryMask(binaryMask, decoded.width, decoded.height);
   }
 
+  /// 构建 NovelAI 官网式 infill 请求蒙版。
+  ///
+  /// 官网会先把 mask 量化到 latent 网格，再在真正提交请求前用
+  /// `imageSmoothingEnabled=false` 放大回生成尺寸。直接发送 latent
+  /// 尺寸 mask 会让服务端按粗块处理蒙版区域。
+  static Uint8List prepareNovelAiRequestMaskBytes(
+    Uint8List bytes, {
+    required int targetWidth,
+    required int targetHeight,
+    int closingIterations = 0,
+    int expansionIterations = 0,
+    int latentGridSize = 8,
+  }) {
+    final latentMaskBytes = prepareNovelAiLatentMaskBytes(
+      bytes,
+      targetWidth: targetWidth,
+      targetHeight: targetHeight,
+      closingIterations: closingIterations,
+      expansionIterations: expansionIterations,
+      latentGridSize: latentGridSize,
+    );
+    img.Image? latentMask;
+    try {
+      latentMask = img.decodeImage(latentMaskBytes);
+    } catch (_) {
+      return latentMaskBytes;
+    }
+    if (latentMask == null) {
+      return latentMaskBytes;
+    }
+
+    final fullSizeMask = _resizeNearestCanvasLike(
+      latentMask,
+      width: targetWidth,
+      height: targetHeight,
+    );
+    return Uint8List.fromList(img.encodePng(fullSizeMask));
+  }
+
+  /// 构建 NovelAI 官网 infill 流程中的 latent 网格中间蒙版。
+  static Uint8List prepareNovelAiLatentMaskBytes(
+    Uint8List bytes, {
+    required int targetWidth,
+    required int targetHeight,
+    int closingIterations = 0,
+    int expansionIterations = 0,
+    int latentGridSize = 8,
+  }) {
+    img.Image? decoded;
+    try {
+      decoded = img.decodeImage(bytes);
+    } catch (_) {
+      return bytes;
+    }
+    if (decoded == null) {
+      return bytes;
+    }
+
+    var binaryMask = _createBinaryMask(decoded);
+    if (closingIterations > 0) {
+      binaryMask = _closeMask(
+        binaryMask,
+        decoded.width,
+        decoded.height,
+        closingIterations,
+      );
+    }
+    if (expansionIterations > 0) {
+      binaryMask = _dilateMask(
+        binaryMask,
+        decoded.width,
+        decoded.height,
+        expansionIterations,
+      );
+    }
+
+    var fullSizeMask = img.decodeImage(
+      _encodeBinaryMask(binaryMask, decoded.width, decoded.height),
+    );
+    if (fullSizeMask == null) {
+      return bytes;
+    }
+    if (fullSizeMask.width != targetWidth ||
+        fullSizeMask.height != targetHeight) {
+      fullSizeMask = _resizeNearestCanvasLike(
+        fullSizeMask,
+        width: targetWidth,
+        height: targetHeight,
+      );
+    }
+
+    final latentWidth = (targetWidth / latentGridSize).round();
+    final latentHeight = (targetHeight / latentGridSize).round();
+    if (latentWidth <= 0 || latentHeight <= 0) {
+      return Uint8List.fromList(img.encodePng(fullSizeMask));
+    }
+
+    final latentMask = _resizeNearestCanvasLike(
+      fullSizeMask,
+      width: latentWidth,
+      height: latentHeight,
+    );
+    final latentBinaryMask = _createBinaryMask(latentMask);
+    return _encodeBinaryMask(latentBinaryMask, latentWidth, latentHeight);
+  }
+
   /// 将已保存的黑白蒙版转换为编辑器可见的透明覆盖层。
   static Uint8List maskToEditorOverlay(
     Uint8List bytes, {
@@ -573,7 +751,7 @@ class InpaintMaskUtils {
     return mask;
   }
 
-  static Uint8List _encodeBinaryMask(
+  static img.Image _binaryMaskToImage(
     Uint8List binaryMask,
     int width,
     int height,
@@ -591,8 +769,248 @@ class InpaintMaskUtils {
         normalized.setPixelRgba(x, y, value, value, value, 255);
       }
     }
+    return normalized;
+  }
 
+  static Uint8List _encodeBinaryMask(
+    Uint8List binaryMask,
+    int width,
+    int height,
+  ) {
+    final normalized = _binaryMaskToImage(binaryMask, width, height);
     return Uint8List.fromList(img.encodePng(normalized));
+  }
+
+  static img.Image _resizeNearestCanvasLike(
+    img.Image source, {
+    required int width,
+    required int height,
+  }) {
+    final resized = img.Image(width: width, height: height, numChannels: 4);
+
+    for (var y = 0; y < height; y++) {
+      var sourceY = (((y + 0.5) * source.height) / height).floor();
+      sourceY = _clampInt(sourceY, 0, source.height - 1);
+      for (var x = 0; x < width; x++) {
+        var sourceX = (((x + 0.5) * source.width) / width).floor();
+        sourceX = _clampInt(sourceX, 0, source.width - 1);
+        final pixel = source.getPixel(sourceX, sourceY);
+        resized.setPixelRgba(
+          x,
+          y,
+          pixel.r.toInt(),
+          pixel.g.toInt(),
+          pixel.b.toInt(),
+          pixel.a.toInt(),
+        );
+      }
+    }
+    return resized;
+  }
+
+  static img.Image _scaleImageByInteger(img.Image source, int scale) {
+    if (scale <= 1) {
+      return img.Image.from(source, noAnimation: true);
+    }
+
+    final scaled = img.Image(
+      width: source.width * scale,
+      height: source.height * scale,
+      numChannels: 4,
+    );
+    for (var y = 0; y < scaled.height; y++) {
+      final sourceY = y ~/ scale;
+      for (var x = 0; x < scaled.width; x++) {
+        final sourceX = x ~/ scale;
+        final pixel = source.getPixel(sourceX, sourceY);
+        scaled.setPixelRgba(
+          x,
+          y,
+          pixel.r.toInt(),
+          pixel.g.toInt(),
+          pixel.b.toInt(),
+          pixel.a.toInt(),
+        );
+      }
+    }
+    return scaled;
+  }
+
+  static img.Image _officialWorkerBlur(
+    img.Image source, {
+    required int radius,
+    required int iterations,
+  }) {
+    if (radius < 1) {
+      return img.Image.from(source, noAnimation: true);
+    }
+
+    final constants = _officialStackBlurConstants(radius);
+    if (constants == null) {
+      return img.gaussianBlur(source, radius: radius);
+    }
+
+    final width = source.width;
+    final height = source.height;
+    final right = width - 1;
+    final bottom = height - 1;
+    final rowBytes = width << 2;
+    final radiusPlusOne = radius + 1;
+    final iterationCount = _clampInt(iterations, 1, 3);
+    final red = Int16List(width * height);
+    final green = Int16List(width * height);
+    final blue = Int16List(width * height);
+    final minX = Uint16List(width);
+    final maxX = Uint16List(width);
+    final minY = Uint16List(height);
+    final maxY = Uint16List(height);
+    final capX = math.min(right, radius);
+    final data = Uint8List(width * height * 4);
+
+    var dataIndex = 0;
+    for (var y = 0; y < height; y++) {
+      for (var x = 0; x < width; x++) {
+        final pixel = source.getPixel(x, y);
+        data[dataIndex++] = pixel.r.toInt();
+        data[dataIndex++] = pixel.g.toInt();
+        data[dataIndex++] = pixel.b.toInt();
+        data[dataIndex++] = pixel.a.toInt();
+      }
+    }
+
+    for (var x = 0; x < width; x++) {
+      minX[x] = math.min(x + radiusPlusOne, right) << 2;
+      maxX[x] = math.max(x - radius, 0) << 2;
+    }
+    for (var y = 0; y < height; y++) {
+      minY[y] = math.min(y + radiusPlusOne, bottom);
+      maxY[y] = math.max(y - radius, 0);
+    }
+
+    for (var iteration = iterationCount; -1 != --iteration;) {
+      var flatIndex = 0;
+      for (var y = 0, rowOffset = 0; y < height; y++, rowOffset += rowBytes) {
+        var r = data[rowOffset] * radiusPlusOne;
+        var g = data[rowOffset + 1] * radiusPlusOne;
+        var b = data[rowOffset + 2] * radiusPlusOne;
+        for (var x = 1; x <= capX; x++) {
+          final index = rowOffset + (x << 2);
+          r += data[index];
+          g += data[index + 1];
+          b += data[index + 2];
+        }
+        if (radius > right) {
+          r += data[rowOffset + rowBytes - 4] * (radius - right);
+          g += data[rowOffset + rowBytes - 3] * (radius - right);
+          b += data[rowOffset + rowBytes - 2] * (radius - right);
+        }
+
+        for (var x = 0; x < width; x++, flatIndex++) {
+          red[flatIndex] = r;
+          green[flatIndex] = g;
+          blue[flatIndex] = b;
+          final add = rowOffset + minX[x];
+          final sub = rowOffset + maxX[x];
+          if (_hasAnyRgb(data, add) || _hasAnyRgb(data, sub)) {
+            r += data[add] - data[sub];
+            g += data[add + 1] - data[sub + 1];
+            b += data[add + 2] - data[sub + 2];
+          }
+        }
+      }
+
+      for (var x = 0; x < width; x++) {
+        var flatBase = x;
+        var r = red[flatBase] * radiusPlusOne;
+        var g = green[flatBase] * radiusPlusOne;
+        var b = blue[flatBase] * radiusPlusOne;
+        for (var y = 1; y <= radius; y++) {
+          if (y <= bottom) {
+            flatBase += width;
+          }
+          r += red[flatBase];
+          g += green[flatBase];
+          b += blue[flatBase];
+        }
+
+        for (var y = 0, offset = x; y < height; y++, offset += width) {
+          final pixelIndex = offset << 2;
+          if ((b | g | r) == 0) {
+            data[pixelIndex] = 0;
+            data[pixelIndex + 1] = 0;
+            data[pixelIndex + 2] = 0;
+          } else {
+            data[pixelIndex] = _clampByte((r * constants.mul) >> constants.shg);
+            data[pixelIndex + 1] =
+                _clampByte((g * constants.mul) >> constants.shg);
+            data[pixelIndex + 2] =
+                _clampByte((b * constants.mul) >> constants.shg);
+          }
+
+          final add = x + minY[y] * width;
+          final sub = x + maxY[y] * width;
+          r += red[add] - red[sub];
+          g += green[add] - green[sub];
+          b += blue[add] - blue[sub];
+        }
+      }
+    }
+
+    final blurred = img.Image(width: width, height: height, numChannels: 4);
+    dataIndex = 0;
+    for (var y = 0; y < height; y++) {
+      for (var x = 0; x < width; x++) {
+        blurred.setPixelRgba(
+          x,
+          y,
+          data[dataIndex],
+          data[dataIndex + 1],
+          data[dataIndex + 2],
+          data[dataIndex + 3],
+        );
+        dataIndex += 4;
+      }
+    }
+    return blurred;
+  }
+
+  static ({int mul, int shg})? _officialStackBlurConstants(int radius) {
+    // NovelAI's current infill worker calls blur with radius 20.
+    if (radius == 20) {
+      return (mul: 39, shg: 16);
+    }
+    return null;
+  }
+
+  static bool _hasAnyRgb(Uint8List data, int index) {
+    return data[index] != 0 || data[index + 1] != 0 || data[index + 2] != 0;
+  }
+
+  static int _clampByte(int value) => _clampInt(value, 0, 255);
+
+  static int _clampInt(int value, int min, int max) {
+    if (value < min) return min;
+    if (value > max) return max;
+    return value;
+  }
+
+  static img.Image _alphaMatchRed(img.Image source) {
+    final matched = img.Image.from(source, noAnimation: true);
+    for (var y = 0; y < matched.height; y++) {
+      for (var x = 0; x < matched.width; x++) {
+        final pixel = matched.getPixel(x, y);
+        final red = pixel.r.toInt();
+        matched.setPixelRgba(
+          x,
+          y,
+          red,
+          pixel.g.toInt(),
+          pixel.b.toInt(),
+          red,
+        );
+      }
+    }
+    return matched;
   }
 
   static Uint8List _encodeEditorOverlay(

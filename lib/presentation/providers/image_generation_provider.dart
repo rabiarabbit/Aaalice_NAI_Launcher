@@ -1291,7 +1291,7 @@ class ImageGenerationNotifier extends _$ImageGenerationNotifier {
         focusedSelectionRect: workflow.focusedSelectionRect,
       );
 
-      Uint8List? finalImage;
+      final finalImages = <int, Uint8List>{};
       bool streamingNotAllowed = false;
 
       await for (final chunk in stream) {
@@ -1357,7 +1357,7 @@ class ImageGenerationNotifier extends _$ImageGenerationNotifier {
         }
 
         if (chunk.isComplete && chunk.hasFinalImage) {
-          finalImage = chunk.finalImage;
+          finalImages[chunk.sampleIndex] = chunk.finalImage!;
         }
       }
 
@@ -1408,20 +1408,26 @@ class ImageGenerationNotifier extends _$ImageGenerationNotifier {
         return;
       }
 
-      if (finalImage != null) {
+      if (finalImages.isNotEmpty) {
         if (_shouldAbortGenerationRun(generationRunId)) return;
-        final generatedImage = GeneratedImage.create(
-          finalImage,
-          width: params.width,
-          height: params.height,
-        );
+        final orderedImages = finalImages.entries.toList()
+          ..sort((a, b) => a.key.compareTo(b.key));
+        final generatedList = orderedImages
+            .map(
+              (entry) => GeneratedImage.create(
+                entry.value,
+                width: params.width,
+                height: params.height,
+              ),
+            )
+            .toList();
         state = state.copyWith(
           status: GenerationStatus.completed,
-          currentImages: [generatedImage],
-          displayImages: [generatedImage],
+          currentImages: generatedList,
+          displayImages: generatedList,
           displayWidth: params.width,
           displayHeight: params.height,
-          history: [generatedImage, ...state.history].take(50).toList(),
+          history: [...generatedList, ...state.history].take(50).toList(),
           progress: 1.0,
           currentImage: 0,
           totalImages: 0,
@@ -1433,9 +1439,9 @@ class ImageGenerationNotifier extends _$ImageGenerationNotifier {
           imageNumber: current,
         );
         // 自动保存
-        await _autoSaveIfEnabled([generatedImage], params);
+        await _autoSaveIfEnabled(generatedList, params);
         // 后台预解析元数据（不阻塞）
-        _preloadMetadataInBackground([generatedImage]);
+        _preloadMetadataInBackground(generatedList);
       } else {
         // 流式 API 未返回图像，回退到非流式 API
         AppLogger.w(
