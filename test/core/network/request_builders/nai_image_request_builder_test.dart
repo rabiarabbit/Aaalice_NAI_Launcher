@@ -310,12 +310,12 @@ void main() {
     });
 
     test(
-        'should normalize infill mask to hard binary edges and disable overlay original image',
+        'should send official full-size infill mask and disable server original image overlay',
         () async {
-      final noisyMask = img.Image(width: 16, height: 16);
+      final noisyMask = img.Image(width: 128, height: 128);
       img.fill(noisyMask, color: img.ColorRgba8(0, 0, 0, 255));
-      for (var y = 10; y <= 13; y++) {
-        for (var x = 10; x <= 13; x++) {
+      for (var y = 80; y <= 111; y++) {
+        for (var x = 80; x <= 111; x++) {
           noisyMask.setPixelRgba(x, y, 90, 160, 255, 120);
         }
       }
@@ -323,7 +323,9 @@ void main() {
       final params = ImageParams(
         action: ImageGenerationAction.infill,
         model: 'nai-diffusion-4-5-full',
-        sourceImage: _validPngBytes(),
+        width: 128,
+        height: 128,
+        sourceImage: _validPngBytes(width: 128, height: 128),
         maskImage: Uint8List.fromList(img.encodePng(noisyMask)),
         addOriginalImage: true,
       );
@@ -339,15 +341,16 @@ void main() {
       final decodedMask = img.decodeImage(maskBytes)!;
 
       expect(result.requestParameters['add_original_image'], isFalse);
+      expect('${decodedMask.width}x${decodedMask.height}', '128x128');
       expect(decodedMask.getPixel(0, 0).r.toInt(), equals(0));
       expect(decodedMask.getPixel(0, 0).a.toInt(), equals(255));
-      expect(decodedMask.getPixel(8, 8).r.toInt(), equals(255));
-      expect(decodedMask.getPixel(15, 15).r.toInt(), equals(255));
-      expect(decodedMask.getPixel(8, 8).a.toInt(), equals(255));
-      expect(decodedMask.getPixel(7, 7).r.toInt(), equals(0));
+      expect(decodedMask.getPixel(80, 80).r.toInt(), equals(255));
+      expect(decodedMask.getPixel(111, 111).r.toInt(), equals(255));
+      expect(decodedMask.getPixel(80, 80).a.toInt(), equals(255));
+      expect(decodedMask.getPixel(79, 79).r.toInt(), equals(0));
     });
 
-    test('should send expanded infill source and mask dimensions for outpaint',
+    test('should send expanded infill source and full-size mask for outpaint',
         () async {
       final expandedSource = _validPngBytes(width: 1472, height: 1664);
       final expandedMask = img.Image(width: 1472, height: 1664);
@@ -399,6 +402,9 @@ void main() {
       expect(decodedMask, isNotNull);
       expect('${decodedSource!.width}x${decodedSource.height}', '1472x1664');
       expect('${decodedMask!.width}x${decodedMask.height}', '1472x1664');
+      expect(decodedMask.getPixel(0, 0).r.toInt(), equals(255));
+      expect(decodedMask.getPixel(0, 63).r.toInt(), equals(255));
+      expect(decodedMask.getPixel(0, 64).r.toInt(), equals(0));
       expect(parameters['strength'], equals(0.42));
       expect(parameters['noise'], equals(0.13));
       expect(parameters['add_original_image'], isFalse);
@@ -409,10 +415,10 @@ void main() {
 
     test('should allow focused inpaint masks to skip extra post expansion',
         () async {
-      final singlePixelMask = img.Image(width: 16, height: 16);
+      final singlePixelMask = img.Image(width: 128, height: 128);
       img.fill(singlePixelMask, color: img.ColorRgba8(0, 0, 0, 255));
-      for (var y = 10; y <= 13; y++) {
-        for (var x = 10; x <= 13; x++) {
+      for (var y = 64; y <= 71; y++) {
+        for (var x = 64; x <= 71; x++) {
           singlePixelMask.setPixelRgba(x, y, 255, 255, 255, 255);
         }
       }
@@ -420,7 +426,9 @@ void main() {
       final params = ImageParams(
         action: ImageGenerationAction.infill,
         model: 'nai-diffusion-4-5-full',
-        sourceImage: _validPngBytes(),
+        width: 128,
+        height: 128,
+        sourceImage: _validPngBytes(width: 128, height: 128),
         maskImage: Uint8List.fromList(img.encodePng(singlePixelMask)),
         inpaintMaskClosingIterations: 0,
         inpaintMaskExpansionIterations: 0,
@@ -436,10 +444,10 @@ void main() {
           base64Decode(result.requestParameters['mask'] as String);
       final decodedMask = img.decodeImage(maskBytes)!;
 
-      expect(decodedMask.getPixel(8, 8).r.toInt(), equals(255));
-      expect(decodedMask.getPixel(15, 15).r.toInt(), equals(255));
-      expect(decodedMask.getPixel(7, 8).r.toInt(), equals(0));
-      expect(decodedMask.getPixel(8, 7).r.toInt(), equals(0));
+      expect('${decodedMask.width}x${decodedMask.height}', '128x128');
+      expect(decodedMask.getPixel(64, 64).r.toInt(), equals(255));
+      expect(decodedMask.getPixel(63, 64).r.toInt(), equals(0));
+      expect(decodedMask.getPixel(64, 63).r.toInt(), equals(0));
     });
 
     test('should prefer precise reference over vibe transfer on v4.5 requests',

@@ -5345,6 +5345,170 @@
 
   "vibe_export_include_thumbnails": "Include Thumbnails",
   "vibe_export_include_thumbnails_subtitle": "Include thumbnail preview in export file",
+  "vibe_export_singleFile": "Single file (.naiv4vibe)",
+  "vibe_export_singleFileDescription": "Export each Vibe as a separate file, suitable for sharing one Vibe",
+  "vibe_export_bundleFile": "Bundle file (.naiv4vibebundle)",
+  "vibe_export_bundleFileDescription": "Pack multiple Vibes into one file, suitable for batch backup",
+  "vibe_export_embedIntoPng": "Embed into PNG",
+  "vibe_export_embedIntoPngDescription": "Export a single Vibe by embedding its data into PNG metadata",
+  "vibe_export_exportable": "Exportable",
+  "vibe_export_notExportable": "Not exportable",
+  "vibe_export_selectVibesToExport": "Select Vibes to export",
+  "vibe_export_exportSelected": "Export ({count})",
+  "@vibe_export_exportSelected": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "vibe_export_strengthPercent": "Strength: {percent}%",
+  "@vibe_export_strengthPercent": {
+    "placeholders": {
+      "percent": {"type": "int"}
+    }
+  },
+  "vibe_export_pngCarrierImage": "PNG carrier image",
+  "vibe_export_noUsablePngCarrier": "This Vibe has no directly usable PNG carrier image. You can choose an external PNG image as the carrier.",
+  "vibe_export_selectExternalPngImage": "Select external PNG image...",
+  "vibe_export_changeExternalPngImage": "Change external PNG image...",
+  "vibe_export_useVibeImageInstead": "Use Vibe image instead",
+  "vibe_export_usingExternalPng": "Using external PNG: {fileName}",
+  "@vibe_export_usingExternalPng": {
+    "placeholders": {
+      "fileName": {"type": "String"}
+    }
+  },
+  "vibe_export_selectPngImage": "Select PNG image",
+  "vibe_export_invalidPngImage": "The selected file is not a valid PNG image",
+  "vibe_export_selectPngImageFailed": "Failed to select PNG image: {error}",
+  "@vibe_export_selectPngImageFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "vibe_export_embeddingPng": "Embedding PNG: {name}",
+  "@vibe_export_embeddingPng": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "vibe_export_exportCompleteCounts": "Export complete: {successCount} succeeded, {failCount} failed",
+  "@vibe_export_exportCompleteCounts": {
+    "placeholders": {
+      "successCount": {"type": "int"},
+      "failCount": {"type": "int"}
+    }
+  },
+  "vibe_export_exportCompletePath": "Export complete: {path}",
+  "@vibe_export_exportCompletePath": {
+    "placeholders": {
+      "path": {"type": "String"}
+    }
+  },
+  "vibe_export_packingVibes": "Packing {count} Vibes...",
+  "@vibe_export_packingVibes": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "vibe_export_exportingName": "Exporting: {name}",
+  "@vibe_export_exportingName": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "vibe_export_selectExportFolder": "Select export folder",
+  "vibe_export_generatingBundleFile": "Generating bundle file...",
+  "vibe_export_bundleTitle": "Export Bundle: {name}",
+  "@vibe_export_bundleTitle": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "vibe_export_vibesTitle": "Export Vibes ({count} selected)",
+  "@vibe_export_vibesTitle": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "vibe_export_method": "Export Method",
+  "vibe_export_wholeBundle": "Whole Bundle",
+  "vibe_export_internalVibe": "Internal Vibe",
+  "vibe_export_wholeBundleDescription": "Export as a .naiv4vibebundle file containing all {count} vibes",
+  "@vibe_export_wholeBundleDescription": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "vibe_export_internalVibeDescription": "Select internal bundle vibes to export separately as .naiv4vibe files ({count} total)",
+  "@vibe_export_internalVibeDescription": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "vibe_export_exportBundle": "Export Bundle",
+  "vibe_export_exportAsFiles": "Export as Files",
+  "vibe_export_exportBundleDescription": "Export as a .naiv4vibebundle file",
+  "vibe_export_exportAsFilesDescription": "Export as .naiv4vibe or .naiv4vibebundle files",
+  "vibe_export_compressData": "Compress data",
+  "vibe_export_compressDataDescription": "Use compression to reduce file size (recommended for batch export)",
+  "vibe_export_exportAsPng": "Export as PNG",
+  "vibe_export_pngInternalBundleUnsupported": "Embedding into an image is not supported when exporting a single internal bundle vibe",
+  "vibe_export_embedVibeDataIntoPng": "Embed Vibe data into PNG metadata",
+  "vibe_export_batchPngUsesFirstImage": "Batch export uses each Vibe's first available image. Entries without images are skipped automatically.",
+  "vibe_export_exportCarrierImage": "Export carrier image",
+  "vibe_export_usingExternalCarrierImage": "Using an external PNG as the export carrier image",
+  "vibe_export_exportAsEncodings": "Export as Encodings",
+  "vibe_export_exportAsEncodingsDescription": "Export data as encodings (JSON or Base64)",
+  "vibe_export_jsonDescription": "Export as a formatted JSON file for easier reading and editing",
+  "vibe_export_base64Description": "Export as plain Base64 for copying and sharing",
+  "vibe_export_selectAtLeastOneMethod": "Select at least one export method",
+  "vibe_export_batchPngUnsupported": "Batch Vibe export does not support embedding into PNG. Use the single Vibe export screen.",
+  "vibe_export_selectPngCarrier": "Select a PNG carrier image for export",
+  "vibe_export_selectAtLeastOneInternalVibe": "Select at least one internal vibe to export",
+  "vibe_export_selectVibeExportFolder": "Select Vibe export folder",
+  "vibe_export_saveEncodingFile": "Save encoding file",
+  "vibe_export_preparingExport": "Preparing export...",
+  "vibe_export_exportingBundle": "Exporting Bundle...",
+  "vibe_export_embeddingImage": "Embedding image...",
+  "vibe_export_exportingEncoding": "Exporting encoding...",
+  "vibe_export_exportFailedWithError": "Export failed: {error}",
+  "@vibe_export_exportFailedWithError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "vibe_export_bundleFilePathEmpty": "Bundle file path is empty",
+  "vibe_export_invalidImageFormatWithError": "Invalid image format: {error}",
+  "@vibe_export_invalidImageFormatWithError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "vibe_export_embedFailedWithError": "Embed failed: {error}",
+  "@vibe_export_embedFailedWithError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "vibe_export_embedImageFailedWithError": "Failed to embed image: {error}",
+  "@vibe_export_embedImageFailedWithError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "vibe_export_extractingVibeProgress": "Extracting vibe {current}/{total}...",
+  "@vibe_export_extractingVibeProgress": {
+    "placeholders": {
+      "current": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "vibe_export_selectImageFailed": "Failed to select image: {error}",
+  "@vibe_export_selectImageFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
   "vibe_export_dialogTitle": "Export {count} Vibes",
   "@vibe_export_dialogTitle": {
     "placeholders": {

@@ -9,6 +9,8 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:image/image.dart' as img;
 import 'package:nai_launcher/core/constants/storage_keys.dart';
 import 'package:nai_launcher/l10n/app_localizations.dart';
+import 'package:nai_launcher/presentation/providers/image_generation_provider.dart';
+import 'package:nai_launcher/presentation/screens/generation/widgets/image_preview.dart';
 import 'package:nai_launcher/presentation/widgets/common/pro_context_menu.dart';
 import 'package:nai_launcher/presentation/widgets/common/selectable_image_card.dart';
 
@@ -157,6 +159,52 @@ void main() {
     expect(find.text('精准参考'), findsOneWidget);
   });
 
+  testWidgets('generation preview hover exposes history destination shortcuts',
+      (tester) async {
+    final container = _createContainerWithPreviewImage();
+    addTearDown(container.dispose);
+
+    await tester.pumpWidget(_buildPreviewApp(container));
+    await tester.pumpAndSettle();
+
+    final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    addTearDown(gesture.removePointer);
+    await gesture.addPointer();
+    await gesture.moveTo(tester.getCenter(find.byType(SelectableImageCard)));
+    await tester.pumpAndSettle();
+
+    expect(find.byTooltip('反推'), findsOneWidget);
+    expect(find.byTooltip('图生图'), findsOneWidget);
+    expect(find.byTooltip('风格迁移'), findsOneWidget);
+    expect(find.byTooltip('精准参考'), findsOneWidget);
+  });
+
+  testWidgets(
+      'generation preview context menu exposes history destination shortcuts',
+      (tester) async {
+    final container = _createContainerWithPreviewImage();
+    addTearDown(container.dispose);
+
+    await tester.pumpWidget(_buildPreviewApp(container));
+    await tester.pumpAndSettle();
+
+    final center = tester.getCenter(find.byType(SelectableImageCard));
+    final gesture = await tester.startGesture(
+      center,
+      kind: PointerDeviceKind.mouse,
+      buttons: kSecondaryMouseButton,
+    );
+    addTearDown(gesture.removePointer);
+    await tester.pumpAndSettle();
+    await gesture.up();
+    await tester.pumpAndSettle();
+
+    expect(find.text('反推'), findsOneWidget);
+    expect(find.text('图生图'), findsOneWidget);
+    expect(find.text('风格迁移'), findsOneWidget);
+    expect(find.text('精准参考'), findsOneWidget);
+  });
+
   testWidgets('disabled hover effects should not expose hover action bar',
       (tester) async {
     await tester.pumpWidget(_buildCardApp(hoverEffectsEnabled: false));
@@ -229,6 +277,42 @@ void main() {
 }
 
 void _noop() {}
+
+ProviderContainer _createContainerWithPreviewImage() {
+  final container = ProviderContainer();
+  final bytes = Uint8List.fromList(
+    img.encodePng(img.Image(width: 32, height: 32)),
+  );
+
+  container.read(imageGenerationNotifierProvider.notifier).updateDisplayImages([
+    GeneratedImage(
+      id: 'preview-image',
+      bytes: bytes,
+      width: 32,
+      height: 32,
+    ),
+  ]);
+
+  return container;
+}
+
+Widget _buildPreviewApp(ProviderContainer container) {
+  return UncontrolledProviderScope(
+    container: container,
+    child: const MaterialApp(
+      locale: Locale('zh'),
+      supportedLocales: AppLocalizations.supportedLocales,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      home: Scaffold(
+        body: SizedBox(
+          width: 480,
+          height: 480,
+          child: ImagePreviewWidget(),
+        ),
+      ),
+    ),
+  );
+}
 
 Widget _buildCardApp({
   bool hoverEffectsEnabled = true,

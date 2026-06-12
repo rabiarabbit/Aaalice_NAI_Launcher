@@ -139,7 +139,8 @@ class WarmupNotifier extends _$WarmupNotifier {
 
     migrationService.onProgress = (stage, progress) {
       state = state.copyWith(
-          subTaskMessage: '$stage (${(progress * 100).toInt()}%)');
+        subTaskMessage: '$stage (${(progress * 100).toInt()}%)',
+      );
     };
 
     final result = await migrationService.migrateAll();
@@ -181,7 +182,8 @@ class WarmupNotifier extends _$WarmupNotifier {
 
     try {
       await GoogleFonts.pendingFonts(
-          [GoogleFonts.getFont(fontConfig.fontFamily)]);
+        [GoogleFonts.getFont(fontConfig.fontFamily)],
+      );
       AppLogger.i('Preloaded Google Font: ${fontConfig.fontFamily}', 'Warmup');
     } catch (e) {
       AppLogger.w('Font preload failed: $e', 'Warmup');
@@ -231,7 +233,9 @@ class WarmupNotifier extends _$WarmupNotifier {
 
         if (result.success) {
           AppLogger.i(
-              'Network check successful: ${result.latencyMs}ms', 'Warmup');
+            'Network check successful: ${result.latencyMs}ms',
+            'Warmup',
+          );
           state = state.copyWith(
             subTaskMessage: 'warmup_networkCheck_success|${result.latencyMs}',
           );
@@ -240,16 +244,21 @@ class WarmupNotifier extends _$WarmupNotifier {
         }
 
         AppLogger.w(
-            'Network check attempt $attempt/$maxAttempts failed: ${result.errorMessage}',
-            'Warmup');
+          'Network check attempt $attempt/$maxAttempts failed: ${result.errorMessage}',
+          'Warmup',
+        );
       } catch (e) {
         AppLogger.w(
-            'Network check attempt $attempt/$maxAttempts error: $e', 'Warmup');
+          'Network check attempt $attempt/$maxAttempts error: $e',
+          'Warmup',
+        );
       }
 
       if (attempt >= maxAttempts) {
         AppLogger.w(
-            'Network check reached max attempts, continuing offline', 'Warmup');
+          'Network check reached max attempts, continuing offline',
+          'Warmup',
+        );
         state = state.copyWith(subTaskMessage: 'warmup_networkCheck_timeout');
         return;
       }
@@ -554,7 +563,9 @@ class WarmupNotifier extends _$WarmupNotifier {
       AppLogger.e('Database initialization failed', e, stack, 'Warmup');
       // 数据库初始化失败不应阻塞启动，记录错误但继续
       AppLogger.w(
-          'Continuing without database - will retry on first use', 'Warmup');
+        'Continuing without database - will retry on first use',
+        'Warmup',
+      );
     }
   }
 
@@ -657,7 +668,9 @@ class WarmupNotifier extends _$WarmupNotifier {
           );
     } on TimeoutException {
       AppLogger.w(
-          'Translation initialization timeout, will retry later', 'Warmup');
+        'Translation initialization timeout, will retry later',
+        'Warmup',
+      );
     }
   }
 
@@ -783,7 +796,9 @@ class WarmupNotifier extends _$WarmupNotifier {
       for (final task in fetchTasks) {
         if (!task.needed) {
           AppLogger.i(
-              'Skipping ${task.name} tags fetch (already has data)', 'Warmup');
+            'Skipping ${task.name} tags fetch (already has data)',
+            'Warmup',
+          );
           continue;
         }
         state = state.copyWith(subTaskMessage: task.message);
@@ -801,7 +816,9 @@ class WarmupNotifier extends _$WarmupNotifier {
         AppLogger.i('After fetch: danbooru tag count = $newCount', 'Warmup');
         if (newCount == 0) {
           AppLogger.w(
-              'Tag count is still 0 after fetch, may need retry', 'Warmup');
+            'Tag count is still 0 after fetch, may need retry',
+            'Warmup',
+          );
         }
       } catch (e) {
         AppLogger.w('Failed to verify tag count after fetch: $e', 'Warmup');
@@ -866,7 +883,11 @@ class WarmupNotifier extends _$WarmupNotifier {
       AppLogger.i('Artist tags fetch completed in warmup phase', 'Warmup');
     } catch (e, stack) {
       AppLogger.e(
-          'Artist tags fetch error in warmup phase: $e', e, stack, 'Warmup');
+        'Artist tags fetch error in warmup phase: $e',
+        e,
+        stack,
+        'Warmup',
+      );
       // 预热阶段失败不阻塞，进入主页后可能重试
     }
   }

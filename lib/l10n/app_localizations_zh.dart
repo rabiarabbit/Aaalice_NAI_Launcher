@@ -10398,6 +10398,252 @@ class AppLocalizationsZh extends AppLocalizations {
   String get vibe_export_include_thumbnails_subtitle => '导出文件中包含缩略图预览';
 
   @override
+  String get vibe_export_singleFile => '单文件 (.naiv4vibe)';
+
+  @override
+  String get vibe_export_singleFileDescription =>
+      '将每个 Vibe 导出为单独文件，适合分享单个 Vibe';
+
+  @override
+  String get vibe_export_bundleFile => '打包文件 (.naiv4vibebundle)';
+
+  @override
+  String get vibe_export_bundleFileDescription => '将多个 Vibe 打包到一个文件中，适合批量备份';
+
+  @override
+  String get vibe_export_embedIntoPng => '嵌入到 PNG';
+
+  @override
+  String get vibe_export_embedIntoPngDescription => '通过写入 PNG 元数据导出单个 Vibe';
+
+  @override
+  String get vibe_export_exportable => '可导出';
+
+  @override
+  String get vibe_export_notExportable => '不可导出';
+
+  @override
+  String get vibe_export_selectVibesToExport => '选择要导出的 Vibe';
+
+  @override
+  String vibe_export_exportSelected(int count) {
+    return '导出 ($count)';
+  }
+
+  @override
+  String vibe_export_strengthPercent(int percent) {
+    return '强度: $percent%';
+  }
+
+  @override
+  String get vibe_export_pngCarrierImage => 'PNG 载体图片';
+
+  @override
+  String get vibe_export_noUsablePngCarrier =>
+      '这个 Vibe 没有可直接使用的 PNG 载体图片。你可以选择外部 PNG 图片作为载体。';
+
+  @override
+  String get vibe_export_selectExternalPngImage => '选择外部 PNG 图片...';
+
+  @override
+  String get vibe_export_changeExternalPngImage => '更换外部 PNG 图片...';
+
+  @override
+  String get vibe_export_useVibeImageInstead => '改用 Vibe 图片';
+
+  @override
+  String vibe_export_usingExternalPng(String fileName) {
+    return '正在使用外部 PNG: $fileName';
+  }
+
+  @override
+  String get vibe_export_selectPngImage => '选择 PNG 图片';
+
+  @override
+  String get vibe_export_invalidPngImage => '所选文件不是有效的 PNG 图片';
+
+  @override
+  String vibe_export_selectPngImageFailed(String error) {
+    return '选择 PNG 图片失败: $error';
+  }
+
+  @override
+  String vibe_export_embeddingPng(String name) {
+    return '正在嵌入 PNG: $name';
+  }
+
+  @override
+  String vibe_export_exportCompleteCounts(int successCount, int failCount) {
+    return '导出完成: 成功 $successCount 个，失败 $failCount 个';
+  }
+
+  @override
+  String vibe_export_exportCompletePath(String path) {
+    return '导出完成: $path';
+  }
+
+  @override
+  String vibe_export_packingVibes(int count) {
+    return '正在打包 $count 个 Vibe...';
+  }
+
+  @override
+  String vibe_export_exportingName(String name) {
+    return '正在导出: $name';
+  }
+
+  @override
+  String get vibe_export_selectExportFolder => '选择导出文件夹';
+
+  @override
+  String get vibe_export_generatingBundleFile => '正在生成打包文件...';
+
+  @override
+  String vibe_export_bundleTitle(String name) {
+    return '导出 Bundle: $name';
+  }
+
+  @override
+  String vibe_export_vibesTitle(int count) {
+    return '导出 Vibe ($count 个已选)';
+  }
+
+  @override
+  String get vibe_export_method => '导出方式';
+
+  @override
+  String get vibe_export_wholeBundle => '整个 Bundle';
+
+  @override
+  String get vibe_export_internalVibe => '内部 Vibe';
+
+  @override
+  String vibe_export_wholeBundleDescription(int count) {
+    return '导出包含全部 $count 个 Vibe 的 .naiv4vibebundle 文件';
+  }
+
+  @override
+  String vibe_export_internalVibeDescription(int count) {
+    return '选择 Bundle 内部 Vibe，分别导出为 .naiv4vibe 文件 (共 $count 个)';
+  }
+
+  @override
+  String get vibe_export_exportBundle => '导出 Bundle';
+
+  @override
+  String get vibe_export_exportAsFiles => '导出为文件';
+
+  @override
+  String get vibe_export_exportBundleDescription => '导出为 .naiv4vibebundle 文件';
+
+  @override
+  String get vibe_export_exportAsFilesDescription =>
+      '导出为 .naiv4vibe 或 .naiv4vibebundle 文件';
+
+  @override
+  String get vibe_export_compressData => '压缩数据';
+
+  @override
+  String get vibe_export_compressDataDescription => '使用压缩以减小文件大小 (推荐用于批量导出)';
+
+  @override
+  String get vibe_export_exportAsPng => '导出为 PNG';
+
+  @override
+  String get vibe_export_pngInternalBundleUnsupported =>
+      '导出单个 Bundle 内部 Vibe 时不支持嵌入图片';
+
+  @override
+  String get vibe_export_embedVibeDataIntoPng => '将 Vibe 数据写入 PNG 元数据';
+
+  @override
+  String get vibe_export_batchPngUsesFirstImage =>
+      '批量导出会使用每个 Vibe 的第一张可用图片，没有图片的条目会自动跳过。';
+
+  @override
+  String get vibe_export_exportCarrierImage => '导出载体图片';
+
+  @override
+  String get vibe_export_usingExternalCarrierImage => '正在使用外部 PNG 作为导出载体图片';
+
+  @override
+  String get vibe_export_exportAsEncodings => '导出为编码';
+
+  @override
+  String get vibe_export_exportAsEncodingsDescription =>
+      '将数据导出为编码 (JSON 或 Base64)';
+
+  @override
+  String get vibe_export_jsonDescription => '导出为格式化 JSON 文件，便于阅读和编辑';
+
+  @override
+  String get vibe_export_base64Description => '导出为纯 Base64，便于复制和分享';
+
+  @override
+  String get vibe_export_selectAtLeastOneMethod => '请选择至少一种导出方式';
+
+  @override
+  String get vibe_export_batchPngUnsupported =>
+      '批量 Vibe 导出不支持嵌入 PNG。请使用单个 Vibe 导出界面。';
+
+  @override
+  String get vibe_export_selectPngCarrier => '请选择用于导出的 PNG 载体图片';
+
+  @override
+  String get vibe_export_selectAtLeastOneInternalVibe => '请选择至少一个内部 Vibe';
+
+  @override
+  String get vibe_export_selectVibeExportFolder => '选择 Vibe 导出文件夹';
+
+  @override
+  String get vibe_export_saveEncodingFile => '保存编码文件';
+
+  @override
+  String get vibe_export_preparingExport => '正在准备导出...';
+
+  @override
+  String get vibe_export_exportingBundle => '正在导出 Bundle...';
+
+  @override
+  String get vibe_export_embeddingImage => '正在嵌入图片...';
+
+  @override
+  String get vibe_export_exportingEncoding => '正在导出编码...';
+
+  @override
+  String vibe_export_exportFailedWithError(String error) {
+    return '导出失败: $error';
+  }
+
+  @override
+  String get vibe_export_bundleFilePathEmpty => 'Bundle 文件路径为空';
+
+  @override
+  String vibe_export_invalidImageFormatWithError(String error) {
+    return '无效的图片格式: $error';
+  }
+
+  @override
+  String vibe_export_embedFailedWithError(String error) {
+    return '嵌入失败: $error';
+  }
+
+  @override
+  String vibe_export_embedImageFailedWithError(String error) {
+    return '嵌入图片失败: $error';
+  }
+
+  @override
+  String vibe_export_extractingVibeProgress(int current, int total) {
+    return '正在提取 Vibe $current/$total...';
+  }
+
+  @override
+  String vibe_export_selectImageFailed(String error) {
+    return '选择图片失败: $error';
+  }
+
+  @override
   String vibe_export_dialogTitle(int count) {
     return '导出 $count 个 Vibes';
   }

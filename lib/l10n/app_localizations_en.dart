@@ -10747,6 +10747,266 @@ class AppLocalizationsEn extends AppLocalizations {
       'Include thumbnail preview in export file';
 
   @override
+  String get vibe_export_singleFile => 'Single file (.naiv4vibe)';
+
+  @override
+  String get vibe_export_singleFileDescription =>
+      'Export each Vibe as a separate file, suitable for sharing one Vibe';
+
+  @override
+  String get vibe_export_bundleFile => 'Bundle file (.naiv4vibebundle)';
+
+  @override
+  String get vibe_export_bundleFileDescription =>
+      'Pack multiple Vibes into one file, suitable for batch backup';
+
+  @override
+  String get vibe_export_embedIntoPng => 'Embed into PNG';
+
+  @override
+  String get vibe_export_embedIntoPngDescription =>
+      'Export a single Vibe by embedding its data into PNG metadata';
+
+  @override
+  String get vibe_export_exportable => 'Exportable';
+
+  @override
+  String get vibe_export_notExportable => 'Not exportable';
+
+  @override
+  String get vibe_export_selectVibesToExport => 'Select Vibes to export';
+
+  @override
+  String vibe_export_exportSelected(int count) {
+    return 'Export ($count)';
+  }
+
+  @override
+  String vibe_export_strengthPercent(int percent) {
+    return 'Strength: $percent%';
+  }
+
+  @override
+  String get vibe_export_pngCarrierImage => 'PNG carrier image';
+
+  @override
+  String get vibe_export_noUsablePngCarrier =>
+      'This Vibe has no directly usable PNG carrier image. You can choose an external PNG image as the carrier.';
+
+  @override
+  String get vibe_export_selectExternalPngImage =>
+      'Select external PNG image...';
+
+  @override
+  String get vibe_export_changeExternalPngImage =>
+      'Change external PNG image...';
+
+  @override
+  String get vibe_export_useVibeImageInstead => 'Use Vibe image instead';
+
+  @override
+  String vibe_export_usingExternalPng(String fileName) {
+    return 'Using external PNG: $fileName';
+  }
+
+  @override
+  String get vibe_export_selectPngImage => 'Select PNG image';
+
+  @override
+  String get vibe_export_invalidPngImage =>
+      'The selected file is not a valid PNG image';
+
+  @override
+  String vibe_export_selectPngImageFailed(String error) {
+    return 'Failed to select PNG image: $error';
+  }
+
+  @override
+  String vibe_export_embeddingPng(String name) {
+    return 'Embedding PNG: $name';
+  }
+
+  @override
+  String vibe_export_exportCompleteCounts(int successCount, int failCount) {
+    return 'Export complete: $successCount succeeded, $failCount failed';
+  }
+
+  @override
+  String vibe_export_exportCompletePath(String path) {
+    return 'Export complete: $path';
+  }
+
+  @override
+  String vibe_export_packingVibes(int count) {
+    return 'Packing $count Vibes...';
+  }
+
+  @override
+  String vibe_export_exportingName(String name) {
+    return 'Exporting: $name';
+  }
+
+  @override
+  String get vibe_export_selectExportFolder => 'Select export folder';
+
+  @override
+  String get vibe_export_generatingBundleFile => 'Generating bundle file...';
+
+  @override
+  String vibe_export_bundleTitle(String name) {
+    return 'Export Bundle: $name';
+  }
+
+  @override
+  String vibe_export_vibesTitle(int count) {
+    return 'Export Vibes ($count selected)';
+  }
+
+  @override
+  String get vibe_export_method => 'Export Method';
+
+  @override
+  String get vibe_export_wholeBundle => 'Whole Bundle';
+
+  @override
+  String get vibe_export_internalVibe => 'Internal Vibe';
+
+  @override
+  String vibe_export_wholeBundleDescription(int count) {
+    return 'Export as a .naiv4vibebundle file containing all $count vibes';
+  }
+
+  @override
+  String vibe_export_internalVibeDescription(int count) {
+    return 'Select internal bundle vibes to export separately as .naiv4vibe files ($count total)';
+  }
+
+  @override
+  String get vibe_export_exportBundle => 'Export Bundle';
+
+  @override
+  String get vibe_export_exportAsFiles => 'Export as Files';
+
+  @override
+  String get vibe_export_exportBundleDescription =>
+      'Export as a .naiv4vibebundle file';
+
+  @override
+  String get vibe_export_exportAsFilesDescription =>
+      'Export as .naiv4vibe or .naiv4vibebundle files';
+
+  @override
+  String get vibe_export_compressData => 'Compress data';
+
+  @override
+  String get vibe_export_compressDataDescription =>
+      'Use compression to reduce file size (recommended for batch export)';
+
+  @override
+  String get vibe_export_exportAsPng => 'Export as PNG';
+
+  @override
+  String get vibe_export_pngInternalBundleUnsupported =>
+      'Embedding into an image is not supported when exporting a single internal bundle vibe';
+
+  @override
+  String get vibe_export_embedVibeDataIntoPng =>
+      'Embed Vibe data into PNG metadata';
+
+  @override
+  String get vibe_export_batchPngUsesFirstImage =>
+      'Batch export uses each Vibe\'s first available image. Entries without images are skipped automatically.';
+
+  @override
+  String get vibe_export_exportCarrierImage => 'Export carrier image';
+
+  @override
+  String get vibe_export_usingExternalCarrierImage =>
+      'Using an external PNG as the export carrier image';
+
+  @override
+  String get vibe_export_exportAsEncodings => 'Export as Encodings';
+
+  @override
+  String get vibe_export_exportAsEncodingsDescription =>
+      'Export data as encodings (JSON or Base64)';
+
+  @override
+  String get vibe_export_jsonDescription =>
+      'Export as a formatted JSON file for easier reading and editing';
+
+  @override
+  String get vibe_export_base64Description =>
+      'Export as plain Base64 for copying and sharing';
+
+  @override
+  String get vibe_export_selectAtLeastOneMethod =>
+      'Select at least one export method';
+
+  @override
+  String get vibe_export_batchPngUnsupported =>
+      'Batch Vibe export does not support embedding into PNG. Use the single Vibe export screen.';
+
+  @override
+  String get vibe_export_selectPngCarrier =>
+      'Select a PNG carrier image for export';
+
+  @override
+  String get vibe_export_selectAtLeastOneInternalVibe =>
+      'Select at least one internal vibe to export';
+
+  @override
+  String get vibe_export_selectVibeExportFolder => 'Select Vibe export folder';
+
+  @override
+  String get vibe_export_saveEncodingFile => 'Save encoding file';
+
+  @override
+  String get vibe_export_preparingExport => 'Preparing export...';
+
+  @override
+  String get vibe_export_exportingBundle => 'Exporting Bundle...';
+
+  @override
+  String get vibe_export_embeddingImage => 'Embedding image...';
+
+  @override
+  String get vibe_export_exportingEncoding => 'Exporting encoding...';
+
+  @override
+  String vibe_export_exportFailedWithError(String error) {
+    return 'Export failed: $error';
+  }
+
+  @override
+  String get vibe_export_bundleFilePathEmpty => 'Bundle file path is empty';
+
+  @override
+  String vibe_export_invalidImageFormatWithError(String error) {
+    return 'Invalid image format: $error';
+  }
+
+  @override
+  String vibe_export_embedFailedWithError(String error) {
+    return 'Embed failed: $error';
+  }
+
+  @override
+  String vibe_export_embedImageFailedWithError(String error) {
+    return 'Failed to embed image: $error';
+  }
+
+  @override
+  String vibe_export_extractingVibeProgress(int current, int total) {
+    return 'Extracting vibe $current/$total...';
+  }
+
+  @override
+  String vibe_export_selectImageFailed(String error) {
+    return 'Failed to select image: $error';
+  }
+
+  @override
   String vibe_export_dialogTitle(int count) {
     return 'Export $count Vibes';
   }

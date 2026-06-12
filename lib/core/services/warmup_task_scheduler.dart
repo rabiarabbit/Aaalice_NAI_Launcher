@@ -80,8 +80,10 @@ class WarmupTaskScheduler {
   /// 注册单个任务
   void registerTask(PhasedWarmupTask task) {
     _tasks.add(task);
-    AppLogger.d('Registered task "${task.name}" for phase ${task.phase}',
-        'WarmupScheduler');
+    AppLogger.d(
+      'Registered task "${task.name}" for phase ${task.phase}',
+      'WarmupScheduler',
+    );
   }
 
   /// 注册任务组
@@ -124,10 +126,11 @@ class WarmupTaskScheduler {
     if (tasks.isEmpty && groups.isEmpty) {
       _phaseComplete[phase] = true;
       yield PhaseProgress(
-          phase: phase,
-          progress: 1.0,
-          currentTask: 'complete',
-          isComplete: true);
+        phase: phase,
+        progress: 1.0,
+        currentTask: 'complete',
+        isComplete: true,
+      );
       controller.close();
       return;
     }

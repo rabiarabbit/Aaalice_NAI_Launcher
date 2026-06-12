@@ -307,10 +307,10 @@ class _AddToLibraryDialogState extends ConsumerState<AddToLibraryDialog> {
 
                   return DropdownButtonFormField<String?>(
                     initialValue: _selectedCategoryId,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Target Category',
-                      prefixIcon: const Icon(Icons.folder_outlined),
-                      border: const OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.folder_outlined),
+                      border: OutlineInputBorder(),
                     ),
                     items: [
                       DropdownMenuItem(
