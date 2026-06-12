@@ -284,6 +284,8 @@
   "generation_paramsSettings": "生成参数",
   "generation_history": "历史",
   "generation_historyRecord": "历史记录",
+  "generation_failedStreamSnapshot": "失败快照",
+  "generation_failedStreamSnapshotHint": "生成未完成，仅保留最后一帧预览；不可保存、收藏或用于图生图",
   "generation_noHistory": "暂无历史记录",
   "generation_clearHistory": "清除历史记录",
   "generation_clearHistoryConfirm": "确定要清除所有历史记录吗？此操作不可撤销。",

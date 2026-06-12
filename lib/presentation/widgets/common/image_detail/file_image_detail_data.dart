@@ -18,6 +18,7 @@ class FileImageDetailData implements ImageDetailData {
   final Uint8List? _cachedBytes;
   final String? _id;
   final NaiImageMetadata? _initialMetadata;
+  final bool _showCopyButton;
 
   /// 图像最大维度阈值（超过此值会进行缩放优化）
   static const int _maxImageDimension = 4096;
@@ -27,16 +28,19 @@ class FileImageDetailData implements ImageDetailData {
     Uint8List? cachedBytes,
     String? id,
     NaiImageMetadata? initialMetadata,
+    bool showCopyButton = true,
   })  : _cachedBytes = cachedBytes,
         _id = id ?? filePath,
-        _initialMetadata = initialMetadata;
+        _initialMetadata = initialMetadata,
+        _showCopyButton = showCopyButton;
 
   @override
   ImageProvider getImageProvider() {
     final fileImage = FileImage(File(filePath));
 
     // 尝试从初始元数据或缓存获取元数据以进行缩放优化
-    final cachedMetadata = _initialMetadata ?? ImageMetadataService().getCached(filePath);
+    final cachedMetadata =
+        _initialMetadata ?? ImageMetadataService().getCached(filePath);
     if (cachedMetadata != null) {
       final width = cachedMetadata.width ?? 0;
       final height = cachedMetadata.height ?? 0;
@@ -75,8 +79,12 @@ class FileImageDetailData implements ImageDetailData {
   /// 同步获取元数据（优先使用初始传入的元数据，其次从缓存获取）
   @override
   NaiImageMetadata? get metadata {
-    final result = _initialMetadata ?? ImageMetadataService().getCached(filePath);
-    AppLogger.d('[MetadataFlow] FileImageDetailData.metadata sync: path=$filePath, hasInitial=${_initialMetadata != null}, result=${result?.hasData}', 'FileImageDetailData');
+    final result =
+        _initialMetadata ?? ImageMetadataService().getCached(filePath);
+    AppLogger.d(
+      '[MetadataFlow] FileImageDetailData.metadata sync: path=$filePath, hasInitial=${_initialMetadata != null}, result=${result?.hasData}',
+      'FileImageDetailData',
+    );
     return result;
   }
 
@@ -85,25 +93,40 @@ class FileImageDetailData implements ImageDetailData {
   /// **前台高优先级调用** - 用户主动打开详情页时使用
   /// 不受后台预加载队列影响，立即开始解析
   Future<NaiImageMetadata?> getMetadataAsync() async {
-    AppLogger.i('[MetadataFlow] getMetadataAsync START: path=$filePath', 'FileImageDetailData');
+    AppLogger.i(
+      '[MetadataFlow] getMetadataAsync START: path=$filePath',
+      'FileImageDetailData',
+    );
 
     // 1. 先检查初始元数据
     if (_initialMetadata != null) {
-      AppLogger.i('[MetadataFlow] Returning initial metadata', 'FileImageDetailData');
+      AppLogger.i(
+        '[MetadataFlow] Returning initial metadata',
+        'FileImageDetailData',
+      );
       return _initialMetadata;
     }
 
     // 2. 检查缓存
     final cached = ImageMetadataService().getCached(filePath);
     if (cached != null) {
-      AppLogger.i('[MetadataFlow] Returning cached metadata: hasData=${cached.hasData}', 'FileImageDetailData');
+      AppLogger.i(
+        '[MetadataFlow] Returning cached metadata: hasData=${cached.hasData}',
+        'FileImageDetailData',
+      );
       return cached;
     }
 
     // 3. 前台立即解析（高优先级，不受后台队列影响）
-    AppLogger.i('[MetadataFlow] No cache, calling getMetadataImmediate...', 'FileImageDetailData');
+    AppLogger.i(
+      '[MetadataFlow] No cache, calling getMetadataImmediate...',
+      'FileImageDetailData',
+    );
     final result = await ImageMetadataService().getMetadataImmediate(filePath);
-    AppLogger.i('[MetadataFlow] getMetadataImmediate returned: hasData=${result?.hasData}', 'FileImageDetailData');
+    AppLogger.i(
+      '[MetadataFlow] getMetadataImmediate returned: hasData=${result?.hasData}',
+      'FileImageDetailData',
+    );
     return result;
   }
 
@@ -157,6 +180,9 @@ class FileImageDetailData implements ImageDetailData {
 
   @override
   bool get showSaveButton => false;
+
+  @override
+  bool get showCopyButton => _showCopyButton;
 
   @override
   bool get showFavoriteButton => true;

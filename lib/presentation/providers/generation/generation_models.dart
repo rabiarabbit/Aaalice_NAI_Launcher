@@ -2,6 +2,13 @@ import 'dart:typed_data';
 
 import 'package:uuid/uuid.dart';
 
+import '../../../data/models/gallery/nai_image_metadata.dart';
+
+enum GeneratedImageKind {
+  completed,
+  failedStreamSnapshot,
+}
+
 /// 生成的图像（带唯一ID）
 class GeneratedImage {
   final String id;
@@ -9,6 +16,8 @@ class GeneratedImage {
   final DateTime createdAt;
   final int width;
   final int height;
+  final GeneratedImageKind kind;
+  final NaiImageMetadata? metadata;
 
   /// 已保存的文件路径（如果有）
   /// 当图像被保存到磁盘后，此字段会被填充
@@ -20,6 +29,8 @@ class GeneratedImage {
     required this.width,
     required this.height,
     DateTime? createdAt,
+    this.kind = GeneratedImageKind.completed,
+    this.metadata,
     this.filePath,
   }) : createdAt = createdAt ?? DateTime.now();
 
@@ -28,12 +39,16 @@ class GeneratedImage {
     Uint8List bytes, {
     required int width,
     required int height,
+    GeneratedImageKind kind = GeneratedImageKind.completed,
+    NaiImageMetadata? metadata,
   }) {
     return GeneratedImage(
       id: const Uuid().v4(),
       bytes: bytes,
       width: width,
       height: height,
+      kind: kind,
+      metadata: metadata,
     );
   }
 
@@ -45,12 +60,27 @@ class GeneratedImage {
       width: width,
       height: height,
       createdAt: createdAt,
+      kind: kind,
+      metadata: metadata,
       filePath: path,
     );
   }
 
   /// 获取宽高比
   double get aspectRatio => width / height;
+
+  bool get isFailedStreamSnapshot =>
+      kind == GeneratedImageKind.failedStreamSnapshot;
+
+  bool get canSave => kind == GeneratedImageKind.completed;
+
+  bool get canFavorite => kind == GeneratedImageKind.completed;
+
+  bool get canUseAsGenerationInput => kind == GeneratedImageKind.completed;
+
+  bool get canBulkSelect => kind == GeneratedImageKind.completed;
+
+  bool get canDrag => kind == GeneratedImageKind.completed;
 
   @override
   bool operator ==(Object other) =>

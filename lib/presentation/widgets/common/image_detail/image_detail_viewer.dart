@@ -534,7 +534,9 @@ class _ImageDetailViewerState extends ConsumerState<ImageDetailViewer> {
             onSave: widget.callbacks?.onSave != null
                 ? () => widget.callbacks!.onSave!(_currentImage)
                 : null,
-            onCopyImage: () => _copyImageToClipboard(context),
+            onCopyImage: _currentImage.showCopyButton
+                ? () => _copyImageToClipboard(context)
+                : null,
             onSendToImg2Img: widget.callbacks?.onSendToImg2Img != null
                 ? () => widget.callbacks!.onSendToImg2Img!(_currentImage)
                 : null,

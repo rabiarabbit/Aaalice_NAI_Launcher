@@ -304,6 +304,8 @@
   "generation_paramsSettings": "Parameter Settings",
   "generation_history": "History",
   "generation_historyRecord": "History Records",
+  "generation_failedStreamSnapshot": "Failed snapshot",
+  "generation_failedStreamSnapshotHint": "Generation did not finish; only the last preview frame is kept. It cannot be saved, favorited, or used for image workflows.",
   "generation_noHistory": "No history records",
   "generation_clearHistory": "Clear History",
   "generation_clearHistoryConfirm": "Are you sure you want to clear all history records? This action cannot be undone.",

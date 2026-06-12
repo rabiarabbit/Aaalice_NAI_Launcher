@@ -8,11 +8,16 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:image/image.dart' as img;
 import 'package:mocktail/mocktail.dart';
+import 'package:nai_launcher/core/constants/api_constants.dart';
 import 'package:nai_launcher/core/constants/storage_keys.dart';
 import 'package:nai_launcher/core/network/dio_client.dart';
 import 'package:nai_launcher/data/datasources/remote/nai_image_generation_api_service.dart';
+import 'package:nai_launcher/data/models/character/character_prompt.dart'
+    as ui_character;
+import 'package:nai_launcher/data/models/gallery/nai_image_metadata.dart';
 import 'package:nai_launcher/data/models/image/image_params.dart';
 import 'package:nai_launcher/data/models/image/image_stream_chunk.dart';
+import 'package:nai_launcher/presentation/providers/character_prompt_provider.dart';
 import 'package:nai_launcher/presentation/providers/image_generation_provider.dart';
 import 'package:nai_launcher/presentation/providers/notification_settings_provider.dart';
 
@@ -66,6 +71,13 @@ void main() {
     await Hive.openBox(StorageKeys.settingsBox);
     await Hive.openBox(StorageKeys.historyBox);
     await Hive.openBox(StorageKeys.statisticsCacheBox);
+  });
+
+  setUp(() async {
+    await Hive.box(StorageKeys.settingsBox).put(
+      StorageKeys.imagesPerRequest,
+      1,
+    );
   });
 
   tearDownAll(() async {
@@ -218,6 +230,432 @@ void main() {
     expect(state.currentImages.single.bytes, orderedEquals(freshImage));
     expect(state.history, hasLength(1));
     expect(state.history.single.bytes, orderedEquals(freshImage));
+  });
+
+  test('cancel after stream preview keeps read-only failed snapshot in history',
+      () async {
+    final mockApiService = MockNAIImageGenerationApiService();
+    final stream = StreamController<ImageStreamChunk>();
+    final preview = _validImageBytes(width: 512, height: 768);
+
+    when(
+      () => mockApiService.generateImage(
+        any(),
+        onProgress: any(named: 'onProgress'),
+        focusedInpaintEnabled: any(named: 'focusedInpaintEnabled'),
+        minimumContextMegaPixels: any(named: 'minimumContextMegaPixels'),
+        focusedSelectionRect: any(named: 'focusedSelectionRect'),
+      ),
+    ).thenAnswer((_) async => (<Uint8List>[], <int, String>{}));
+    when(
+      () => mockApiService.generateImageStream(
+        any(),
+        focusedInpaintEnabled: any(named: 'focusedInpaintEnabled'),
+        minimumContextMegaPixels: any(named: 'minimumContextMegaPixels'),
+        focusedSelectionRect: any(named: 'focusedSelectionRect'),
+      ),
+    ).thenAnswer((_) => stream.stream);
+    when(() => mockApiService.cancelGeneration()).thenReturn(null);
+
+    final container = ProviderContainer(
+      overrides: [
+        naiImageGenerationApiServiceProvider.overrideWithValue(mockApiService),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container
+        .read(notificationSettingsNotifierProvider.notifier)
+        .setSoundEnabled(false);
+
+    final notifier = container.read(imageGenerationNotifierProvider.notifier);
+    final params = container.read(generationParamsNotifierProvider).copyWith(
+          prompt: '1girl',
+          negativePrompt: 'bad anatomy',
+          width: 512,
+          height: 768,
+          steps: 28,
+          scale: 5,
+          seed: 1234,
+          model: ImageModels.animeDiffusionV45Full,
+        );
+
+    final generation = notifier.generate(params);
+    stream.add(
+      ImageStreamChunk.progress(
+        progress: 0.5,
+        currentStep: 14,
+        totalSteps: 28,
+        previewImage: preview,
+      ),
+    );
+    await _pumpUntil(
+      () => container.read(imageGenerationNotifierProvider).hasStreamPreview,
+      reason: 'stream preview was not published before cancellation',
+    );
+
+    notifier.cancel();
+    await stream.close();
+    await generation;
+
+    final state = container.read(imageGenerationNotifierProvider);
+    expect(state.status, GenerationStatus.cancelled);
+    expect(state.currentImages, isEmpty);
+    expect(state.displayImages, isEmpty);
+    expect(state.history, hasLength(1));
+
+    final snapshot = state.history.single;
+    expect(snapshot.bytes, orderedEquals(preview));
+    expect(snapshot.kind, GeneratedImageKind.failedStreamSnapshot);
+    expect(snapshot.canSave, isFalse);
+    expect(snapshot.canFavorite, isFalse);
+    expect(snapshot.canUseAsGenerationInput, isFalse);
+    expect(snapshot.canBulkSelect, isFalse);
+    expect(snapshot.canDrag, isFalse);
+    expect(snapshot.filePath, isNull);
+    expect(snapshot.metadata, isA<NaiImageMetadata>());
+    expect(snapshot.metadata!.prompt, equals('1girl'));
+    expect(snapshot.metadata!.negativePrompt, equals('bad anatomy'));
+    expect(snapshot.metadata!.width, equals(512));
+    expect(snapshot.metadata!.height, equals(768));
+    expect(snapshot.metadata!.steps, equals(28));
+    expect(snapshot.metadata!.scale, equals(5));
+    expect(snapshot.metadata!.seed, equals(1234));
+    expect(snapshot.metadata!.model, equals(ImageModels.animeDiffusionV45Full));
+  });
+
+  test('random seed is materialized for failed stream snapshot metadata',
+      () async {
+    final mockApiService = MockNAIImageGenerationApiService();
+    final stream = StreamController<ImageStreamChunk>();
+    final preview = _validImageBytes(width: 512, height: 768);
+    ImageParams? streamParams;
+
+    when(
+      () => mockApiService.generateImage(
+        any(),
+        onProgress: any(named: 'onProgress'),
+        focusedInpaintEnabled: any(named: 'focusedInpaintEnabled'),
+        minimumContextMegaPixels: any(named: 'minimumContextMegaPixels'),
+        focusedSelectionRect: any(named: 'focusedSelectionRect'),
+      ),
+    ).thenAnswer((_) async => (<Uint8List>[], <int, String>{}));
+    when(
+      () => mockApiService.generateImageStream(
+        any(),
+        focusedInpaintEnabled: any(named: 'focusedInpaintEnabled'),
+        minimumContextMegaPixels: any(named: 'minimumContextMegaPixels'),
+        focusedSelectionRect: any(named: 'focusedSelectionRect'),
+      ),
+    ).thenAnswer((invocation) {
+      streamParams = invocation.positionalArguments.first as ImageParams;
+      return stream.stream;
+    });
+    when(() => mockApiService.cancelGeneration()).thenReturn(null);
+
+    final container = ProviderContainer(
+      overrides: [
+        naiImageGenerationApiServiceProvider.overrideWithValue(mockApiService),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container
+        .read(notificationSettingsNotifierProvider.notifier)
+        .setSoundEnabled(false);
+
+    final notifier = container.read(imageGenerationNotifierProvider.notifier);
+    final params = container.read(generationParamsNotifierProvider).copyWith(
+          prompt: 'random seed snapshot',
+          width: 512,
+          height: 768,
+          seed: -1,
+          model: ImageModels.animeDiffusionV45Full,
+        );
+
+    final generation = notifier.generate(params);
+    stream.add(
+      ImageStreamChunk.progress(
+        progress: 0.5,
+        currentStep: 14,
+        totalSteps: 28,
+        previewImage: preview,
+      ),
+    );
+    await _pumpUntil(
+      () => container.read(imageGenerationNotifierProvider).hasStreamPreview,
+      reason: 'stream preview was not published before cancellation',
+    );
+
+    notifier.cancel();
+    await stream.close();
+    await generation;
+
+    final requestSeed = streamParams?.seed;
+    expect(requestSeed, isNotNull);
+    expect(requestSeed, isNot(-1));
+
+    final state = container.read(imageGenerationNotifierProvider);
+    expect(state.status, GenerationStatus.cancelled);
+    expect(state.history, hasLength(1));
+    final snapshot = state.history.single;
+    expect(snapshot.kind, GeneratedImageKind.failedStreamSnapshot);
+    expect(snapshot.metadata!.seed, equals(requestSeed));
+  });
+
+  test('stream error after preview keeps read-only failed snapshot and error',
+      () async {
+    final mockApiService = MockNAIImageGenerationApiService();
+    final preview = _validImageBytes(width: 512, height: 768);
+
+    when(
+      () => mockApiService.generateImage(
+        any(),
+        onProgress: any(named: 'onProgress'),
+        focusedInpaintEnabled: any(named: 'focusedInpaintEnabled'),
+        minimumContextMegaPixels: any(named: 'minimumContextMegaPixels'),
+        focusedSelectionRect: any(named: 'focusedSelectionRect'),
+      ),
+    ).thenAnswer((_) async => (<Uint8List>[], <int, String>{}));
+    when(
+      () => mockApiService.generateImageStream(
+        any(),
+        focusedInpaintEnabled: any(named: 'focusedInpaintEnabled'),
+        minimumContextMegaPixels: any(named: 'minimumContextMegaPixels'),
+        focusedSelectionRect: any(named: 'focusedSelectionRect'),
+      ),
+    ).thenAnswer(
+      (_) => Stream<ImageStreamChunk>.fromIterable([
+        ImageStreamChunk.progress(
+          progress: 0.25,
+          currentStep: 7,
+          totalSteps: 28,
+          previewImage: preview,
+        ),
+        ImageStreamChunk.error('API_ERROR_500|stream failed'),
+      ]),
+    );
+    when(() => mockApiService.cancelGeneration()).thenReturn(null);
+
+    final container = ProviderContainer(
+      overrides: [
+        naiImageGenerationApiServiceProvider.overrideWithValue(mockApiService),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container
+        .read(notificationSettingsNotifierProvider.notifier)
+        .setSoundEnabled(false);
+
+    final notifier = container.read(imageGenerationNotifierProvider.notifier);
+    final characterNotifier =
+        container.read(characterPromptNotifierProvider.notifier);
+    characterNotifier.replaceAll([
+      ui_character.CharacterPrompt.create(
+        name: 'Character 1',
+        prompt: 'red hair, sword',
+        negativePrompt: 'helmet',
+      ),
+      ui_character.CharacterPrompt.create(
+        name: 'Character 2',
+        prompt: 'blue hair, staff',
+        negativePrompt: 'cape',
+      ),
+    ]);
+    characterNotifier.setGlobalAiChoice(false);
+
+    final params = container.read(generationParamsNotifierProvider).copyWith(
+          prompt: 'failed prompt',
+          width: 512,
+          height: 768,
+          model: ImageModels.animeDiffusionV45Full,
+        );
+
+    await notifier.generate(params);
+
+    final state = container.read(imageGenerationNotifierProvider);
+    expect(state.status, GenerationStatus.error);
+    expect(state.errorMessage, contains('stream failed'));
+    expect(state.currentImages, isEmpty);
+    expect(state.displayImages, isEmpty);
+    expect(state.history, hasLength(1));
+    expect(state.history.single.kind, GeneratedImageKind.failedStreamSnapshot);
+    expect(state.history.single.bytes, orderedEquals(preview));
+    expect(state.history.single.metadata!.prompt, equals('failed prompt'));
+    expect(
+      state.history.single.metadata!.model,
+      equals(ImageModels.animeDiffusionV45Full),
+    );
+    expect(
+      state.history.single.metadata!.characterPrompts,
+      containsAll([
+        contains('red hair, sword'),
+        contains('blue hair, staff'),
+      ]),
+    );
+    expect(
+      state.history.single.metadata!.characterNegativePrompts,
+      containsAll(['helmet', 'cape']),
+    );
+  });
+
+  test('batch empty fallback after preview keeps failed snapshot in history',
+      () async {
+    final mockApiService = MockNAIImageGenerationApiService();
+    final preview = _validImageBytes(width: 512, height: 768);
+    var streamCall = 0;
+
+    when(
+      () => mockApiService.generateImage(
+        any(),
+        onProgress: any(named: 'onProgress'),
+        focusedInpaintEnabled: any(named: 'focusedInpaintEnabled'),
+        minimumContextMegaPixels: any(named: 'minimumContextMegaPixels'),
+        focusedSelectionRect: any(named: 'focusedSelectionRect'),
+      ),
+    ).thenAnswer((_) async => (<Uint8List>[], <int, String>{}));
+    when(
+      () => mockApiService.generateImageCancellable(
+        any(),
+        onProgress: any(named: 'onProgress'),
+        focusedInpaintEnabled: any(named: 'focusedInpaintEnabled'),
+        minimumContextMegaPixels: any(named: 'minimumContextMegaPixels'),
+        focusedSelectionRect: any(named: 'focusedSelectionRect'),
+      ),
+    ).thenAnswer((_) async => <Uint8List>[]);
+    when(
+      () => mockApiService.generateImageStream(
+        any(),
+        focusedInpaintEnabled: any(named: 'focusedInpaintEnabled'),
+        minimumContextMegaPixels: any(named: 'minimumContextMegaPixels'),
+        focusedSelectionRect: any(named: 'focusedSelectionRect'),
+      ),
+    ).thenAnswer((_) {
+      streamCall += 1;
+      if (streamCall == 1) {
+        return Stream<ImageStreamChunk>.fromIterable([
+          ImageStreamChunk.progress(
+            progress: 0.5,
+            currentStep: 14,
+            totalSteps: 28,
+            previewImage: preview,
+          ),
+        ]);
+      }
+      return const Stream<ImageStreamChunk>.empty();
+    });
+    when(() => mockApiService.cancelGeneration()).thenReturn(null);
+
+    final container = ProviderContainer(
+      overrides: [
+        naiImageGenerationApiServiceProvider.overrideWithValue(mockApiService),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container
+        .read(notificationSettingsNotifierProvider.notifier)
+        .setSoundEnabled(false);
+    container.read(imagesPerRequestProvider.notifier).set(2);
+
+    final notifier = container.read(imageGenerationNotifierProvider.notifier);
+    final params = container.read(generationParamsNotifierProvider).copyWith(
+          prompt: 'batch failed prompt',
+          width: 512,
+          height: 768,
+          nSamples: 1,
+          model: ImageModels.animeDiffusionV45Full,
+        );
+
+    await notifier.generate(params);
+    container.read(imagesPerRequestProvider.notifier).set(1);
+
+    final state = container.read(imageGenerationNotifierProvider);
+    expect(state.status, GenerationStatus.error);
+    expect(state.currentImages, isEmpty);
+    expect(state.displayImages, isEmpty);
+    expect(state.history, hasLength(1));
+    expect(state.history.single.kind, GeneratedImageKind.failedStreamSnapshot);
+    expect(state.history.single.bytes, orderedEquals(preview));
+    expect(
+      state.history.single.metadata!.prompt,
+      equals('batch failed prompt'),
+    );
+  });
+
+  test(
+      'cancel after successful stream completion must not create failed snapshot',
+      () async {
+    final mockApiService = MockNAIImageGenerationApiService();
+    final preview = _validImageBytes(width: 512, height: 768);
+    final finalImage = _validImageBytes(width: 512, height: 768);
+
+    when(
+      () => mockApiService.generateImage(
+        any(),
+        onProgress: any(named: 'onProgress'),
+        focusedInpaintEnabled: any(named: 'focusedInpaintEnabled'),
+        minimumContextMegaPixels: any(named: 'minimumContextMegaPixels'),
+        focusedSelectionRect: any(named: 'focusedSelectionRect'),
+      ),
+    ).thenAnswer((_) async => (<Uint8List>[], <int, String>{}));
+    when(
+      () => mockApiService.generateImageStream(
+        any(),
+        focusedInpaintEnabled: any(named: 'focusedInpaintEnabled'),
+        minimumContextMegaPixels: any(named: 'minimumContextMegaPixels'),
+        focusedSelectionRect: any(named: 'focusedSelectionRect'),
+      ),
+    ).thenAnswer(
+      (_) => Stream<ImageStreamChunk>.fromIterable([
+        ImageStreamChunk.progress(
+          progress: 0.25,
+          currentStep: 7,
+          totalSteps: 28,
+          previewImage: preview,
+        ),
+        ImageStreamChunk.complete(finalImage),
+      ]),
+    );
+    when(() => mockApiService.cancelGeneration()).thenReturn(null);
+
+    final container = ProviderContainer(
+      overrides: [
+        naiImageGenerationApiServiceProvider.overrideWithValue(mockApiService),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container
+        .read(notificationSettingsNotifierProvider.notifier)
+        .setSoundEnabled(false);
+
+    final notifier = container.read(imageGenerationNotifierProvider.notifier);
+    final params = container.read(generationParamsNotifierProvider).copyWith(
+          prompt: 'successful prompt',
+          width: 512,
+          height: 768,
+          model: ImageModels.animeDiffusionV45Full,
+        );
+
+    await notifier.generate(params);
+
+    final completedState = container.read(imageGenerationNotifierProvider);
+    expect(completedState.status, GenerationStatus.completed);
+    expect(completedState.currentImages, hasLength(1));
+    expect(completedState.displayImages, hasLength(1));
+    expect(completedState.history, hasLength(1));
+    expect(completedState.history.single.kind, GeneratedImageKind.completed);
+    expect(completedState.history.single.bytes, orderedEquals(finalImage));
+
+    notifier.cancel();
+
+    final cancelledState = container.read(imageGenerationNotifierProvider);
+    expect(cancelledState.history, hasLength(1));
+    expect(
+      cancelledState.history
+          .where(
+            (image) => image.kind == GeneratedImageKind.failedStreamSnapshot,
+          )
+          .toList(),
+      isEmpty,
+    );
   });
 
   test(

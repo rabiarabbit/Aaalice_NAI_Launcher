@@ -47,6 +47,18 @@ class SelectableImageCard extends ConsumerStatefulWidget {
   /// 是否允许卡片在悬浮时预热复制/拖拽缓存
   final bool shareWarmupEnabled;
 
+  /// Whether save actions should be shown on hover and context menu.
+  final bool enableSaveAction;
+
+  /// Whether copy actions should be shown on hover and context menu.
+  final bool enableCopyAction;
+
+  /// Optional badge for read-only or special image states.
+  final String? statusBadgeLabel;
+
+  /// Optional tooltip for [statusBadgeLabel].
+  final String? statusBadgeTooltip;
+
   /// 拖拽缓存是否已经准备完成。
   ///
   /// 历史面板会在缓存未准备好时禁用拖拽，并在预览图左下角保持
@@ -135,6 +147,10 @@ class SelectableImageCard extends ConsumerStatefulWidget {
     this.enableGlossEffect = true,
     this.hoverEffectsEnabled = true,
     this.shareWarmupEnabled = true,
+    this.enableSaveAction = true,
+    this.enableCopyAction = true,
+    this.statusBadgeLabel,
+    this.statusBadgeTooltip,
     this.dragPreparationReady = true,
     this.completionPlaceholderBytes,
     this.onCompletionPlaceholderSettled,
@@ -910,8 +926,16 @@ class _SelectableImageCardState extends ConsumerState<SelectableImageCard>
                     ),
                   ),
 
+                if (widget.statusBadgeLabel != null)
+                  Positioned(
+                    top: 8,
+                    left: 8,
+                    child: _buildStatusBadge(context),
+                  ),
+
                 // 5. 左上角：选择框（悬浮或选中时显示）
                 if (widget.enableSelection &&
+                    widget.statusBadgeLabel == null &&
                     (_isHovering || widget.isSelected))
                   Positioned(
                     top: 8,
@@ -928,7 +952,7 @@ class _SelectableImageCardState extends ConsumerState<SelectableImageCard>
                   ),
 
                 // 6. 操作按钮（悬浮时显示）
-                if (_isHovering)
+                if (_isHovering && _hasHoverActions)
                   Positioned(
                     bottom: 12,
                     left: 0,
@@ -981,6 +1005,43 @@ class _SelectableImageCardState extends ConsumerState<SelectableImageCard>
                   ),
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatusBadge(BuildContext context) {
+    final label = widget.statusBadgeLabel!;
+
+    return Tooltip(
+      message: widget.statusBadgeTooltip ?? label,
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 120),
+        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+        decoration: BoxDecoration(
+          color: Colors.black.withValues(alpha: 0.62),
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.18),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.25),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Text(
+          label,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+            height: 1.1,
           ),
         ),
       ),
@@ -1047,17 +1108,19 @@ class _SelectableImageCardState extends ConsumerState<SelectableImageCard>
           runSpacing: 6,
           alignment: WrapAlignment.center,
           children: [
-            _HoverActionButton(
-              icon: Icons.save_alt_rounded,
-              tooltip: context.l10n.image_save,
-              onTap: () => _saveImage(context),
-              isPrimary: true,
-            ),
-            _HoverActionButton(
-              icon: Icons.copy_rounded,
-              tooltip: context.l10n.image_copy,
-              onTap: () => _copyImage(context),
-            ),
+            if (widget.enableSaveAction)
+              _HoverActionButton(
+                icon: Icons.save_alt_rounded,
+                tooltip: context.l10n.image_save,
+                onTap: () => _saveImage(context),
+                isPrimary: true,
+              ),
+            if (widget.enableCopyAction)
+              _HoverActionButton(
+                icon: Icons.copy_rounded,
+                tooltip: context.l10n.image_copy,
+                onTap: () => _copyImage(context),
+              ),
             if (widget.onEditImage != null)
               _HoverActionButton(
                 icon: Icons.edit_outlined,
@@ -1111,6 +1174,18 @@ class _SelectableImageCardState extends ConsumerState<SelectableImageCard>
       ),
     );
   }
+
+  bool get _hasHoverActions =>
+      widget.enableSaveAction ||
+      widget.enableCopyAction ||
+      widget.onEditImage != null ||
+      widget.onInpaint != null ||
+      widget.onGenerateVariations != null ||
+      widget.onDirectorTools != null ||
+      widget.onEnhance != null ||
+      widget.onUpscale != null ||
+      widget.onSendToKrita != null ||
+      widget.onSaveToLibrary != null;
 
   Widget _buildCheckbox(ThemeData theme) {
     return GestureDetector(
@@ -1259,18 +1334,20 @@ class _SelectableImageCardState extends ConsumerState<SelectableImageCard>
   /// 显示右键菜单
   void _showContextMenu(BuildContext context, Offset position) {
     final items = <ProMenuItem>[
-      ProMenuItem(
-        id: 'save',
-        label: '保存图片',
-        icon: Icons.save_alt,
-        onTap: () => _saveImage(context),
-      ),
-      ProMenuItem(
-        id: 'copy',
-        label: '复制图片',
-        icon: Icons.copy,
-        onTap: () => _copyImage(context),
-      ),
+      if (widget.enableSaveAction)
+        ProMenuItem(
+          id: 'save',
+          label: '保存图片',
+          icon: Icons.save_alt,
+          onTap: () => _saveImage(context),
+        ),
+      if (widget.enableCopyAction)
+        ProMenuItem(
+          id: 'copy',
+          label: '复制图片',
+          icon: Icons.copy,
+          onTap: () => _copyImage(context),
+        ),
       if (widget.onOpenInExplorer != null) ...[
         const ProMenuItem.divider(),
         ProMenuItem(
@@ -1339,6 +1416,10 @@ class _SelectableImageCardState extends ConsumerState<SelectableImageCard>
           ),
       ],
     ];
+
+    if (items.isEmpty) {
+      return;
+    }
 
     Navigator.of(context).push(
       _ContextMenuRoute(

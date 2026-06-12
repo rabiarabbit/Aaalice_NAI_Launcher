@@ -1556,6 +1556,18 @@ abstract class AppLocalizations {
   /// **'History Records'**
   String get generation_historyRecord;
 
+  /// No description provided for @generation_failedStreamSnapshot.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed snapshot'**
+  String get generation_failedStreamSnapshot;
+
+  /// No description provided for @generation_failedStreamSnapshotHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Generation did not finish; only the last preview frame is kept. It cannot be saved, favorited, or used for image workflows.'**
+  String get generation_failedStreamSnapshotHint;
+
   /// No description provided for @generation_noHistory.
   ///
   /// In en, this message translates to:

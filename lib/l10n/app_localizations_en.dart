@@ -778,6 +778,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get generation_historyRecord => 'History Records';
 
   @override
+  String get generation_failedStreamSnapshot => 'Failed snapshot';
+
+  @override
+  String get generation_failedStreamSnapshotHint =>
+      'Generation did not finish; only the last preview frame is kept. It cannot be saved, favorited, or used for image workflows.';
+
+  @override
   String get generation_noHistory => 'No history records';
 
   @override

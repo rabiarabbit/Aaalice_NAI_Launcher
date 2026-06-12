@@ -763,6 +763,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get generation_historyRecord => '历史记录';
 
   @override
+  String get generation_failedStreamSnapshot => '失败快照';
+
+  @override
+  String get generation_failedStreamSnapshotHint =>
+      '生成未完成，仅保留最后一帧预览；不可保存、收藏或用于图生图';
+
+  @override
   String get generation_noHistory => '暂无历史记录';
 
   @override

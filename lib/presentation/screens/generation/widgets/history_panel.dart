@@ -268,7 +268,9 @@ class _HistoryPanelState extends ConsumerState<HistoryPanel> {
     final deduplicatedHistory =
         state.history.where((img) => !currentIds.contains(img.id)).toList();
 
-    return [...currentCompleted, ...deduplicatedHistory];
+    return [...currentCompleted, ...deduplicatedHistory]
+        .where((image) => image.canBulkSelect)
+        .toList();
   }
 
   /// 判断是否有当前正在生成的图像
@@ -351,7 +353,8 @@ class _HistoryPanelState extends ConsumerState<HistoryPanel> {
     Duration delay = const Duration(milliseconds: 600),
   }) {
     _historyPreheatTimer?.cancel();
-    if (images.isEmpty) {
+    final draggableImages = images.where((image) => image.canDrag).toList();
+    if (draggableImages.isEmpty) {
       return;
     }
 
@@ -360,7 +363,7 @@ class _HistoryPanelState extends ConsumerState<HistoryPanel> {
         return;
       }
 
-      for (final image in images) {
+      for (final image in draggableImages) {
         _sharePreparationService.enqueue(
           imageId: image.id,
           imageBytes: image.bytes,
@@ -376,6 +379,10 @@ class _HistoryPanelState extends ConsumerState<HistoryPanel> {
     GeneratedImage image,
     bool stripMetadata,
   ) {
+    if (!image.canDrag) {
+      return;
+    }
+
     if (_isHistoryScrolling) {
       return;
     }
@@ -507,6 +514,7 @@ class _HistoryPanelState extends ConsumerState<HistoryPanel> {
           final historyIndex = index - currentGenerationCount;
           final historyImage = deduplicatedHistory[historyIndex];
           final isFavorite = _favoriteStateFor(historyImage);
+          final isFailedSnapshot = historyImage.isFailedStreamSnapshot;
           // 计算在原始 history 中的真实索引（用于选择操作）
           final actualHistoryIndex = history.indexOf(historyImage);
           return Padding(
@@ -528,9 +536,22 @@ class _HistoryPanelState extends ConsumerState<HistoryPanel> {
                   isSelected: _selectedIds.contains(historyImage.id),
                   isFavorite: isFavorite,
                   dragPreparationReady: dragPreparationReady,
-                  onFavoriteToggle: () =>
-                      _toggleHistoryFavorite(context, historyImage),
+                  enableSelection: historyImage.canBulkSelect,
+                  enableSaveAction: historyImage.canSave,
+                  enableCopyAction: historyImage.canSave,
+                  statusBadgeLabel: isFailedSnapshot
+                      ? context.l10n.generation_failedStreamSnapshot
+                      : null,
+                  statusBadgeTooltip: isFailedSnapshot
+                      ? context.l10n.generation_failedStreamSnapshotHint
+                      : null,
+                  onFavoriteToggle: historyImage.canFavorite
+                      ? () => _toggleHistoryFavorite(context, historyImage)
+                      : null,
                   onSelectionChanged: (selected) {
+                    if (!historyImage.canBulkSelect) {
+                      return;
+                    }
                     setState(() {
                       if (selected) {
                         _selectedIds.add(historyImage.id);
@@ -544,47 +565,61 @@ class _HistoryPanelState extends ConsumerState<HistoryPanel> {
                   enableHoverScale: true,
                   hoverEffectsEnabled: !_isHistoryScrolling,
                   shareWarmupEnabled: false,
-                  onEditImage: () => ImageWorkflowLauncher.openEditor(
-                    context,
-                    ref,
-                    historyImage.bytes,
-                    mode: ImageEditorMode.edit,
-                  ),
-                  onInpaint: () => ImageWorkflowLauncher.openInpaint(
-                    context,
-                    ref,
-                    historyImage.bytes,
-                  ),
-                  onGenerateVariations: () =>
-                      ImageWorkflowLauncher.generateVariations(
-                    context,
-                    ref,
-                    historyImage.bytes,
-                  ),
-                  onDirectorTools: () =>
-                      ImageWorkflowLauncher.openDirectorTools(
-                    context,
-                    ref,
-                    historyImage.bytes,
-                  ),
-                  onEnhance: () => ImageWorkflowLauncher.openEnhance(
-                    ref,
-                    historyImage.bytes,
-                  ),
-                  onUpscale: () => ImageWorkflowLauncher.openUpscale(
-                    ref,
-                    historyImage.bytes,
-                  ),
-                  onSendToKrita: () => KritaSendHelper.sendImageBytes(
-                    context,
-                    ref,
-                    historyImage.bytes,
-                    name: 'history_${historyImage.id}.png',
-                  ),
-                  onOpenInExplorer: () =>
-                      _openImageInExplorer(context, historyImage),
-                  onSaveToLibrary: (bytes, _) =>
-                      _showSaveToLibraryDialog(context, bytes),
+                  onEditImage: historyImage.canUseAsGenerationInput
+                      ? () => ImageWorkflowLauncher.openEditor(
+                            context,
+                            ref,
+                            historyImage.bytes,
+                            mode: ImageEditorMode.edit,
+                          )
+                      : null,
+                  onInpaint: historyImage.canUseAsGenerationInput
+                      ? () => ImageWorkflowLauncher.openInpaint(
+                            context,
+                            ref,
+                            historyImage.bytes,
+                          )
+                      : null,
+                  onGenerateVariations: historyImage.canUseAsGenerationInput
+                      ? () => ImageWorkflowLauncher.generateVariations(
+                            context,
+                            ref,
+                            historyImage.bytes,
+                          )
+                      : null,
+                  onDirectorTools: historyImage.canUseAsGenerationInput
+                      ? () => ImageWorkflowLauncher.openDirectorTools(
+                            context,
+                            ref,
+                            historyImage.bytes,
+                          )
+                      : null,
+                  onEnhance: historyImage.canUseAsGenerationInput
+                      ? () => ImageWorkflowLauncher.openEnhance(
+                            ref,
+                            historyImage.bytes,
+                          )
+                      : null,
+                  onUpscale: historyImage.canUseAsGenerationInput
+                      ? () => ImageWorkflowLauncher.openUpscale(
+                            ref,
+                            historyImage.bytes,
+                          )
+                      : null,
+                  onSendToKrita: historyImage.canUseAsGenerationInput
+                      ? () => KritaSendHelper.sendImageBytes(
+                            context,
+                            ref,
+                            historyImage.bytes,
+                            name: 'history_${historyImage.id}.png',
+                          )
+                      : null,
+                  onOpenInExplorer: historyImage.canSave
+                      ? () => _openImageInExplorer(context, historyImage)
+                      : null,
+                  onSaveToLibrary: historyImage.canUseAsGenerationInput
+                      ? (bytes, _) => _showSaveToLibraryDialog(context, bytes)
+                      : null,
                 ),
               ),
             ),
@@ -600,6 +635,10 @@ class _HistoryPanelState extends ConsumerState<HistoryPanel> {
     required bool stripMetadata,
     required Widget Function(bool dragPreparationReady) childBuilder,
   }) {
+    if (!image.canDrag) {
+      return childBuilder(true);
+    }
+
     final snapshot = _sharePreparationService.snapshotFor(
       image.id,
       stripMetadata: stripMetadata,
@@ -655,6 +694,7 @@ class _HistoryPanelState extends ConsumerState<HistoryPanel> {
       final image = completedImages[index];
       final imageBytes = image.bytes;
       final isFavorite = _favoriteStateFor(image);
+      final isFailedSnapshot = image.isFailedStreamSnapshot;
       return _buildPreparedHistoryItem(
         context: context,
         image: image,
@@ -670,8 +710,22 @@ class _HistoryPanelState extends ConsumerState<HistoryPanel> {
           completionPlaceholderBytes: _completionPreviewPlaceholders[image.id],
           onCompletionPlaceholderSettled: () =>
               _clearCompletionPreviewPlaceholder(image.id),
-          onFavoriteToggle: () => _toggleHistoryFavorite(context, image),
+          enableSelection: image.canBulkSelect,
+          enableSaveAction: image.canSave,
+          enableCopyAction: image.canSave,
+          statusBadgeLabel: isFailedSnapshot
+              ? context.l10n.generation_failedStreamSnapshot
+              : null,
+          statusBadgeTooltip: isFailedSnapshot
+              ? context.l10n.generation_failedStreamSnapshotHint
+              : null,
+          onFavoriteToggle: image.canFavorite
+              ? () => _toggleHistoryFavorite(context, image)
+              : null,
           onSelectionChanged: (selected) {
+            if (!image.canBulkSelect) {
+              return;
+            }
             setState(() {
               if (selected) {
                 _selectedIds.add(image.id);
@@ -685,32 +739,54 @@ class _HistoryPanelState extends ConsumerState<HistoryPanel> {
           enableHoverScale: true,
           hoverEffectsEnabled: !_isHistoryScrolling,
           shareWarmupEnabled: false,
-          onEditImage: () => ImageWorkflowLauncher.openEditor(
-            context,
-            ref,
-            imageBytes,
-            mode: ImageEditorMode.edit,
-          ),
-          onInpaint: () =>
-              ImageWorkflowLauncher.openInpaint(context, ref, imageBytes),
-          onGenerateVariations: () => ImageWorkflowLauncher.generateVariations(
-            context,
-            ref,
-            imageBytes,
-          ),
-          onDirectorTools: () =>
-              ImageWorkflowLauncher.openDirectorTools(context, ref, imageBytes),
-          onEnhance: () => ImageWorkflowLauncher.openEnhance(ref, imageBytes),
-          onUpscale: () => ImageWorkflowLauncher.openUpscale(ref, imageBytes),
-          onSendToKrita: () => KritaSendHelper.sendImageBytes(
-            context,
-            ref,
-            image.bytes,
-            name: 'history_${image.id}.png',
-          ),
-          onOpenInExplorer: () => _openImageInExplorer(context, image),
-          onSaveToLibrary: (bytes, _) =>
-              _showSaveToLibraryDialog(context, bytes),
+          onEditImage: image.canUseAsGenerationInput
+              ? () => ImageWorkflowLauncher.openEditor(
+                    context,
+                    ref,
+                    imageBytes,
+                    mode: ImageEditorMode.edit,
+                  )
+              : null,
+          onInpaint: image.canUseAsGenerationInput
+              ? () => ImageWorkflowLauncher.openInpaint(
+                    context,
+                    ref,
+                    imageBytes,
+                  )
+              : null,
+          onGenerateVariations: image.canUseAsGenerationInput
+              ? () => ImageWorkflowLauncher.generateVariations(
+                    context,
+                    ref,
+                    imageBytes,
+                  )
+              : null,
+          onDirectorTools: image.canUseAsGenerationInput
+              ? () => ImageWorkflowLauncher.openDirectorTools(
+                    context,
+                    ref,
+                    imageBytes,
+                  )
+              : null,
+          onEnhance: image.canUseAsGenerationInput
+              ? () => ImageWorkflowLauncher.openEnhance(ref, imageBytes)
+              : null,
+          onUpscale: image.canUseAsGenerationInput
+              ? () => ImageWorkflowLauncher.openUpscale(ref, imageBytes)
+              : null,
+          onSendToKrita: image.canUseAsGenerationInput
+              ? () => KritaSendHelper.sendImageBytes(
+                    context,
+                    ref,
+                    image.bytes,
+                    name: 'history_${image.id}.png',
+                  )
+              : null,
+          onOpenInExplorer:
+              image.canSave ? () => _openImageInExplorer(context, image) : null,
+          onSaveToLibrary: image.canUseAsGenerationInput
+              ? (bytes, _) => _showSaveToLibraryDialog(context, bytes)
+              : null,
         ),
       );
     }
@@ -1065,12 +1141,17 @@ class _HistoryPanelState extends ConsumerState<HistoryPanel> {
         filePath: image.filePath!,
         cachedBytes: image.bytes,
         id: image.id,
+        initialMetadata: image.metadata,
+        showCopyButton: image.canSave,
       );
     } else {
-      // 未保存的图像：使用 GeneratedImageDetailData（显示"无元数据"）
+      // 未保存的图像：使用 GeneratedImageDetailData，失败快照仅允许查看。
       imageData = GeneratedImageDetailData(
         imageBytes: image.bytes,
+        metadata: image.metadata,
         id: image.id,
+        showSaveButton: image.canSave,
+        showCopyButton: image.canSave,
       );
     }
 
@@ -1082,8 +1163,13 @@ class _HistoryPanelState extends ConsumerState<HistoryPanel> {
       image: imageData,
       showMetadataPanel: true,
       callbacks: ImageDetailCallbacks(
-        onSave: (img) =>
-            GenerationSaveService.saveImageFromDetail(currentContext, ref, img),
+        onSave: image.canSave
+            ? (img) => GenerationSaveService.saveImageFromDetail(
+                  currentContext,
+                  ref,
+                  img,
+                )
+            : null,
       ),
     );
   }
