@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:nai_launcher/core/utils/localization_extension.dart';
 
 /// 权重调整工具条包装器
 ///
@@ -442,6 +443,7 @@ class _WeightAdjustToolbarState extends State<_WeightAdjustToolbar> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = context.l10n;
 
     return Listener(
       onPointerDown: (_) => widget.onInteractingChanged(true),
@@ -474,7 +476,7 @@ class _WeightAdjustToolbarState extends State<_WeightAdjustToolbar> {
                     _WeightButton(
                       icon: Icons.remove,
                       onPressed: () => _adjustWeightByStep(-0.05),
-                      tooltip: '减少权重 (-0.05)',
+                      tooltip: l10n.tooltip_decreaseWeight,
                     ),
                     Expanded(
                       child: Container(
@@ -528,7 +530,7 @@ class _WeightAdjustToolbarState extends State<_WeightAdjustToolbar> {
                     _WeightButton(
                       icon: Icons.add,
                       onPressed: () => _adjustWeightByStep(0.05),
-                      tooltip: '增加权重 (+0.05)',
+                      tooltip: l10n.tooltip_increaseWeight,
                     ),
                     Container(
                       width: 1,
@@ -539,12 +541,12 @@ class _WeightAdjustToolbarState extends State<_WeightAdjustToolbar> {
                     _WeightButton(
                       icon: Icons.refresh,
                       onPressed: () => _applyWeight(1.0),
-                      tooltip: '重置权重 (1.0)',
+                      tooltip: l10n.tooltip_resetWeight,
                     ),
                     _WeightButton(
                       icon: Icons.close,
                       onPressed: widget.onClose,
-                      tooltip: '关闭',
+                      tooltip: l10n.common_close,
                     ),
                   ],
                 ),

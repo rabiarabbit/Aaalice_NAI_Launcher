@@ -169,7 +169,7 @@ class _VibeSectionState extends State<VibeSection> {
               size: 16,
               color: colorScheme.onSurfaceVariant,
             ),
-            tooltip: '复制全部 Vibe 数据',
+            tooltip: context.l10n.detail_copyAllVibeData,
             style: IconButton.styleFrom(
               padding: const EdgeInsets.all(6),
               minimumSize: const Size(28, 28),
@@ -307,7 +307,7 @@ class _VibeCard extends StatelessWidget {
                 size: 18,
                 color: colorScheme.primary,
               ),
-              tooltip: '保存到 Vibe 库',
+              tooltip: context.l10n.detail_saveToVibeLibrary,
               style: IconButton.styleFrom(
                 padding: const EdgeInsets.all(6),
                 minimumSize: const Size(32, 32),

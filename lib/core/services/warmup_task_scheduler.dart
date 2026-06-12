@@ -64,7 +64,7 @@ class PhaseProgress {
   factory PhaseProgress.initial(WarmupPhase phase) => PhaseProgress(
         phase: phase,
         progress: 0.0,
-        currentTask: '${phase.displayName}准备中...',
+        currentTask: 'warmup_preparing',
       );
 }
 
@@ -74,12 +74,14 @@ class WarmupTaskScheduler {
   final List<PhasedTaskGroup> _groups = [];
 
   final Map<WarmupPhase, bool> _phaseComplete = {};
-  final Map<WarmupPhase, StreamController<PhaseProgress>> _phaseControllers = {};
+  final Map<WarmupPhase, StreamController<PhaseProgress>> _phaseControllers =
+      {};
 
   /// 注册单个任务
   void registerTask(PhasedWarmupTask task) {
     _tasks.add(task);
-    AppLogger.d('Registered task "${task.name}" for phase ${task.phase}', 'WarmupScheduler');
+    AppLogger.d('Registered task "${task.name}" for phase ${task.phase}',
+        'WarmupScheduler');
   }
 
   /// 注册任务组
@@ -103,8 +105,10 @@ class WarmupTaskScheduler {
 
   /// 计算阶段总权重
   int _getPhaseWeight(WarmupPhase phase) {
-    final taskWeight = _getTasksForPhase(phase).fold(0, (sum, t) => sum + t.weight);
-    final groupWeight = _getGroupsForPhase(phase).fold(0, (sum, g) => sum + g.weight);
+    final taskWeight =
+        _getTasksForPhase(phase).fold(0, (sum, t) => sum + t.weight);
+    final groupWeight =
+        _getGroupsForPhase(phase).fold(0, (sum, g) => sum + g.weight);
     return taskWeight + groupWeight;
   }
 
@@ -119,7 +123,11 @@ class WarmupTaskScheduler {
 
     if (tasks.isEmpty && groups.isEmpty) {
       _phaseComplete[phase] = true;
-      yield PhaseProgress(phase: phase, progress: 1.0, currentTask: 'complete', isComplete: true);
+      yield PhaseProgress(
+          phase: phase,
+          progress: 1.0,
+          currentTask: 'complete',
+          isComplete: true);
       controller.close();
       return;
     }
@@ -154,7 +162,7 @@ class WarmupTaskScheduler {
       yield PhaseProgress(
         phase: phase,
         progress: completedWeight / totalWeight,
-        currentTask: '${group.displayText}...',
+        currentTask: group.displayText,
       );
 
       if (group.parallel) {
@@ -169,7 +177,7 @@ class WarmupTaskScheduler {
       final progress = PhaseProgress(
         phase: phase,
         progress: completedWeight / totalWeight,
-        currentTask: '${group.displayText}完成',
+        currentTask: '${group.displayText}_complete',
       );
       yield progress;
       controller.add(progress);

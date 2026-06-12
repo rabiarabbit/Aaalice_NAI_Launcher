@@ -348,17 +348,19 @@ class _VibeDetailViewerState extends ConsumerState<VibeDetailViewer> {
           builder: (context, setState) {
             void validate(String value) {
               setState(() {
-                errorText = value.trim().isEmpty ? '名称不能为空' : null;
+                errorText = value.trim().isEmpty
+                    ? context.l10n.vibe_nameRequired
+                    : null;
               });
             }
 
             return AlertDialog(
-              title: const Text('重命名 Vibe'),
+              title: Text(context.l10n.shortcut_action_vibe_detail_rename),
               content: TextField(
                 controller: controller,
                 autofocus: true,
                 decoration: InputDecoration(
-                  hintText: '输入新名称',
+                  hintText: 'Enter a new name',
                   errorText: errorText,
                 ),
                 onChanged: validate,
@@ -374,7 +376,7 @@ class _VibeDetailViewerState extends ConsumerState<VibeDetailViewer> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('取消'),
+                  child: Text(context.l10n.common_cancel),
                 ),
                 FilledButton(
                   onPressed: () {
@@ -385,7 +387,7 @@ class _VibeDetailViewerState extends ConsumerState<VibeDetailViewer> {
                     }
                     Navigator.of(context).pop(trimmed);
                   },
-                  child: const Text('确定'),
+                  child: Text(context.l10n.common_confirm),
                 ),
               ],
             );
@@ -645,8 +647,8 @@ class _VibeDetailViewerState extends ConsumerState<VibeDetailViewer> {
   Widget _buildParamPanel() {
     final bundleParamHint = _entry.isBundle
         ? _selectedSubVibeIndex >= 0
-            ? '当前显示第 ${_selectedSubVibeIndex + 1} 个子 Vibe 的导入参数。'
-            : '当前显示 Bundle 默认参数。点击下方子项可查看各自参数。'
+            ? 'Showing import parameters for child Vibe ${_selectedSubVibeIndex + 1}.'
+            : 'Showing Bundle default parameters. Click a child item below to view its parameters.'
         : null;
 
     return VibeDetailParamPanel(

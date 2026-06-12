@@ -23,6 +23,22 @@ class GenerateButtonWithCost extends ConsumerWidget {
     required this.onCancel,
   });
 
+  String _labelText(BuildContext context) {
+    final progress =
+        '${generationState.currentImage}/${generationState.totalImages}';
+    if (showCancel) {
+      return generationState.totalImages > 1
+          ? '${context.l10n.generation_cancel} $progress'
+          : context.l10n.generation_cancel;
+    }
+    if (isGenerating) {
+      return generationState.totalImages > 1
+          ? progress
+          : context.l10n.generation_generating;
+    }
+    return context.l10n.generation_generate;
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return SizedBox(
@@ -36,15 +52,7 @@ class GenerateButtonWithCost extends ConsumerWidget {
         label: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              showCancel
-                  ? context.l10n.generation_cancel
-                  : (isGenerating
-                      ? (generationState.totalImages > 1
-                          ? '${generationState.currentImage}/${generationState.totalImages}'
-                          : context.l10n.generation_generating)
-                      : context.l10n.generation_generate),
-            ),
+            Text(_labelText(context)),
             AnlasCostBadge(isGenerating: isGenerating),
           ],
         ),

@@ -296,6 +296,36 @@ abstract class AppLocalizations {
   /// **'Confirm Delete'**
   String get common_confirmDelete;
 
+  /// No description provided for @common_confirmClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Clear'**
+  String get common_confirmClear;
+
+  /// No description provided for @common_gotIt.
+  ///
+  /// In en, this message translates to:
+  /// **'Got it'**
+  String get common_gotIt;
+
+  /// No description provided for @common_deleteItemConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete \"{itemName}\"? This action cannot be undone.'**
+  String common_deleteItemConfirm(Object itemName);
+
+  /// No description provided for @common_clearAllItemsConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear all {count} {itemType}? This action cannot be undone.'**
+  String common_clearAllItemsConfirm(Object count, Object itemType);
+
+  /// No description provided for @common_clearInputConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear the input content?'**
+  String get common_clearInputConfirm;
+
   /// No description provided for @common_settings.
   ///
   /// In en, this message translates to:
@@ -757,6 +787,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Set a recognizable name for this account'**
   String get auth_nicknameHint;
+
+  /// No description provided for @auth_thirdPartyApiSite.
+  ///
+  /// In en, this message translates to:
+  /// **'Third-party API Site'**
+  String get auth_thirdPartyApiSite;
+
+  /// No description provided for @auth_imageApiSiteOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Image API Site (optional)'**
+  String get auth_imageApiSiteOptional;
+
+  /// No description provided for @auth_imageApiSiteHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave empty to use the same third-party API site'**
+  String get auth_imageApiSiteHint;
+
+  /// No description provided for @auth_thirdPartyNicknameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'For example: self-hosted site / mirror site'**
+  String get auth_thirdPartyNicknameHint;
+
+  /// No description provided for @auth_thirdPartyTokenHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the API token from the third-party site'**
+  String get auth_thirdPartyTokenHint;
+
+  /// No description provided for @auth_thirdPartyCompatibilityHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The third-party site must be compatible with NovelAI subscription and image-generation APIs. The token will be sent as a Bearer token.'**
+  String get auth_thirdPartyCompatibilityHint;
+
+  /// No description provided for @auth_thirdPartyApiSiteRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter third-party API site URL'**
+  String get auth_thirdPartyApiSiteRequired;
 
   /// No description provided for @auth_saveAccount.
   ///
@@ -1322,6 +1394,18 @@ abstract class AppLocalizations {
   /// **'Account Type'**
   String get settings_accountType;
 
+  /// No description provided for @settings_thirdPartyApiAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Third-party Site API'**
+  String get settings_thirdPartyApiAccount;
+
+  /// No description provided for @settings_apiSite.
+  ///
+  /// In en, this message translates to:
+  /// **'API Site'**
+  String get settings_apiSite;
+
   /// No description provided for @settings_notLoggedIn.
   ///
   /// In en, this message translates to:
@@ -1555,6 +1639,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'History Records'**
   String get generation_historyRecord;
+
+  /// No description provided for @generation_failedStreamSnapshot.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed snapshot'**
+  String get generation_failedStreamSnapshot;
+
+  /// No description provided for @generation_failedStreamSnapshotHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Generation did not finish; only the last preview frame is kept. It cannot be saved, favorited, or used for image workflows.'**
+  String get generation_failedStreamSnapshotHint;
 
   /// No description provided for @generation_noHistory.
   ///
@@ -4934,6 +5030,12 @@ abstract class AppLocalizations {
   /// **'Krita'**
   String get gallery_sendToKrita;
 
+  /// No description provided for @gallery_sendToKritaAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Send to Krita'**
+  String get gallery_sendToKritaAction;
+
   /// No description provided for @gallery_sendToConnectedKrita.
   ///
   /// In en, this message translates to:
@@ -7364,6 +7466,24 @@ abstract class AppLocalizations {
   /// **'Initializing Danbooru tags...'**
   String get warmup_danbooruTagsInit;
 
+  /// No description provided for @warmup_dataMigration.
+  ///
+  /// In en, this message translates to:
+  /// **'Migrating Hive / Vibe / image data...'**
+  String get warmup_dataMigration;
+
+  /// No description provided for @warmup_galleryDataSource.
+  ///
+  /// In en, this message translates to:
+  /// **'Initializing gallery index...'**
+  String get warmup_galleryDataSource;
+
+  /// No description provided for @warmup_checkAndRecoverData.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking data integrity...'**
+  String get warmup_checkAndRecoverData;
+
   /// No description provided for @warmup_group_dataSourceInitialization.
   ///
   /// In en, this message translates to:
@@ -7706,6 +7826,12 @@ abstract class AppLocalizations {
   /// **'Image to Image'**
   String get drop_img2img;
 
+  /// No description provided for @drop_reversePrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Reverse Prompt'**
+  String get drop_reversePrompt;
+
   /// No description provided for @drop_vibeTransfer.
   ///
   /// In en, this message translates to:
@@ -7729,6 +7855,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Added to Image to Image'**
   String get drop_addedToImg2Img;
+
+  /// No description provided for @drop_addedToReversePrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Added to Reverse Prompt'**
+  String get drop_addedToReversePrompt;
 
   /// No description provided for @drop_addedToVibe.
   ///
@@ -13443,17 +13575,35 @@ abstract class AppLocalizations {
   /// **'Filter by Resolution'**
   String get localGallery_filterByResolution;
 
+  /// No description provided for @localGallery_filterSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Precisely filter your image collection'**
+  String get localGallery_filterSubtitle;
+
   /// No description provided for @localGallery_model.
   ///
   /// In en, this message translates to:
   /// **'Model'**
   String get localGallery_model;
 
+  /// No description provided for @localGallery_modelHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter model name...'**
+  String get localGallery_modelHint;
+
   /// No description provided for @localGallery_sampler.
   ///
   /// In en, this message translates to:
   /// **'Sampler'**
   String get localGallery_sampler;
+
+  /// No description provided for @localGallery_samplerHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter sampler name...'**
+  String get localGallery_samplerHint;
 
   /// No description provided for @localGallery_steps.
   ///
@@ -13473,6 +13623,12 @@ abstract class AppLocalizations {
   /// **'Resolution'**
   String get localGallery_resolution;
 
+  /// No description provided for @localGallery_resolutionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Width x height (e.g. 1024x1024)'**
+  String get localGallery_resolutionHint;
+
   /// No description provided for @localGallery_any.
   ///
   /// In en, this message translates to:
@@ -13490,6 +13646,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'to'**
   String get localGallery_to;
+
+  /// No description provided for @localGallery_activeFiltersSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Filters set'**
+  String get localGallery_activeFiltersSet;
 
   /// No description provided for @localGallery_applyFilters.
   ///
@@ -17068,6 +17230,36 @@ abstract class AppLocalizations {
   /// **'Supported formats:'**
   String get queue_supportedFormats;
 
+  /// No description provided for @queue_supportedFormatJson.
+  ///
+  /// In en, this message translates to:
+  /// **'• JSON file (.json)'**
+  String get queue_supportedFormatJson;
+
+  /// No description provided for @queue_supportedFormatCsv.
+  ///
+  /// In en, this message translates to:
+  /// **'• CSV file (.csv)'**
+  String get queue_supportedFormatCsv;
+
+  /// No description provided for @queue_supportedFormatText.
+  ///
+  /// In en, this message translates to:
+  /// **'• Plain text file (.txt) - one prompt per line'**
+  String get queue_supportedFormatText;
+
+  /// No description provided for @queue_shareSubject.
+  ///
+  /// In en, this message translates to:
+  /// **'Queue Export'**
+  String get queue_shareSubject;
+
+  /// No description provided for @queue_unsupportedFileFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'Unsupported file format: {extension}'**
+  String queue_unsupportedFileFormat(Object extension);
+
   /// No description provided for @queue_exportSuccess.
   ///
   /// In en, this message translates to:
@@ -18388,6 +18580,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Customize Shortcuts'**
   String get shortcut_help_customize;
+
+  /// No description provided for @shortcut_help_all.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get shortcut_help_all;
+
+  /// No description provided for @shortcut_help_tip.
+  ///
+  /// In en, this message translates to:
+  /// **'Tip: press F1 or ? anytime to open this help dialog'**
+  String get shortcut_help_tip;
+
+  /// No description provided for @shortcut_help_fabTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Keyboard Shortcuts Help (F1)'**
+  String get shortcut_help_fabTooltip;
+
+  /// No description provided for @shortcut_editor_recordingInline.
+  ///
+  /// In en, this message translates to:
+  /// **'Press shortcut...'**
+  String get shortcut_editor_recordingInline;
+
+  /// No description provided for @shortcut_editor_pressEscToCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Press Esc to cancel'**
+  String get shortcut_editor_pressEscToCancel;
+
+  /// No description provided for @shortcut_editor_clickToRecord.
+  ///
+  /// In en, this message translates to:
+  /// **'Click to start recording'**
+  String get shortcut_editor_clickToRecord;
+
+  /// No description provided for @shortcut_editor_conflictWith.
+  ///
+  /// In en, this message translates to:
+  /// **'This shortcut conflicts with \"{action}\"'**
+  String shortcut_editor_conflictWith(Object action);
 
   /// No description provided for @drop_extractMetadata.
   ///
@@ -21563,6 +21797,744 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{hours} hours ago'**
   String common_hoursAgo(Object hours);
+
+  /// No description provided for @common_saving.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving...'**
+  String get common_saving;
+
+  /// No description provided for @common_pleaseWait.
+  ///
+  /// In en, this message translates to:
+  /// **'Please wait'**
+  String get common_pleaseWait;
+
+  /// No description provided for @common_change.
+  ///
+  /// In en, this message translates to:
+  /// **'Change'**
+  String get common_change;
+
+  /// No description provided for @common_expand.
+  ///
+  /// In en, this message translates to:
+  /// **'Expand'**
+  String get common_expand;
+
+  /// No description provided for @common_collapse.
+  ///
+  /// In en, this message translates to:
+  /// **'Collapse'**
+  String get common_collapse;
+
+  /// No description provided for @vibeLibrary_emptySearchTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching Vibes'**
+  String get vibeLibrary_emptySearchTitle;
+
+  /// No description provided for @vibeLibrary_emptySearchSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Try a different keyword'**
+  String get vibeLibrary_emptySearchSubtitle;
+
+  /// No description provided for @vibeLibrary_emptyFavoritesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No favorite Vibes yet'**
+  String get vibeLibrary_emptyFavoritesTitle;
+
+  /// No description provided for @vibeLibrary_emptyFavoritesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Click the heart icon to favorite a Vibe'**
+  String get vibeLibrary_emptyFavoritesSubtitle;
+
+  /// No description provided for @vibeLibrary_emptyCategoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No Vibes in this category'**
+  String get vibeLibrary_emptyCategoryTitle;
+
+  /// No description provided for @vibeLibrary_emptyCategorySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to \"All Vibes\" to see all entries'**
+  String get vibeLibrary_emptyCategorySubtitle;
+
+  /// No description provided for @vibeLibrary_emptyNoMatchesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching results'**
+  String get vibeLibrary_emptyNoMatchesTitle;
+
+  /// No description provided for @vibeLibrary_emptySaveFromGenerationHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Vibes from the generation page to add them to the library'**
+  String get vibeLibrary_emptySaveFromGenerationHint;
+
+  /// No description provided for @vibe_nameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Name is required'**
+  String get vibe_nameRequired;
+
+  /// No description provided for @vibe_import_namingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Name Vibe'**
+  String get vibe_import_namingTitle;
+
+  /// No description provided for @vibe_import_nameConflictOverwrite.
+  ///
+  /// In en, this message translates to:
+  /// **'This name already exists and will be overwritten'**
+  String get vibe_import_nameConflictOverwrite;
+
+  /// No description provided for @vibe_previewLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load preview'**
+  String get vibe_previewLoadFailed;
+
+  /// No description provided for @vibe_import_applyToRemainingFiles.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply to all remaining files'**
+  String get vibe_import_applyToRemainingFiles;
+
+  /// No description provided for @vibe_import_applyNamingToRemainingFiles.
+  ///
+  /// In en, this message translates to:
+  /// **'Use this naming rule for the remaining files'**
+  String get vibe_import_applyNamingToRemainingFiles;
+
+  /// No description provided for @vibe_encodeImageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Encode Image as Vibe'**
+  String get vibe_encodeImageTitle;
+
+  /// No description provided for @vibe_imagePreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Image preview'**
+  String get vibe_imagePreview;
+
+  /// No description provided for @vibe_encodeStartButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Encoding'**
+  String get vibe_encodeStartButton;
+
+  /// No description provided for @vibe_encodeImageInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Encoding image...'**
+  String get vibe_encodeImageInProgress;
+
+  /// No description provided for @vibe_encodeErrorImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Image: {fileName}'**
+  String vibe_encodeErrorImage(Object fileName);
+
+  /// No description provided for @vibe_encodeErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Error: {error}'**
+  String vibe_encodeErrorMessage(Object error);
+
+  /// No description provided for @vibe_encodeSkipImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip this image'**
+  String get vibe_encodeSkipImage;
+
+  /// No description provided for @detail_sendToImg2Img.
+  ///
+  /// In en, this message translates to:
+  /// **'Send to Image-to-Image'**
+  String get detail_sendToImg2Img;
+
+  /// No description provided for @detail_sendToReversePrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Send to Reverse Prompt'**
+  String get detail_sendToReversePrompt;
+
+  /// No description provided for @detail_loadingImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading image...'**
+  String get detail_loadingImage;
+
+  /// No description provided for @detail_imageLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load image'**
+  String get detail_imageLoadFailed;
+
+  /// No description provided for @detail_noImage.
+  ///
+  /// In en, this message translates to:
+  /// **'No image'**
+  String get detail_noImage;
+
+  /// No description provided for @detail_parsingMetadata.
+  ///
+  /// In en, this message translates to:
+  /// **'Parsing metadata...'**
+  String get detail_parsingMetadata;
+
+  /// No description provided for @detail_noMetadata.
+  ///
+  /// In en, this message translates to:
+  /// **'This image has no metadata'**
+  String get detail_noMetadata;
+
+  /// No description provided for @detail_metadata.
+  ///
+  /// In en, this message translates to:
+  /// **'Metadata'**
+  String get detail_metadata;
+
+  /// No description provided for @detail_imageDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Image Details'**
+  String get detail_imageDetails;
+
+  /// No description provided for @detail_basicInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Basic Info'**
+  String get detail_basicInfo;
+
+  /// No description provided for @detail_fileName.
+  ///
+  /// In en, this message translates to:
+  /// **'File Name'**
+  String get detail_fileName;
+
+  /// No description provided for @detail_modifiedTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Modified'**
+  String get detail_modifiedTime;
+
+  /// No description provided for @detail_fileSize.
+  ///
+  /// In en, this message translates to:
+  /// **'File Size'**
+  String get detail_fileSize;
+
+  /// No description provided for @detail_noContent.
+  ///
+  /// In en, this message translates to:
+  /// **'(No content)'**
+  String get detail_noContent;
+
+  /// No description provided for @detail_savePreset.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Preset'**
+  String get detail_savePreset;
+
+  /// No description provided for @detail_copyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy {label}'**
+  String detail_copyLabel(Object label);
+
+  /// No description provided for @detail_copyCharacterPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy Character Prompt'**
+  String get detail_copyCharacterPrompt;
+
+  /// No description provided for @detail_copyAllVibeData.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy all Vibe data'**
+  String get detail_copyAllVibeData;
+
+  /// No description provided for @detail_saveToVibeLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Save to Vibe Library'**
+  String get detail_saveToVibeLibrary;
+
+  /// No description provided for @pagination_firstPage.
+  ///
+  /// In en, this message translates to:
+  /// **'First page'**
+  String get pagination_firstPage;
+
+  /// No description provided for @pagination_previousPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous page'**
+  String get pagination_previousPage;
+
+  /// No description provided for @pagination_nextPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Next page'**
+  String get pagination_nextPage;
+
+  /// No description provided for @pagination_lastPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Last page'**
+  String get pagination_lastPage;
+
+  /// No description provided for @pagination_jumpToPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Jump to page'**
+  String get pagination_jumpToPage;
+
+  /// No description provided for @pagination_jump.
+  ///
+  /// In en, this message translates to:
+  /// **'Jump'**
+  String get pagination_jump;
+
+  /// No description provided for @pagination_itemsPerPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Per page'**
+  String get pagination_itemsPerPage;
+
+  /// No description provided for @pagination_itemUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'items'**
+  String get pagination_itemUnit;
+
+  /// No description provided for @diyGuide_title.
+  ///
+  /// In en, this message translates to:
+  /// **'DIY Feature Guide'**
+  String get diyGuide_title;
+
+  /// No description provided for @diyGuide_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Learn advanced features and create your own library'**
+  String get diyGuide_subtitle;
+
+  /// No description provided for @diyGuide_intro.
+  ///
+  /// In en, this message translates to:
+  /// **'This guide explains the core concepts and advanced features of the DIY system, helping you build powerful dynamic prompt libraries.'**
+  String get diyGuide_intro;
+
+  /// No description provided for @diyGuide_exampleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Example'**
+  String get diyGuide_exampleLabel;
+
+  /// No description provided for @diyGuide_hierarchyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Hierarchy'**
+  String get diyGuide_hierarchyTitle;
+
+  /// No description provided for @diyGuide_hierarchyDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'The DIY system uses a three-level category structure to organize prompts for easier management and lookup.'**
+  String get diyGuide_hierarchyDescription;
+
+  /// No description provided for @diyGuide_hierarchyExample.
+  ///
+  /// In en, this message translates to:
+  /// **'Category: Character features\n  -> Group: Hairstyle\n      -> Tag: long hair, short hair, twintails'**
+  String get diyGuide_hierarchyExample;
+
+  /// No description provided for @diyGuide_selectionModeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Selection Mode'**
+  String get diyGuide_selectionModeTitle;
+
+  /// No description provided for @diyGuide_selectionModeDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Controls how many tags are selected from a group.'**
+  String get diyGuide_selectionModeDescription;
+
+  /// No description provided for @diyGuide_selectionModeExample.
+  ///
+  /// In en, this message translates to:
+  /// **'• Random: select one item each time, such as a random hair color\n• All: select every tag in the group, such as a fixed feature set'**
+  String get diyGuide_selectionModeExample;
+
+  /// No description provided for @diyGuide_weightTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight Control'**
+  String get diyGuide_weightTitle;
+
+  /// No description provided for @diyGuide_weightDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjusts the influence of specific prompts during generation.'**
+  String get diyGuide_weightDescription;
+
+  /// No description provided for @diyGuide_weightExample.
+  ///
+  /// In en, this message translates to:
+  /// **'• Boost: curly brackets around masterpiece = 1.05x weight\n• Strong boost: triple curly brackets around masterpiece = 1.16x weight\n• Weaken: [bad hands] = 0.95x weight'**
+  String get diyGuide_weightExample;
+
+  /// No description provided for @diyGuide_genderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Gender Restriction'**
+  String get diyGuide_genderTitle;
+
+  /// No description provided for @diyGuide_genderDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Limits tags to specific character genders to avoid incompatible generated features.'**
+  String get diyGuide_genderDescription;
+
+  /// No description provided for @diyGuide_genderExample.
+  ///
+  /// In en, this message translates to:
+  /// **'• Female: only female characters, such as skirt\n• Male: only male characters, such as beard\n• Any: universal, such as T-shirt'**
+  String get diyGuide_genderExample;
+
+  /// No description provided for @diyGuide_scopeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Scope'**
+  String get diyGuide_scopeTitle;
+
+  /// No description provided for @diyGuide_scopeDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Defines whether a tag applies to the character, background, or the whole image.'**
+  String get diyGuide_scopeDescription;
+
+  /// No description provided for @diyGuide_scopeExample.
+  ///
+  /// In en, this message translates to:
+  /// **'• Character: character features, such as eyes and hair\n• Background: environment descriptions, such as blue sky and indoors\n• Global: art style and quality tags, such as best quality'**
+  String get diyGuide_scopeExample;
+
+  /// No description provided for @diyGuide_conditionalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Conditional Branch'**
+  String get diyGuide_conditionalTitle;
+
+  /// No description provided for @diyGuide_conditionalDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Dynamically chooses later tags based on selected tags or other conditions.'**
+  String get diyGuide_conditionalDescription;
+
+  /// No description provided for @diyGuide_conditionalExample.
+  ///
+  /// In en, this message translates to:
+  /// **'IF selected \"rain\"\n  THEN add \"umbrella\" and \"wet clothes\"\n  ELSE add \"sunny\"'**
+  String get diyGuide_conditionalExample;
+
+  /// No description provided for @diyGuide_dependenciesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Dependencies'**
+  String get diyGuide_dependenciesTitle;
+
+  /// No description provided for @diyGuide_dependenciesDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Creates links between tags so related tags are automatically introduced when one tag is selected.'**
+  String get diyGuide_dependenciesDescription;
+
+  /// No description provided for @diyGuide_dependenciesExample.
+  ///
+  /// In en, this message translates to:
+  /// **'Selecting \"JK uniform\" -> automatically adds \"school background\" and \"school bag\"'**
+  String get diyGuide_dependenciesExample;
+
+  /// No description provided for @diyGuide_visibilityTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Visibility Rules'**
+  String get diyGuide_visibilityTitle;
+
+  /// No description provided for @diyGuide_visibilityDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Controls when tags are shown in the UI or become active during generation.'**
+  String get diyGuide_visibilityDescription;
+
+  /// No description provided for @diyGuide_visibilityExample.
+  ///
+  /// In en, this message translates to:
+  /// **'Only show the \"magic wand\" option group when the \"magical girl\" category is selected'**
+  String get diyGuide_visibilityExample;
+
+  /// No description provided for @diyGuide_timeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Time Condition'**
+  String get diyGuide_timeTitle;
+
+  /// No description provided for @diyGuide_timeDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Triggers specific tags based on real time or configured simulated time.'**
+  String get diyGuide_timeDescription;
+
+  /// No description provided for @diyGuide_timeExample.
+  ///
+  /// In en, this message translates to:
+  /// **'• 06:00-18:00 -> add \"daylight\"\n• 18:00-06:00 -> add \"night\"'**
+  String get diyGuide_timeExample;
+
+  /// No description provided for @diyGuide_postProcessingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Post-processing Rules'**
+  String get diyGuide_postProcessingTitle;
+
+  /// No description provided for @diyGuide_postProcessingDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Runs text replacement or cleanup at the final stage of prompt generation.'**
+  String get diyGuide_postProcessingDescription;
+
+  /// No description provided for @diyGuide_postProcessingExample.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace every \"blue eyes\" with \"azure eyes\" for a more distinctive description'**
+  String get diyGuide_postProcessingExample;
+
+  /// No description provided for @diyGuide_emphasisTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Emphasis Probability'**
+  String get diyGuide_emphasisTitle;
+
+  /// No description provided for @diyGuide_emphasisDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Randomly adds weight syntax to tags to increase output variety.'**
+  String get diyGuide_emphasisDescription;
+
+  /// No description provided for @diyGuide_emphasisExample.
+  ///
+  /// In en, this message translates to:
+  /// **'Set a 30% probability: about 1/3 of outputs use a weighted tag and 2/3 output the plain tag'**
+  String get diyGuide_emphasisExample;
+
+  /// No description provided for @naiRules_title.
+  ///
+  /// In en, this message translates to:
+  /// **'NAI Random Rules'**
+  String get naiRules_title;
+
+  /// No description provided for @naiRules_characterCountProbability.
+  ///
+  /// In en, this message translates to:
+  /// **'Character Count Probability'**
+  String get naiRules_characterCountProbability;
+
+  /// No description provided for @naiRules_solo.
+  ///
+  /// In en, this message translates to:
+  /// **'1 person (Solo)'**
+  String get naiRules_solo;
+
+  /// No description provided for @naiRules_duo.
+  ///
+  /// In en, this message translates to:
+  /// **'2 people (Duo)'**
+  String get naiRules_duo;
+
+  /// No description provided for @naiRules_trio.
+  ///
+  /// In en, this message translates to:
+  /// **'3 people (Trio)'**
+  String get naiRules_trio;
+
+  /// No description provided for @naiRules_group.
+  ///
+  /// In en, this message translates to:
+  /// **'4 people (Group)'**
+  String get naiRules_group;
+
+  /// No description provided for @naiRules_genderRules.
+  ///
+  /// In en, this message translates to:
+  /// **'Gender Rules'**
+  String get naiRules_genderRules;
+
+  /// No description provided for @naiRules_female.
+  ///
+  /// In en, this message translates to:
+  /// **'Female'**
+  String get naiRules_female;
+
+  /// No description provided for @naiRules_male.
+  ///
+  /// In en, this message translates to:
+  /// **'Male'**
+  String get naiRules_male;
+
+  /// No description provided for @naiRules_mixed.
+  ///
+  /// In en, this message translates to:
+  /// **'Mixed / Other'**
+  String get naiRules_mixed;
+
+  /// No description provided for @naiRules_categoryProbability.
+  ///
+  /// In en, this message translates to:
+  /// **'Category Probability'**
+  String get naiRules_categoryProbability;
+
+  /// No description provided for @naiRules_dynamicTagWeightTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Dynamic Tag Weight Adjustment'**
+  String get naiRules_dynamicTagWeightTitle;
+
+  /// No description provided for @naiRules_dynamicTagWeightSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Randomly combines multiple dimensions such as action, clothing, expression, and background, then adjusts category weights based on the image theme.'**
+  String get naiRules_dynamicTagWeightSubtitle;
+
+  /// No description provided for @naiRules_specialMechanisms.
+  ///
+  /// In en, this message translates to:
+  /// **'Special Mechanisms'**
+  String get naiRules_specialMechanisms;
+
+  /// No description provided for @naiRules_tagStrengthening.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag Strengthening'**
+  String get naiRules_tagStrengthening;
+
+  /// No description provided for @naiRules_seasonalLibraryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Seasonal Library'**
+  String get naiRules_seasonalLibraryTitle;
+
+  /// No description provided for @naiRules_seasonalLibrarySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatically matches seasonal features, including seasonal clothing, weather, lighting, and atmosphere.'**
+  String get naiRules_seasonalLibrarySubtitle;
+
+  /// No description provided for @naiRules_v4CharacterPositioning.
+  ///
+  /// In en, this message translates to:
+  /// **'V4 Multi-character Positioning'**
+  String get naiRules_v4CharacterPositioning;
+
+  /// No description provided for @naiRules_smartPositionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Smart Position Assignment'**
+  String get naiRules_smartPositionTitle;
+
+  /// No description provided for @naiRules_smartPositionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'With V4 models, character positioning syntax is used to precisely control multi-character placement.'**
+  String get naiRules_smartPositionSubtitle;
+
+  /// No description provided for @comfyImport_detectedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Detected ComfyUI multi-character prompt'**
+  String get comfyImport_detectedTitle;
+
+  /// No description provided for @comfyImport_characterList.
+  ///
+  /// In en, this message translates to:
+  /// **'Character List ({count})'**
+  String comfyImport_characterList(Object count);
+
+  /// No description provided for @comfyImport_usePositionInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Use position information'**
+  String get comfyImport_usePositionInfo;
+
+  /// No description provided for @comfyImport_usePositionInfoSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Map ComfyUI regions to NAI character positions'**
+  String get comfyImport_usePositionInfoSubtitle;
+
+  /// No description provided for @comfyImport_convertCharacters.
+  ///
+  /// In en, this message translates to:
+  /// **'Convert {count} characters'**
+  String comfyImport_convertCharacters(Object count);
+
+  /// No description provided for @comfyImport_syntaxCouple.
+  ///
+  /// In en, this message translates to:
+  /// **'COUPLE syntax'**
+  String get comfyImport_syntaxCouple;
+
+  /// No description provided for @comfyImport_syntaxAndMask.
+  ///
+  /// In en, this message translates to:
+  /// **'AND+MASK syntax'**
+  String get comfyImport_syntaxAndMask;
+
+  /// No description provided for @comfyImport_syntaxPipe.
+  ///
+  /// In en, this message translates to:
+  /// **'Pipe format'**
+  String get comfyImport_syntaxPipe;
+
+  /// No description provided for @comfyImport_syntaxUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown syntax'**
+  String get comfyImport_syntaxUnknown;
+
+  /// No description provided for @comfyImport_globalPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Global Prompt'**
+  String get comfyImport_globalPrompt;
+
+  /// No description provided for @danbooruPreview_noTagData.
+  ///
+  /// In en, this message translates to:
+  /// **'No tag data'**
+  String get danbooruPreview_noTagData;
+
+  /// No description provided for @danbooruPreview_noPoolData.
+  ///
+  /// In en, this message translates to:
+  /// **'No Pool data'**
+  String get danbooruPreview_noPoolData;
+
+  /// No description provided for @danbooruPreview_postCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} posts'**
+  String danbooruPreview_postCount(Object count);
 
   /// No description provided for @checkForUpdate.
   ///

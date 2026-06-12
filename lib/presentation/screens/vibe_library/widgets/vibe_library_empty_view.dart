@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:nai_launcher/core/utils/localization_extension.dart';
 
 /// Empty state view for Vibe library
 /// Vibe库空状态视图
 class VibeLibraryEmptyView extends StatelessWidget {
   /// Title text
   /// 标题文本
-  final String title;
+  final String? title;
 
   /// Subtitle text
   /// 副标题文本
-  final String subtitle;
+  final String? subtitle;
 
   /// Icon name to display (mapped to actual IconData in build)
   /// 显示的图标名称（在build中映射为实际IconData）
@@ -17,8 +18,8 @@ class VibeLibraryEmptyView extends StatelessWidget {
 
   const VibeLibraryEmptyView({
     super.key,
-    this.title = 'Vibe库为空',
-    this.subtitle = '从生成页面保存Vibe到库中',
+    this.title,
+    this.subtitle,
     this.iconName = 'auto_awesome_outlined',
   });
 
@@ -29,7 +30,7 @@ class VibeLibraryEmptyView extends StatelessWidget {
           name == 'favorite_border' ||
           name == 'folder_outlined' ||
           name == 'auto_awesome_outlined',
-      '未知的图标名称: $name。请使用有效的图标名称。',
+      'Unknown icon name: $name. Use a valid icon name.',
     );
     return switch (name) {
       'search_off' => Icons.search_off,
@@ -43,6 +44,10 @@ class VibeLibraryEmptyView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
+    final resolvedTitle = title ?? l10n.vibeLibrary_empty;
+    final resolvedSubtitle =
+        subtitle ?? l10n.vibeLibrary_emptySaveFromGenerationHint;
 
     return Center(
       child: Column(
@@ -55,14 +60,14 @@ class VibeLibraryEmptyView extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            title,
+            resolvedTitle,
             style: theme.textTheme.titleMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            subtitle,
+            resolvedSubtitle,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.outline,
             ),

@@ -652,13 +652,18 @@ class _ImagePreviewWidgetState extends ConsumerState<ImagePreviewWidget> {
           filePath: img.filePath!,
           cachedBytes: img.bytes,
           id: img.id,
+          initialMetadata: img.metadata,
+          showCopyButton: img.canSave,
         );
       }
 
       // 未保存的图像：使用 GeneratedImageDetailData 作为 fallback
       return GeneratedImageDetailData(
         imageBytes: img.bytes,
+        metadata: img.metadata,
         id: img.id,
+        showSaveButton: img.canSave,
+        showCopyButton: img.canSave,
       );
     }).toList();
 
@@ -670,7 +675,10 @@ class _ImagePreviewWidgetState extends ConsumerState<ImagePreviewWidget> {
       showMetadataPanel: true,
       showThumbnails: allImages.length > 1,
       callbacks: ImageDetailCallbacks(
-        onSave: (image) => _saveImage(context, image),
+        onSave: (image) async {
+          if (!image.showSaveButton) return;
+          await _saveImage(context, image);
+        },
       ),
     );
   }

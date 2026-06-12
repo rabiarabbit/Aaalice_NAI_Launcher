@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../core/utils/localization_extension.dart';
 import 'inset_shadow_container.dart';
 import 'themed_confirm_dialog.dart';
 
@@ -264,11 +265,13 @@ class _ThemedInputState extends State<ThemedInput> {
   Future<void> _handleClear() async {
     // 如果需要确认，显示对话框
     if (widget.clearNeedsConfirm) {
+      final l10n = context.l10n;
       final confirmed = await ThemedConfirmDialog.show(
         context: context,
-        title: '清空确认',
-        content: '确定要清空输入内容吗？',
-        confirmText: '清空',
+        title: l10n.common_confirmClear,
+        content: l10n.common_clearInputConfirm,
+        confirmText: l10n.common_clear,
+        cancelText: l10n.common_cancel,
         type: ThemedConfirmDialogType.warning,
         icon: Icons.clear_all,
       );

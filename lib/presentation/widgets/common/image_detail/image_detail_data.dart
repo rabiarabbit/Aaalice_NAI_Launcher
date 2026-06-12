@@ -36,6 +36,9 @@ abstract class ImageDetailData {
   /// 是否需要显示保存按钮（生成图像需要，本地图库不需要）
   bool get showSaveButton;
 
+  /// 是否需要显示复制按钮
+  bool get showCopyButton;
+
   /// 是否需要显示收藏按钮
   bool get showFavoriteButton;
 }
@@ -153,6 +156,9 @@ class LocalImageDetailData implements ImageDetailData {
   bool get showSaveButton => false;
 
   @override
+  bool get showCopyButton => true;
+
+  @override
   bool get showFavoriteButton => true;
 }
 
@@ -164,13 +170,19 @@ class GeneratedImageDetailData implements ImageDetailData {
   final Uint8List imageBytes;
   final NaiImageMetadata? _metadata;
   final String _id;
+  final bool _showSaveButton;
+  final bool _showCopyButton;
 
   GeneratedImageDetailData({
     required this.imageBytes,
     NaiImageMetadata? metadata,
     String? id,
+    bool showSaveButton = true,
+    bool showCopyButton = true,
   })  : _metadata = metadata,
-        _id = id ?? imageBytes.hashCode.toString();
+        _id = id ?? imageBytes.hashCode.toString(),
+        _showSaveButton = showSaveButton,
+        _showCopyButton = showCopyButton;
 
   @override
   ImageProvider getImageProvider() {
@@ -208,7 +220,10 @@ class GeneratedImageDetailData implements ImageDetailData {
   FileInfo? get fileInfo => null;
 
   @override
-  bool get showSaveButton => true;
+  bool get showSaveButton => _showSaveButton;
+
+  @override
+  bool get showCopyButton => _showCopyButton;
 
   @override
   bool get showFavoriteButton => false;

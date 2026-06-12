@@ -108,6 +108,25 @@ class AppLocalizationsZh extends AppLocalizations {
   String get common_confirmDelete => '确认删除';
 
   @override
+  String get common_confirmClear => '确认清空';
+
+  @override
+  String get common_gotIt => '知道了';
+
+  @override
+  String common_deleteItemConfirm(Object itemName) {
+    return '确定要删除「$itemName」吗？此操作不可撤销。';
+  }
+
+  @override
+  String common_clearAllItemsConfirm(Object count, Object itemType) {
+    return '确定要清空所有 $count 个$itemType吗？此操作不可撤销。';
+  }
+
+  @override
+  String get common_clearInputConfirm => '确定要清空输入内容吗？';
+
+  @override
   String get common_settings => '设置';
 
   @override
@@ -339,6 +358,28 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get auth_nicknameHint => '为此账号设置一个便于识别的名称';
+
+  @override
+  String get auth_thirdPartyApiSite => '第三方 API 站点';
+
+  @override
+  String get auth_imageApiSiteOptional => '图像 API 站点（可选）';
+
+  @override
+  String get auth_imageApiSiteHint => '留空则使用同一个第三方 API 站点';
+
+  @override
+  String get auth_thirdPartyNicknameHint => '例如：自建站点 / 镜像站点';
+
+  @override
+  String get auth_thirdPartyTokenHint => '请输入第三方站点提供的 API Token';
+
+  @override
+  String get auth_thirdPartyCompatibilityHint =>
+      '第三方站点需兼容 NovelAI 的 /user/subscription 与图像生成相关 API；Token 将按 Bearer 方式发送。';
+
+  @override
+  String get auth_thirdPartyApiSiteRequired => '请输入第三方 API 站点地址';
 
   @override
   String get auth_saveAccount => '保存此账号';
@@ -640,6 +681,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_accountType => '账号类型';
 
   @override
+  String get settings_thirdPartyApiAccount => '第三方站点 API';
+
+  @override
+  String get settings_apiSite => 'API 站点';
+
+  @override
   String get settings_notLoggedIn => '登录后可设置头像和昵称';
 
   @override
@@ -761,6 +808,13 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get generation_historyRecord => '历史记录';
+
+  @override
+  String get generation_failedStreamSnapshot => '失败快照';
+
+  @override
+  String get generation_failedStreamSnapshotHint =>
+      '生成未完成，仅保留最后一帧预览；不可保存、收藏或用于图生图';
 
   @override
   String get generation_noHistory => '暂无历史记录';
@@ -2604,6 +2658,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get gallery_sendToKrita => 'Krita';
 
   @override
+  String get gallery_sendToKritaAction => '发送到 Krita';
+
+  @override
   String get gallery_sendToConnectedKrita => '发送到已连接的 Krita 插件';
 
   @override
@@ -3921,6 +3978,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get warmup_danbooruTagsInit => '初始化 Danbooru 标签...';
 
   @override
+  String get warmup_dataMigration => '迁移 Hive / Vibe / 图片数据...';
+
+  @override
+  String get warmup_galleryDataSource => '初始化画廊索引...';
+
+  @override
+  String get warmup_checkAndRecoverData => '检查数据完整性...';
+
+  @override
   String get warmup_group_dataSourceInitialization => '初始化数据源服务...';
 
   @override
@@ -4094,6 +4160,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get drop_img2img => '图生图';
 
   @override
+  String get drop_reversePrompt => '反推';
+
+  @override
   String get drop_vibeTransfer => '风格迁移';
 
   @override
@@ -4104,6 +4173,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get drop_addedToImg2Img => '已添加到图生图';
+
+  @override
+  String get drop_addedToReversePrompt => '已添加到反推';
 
   @override
   String get drop_addedToVibe => '已添加到风格迁移';
@@ -7229,10 +7301,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get localGallery_filterByResolution => '按分辨率筛选';
 
   @override
+  String get localGallery_filterSubtitle => '精确筛选您的图片集合';
+
+  @override
   String get localGallery_model => '模型';
 
   @override
+  String get localGallery_modelHint => '输入模型名称...';
+
+  @override
   String get localGallery_sampler => '采样器';
+
+  @override
+  String get localGallery_samplerHint => '输入采样器名称...';
 
   @override
   String get localGallery_steps => '步数';
@@ -7244,6 +7325,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get localGallery_resolution => '分辨率';
 
   @override
+  String get localGallery_resolutionHint => '宽度x高度 (如: 1024x1024)';
+
+  @override
   String get localGallery_any => '任意';
 
   @override
@@ -7251,6 +7335,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get localGallery_to => '至';
+
+  @override
+  String get localGallery_activeFiltersSet => '已设置筛选';
 
   @override
   String get localGallery_applyFilters => '应用筛选';
@@ -9200,6 +9287,23 @@ class AppLocalizationsZh extends AppLocalizations {
   String get queue_supportedFormats => '支持的格式：';
 
   @override
+  String get queue_supportedFormatJson => '• JSON 文件 (.json)';
+
+  @override
+  String get queue_supportedFormatCsv => '• CSV 文件 (.csv)';
+
+  @override
+  String get queue_supportedFormatText => '• 纯文本文件 (.txt) - 每行一个提示词';
+
+  @override
+  String get queue_shareSubject => '队列导出';
+
+  @override
+  String queue_unsupportedFileFormat(Object extension) {
+    return '不支持的文件格式: $extension';
+  }
+
+  @override
   String get queue_exportSuccess => '导出成功';
 
   @override
@@ -9925,6 +10029,29 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get shortcut_help_customize => '自定义快捷键';
+
+  @override
+  String get shortcut_help_all => '全部';
+
+  @override
+  String get shortcut_help_tip => '提示：按 F1 或 ? 键可随时打开此帮助对话框';
+
+  @override
+  String get shortcut_help_fabTooltip => '快捷键帮助 (F1)';
+
+  @override
+  String get shortcut_editor_recordingInline => '按快捷键...';
+
+  @override
+  String get shortcut_editor_pressEscToCancel => '按 Esc 取消';
+
+  @override
+  String get shortcut_editor_clickToRecord => '点击开始录制';
+
+  @override
+  String shortcut_editor_conflictWith(Object action) {
+    return '此快捷键与 \"$action\" 冲突';
+  }
 
   @override
   String get drop_extractMetadata => '提取元数据';
@@ -11722,6 +11849,401 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String common_hoursAgo(Object hours) {
     return '$hours小时前';
+  }
+
+  @override
+  String get common_saving => '保存中...';
+
+  @override
+  String get common_pleaseWait => '请稍候';
+
+  @override
+  String get common_change => '更换';
+
+  @override
+  String get common_expand => '展开';
+
+  @override
+  String get common_collapse => '收起';
+
+  @override
+  String get vibeLibrary_emptySearchTitle => '未找到匹配的 Vibe';
+
+  @override
+  String get vibeLibrary_emptySearchSubtitle => '尝试其他关键词';
+
+  @override
+  String get vibeLibrary_emptyFavoritesTitle => '暂无收藏的 Vibe';
+
+  @override
+  String get vibeLibrary_emptyFavoritesSubtitle => '点击心形图标收藏 Vibe';
+
+  @override
+  String get vibeLibrary_emptyCategoryTitle => '该分类下暂无 Vibe';
+
+  @override
+  String get vibeLibrary_emptyCategorySubtitle => '尝试切换到\"全部 Vibe\"查看所有内容';
+
+  @override
+  String get vibeLibrary_emptyNoMatchesTitle => '无匹配结果';
+
+  @override
+  String get vibeLibrary_emptySaveFromGenerationHint => '从生成页面保存Vibe到库中';
+
+  @override
+  String get vibe_nameRequired => '名称不能为空';
+
+  @override
+  String get vibe_import_namingTitle => '命名 Vibe';
+
+  @override
+  String get vibe_import_nameConflictOverwrite => '该名称已存在，将被覆盖';
+
+  @override
+  String get vibe_previewLoadFailed => '预览加载失败';
+
+  @override
+  String get vibe_import_applyToRemainingFiles => '应用到后续所有文件';
+
+  @override
+  String get vibe_import_applyNamingToRemainingFiles => '使用此命名规则处理剩余文件';
+
+  @override
+  String get vibe_encodeImageTitle => '编码图片为 Vibe';
+
+  @override
+  String get vibe_imagePreview => '图片预览';
+
+  @override
+  String get vibe_encodeStartButton => '开始编码';
+
+  @override
+  String get vibe_encodeImageInProgress => '正在编码图片...';
+
+  @override
+  String vibe_encodeErrorImage(Object fileName) {
+    return '图片: $fileName';
+  }
+
+  @override
+  String vibe_encodeErrorMessage(Object error) {
+    return '错误: $error';
+  }
+
+  @override
+  String get vibe_encodeSkipImage => '跳过此图';
+
+  @override
+  String get detail_sendToImg2Img => '发送到图生图';
+
+  @override
+  String get detail_sendToReversePrompt => '发送到反推';
+
+  @override
+  String get detail_loadingImage => '加载图片中...';
+
+  @override
+  String get detail_imageLoadFailed => '无法加载图片';
+
+  @override
+  String get detail_noImage => '无图片';
+
+  @override
+  String get detail_parsingMetadata => '正在解析元数据...';
+
+  @override
+  String get detail_noMetadata => '此图片无元数据';
+
+  @override
+  String get detail_metadata => '元数据';
+
+  @override
+  String get detail_imageDetails => '图片详情';
+
+  @override
+  String get detail_basicInfo => '基本信息';
+
+  @override
+  String get detail_fileName => '文件名';
+
+  @override
+  String get detail_modifiedTime => '修改时间';
+
+  @override
+  String get detail_fileSize => '文件大小';
+
+  @override
+  String get detail_noContent => '(无内容)';
+
+  @override
+  String get detail_savePreset => '保存预设';
+
+  @override
+  String detail_copyLabel(Object label) {
+    return '复制$label';
+  }
+
+  @override
+  String get detail_copyCharacterPrompt => '复制角色提示词';
+
+  @override
+  String get detail_copyAllVibeData => '复制全部 Vibe 数据';
+
+  @override
+  String get detail_saveToVibeLibrary => '保存到 Vibe 库';
+
+  @override
+  String get pagination_firstPage => '首页';
+
+  @override
+  String get pagination_previousPage => '上一页';
+
+  @override
+  String get pagination_nextPage => '下一页';
+
+  @override
+  String get pagination_lastPage => '末页';
+
+  @override
+  String get pagination_jumpToPage => '跳转到页面';
+
+  @override
+  String get pagination_jump => '跳转';
+
+  @override
+  String get pagination_itemsPerPage => '每页';
+
+  @override
+  String get pagination_itemUnit => '项';
+
+  @override
+  String get diyGuide_title => 'DIY 功能指南';
+
+  @override
+  String get diyGuide_subtitle => '了解高级功能，创建专属词库';
+
+  @override
+  String get diyGuide_intro => '本指南介绍了 DIY 系统的核心概念和高级功能，帮助您构建强大的动态提示词库。';
+
+  @override
+  String get diyGuide_exampleLabel => '示例';
+
+  @override
+  String get diyGuide_hierarchyTitle => '层级结构 (Hierarchy)';
+
+  @override
+  String get diyGuide_hierarchyDescription => 'DIY 系统采用三级分类结构来组织提示词，便于管理和检索。';
+
+  @override
+  String get diyGuide_hierarchyExample =>
+      'Category (分类): 角色特征\n  -> Group (分组): 发型\n      -> Tag (标签): 长发, 短发, 双马尾';
+
+  @override
+  String get diyGuide_selectionModeTitle => '选择模式 (Selection Mode)';
+
+  @override
+  String get diyGuide_selectionModeDescription => '决定从一个分组(Group)中选取多少个标签。';
+
+  @override
+  String get diyGuide_selectionModeExample =>
+      '• Random (随机): 每次随机选取一个 (如：随机发色)\n• All (全选): 选取组内所有标签 (如：固定特征组合)';
+
+  @override
+  String get diyGuide_weightTitle => '权重控制 (Weight)';
+
+  @override
+  String get diyGuide_weightDescription => '调整特定提示词在生成过程中的影响力。';
+
+  @override
+  String get diyGuide_weightExample =>
+      '• 增强: 用花括号包裹 masterpiece = 1.05 倍权重\n• 强力增强: 三层花括号包裹 masterpiece = 1.16 倍权重\n• 减弱: [bad hands] = 0.95 倍权重';
+
+  @override
+  String get diyGuide_genderTitle => '性别限制 (Gender)';
+
+  @override
+  String get diyGuide_genderDescription => '限制标签仅对特定性别的角色生效，避免生成错误的特征。';
+
+  @override
+  String get diyGuide_genderExample =>
+      '• Female: 仅女性角色可用 (如：裙子)\n• Male: 仅男性角色可用 (如：胡须)\n• Any: 通用 (如：T恤)';
+
+  @override
+  String get diyGuide_scopeTitle => '作用域 (Scope)';
+
+  @override
+  String get diyGuide_scopeDescription => '定义标签是作用于角色本身、背景环境还是全局画面。';
+
+  @override
+  String get diyGuide_scopeExample =>
+      '• Character: 角色特征 (眼睛, 头发)\n• Background: 环境描述 (蓝天, 室内)\n• Global: 画风, 质量词 (best quality)';
+
+  @override
+  String get diyGuide_conditionalTitle => '条件分支 (Conditional)';
+
+  @override
+  String get diyGuide_conditionalDescription => '基于已选标签或其他条件来动态决定后续标签。';
+
+  @override
+  String get diyGuide_conditionalExample =>
+      'IF (已选 \"下雨\")\n  THEN 添加 \"雨伞\", \"湿衣服\"\n  ELSE 添加 \"晴朗\"';
+
+  @override
+  String get diyGuide_dependenciesTitle => '依赖引用 (Dependencies)';
+
+  @override
+  String get diyGuide_dependenciesDescription =>
+      '建立标签间的关联，选中一个标签时自动引入相关联的其他标签。';
+
+  @override
+  String get diyGuide_dependenciesExample =>
+      '选中 \"JK制服\" -> 自动引入 \"学校背景\", \"书包\"';
+
+  @override
+  String get diyGuide_visibilityTitle => '可见性规则 (Visibility)';
+
+  @override
+  String get diyGuide_visibilityDescription => '控制标签在界面上的显示条件，或在生成时的生效条件。';
+
+  @override
+  String get diyGuide_visibilityExample => '仅当选中 \"魔法少女\" 分类时，显示 \"魔杖\" 选项组';
+
+  @override
+  String get diyGuide_timeTitle => '时间条件 (Time)';
+
+  @override
+  String get diyGuide_timeDescription => '根据现实时间或设定的模拟时间触发特定标签。';
+
+  @override
+  String get diyGuide_timeExample =>
+      '• 06:00-18:00 -> 添加 \"daylight\"\n• 18:00-06:00 -> 添加 \"night\"';
+
+  @override
+  String get diyGuide_postProcessingTitle => '后处理规则 (Post-processing)';
+
+  @override
+  String get diyGuide_postProcessingDescription => '在提示词生成最后阶段进行文本替换或清理。';
+
+  @override
+  String get diyGuide_postProcessingExample =>
+      '将所有 \"blue eyes\" 替换为 \"azure eyes\" 以获得更独特的描述';
+
+  @override
+  String get diyGuide_emphasisTitle => '强调概率 (Emphasis)';
+
+  @override
+  String get diyGuide_emphasisDescription => '为标签随机添加权重符号的概率，增加结果的多样性。';
+
+  @override
+  String get diyGuide_emphasisExample =>
+      '设置 30% 概率: 约有 1/3 的机会输出加权 tag，2/3 的机会输出普通 tag';
+
+  @override
+  String get naiRules_title => 'NAI 随机规则说明';
+
+  @override
+  String get naiRules_characterCountProbability => '角色数量概率';
+
+  @override
+  String get naiRules_solo => '1人 (Solo)';
+
+  @override
+  String get naiRules_duo => '2人 (Duo)';
+
+  @override
+  String get naiRules_trio => '3人 (Trio)';
+
+  @override
+  String get naiRules_group => '4人 (Group)';
+
+  @override
+  String get naiRules_genderRules => '性别规则';
+
+  @override
+  String get naiRules_female => '女性 (Female)';
+
+  @override
+  String get naiRules_male => '男性 (Male)';
+
+  @override
+  String get naiRules_mixed => '混合/其他 (Mixed)';
+
+  @override
+  String get naiRules_categoryProbability => '类别概率';
+
+  @override
+  String get naiRules_dynamicTagWeightTitle => '标签权重动态调整';
+
+  @override
+  String get naiRules_dynamicTagWeightSubtitle =>
+      '包含动作、服饰、表情、背景等多个维度的随机组合，根据画面主题动态调整各类别的抽取权重';
+
+  @override
+  String get naiRules_specialMechanisms => '特殊机制';
+
+  @override
+  String get naiRules_tagStrengthening => '强调机制 (Tag Strengthening)';
+
+  @override
+  String get naiRules_seasonalLibraryTitle => '季节词库';
+
+  @override
+  String get naiRules_seasonalLibrarySubtitle =>
+      '自动匹配季节特征，包含季节性服饰、天气、光照效果和环境氛围';
+
+  @override
+  String get naiRules_v4CharacterPositioning => 'V4 多角色位置';
+
+  @override
+  String get naiRules_smartPositionTitle => '智能位置分配';
+
+  @override
+  String get naiRules_smartPositionSubtitle =>
+      '在 V4 模型下，使用 character positioning 语法精确控制多角色站位';
+
+  @override
+  String get comfyImport_detectedTitle => '检测到 ComfyUI 多角色提示词';
+
+  @override
+  String comfyImport_characterList(Object count) {
+    return '角色列表 ($count)';
+  }
+
+  @override
+  String get comfyImport_usePositionInfo => '使用位置信息';
+
+  @override
+  String get comfyImport_usePositionInfoSubtitle => '将 ComfyUI 区域映射为 NAI 角色位置';
+
+  @override
+  String comfyImport_convertCharacters(Object count) {
+    return '转换 $count 个角色';
+  }
+
+  @override
+  String get comfyImport_syntaxCouple => 'COUPLE 语法';
+
+  @override
+  String get comfyImport_syntaxAndMask => 'AND+MASK 语法';
+
+  @override
+  String get comfyImport_syntaxPipe => '竖线格式';
+
+  @override
+  String get comfyImport_syntaxUnknown => '未知语法';
+
+  @override
+  String get comfyImport_globalPrompt => '全局提示词';
+
+  @override
+  String get danbooruPreview_noTagData => '暂无标签数据';
+
+  @override
+  String get danbooruPreview_noPoolData => '暂无 Pool 数据';
+
+  @override
+  String danbooruPreview_postCount(Object count) {
+    return '$count 个帖子';
   }
 
   @override

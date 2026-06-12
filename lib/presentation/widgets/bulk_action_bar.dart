@@ -51,11 +51,11 @@ class BulkActionBar extends StatelessWidget {
     this.onSelectAllAvailable,
     this.actions = const [],
     this.isVibeLibrary = false,
-    this.itemName = '项',
-    this.selectAllLabel = '全选',
-    this.deselectAllLabel = '取消全选',
-    this.selectAllAvailableLabel = '选择全部',
-    this.deselectAllAvailableLabel = '取消全部',
+    this.itemName = 'items',
+    this.selectAllLabel = 'Select all',
+    this.deselectAllLabel = 'Deselect all',
+    this.selectAllAvailableLabel = 'Select all',
+    this.deselectAllAvailableLabel = 'Deselect all',
   });
 
   @override
@@ -85,7 +85,7 @@ class BulkActionBar extends StatelessWidget {
               // 退出按钮
               _ActionButton(
                 icon: Icons.close,
-                label: '退出',
+                label: 'Exit',
                 onPressed: onExit,
                 compact: true,
               ),
@@ -101,7 +101,7 @@ class BulkActionBar extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  '已选择 $selectedCount $itemName',
+                  'Selected $selectedCount $itemName',
                   style: theme.textTheme.labelLarge?.copyWith(
                     color: theme.colorScheme.onPrimaryContainer,
                     fontWeight: FontWeight.w600,
@@ -198,7 +198,7 @@ class VibeBulkActions {
   }) {
     return BulkActionItem(
       icon: Icons.send,
-      label: '发送到生成',
+      label: 'Send to Generation',
       onPressed: onPressed,
       color: color,
     );
@@ -211,7 +211,7 @@ class VibeBulkActions {
   }) {
     return BulkActionItem(
       icon: Icons.drive_file_move_outline,
-      label: '移动',
+      label: 'Move',
       onPressed: onPressed,
       color: color,
     );
@@ -224,7 +224,7 @@ class VibeBulkActions {
   }) {
     return BulkActionItem(
       icon: Icons.edit_note,
-      label: '编辑标签',
+      label: 'Edit Tags',
       onPressed: onPressed,
       color: color,
     );
@@ -237,7 +237,7 @@ class VibeBulkActions {
   }) {
     return BulkActionItem(
       icon: Icons.inventory_2_outlined,
-      label: '导出Bundle',
+      label: 'Export Bundle',
       onPressed: onPressed,
       color: color,
     );
@@ -250,7 +250,7 @@ class VibeBulkActions {
   }) {
     return BulkActionItem(
       icon: Icons.favorite_border,
-      label: '收藏',
+      label: 'Favorite',
       onPressed: onPressed,
       color: color,
     );
@@ -264,7 +264,7 @@ class VibeBulkActions {
   }) {
     return BulkActionItem(
       icon: Icons.delete_outline,
-      label: '删除',
+      label: 'Delete',
       onPressed: onPressed,
       color: color,
       isDanger: true,

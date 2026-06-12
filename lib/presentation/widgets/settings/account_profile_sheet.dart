@@ -418,7 +418,7 @@ class _AccountProfileBottomSheetState
           icon: Icons.account_circle_outlined,
           label: context.l10n.settings_accountType,
           value: isThirdParty
-              ? '第三方站点 API'
+              ? context.l10n.settings_thirdPartyApiAccount
               : currentAccount.accountType == AccountType.credentials
                   ? context.l10n.settings_emailAccount
                   : context.l10n.settings_tokenAccount,
@@ -428,7 +428,7 @@ class _AccountProfileBottomSheetState
           _buildDetailRow(
             context,
             icon: Icons.public_outlined,
-            label: 'API 站点',
+            label: context.l10n.settings_apiSite,
             value: endpoint.mainBaseUrl,
           ),
         ],

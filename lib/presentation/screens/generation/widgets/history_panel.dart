@@ -8,9 +8,11 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart' as p;
 
+import '../../../../core/enums/precise_ref_type.dart';
 import '../../../../core/utils/localization_extension.dart';
 import '../../../../core/utils/file_explorer_utils.dart';
 import '../../../../core/utils/image_share_sanitizer.dart';
+import '../../../../core/utils/vibe_file_parser.dart';
 import '../../../../core/utils/zip_utils.dart';
 import '../../../../data/services/alias_resolver_service.dart';
 import '../../../providers/layout_state_provider.dart';
@@ -21,6 +23,7 @@ import '../../../../data/repositories/gallery_folder_repository.dart';
 import '../../../providers/generation/generation_params_selectors.dart';
 import '../../../providers/image_generation_provider.dart';
 import '../../../providers/local_gallery_provider.dart';
+import '../../../providers/reverse_prompt_provider.dart';
 import '../../../providers/share_image_settings_provider.dart';
 import '../../../services/image_workflow_launcher.dart';
 import '../../../widgets/common/app_toast.dart';
@@ -268,7 +271,9 @@ class _HistoryPanelState extends ConsumerState<HistoryPanel> {
     final deduplicatedHistory =
         state.history.where((img) => !currentIds.contains(img.id)).toList();
 
-    return [...currentCompleted, ...deduplicatedHistory];
+    return [...currentCompleted, ...deduplicatedHistory]
+        .where((image) => image.canBulkSelect)
+        .toList();
   }
 
   /// 判断是否有当前正在生成的图像
@@ -351,7 +356,8 @@ class _HistoryPanelState extends ConsumerState<HistoryPanel> {
     Duration delay = const Duration(milliseconds: 600),
   }) {
     _historyPreheatTimer?.cancel();
-    if (images.isEmpty) {
+    final draggableImages = images.where((image) => image.canDrag).toList();
+    if (draggableImages.isEmpty) {
       return;
     }
 
@@ -360,7 +366,7 @@ class _HistoryPanelState extends ConsumerState<HistoryPanel> {
         return;
       }
 
-      for (final image in images) {
+      for (final image in draggableImages) {
         _sharePreparationService.enqueue(
           imageId: image.id,
           imageBytes: image.bytes,
@@ -376,6 +382,10 @@ class _HistoryPanelState extends ConsumerState<HistoryPanel> {
     GeneratedImage image,
     bool stripMetadata,
   ) {
+    if (!image.canDrag) {
+      return;
+    }
+
     if (_isHistoryScrolling) {
       return;
     }
@@ -507,6 +517,7 @@ class _HistoryPanelState extends ConsumerState<HistoryPanel> {
           final historyIndex = index - currentGenerationCount;
           final historyImage = deduplicatedHistory[historyIndex];
           final isFavorite = _favoriteStateFor(historyImage);
+          final isFailedSnapshot = historyImage.isFailedStreamSnapshot;
           // 计算在原始 history 中的真实索引（用于选择操作）
           final actualHistoryIndex = history.indexOf(historyImage);
           return Padding(
@@ -528,9 +539,22 @@ class _HistoryPanelState extends ConsumerState<HistoryPanel> {
                   isSelected: _selectedIds.contains(historyImage.id),
                   isFavorite: isFavorite,
                   dragPreparationReady: dragPreparationReady,
-                  onFavoriteToggle: () =>
-                      _toggleHistoryFavorite(context, historyImage),
+                  enableSelection: historyImage.canBulkSelect,
+                  enableSaveAction: historyImage.canSave,
+                  enableCopyAction: historyImage.canSave,
+                  statusBadgeLabel: isFailedSnapshot
+                      ? context.l10n.generation_failedStreamSnapshot
+                      : null,
+                  statusBadgeTooltip: isFailedSnapshot
+                      ? context.l10n.generation_failedStreamSnapshotHint
+                      : null,
+                  onFavoriteToggle: historyImage.canFavorite
+                      ? () => _toggleHistoryFavorite(context, historyImage)
+                      : null,
                   onSelectionChanged: (selected) {
+                    if (!historyImage.canBulkSelect) {
+                      return;
+                    }
                     setState(() {
                       if (selected) {
                         _selectedIds.add(historyImage.id);
@@ -544,47 +568,91 @@ class _HistoryPanelState extends ConsumerState<HistoryPanel> {
                   enableHoverScale: true,
                   hoverEffectsEnabled: !_isHistoryScrolling,
                   shareWarmupEnabled: false,
-                  onEditImage: () => ImageWorkflowLauncher.openEditor(
-                    context,
-                    ref,
-                    historyImage.bytes,
-                    mode: ImageEditorMode.edit,
-                  ),
-                  onInpaint: () => ImageWorkflowLauncher.openInpaint(
-                    context,
-                    ref,
-                    historyImage.bytes,
-                  ),
-                  onGenerateVariations: () =>
-                      ImageWorkflowLauncher.generateVariations(
-                    context,
-                    ref,
-                    historyImage.bytes,
-                  ),
-                  onDirectorTools: () =>
-                      ImageWorkflowLauncher.openDirectorTools(
-                    context,
-                    ref,
-                    historyImage.bytes,
-                  ),
-                  onEnhance: () => ImageWorkflowLauncher.openEnhance(
-                    ref,
-                    historyImage.bytes,
-                  ),
-                  onUpscale: () => ImageWorkflowLauncher.openUpscale(
-                    ref,
-                    historyImage.bytes,
-                  ),
-                  onSendToKrita: () => KritaSendHelper.sendImageBytes(
-                    context,
-                    ref,
-                    historyImage.bytes,
-                    name: 'history_${historyImage.id}.png',
-                  ),
-                  onOpenInExplorer: () =>
-                      _openImageInExplorer(context, historyImage),
-                  onSaveToLibrary: (bytes, _) =>
-                      _showSaveToLibraryDialog(context, bytes),
+                  onReversePrompt: historyImage.canUseAsGenerationInput
+                      ? () => unawaited(
+                            _sendHistoryImageToReversePrompt(
+                              context,
+                              historyImage,
+                            ),
+                          )
+                      : null,
+                  onImageToImage: historyImage.canUseAsGenerationInput
+                      ? () => _sendHistoryImageToImageToImage(
+                            context,
+                            historyImage,
+                          )
+                      : null,
+                  onVibeTransfer: historyImage.canUseAsGenerationInput
+                      ? () => unawaited(
+                            _sendHistoryImageToVibeTransfer(
+                              context,
+                              historyImage,
+                            ),
+                          )
+                      : null,
+                  onPreciseReference: historyImage.canUseAsGenerationInput
+                      ? () => unawaited(
+                            _sendHistoryImageToPreciseReference(
+                              context,
+                              historyImage,
+                            ),
+                          )
+                      : null,
+                  onEditImage: historyImage.canUseAsGenerationInput
+                      ? () => ImageWorkflowLauncher.openEditor(
+                            context,
+                            ref,
+                            historyImage.bytes,
+                            mode: ImageEditorMode.edit,
+                          )
+                      : null,
+                  onInpaint: historyImage.canUseAsGenerationInput
+                      ? () => ImageWorkflowLauncher.openInpaint(
+                            context,
+                            ref,
+                            historyImage.bytes,
+                          )
+                      : null,
+                  onGenerateVariations: historyImage.canUseAsGenerationInput
+                      ? () => ImageWorkflowLauncher.generateVariations(
+                            context,
+                            ref,
+                            historyImage.bytes,
+                          )
+                      : null,
+                  onDirectorTools: historyImage.canUseAsGenerationInput
+                      ? () => ImageWorkflowLauncher.openDirectorTools(
+                            context,
+                            ref,
+                            historyImage.bytes,
+                          )
+                      : null,
+                  onEnhance: historyImage.canUseAsGenerationInput
+                      ? () => ImageWorkflowLauncher.openEnhance(
+                            ref,
+                            historyImage.bytes,
+                          )
+                      : null,
+                  onUpscale: historyImage.canUseAsGenerationInput
+                      ? () => ImageWorkflowLauncher.openUpscale(
+                            ref,
+                            historyImage.bytes,
+                          )
+                      : null,
+                  onSendToKrita: historyImage.canUseAsGenerationInput
+                      ? () => KritaSendHelper.sendImageBytes(
+                            context,
+                            ref,
+                            historyImage.bytes,
+                            name: 'history_${historyImage.id}.png',
+                          )
+                      : null,
+                  onOpenInExplorer: historyImage.canSave
+                      ? () => _openImageInExplorer(context, historyImage)
+                      : null,
+                  onSaveToLibrary: historyImage.canUseAsGenerationInput
+                      ? (bytes, _) => _showSaveToLibraryDialog(context, bytes)
+                      : null,
                 ),
               ),
             ),
@@ -600,6 +668,10 @@ class _HistoryPanelState extends ConsumerState<HistoryPanel> {
     required bool stripMetadata,
     required Widget Function(bool dragPreparationReady) childBuilder,
   }) {
+    if (!image.canDrag) {
+      return childBuilder(true);
+    }
+
     final snapshot = _sharePreparationService.snapshotFor(
       image.id,
       stripMetadata: stripMetadata,
@@ -655,6 +727,7 @@ class _HistoryPanelState extends ConsumerState<HistoryPanel> {
       final image = completedImages[index];
       final imageBytes = image.bytes;
       final isFavorite = _favoriteStateFor(image);
+      final isFailedSnapshot = image.isFailedStreamSnapshot;
       return _buildPreparedHistoryItem(
         context: context,
         image: image,
@@ -670,8 +743,22 @@ class _HistoryPanelState extends ConsumerState<HistoryPanel> {
           completionPlaceholderBytes: _completionPreviewPlaceholders[image.id],
           onCompletionPlaceholderSettled: () =>
               _clearCompletionPreviewPlaceholder(image.id),
-          onFavoriteToggle: () => _toggleHistoryFavorite(context, image),
+          enableSelection: image.canBulkSelect,
+          enableSaveAction: image.canSave,
+          enableCopyAction: image.canSave,
+          statusBadgeLabel: isFailedSnapshot
+              ? context.l10n.generation_failedStreamSnapshot
+              : null,
+          statusBadgeTooltip: isFailedSnapshot
+              ? context.l10n.generation_failedStreamSnapshotHint
+              : null,
+          onFavoriteToggle: image.canFavorite
+              ? () => _toggleHistoryFavorite(context, image)
+              : null,
           onSelectionChanged: (selected) {
+            if (!image.canBulkSelect) {
+              return;
+            }
             setState(() {
               if (selected) {
                 _selectedIds.add(image.id);
@@ -685,32 +772,84 @@ class _HistoryPanelState extends ConsumerState<HistoryPanel> {
           enableHoverScale: true,
           hoverEffectsEnabled: !_isHistoryScrolling,
           shareWarmupEnabled: false,
-          onEditImage: () => ImageWorkflowLauncher.openEditor(
-            context,
-            ref,
-            imageBytes,
-            mode: ImageEditorMode.edit,
-          ),
-          onInpaint: () =>
-              ImageWorkflowLauncher.openInpaint(context, ref, imageBytes),
-          onGenerateVariations: () => ImageWorkflowLauncher.generateVariations(
-            context,
-            ref,
-            imageBytes,
-          ),
-          onDirectorTools: () =>
-              ImageWorkflowLauncher.openDirectorTools(context, ref, imageBytes),
-          onEnhance: () => ImageWorkflowLauncher.openEnhance(ref, imageBytes),
-          onUpscale: () => ImageWorkflowLauncher.openUpscale(ref, imageBytes),
-          onSendToKrita: () => KritaSendHelper.sendImageBytes(
-            context,
-            ref,
-            image.bytes,
-            name: 'history_${image.id}.png',
-          ),
-          onOpenInExplorer: () => _openImageInExplorer(context, image),
-          onSaveToLibrary: (bytes, _) =>
-              _showSaveToLibraryDialog(context, bytes),
+          onReversePrompt: image.canUseAsGenerationInput
+              ? () => unawaited(
+                    _sendHistoryImageToReversePrompt(
+                      context,
+                      image,
+                    ),
+                  )
+              : null,
+          onImageToImage: image.canUseAsGenerationInput
+              ? () => _sendHistoryImageToImageToImage(
+                    context,
+                    image,
+                  )
+              : null,
+          onVibeTransfer: image.canUseAsGenerationInput
+              ? () => unawaited(
+                    _sendHistoryImageToVibeTransfer(
+                      context,
+                      image,
+                    ),
+                  )
+              : null,
+          onPreciseReference: image.canUseAsGenerationInput
+              ? () => unawaited(
+                    _sendHistoryImageToPreciseReference(
+                      context,
+                      image,
+                    ),
+                  )
+              : null,
+          onEditImage: image.canUseAsGenerationInput
+              ? () => ImageWorkflowLauncher.openEditor(
+                    context,
+                    ref,
+                    imageBytes,
+                    mode: ImageEditorMode.edit,
+                  )
+              : null,
+          onInpaint: image.canUseAsGenerationInput
+              ? () => ImageWorkflowLauncher.openInpaint(
+                    context,
+                    ref,
+                    imageBytes,
+                  )
+              : null,
+          onGenerateVariations: image.canUseAsGenerationInput
+              ? () => ImageWorkflowLauncher.generateVariations(
+                    context,
+                    ref,
+                    imageBytes,
+                  )
+              : null,
+          onDirectorTools: image.canUseAsGenerationInput
+              ? () => ImageWorkflowLauncher.openDirectorTools(
+                    context,
+                    ref,
+                    imageBytes,
+                  )
+              : null,
+          onEnhance: image.canUseAsGenerationInput
+              ? () => ImageWorkflowLauncher.openEnhance(ref, imageBytes)
+              : null,
+          onUpscale: image.canUseAsGenerationInput
+              ? () => ImageWorkflowLauncher.openUpscale(ref, imageBytes)
+              : null,
+          onSendToKrita: image.canUseAsGenerationInput
+              ? () => KritaSendHelper.sendImageBytes(
+                    context,
+                    ref,
+                    image.bytes,
+                    name: 'history_${image.id}.png',
+                  )
+              : null,
+          onOpenInExplorer:
+              image.canSave ? () => _openImageInExplorer(context, image) : null,
+          onSaveToLibrary: image.canUseAsGenerationInput
+              ? (bytes, _) => _showSaveToLibraryDialog(context, bytes)
+              : null,
         ),
       );
     }
@@ -839,6 +978,106 @@ class _HistoryPanelState extends ConsumerState<HistoryPanel> {
         .addNewlySavedImages([file.path]);
 
     return file.path;
+  }
+
+  String _historyImageFileName(GeneratedImage image) {
+    final filePath = image.filePath;
+    if (filePath != null && filePath.isNotEmpty) {
+      return p.basename(filePath);
+    }
+    return 'history_${image.id}.png';
+  }
+
+  Future<void> _sendHistoryImageToReversePrompt(
+    BuildContext context,
+    GeneratedImage image,
+  ) async {
+    final l10n = context.l10n;
+
+    try {
+      await ref.read(reversePromptProvider.notifier).addImage(
+            image.bytes,
+            name: _historyImageFileName(image),
+          );
+
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.drop_addedToReversePrompt);
+    } catch (e) {
+      if (context.mounted) {
+        AppToast.error(context, l10n.gallery_sendFailed(e.toString()));
+      }
+    }
+  }
+
+  void _sendHistoryImageToImageToImage(
+    BuildContext context,
+    GeneratedImage image,
+  ) {
+    ImageWorkflowLauncher.openImageToImage(ref, image.bytes);
+    AppToast.success(context, context.l10n.drop_addedToImg2Img);
+  }
+
+  Future<void> _sendHistoryImageToVibeTransfer(
+    BuildContext context,
+    GeneratedImage image,
+  ) async {
+    final l10n = context.l10n;
+
+    try {
+      final currentState = ref.read(generationParamsNotifierProvider);
+      final currentCount = currentState.vibeReferencesV4.length;
+      const maxCount = 16;
+      final vibes = await VibeFileParser.parseFile(
+        _historyImageFileName(image),
+        image.bytes,
+      );
+
+      if (!context.mounted) return;
+      if (currentCount + vibes.length > maxCount) {
+        AppToast.warning(context, l10n.toast_styleReferenceLimit(maxCount));
+        return;
+      }
+
+      ref
+          .read(generationParamsNotifierProvider.notifier)
+          .addVibeReferences(vibes);
+
+      final message = currentCount > 0
+          ? l10n.toast_appendedStyleReferences(vibes.length)
+          : vibes.length == 1
+              ? l10n.drop_addedToVibe
+              : l10n.drop_addedMultipleToVibe(vibes.length);
+      AppToast.success(context, message);
+    } catch (e) {
+      if (context.mounted) {
+        AppToast.error(context, '${l10n.vibeParseFailed}: $e');
+      }
+    }
+  }
+
+  Future<void> _sendHistoryImageToPreciseReference(
+    BuildContext context,
+    GeneratedImage image,
+  ) async {
+    final l10n = context.l10n;
+
+    try {
+      await ref
+          .read(generationParamsNotifierProvider.notifier)
+          .addPreciseReferenceFromImage(
+            image.bytes,
+            type: PreciseRefType.character,
+            strength: 1.0,
+            fidelity: 1.0,
+          );
+
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.drop_addedToCharacterRef);
+    } catch (e) {
+      if (context.mounted) {
+        AppToast.error(context, l10n.gallery_sendFailed(e.toString()));
+      }
+    }
   }
 
   Widget _buildBottomActions(
@@ -1065,12 +1304,17 @@ class _HistoryPanelState extends ConsumerState<HistoryPanel> {
         filePath: image.filePath!,
         cachedBytes: image.bytes,
         id: image.id,
+        initialMetadata: image.metadata,
+        showCopyButton: image.canSave,
       );
     } else {
-      // 未保存的图像：使用 GeneratedImageDetailData（显示"无元数据"）
+      // 未保存的图像：使用 GeneratedImageDetailData，失败快照仅允许查看。
       imageData = GeneratedImageDetailData(
         imageBytes: image.bytes,
+        metadata: image.metadata,
         id: image.id,
+        showSaveButton: image.canSave,
+        showCopyButton: image.canSave,
       );
     }
 
@@ -1082,8 +1326,13 @@ class _HistoryPanelState extends ConsumerState<HistoryPanel> {
       image: imageData,
       showMetadataPanel: true,
       callbacks: ImageDetailCallbacks(
-        onSave: (img) =>
-            GenerationSaveService.saveImageFromDetail(currentContext, ref, img),
+        onSave: image.canSave
+            ? (img) => GenerationSaveService.saveImageFromDetail(
+                  currentContext,
+                  ref,
+                  img,
+                )
+            : null,
       ),
     );
   }

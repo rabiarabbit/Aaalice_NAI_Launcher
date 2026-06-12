@@ -104,7 +104,7 @@ class _VibeImportNamingDialogState extends State<VibeImportNamingDialog> {
   /// 验证名称
   bool _validateName(String name) {
     if (name.trim().isEmpty) {
-      setState(() => _errorText = '名称不能为空');
+      setState(() => _errorText = context.l10n.vibe_nameRequired);
       return false;
     }
     setState(() => _errorText = null);
@@ -207,7 +207,7 @@ class _VibeImportNamingDialogState extends State<VibeImportNamingDialog> {
         const SizedBox(width: 12),
         Expanded(
           child: Text(
-            '命名 Vibe',
+            context.l10n.vibe_import_namingTitle,
             style: theme.textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.w600,
             ),
@@ -215,7 +215,7 @@ class _VibeImportNamingDialogState extends State<VibeImportNamingDialog> {
         ),
         if (widget.hasNameConflict)
           Tooltip(
-            message: '该名称已存在，将被覆盖',
+            message: context.l10n.vibe_import_nameConflictOverwrite,
             child: Icon(
               Icons.warning_amber,
               color: theme.colorScheme.error,
@@ -258,7 +258,7 @@ class _VibeImportNamingDialogState extends State<VibeImportNamingDialog> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  '预览加载失败',
+                  context.l10n.vibe_previewLoadFailed,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.outline,
                   ),
@@ -277,8 +277,8 @@ class _VibeImportNamingDialogState extends State<VibeImportNamingDialog> {
       controller: _nameController,
       focusNode: _nameFocusNode,
       decoration: InputDecoration(
-        labelText: '名称',
-        hintText: '输入 Vibe 名称',
+        labelText: context.l10n.vibe_saveToLibrary_nameLabel,
+        hintText: context.l10n.vibe_saveToLibrary_nameHint,
         errorText: _errorText,
         prefixIcon: const Icon(Icons.label_outline),
         border: OutlineInputBorder(
@@ -318,13 +318,13 @@ class _VibeImportNamingDialogState extends State<VibeImportNamingDialog> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '应用到后续所有文件',
+                  context.l10n.vibe_import_applyToRemainingFiles,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w500,
                   ),
                 ),
                 Text(
-                  '使用此命名规则处理剩余文件',
+                  context.l10n.vibe_import_applyNamingToRemainingFiles,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.outline,
                   ),

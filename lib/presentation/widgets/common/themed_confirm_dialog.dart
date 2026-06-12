@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/utils/localization_extension.dart';
+
 /// 确认对话框类型
 enum ThemedConfirmDialogType {
   /// 普通确认（使用主题色）
@@ -67,18 +69,19 @@ class ThemedConfirmDialog extends StatelessWidget {
     required BuildContext context,
     required String title,
     required String content,
-    String confirmText = '确定',
-    String cancelText = '取消',
+    String? confirmText,
+    String? cancelText,
     ThemedConfirmDialogType type = ThemedConfirmDialogType.normal,
     IconData? icon,
   }) async {
+    final l10n = context.l10n;
     final result = await showDialog<bool>(
       context: context,
       builder: (ctx) => ThemedConfirmDialog(
         title: title,
         content: content,
-        confirmText: confirmText,
-        cancelText: cancelText,
+        confirmText: confirmText ?? l10n.common_confirm,
+        cancelText: cancelText ?? l10n.common_cancel,
         type: type,
         icon: icon,
       ),
@@ -92,15 +95,16 @@ class ThemedConfirmDialog extends StatelessWidget {
     required String itemName,
     String? title,
     String? content,
-    String confirmText = '删除',
-    String cancelText = '取消',
+    String? confirmText,
+    String? cancelText,
   }) {
+    final l10n = context.l10n;
     return show(
       context: context,
-      title: title ?? '删除确认',
-      content: content ?? '确定要删除「$itemName」吗？此操作不可撤销。',
-      confirmText: confirmText,
-      cancelText: cancelText,
+      title: title ?? l10n.common_confirmDelete,
+      content: content ?? l10n.common_deleteItemConfirm(itemName),
+      confirmText: confirmText ?? l10n.common_delete,
+      cancelText: cancelText ?? l10n.common_cancel,
       type: ThemedConfirmDialogType.danger,
       icon: Icons.delete_outline,
     );
@@ -113,15 +117,16 @@ class ThemedConfirmDialog extends StatelessWidget {
     required String itemType,
     String? title,
     String? content,
-    String confirmText = '清空',
-    String cancelText = '取消',
+    String? confirmText,
+    String? cancelText,
   }) {
+    final l10n = context.l10n;
     return show(
       context: context,
-      title: title ?? '清空确认',
-      content: content ?? '确定要清空所有 $count 个$itemType吗？此操作不可撤销。',
-      confirmText: confirmText,
-      cancelText: cancelText,
+      title: title ?? l10n.common_confirmClear,
+      content: content ?? l10n.common_clearAllItemsConfirm(count, itemType),
+      confirmText: confirmText ?? l10n.common_clear,
+      cancelText: cancelText ?? l10n.common_cancel,
       type: ThemedConfirmDialogType.danger,
       icon: Icons.delete_sweep_outlined,
     );
@@ -132,15 +137,16 @@ class ThemedConfirmDialog extends StatelessWidget {
     required BuildContext context,
     required String title,
     required String content,
-    String confirmText = '知道了',
+    String? confirmText,
     IconData? icon,
   }) async {
+    final l10n = context.l10n;
     final result = await showDialog<bool>(
       context: context,
       builder: (ctx) => ThemedConfirmDialog(
         title: title,
         content: content,
-        confirmText: confirmText,
+        confirmText: confirmText ?? l10n.common_gotIt,
         cancelText: null,
         type: ThemedConfirmDialogType.info,
         icon: icon ?? Icons.info_outline,

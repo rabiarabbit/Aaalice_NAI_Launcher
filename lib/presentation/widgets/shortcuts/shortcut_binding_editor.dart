@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/shortcuts/shortcut_config.dart';
 import '../../../core/shortcuts/shortcut_manager.dart';
+import '../../../core/utils/localization_extension.dart';
 import '../../providers/shortcuts_provider.dart';
 
 /// 快捷键绑定编辑器
@@ -65,6 +66,8 @@ class _ShortcutBindingEditorState extends ConsumerState<ShortcutBindingEditor> {
   }
 
   Widget _buildInlineEditor(ThemeData theme) {
+    final l10n = context.l10n;
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -98,7 +101,7 @@ class _ShortcutBindingEditorState extends ConsumerState<ShortcutBindingEditor> {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        '按快捷键...',
+                        l10n.shortcut_editor_recordingInline,
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.primary,
                         ),
@@ -106,7 +109,9 @@ class _ShortcutBindingEditorState extends ConsumerState<ShortcutBindingEditor> {
                     ],
                   )
                 : Text(
-                    _controller.text.isEmpty ? '未设置' : _controller.text,
+                    _controller.text.isEmpty
+                        ? l10n.shortcut_settings_unassigned
+                        : _controller.text,
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontFamily: 'monospace',
                       color: widget.binding.hasCustomShortcut
@@ -122,7 +127,7 @@ class _ShortcutBindingEditorState extends ConsumerState<ShortcutBindingEditor> {
           const SizedBox(width: 4),
           IconButton(
             icon: const Icon(Icons.refresh, size: 16),
-            tooltip: '重置为默认',
+            tooltip: l10n.shortcut_settings_reset_to_default,
             visualDensity: VisualDensity.compact,
             onPressed: _resetToDefault,
           ),
@@ -131,7 +136,7 @@ class _ShortcutBindingEditorState extends ConsumerState<ShortcutBindingEditor> {
           const SizedBox(width: 4),
           IconButton(
             icon: const Icon(Icons.clear, size: 16),
-            tooltip: '清除',
+            tooltip: l10n.common_clear,
             visualDensity: VisualDensity.compact,
             onPressed: _clear,
           ),
@@ -141,6 +146,8 @@ class _ShortcutBindingEditorState extends ConsumerState<ShortcutBindingEditor> {
   }
 
   Widget _buildFullEditor(ThemeData theme) {
+    final l10n = context.l10n;
+
     return Focus(
       autofocus: true,
       onKeyEvent: _isRecording ? _handleKeyEvent : null,
@@ -186,14 +193,14 @@ class _ShortcutBindingEditorState extends ConsumerState<ShortcutBindingEditor> {
                                 ),
                                 const SizedBox(height: 12),
                                 Text(
-                                  '按下要设置的快捷键组合...',
+                                  l10n.shortcut_settings_press_key,
                                   style: theme.textTheme.bodyMedium?.copyWith(
                                     color: theme.colorScheme.primary,
                                   ),
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  '按 Esc 取消',
+                                  l10n.shortcut_editor_pressEscToCancel,
                                   style: theme.textTheme.bodySmall?.copyWith(
                                     color: theme.colorScheme.outline,
                                   ),
@@ -202,7 +209,7 @@ class _ShortcutBindingEditorState extends ConsumerState<ShortcutBindingEditor> {
                             )
                           : _controller.text.isEmpty
                               ? Text(
-                                  '点击开始录制',
+                                  l10n.shortcut_editor_clickToRecord,
                                   style: theme.textTheme.titleMedium?.copyWith(
                                     color: theme.colorScheme.outline,
                                   ),
@@ -246,7 +253,7 @@ class _ShortcutBindingEditorState extends ConsumerState<ShortcutBindingEditor> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            '此快捷键与 "$_conflictId" 冲突',
+                            l10n.shortcut_editor_conflictWith(_conflictId!),
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: theme.colorScheme.error,
                             ),
@@ -270,7 +277,7 @@ class _ShortcutBindingEditorState extends ConsumerState<ShortcutBindingEditor> {
                 TextButton.icon(
                   onPressed: _resetToDefault,
                   icon: const Icon(Icons.refresh),
-                  label: const Text('重置为默认'),
+                  label: Text(l10n.shortcut_settings_reset_to_default),
                 ),
 
               const Spacer(),
@@ -278,14 +285,14 @@ class _ShortcutBindingEditorState extends ConsumerState<ShortcutBindingEditor> {
               // 取消按钮
               TextButton(
                 onPressed: widget.onCancel,
-                child: const Text('取消'),
+                child: Text(l10n.common_cancel),
               ),
               const SizedBox(width: 8),
 
               // 保存按钮
               FilledButton(
                 onPressed: _conflictId == null && _canSave() ? _save : null,
-                child: const Text('保存'),
+                child: Text(l10n.common_save),
               ),
             ],
           ),

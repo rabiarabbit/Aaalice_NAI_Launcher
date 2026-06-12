@@ -111,7 +111,8 @@ class NAIImageGenerationApiService {
         ? effectiveParams.preciseReferences
         : <PreciseReference>[];
 
-    _currentCancelToken = CancelToken();
+    final cancelToken = CancelToken();
+    _currentCancelToken = cancelToken;
 
     try {
       // 0. 采样器版本映射
@@ -262,7 +263,7 @@ class NAIImageGenerationApiService {
       final response = await _dio.post(
         _endpointService.imageUrl(ApiConstants.generateImageEndpoint),
         data: requestData,
-        cancelToken: _currentCancelToken,
+        cancelToken: cancelToken,
         onReceiveProgress: onProgress,
         options: Options(
           responseType: ResponseType.bytes,
@@ -286,7 +287,9 @@ class NAIImageGenerationApiService {
       // 返回图像和 Vibe 编码哈希映射
       return (images, vibeEncodingMap);
     } finally {
-      _currentCancelToken = null;
+      if (identical(_currentCancelToken, cancelToken)) {
+        _currentCancelToken = null;
+      }
     }
   }
 
@@ -313,7 +316,13 @@ class NAIImageGenerationApiService {
 
   /// 取消当前生成
   void cancelGeneration() {
-    _currentCancelToken?.cancel('User cancelled');
+    final token = _currentCancelToken;
+    // WARNING 级：release 文件日志可见，用于排查取消是否命中在途请求
+    AppLogger.w(
+      'cancelGeneration: hasInFlightToken=${token != null}',
+      'ImgGen',
+    );
+    token?.cancel('User cancelled');
     _currentCancelToken = null;
   }
 
@@ -329,7 +338,31 @@ class NAIImageGenerationApiService {
     bool focusedInpaintEnabled = false,
     double minimumContextMegaPixels = 88.0,
     Rect? focusedSelectionRect,
+  }) {
+    final cancelToken = CancelToken();
+    _currentCancelToken = cancelToken;
+
+    return _generateImageStreamWithToken(
+      params,
+      cancelToken: cancelToken,
+      focusedInpaintEnabled: focusedInpaintEnabled,
+      minimumContextMegaPixels: minimumContextMegaPixels,
+      focusedSelectionRect: focusedSelectionRect,
+    );
+  }
+
+  Stream<ImageStreamChunk> _generateImageStreamWithToken(
+    ImageParams params, {
+    required CancelToken cancelToken,
+    bool focusedInpaintEnabled = false,
+    double minimumContextMegaPixels = 88.0,
+    Rect? focusedSelectionRect,
   }) async* {
+    if (cancelToken.isCancelled) {
+      yield ImageStreamChunk.error('Cancelled');
+      return;
+    }
+
     final focusedRequest = _prepareFocusedInpaint(
       params,
       enabled: focusedInpaintEnabled,
@@ -353,9 +386,12 @@ class NAIImageGenerationApiService {
         ? effectiveParams.preciseReferences
         : <PreciseReference>[];
 
-    _currentCancelToken = CancelToken();
-
     try {
+      if (cancelToken.isCancelled) {
+        yield ImageStreamChunk.error('Cancelled');
+        return;
+      }
+
       final requestBuildResult = await NAIImageRequestBuilder(
         params: effectiveParams,
         encodeVibe: _enhancementService.encodeVibe,
@@ -477,7 +513,7 @@ class NAIImageGenerationApiService {
       final response = await _dio.post<ResponseBody>(
         _endpointService.imageUrl(ApiConstants.generateImageStreamEndpoint),
         data: requestData,
-        cancelToken: _currentCancelToken,
+        cancelToken: cancelToken,
         options: Options(
           responseType: ResponseType.stream,
           headers: {
@@ -495,7 +531,7 @@ class NAIImageGenerationApiService {
       final int totalSteps = effectiveParams.steps;
 
       await for (final chunk in responseStream) {
-        if (_currentCancelToken?.isCancelled ?? false) {
+        if (cancelToken.isCancelled) {
           yield ImageStreamChunk.error('Cancelled');
           return;
         }
@@ -715,7 +751,9 @@ class NAIImageGenerationApiService {
       AppLogger.e('Stream generation failed: $e', 'ImgGen');
       yield ImageStreamChunk.error(e.toString());
     } finally {
-      _currentCancelToken = null;
+      if (identical(_currentCancelToken, cancelToken)) {
+        _currentCancelToken = null;
+      }
     }
   }
 
@@ -792,9 +830,13 @@ class NAIImageGenerationApiService {
 }
 
 /// NAIImageGenerationApiService Provider
-@riverpod
+///
+/// keepAlive：服务持有进行中请求的 `_currentCancelToken`，
+/// cancelGeneration() 必须命中发起请求的同一实例，否则取消落空。
+@Riverpod(keepAlive: true)
 NAIImageGenerationApiService naiImageGenerationApiService(Ref ref) {
-  final dio = ref.watch(dioClientProvider);
+  // 生成请求必须可中断（释放 NAI 并发额度），使用 HTTP/1.1 专用客户端
+  final dio = ref.watch(imageGenerationDioClientProvider);
   final enhancementService = ref.watch(naiImageEnhancementApiServiceProvider);
   final endpointService = ref.watch(naiApiEndpointServiceProvider);
   return NAIImageGenerationApiService(

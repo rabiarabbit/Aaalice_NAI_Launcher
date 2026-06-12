@@ -208,6 +208,7 @@ class _DetailMetadataPanelState extends State<DetailMetadataPanel> {
   }
 
   Widget _buildExpandedPanel(ThemeData theme) {
+    final l10n = context.l10n;
     final metadata = _currentMetadata;
     final isLoading = _metadataFuture != null && _loadedMetadata == null;
     final colorScheme = theme.colorScheme;
@@ -223,7 +224,7 @@ class _DetailMetadataPanelState extends State<DetailMetadataPanel> {
           child: widget.currentImage == null
               ? Center(
                   child: Text(
-                    '无图片',
+                    l10n.detail_noImage,
                     style: TextStyle(color: colorScheme.onSurfaceVariant),
                   ),
                 )
@@ -271,7 +272,7 @@ class _DetailMetadataPanelState extends State<DetailMetadataPanel> {
           ),
           const SizedBox(height: 16),
           Text(
-            '正在解析元数据...',
+            context.l10n.detail_parsingMetadata,
             style: TextStyle(
               color: colorScheme.onSurfaceVariant,
               fontSize: 12,
@@ -298,7 +299,7 @@ class _DetailMetadataPanelState extends State<DetailMetadataPanel> {
             ),
             const SizedBox(height: 16),
             Text(
-              '此图片无元数据',
+              context.l10n.detail_noMetadata,
               style: TextStyle(
                 color: colorScheme.onSurfaceVariant,
               ),
@@ -330,7 +331,7 @@ class _DetailMetadataPanelState extends State<DetailMetadataPanel> {
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  '元数据',
+                  context.l10n.detail_metadata,
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),
@@ -370,7 +371,7 @@ class _PanelHeader extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           Text(
-            '图片详情',
+            context.l10n.detail_imageDetails,
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w600,
             ),
@@ -382,7 +383,9 @@ class _PanelHeader extends StatelessWidget {
               size: 20,
             ),
             onPressed: onToggle,
-            tooltip: isExpanded ? '收起' : '展开',
+            tooltip: isExpanded
+                ? context.l10n.common_collapse
+                : context.l10n.common_expand,
             visualDensity: VisualDensity.compact,
           ),
         ],
@@ -411,16 +414,19 @@ class _MetadataContent extends StatelessWidget {
         // 基本信息（仅在有文件信息时显示）
         if (fileInfo != null) ...[
           _InfoSection(
-            title: '基本信息',
+            title: context.l10n.detail_basicInfo,
             icon: Icons.insert_drive_file_outlined,
             children: [
-              _InfoRow(label: '文件名', value: fileInfo!.fileName),
               _InfoRow(
-                label: '修改时间',
+                label: context.l10n.detail_fileName,
+                value: fileInfo!.fileName,
+              ),
+              _InfoRow(
+                label: context.l10n.detail_modifiedTime,
                 value: _formatTime(context, fileInfo!.modifiedAt),
               ),
               _InfoRow(
-                label: '文件大小',
+                label: context.l10n.detail_fileSize,
                 value: _formatSize(fileInfo!.size),
               ),
             ],
@@ -515,7 +521,7 @@ class _MetadataContent extends StatelessWidget {
         children: [
           // 主提示词（包含角色提示词）
           PromptSection(
-            title: '主提示词',
+            title: context.l10n.metadataImport_mainPrompt,
             icon: Icons.text_fields,
             content: mainPromptWithChars,
             tags: mainPromptTags,
@@ -528,7 +534,7 @@ class _MetadataContent extends StatelessWidget {
           if (fixedTags.isNotEmpty) ...[
             const SizedBox(height: 12),
             PromptSection(
-              title: '固定词',
+              title: context.l10n.metadataImport_fixedTags,
               icon: Icons.push_pin_outlined,
               content: fixedTags.join(', '),
               tags: fixedTags,
@@ -539,7 +545,7 @@ class _MetadataContent extends StatelessWidget {
           if (fixedNegativeTags.isNotEmpty) ...[
             const SizedBox(height: 12),
             PromptSection(
-              title: '负向固定词',
+              title: context.l10n.fixedTags_negativeTitle,
               icon: Icons.push_pin_outlined,
               content: fixedNegativeTags.join(', '),
               tags: fixedNegativeTags,
@@ -553,7 +559,7 @@ class _MetadataContent extends StatelessWidget {
           if (metadata.qualityTags.isNotEmpty) ...[
             const SizedBox(height: 12),
             PromptSection(
-              title: '质量词',
+              title: context.l10n.qualityTags_label,
               icon: Icons.high_quality,
               content: metadata.qualityTags.join(', '),
               tags: metadata.qualityTags,
@@ -609,7 +615,9 @@ class _MetadataContent extends StatelessWidget {
         PromptSection(
           title: context.l10n.prompt_positivePrompt,
           icon: Icons.text_fields,
-          content: metadata.fullPrompt.isNotEmpty ? metadata.fullPrompt : '(无)',
+          content: metadata.fullPrompt.isNotEmpty
+              ? metadata.fullPrompt
+              : context.l10n.metadataImport_noData,
           tags: mainPromptTags,
           initiallyExpanded: true,
           showAddToLibrary: metadata.fullPrompt.isNotEmpty,
@@ -664,7 +672,7 @@ class _MetadataContent extends StatelessWidget {
   /// 构建角色提示词分组（带折叠功能）
   Widget _buildCharacterSection(BuildContext context) {
     return PromptSection(
-      title: '角色提示词',
+      title: context.l10n.metadataImport_characterPrompts,
       icon: Icons.people_outline,
       content: metadata.characterInfos.map((c) => c.prompt).join(', '),
       initiallyExpanded: false,
@@ -858,7 +866,9 @@ class _ActionButtons extends StatelessWidget {
               Expanded(
                 child: _ActionButton(
                   icon: Icons.copy,
-                  label: context.l10n.prompt_positivePrompt,
+                  label: context.l10n.detail_copyLabel(
+                    context.l10n.prompt_positivePrompt,
+                  ),
                   onPressed: () {
                     Clipboard.setData(ClipboardData(text: metadata.fullPrompt));
                     AppToast.success(
@@ -873,7 +883,7 @@ class _ActionButtons extends StatelessWidget {
                 Expanded(
                   child: _ActionButton(
                     icon: Icons.tag,
-                    label: 'Seed',
+                    label: context.l10n.detail_copyLabel('Seed'),
                     onPressed: () {
                       Clipboard.setData(
                         ClipboardData(text: metadata.seed.toString()),
@@ -894,7 +904,7 @@ class _ActionButtons extends StatelessWidget {
               Expanded(
                 child: _ActionButton(
                   icon: Icons.bookmark_add,
-                  label: '保存预设',
+                  label: context.l10n.detail_savePreset,
                   onPressed: () =>
                       SaveAsPresetDialog.show(context, metadata: metadata),
                 ),
@@ -963,7 +973,7 @@ class _ActionButtonState extends State<_ActionButton> {
               ),
               const SizedBox(width: 6),
               Text(
-                '复制${widget.label}',
+                widget.label,
                 style: theme.textTheme.labelMedium?.copyWith(
                   color: _isHovered
                       ? colorScheme.primary

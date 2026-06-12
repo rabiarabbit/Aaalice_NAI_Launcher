@@ -216,6 +216,11 @@ test/data/services/*
 !test/data/services/random_preset_merger_test.dart
 !test/data/services/random_prompt_legacy_adapter_test.dart
 !test/data/services/random_prompt_generator_preset_test.dart
+!test/data/datasources/
+test/data/datasources/*
+!test/data/datasources/remote/
+test/data/datasources/remote/*
+!test/data/datasources/remote/nai_image_generation_api_service_test.dart
 
 # 保留 Krita 桥接回归测试
 !test/core/
@@ -239,11 +244,13 @@ test/presentation/*
 !test/presentation/providers/
 test/presentation/providers/*
 !test/presentation/providers/fixed_tags_provider_test.dart
+!test/presentation/providers/image_generation_provider_test.dart
 !test/presentation/providers/layout_state_provider_test.dart
 !test/presentation/providers/prompt_config_random_mode_test.dart
 !test/presentation/providers/random_mode_provider_test.dart
 !test/presentation/providers/generation/
 test/presentation/providers/generation/*
+!test/presentation/providers/generation/image_generation_cancel_test.dart
 !test/presentation/providers/generation/image_workflow_controller_test.dart
 !test/presentation/providers/krita/
 !test/presentation/providers/krita/*.dart
@@ -259,8 +266,13 @@ test/presentation/screens/prompt_config/*
 !test/presentation/screens/prompt_config/random_config_screen_test.dart
 !test/presentation/widgets/
 test/presentation/widgets/*
+!test/presentation/widgets/drop/
+test/presentation/widgets/drop/*
+!test/presentation/widgets/drop/image_destination_dialog_test.dart
 !test/presentation/widgets/common/
 test/presentation/widgets/common/*
+!test/presentation/widgets/common/image_detail_data_test.dart
+!test/presentation/widgets/common/selectable_image_card_test.dart
 !test/presentation/widgets/common/thumbnail_display_test.dart
 !test/presentation/widgets/prompt/
 test/presentation/widgets/prompt/*

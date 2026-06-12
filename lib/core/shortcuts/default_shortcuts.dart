@@ -90,8 +90,7 @@ class ShortcutIds {
   static const String vibeDetailExport = 'vibe_detail_export';
   static const String vibeDetailRename = 'vibe_detail_rename';
   static const String vibeDetailDelete = 'vibe_detail_delete';
-  static const String vibeDetailToggleFavorite =
-      'vibe_detail_toggle_favorite';
+  static const String vibeDetailToggleFavorite = 'vibe_detail_toggle_favorite';
   static const String vibeDetailPrevSubVibe = 'vibe_detail_prev_sub_vibe';
   static const String vibeDetailNextSubVibe = 'vibe_detail_next_sub_vibe';
 }
@@ -114,23 +113,23 @@ extension ShortcutContextExtension on ShortcutContext {
   String get displayName {
     switch (this) {
       case ShortcutContext.global:
-        return '全局';
+        return 'Global';
       case ShortcutContext.generation:
-        return '生成页面';
+        return 'Generation';
       case ShortcutContext.gallery:
-        return '画廊列表';
+        return 'Gallery List';
       case ShortcutContext.viewer:
-        return '图片查看器';
+        return 'Image Viewer';
       case ShortcutContext.tagLibrary:
-        return '词库';
+        return 'Tag Library';
       case ShortcutContext.randomConfig:
-        return '随机配置';
+        return 'Random Config';
       case ShortcutContext.settings:
-        return '设置';
+        return 'Settings';
       case ShortcutContext.input:
-        return '输入框';
+        return 'Input Field';
       case ShortcutContext.vibeDetail:
-        return 'Vibe 详情';
+        return 'Vibe Detail';
     }
   }
 

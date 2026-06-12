@@ -172,7 +172,7 @@ class _PromptSectionState extends State<PromptSection> {
             onPressed: _copyContent,
             icon:
                 Icon(Icons.copy, size: 16, color: colorScheme.onSurfaceVariant),
-            tooltip: '复制${widget.title}',
+            tooltip: context.l10n.detail_copyLabel(widget.title),
             style: IconButton.styleFrom(
               padding: const EdgeInsets.all(6),
               minimumSize: const Size(28, 28),
@@ -186,7 +186,7 @@ class _PromptSectionState extends State<PromptSection> {
                 size: 16,
                 color: colorScheme.onSurfaceVariant,
               ),
-              tooltip: '添加到词库',
+              tooltip: context.l10n.tagLibrary_addToLibrary,
               style: IconButton.styleFrom(
                 padding: const EdgeInsets.all(6),
                 minimumSize: const Size(28, 28),
@@ -222,7 +222,7 @@ class _PromptSectionState extends State<PromptSection> {
                   showTranslation: widget.showTranslation,
                 )
               : Text(
-                  '(无内容)',
+                  context.l10n.detail_noContent,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                     fontStyle: FontStyle.italic,
@@ -426,7 +426,7 @@ class CharacterPromptCard extends StatelessWidget {
             ),
           ),
           if (negativePrompt?.isNotEmpty == true)
-            _buildNegativePrompt(theme, colorScheme),
+            _buildNegativePrompt(context, theme, colorScheme),
         ],
       ),
     );
@@ -446,7 +446,7 @@ class CharacterPromptCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
           ),
           child: Text(
-            '角色 ${index + 1}',
+            context.l10n.character_number(index + 1),
             style: theme.textTheme.labelSmall?.copyWith(
               color: colorScheme.onPrimaryContainer,
               fontWeight: FontWeight.w600,
@@ -472,14 +472,15 @@ class CharacterPromptCard extends StatelessWidget {
         IconButton(
           onPressed: () {
             final textToCopy = negativePrompt?.isNotEmpty == true
-                ? '正向: $prompt\n负向: $negativePrompt'
+                ? '${context.l10n.prompt_positivePrompt}: $prompt\n'
+                    '${context.l10n.prompt_negativePrompt}: $negativePrompt'
                 : prompt;
             Clipboard.setData(ClipboardData(text: textToCopy));
             AppToast.success(context, context.l10n.toast_characterPromptCopied);
             onCopy?.call();
           },
           icon: Icon(Icons.copy, size: 16, color: colorScheme.onSurfaceVariant),
-          tooltip: '复制角色提示词',
+          tooltip: context.l10n.detail_copyCharacterPrompt,
           style: IconButton.styleFrom(
             padding: const EdgeInsets.all(4),
             minimumSize: const Size(24, 24),
@@ -489,7 +490,11 @@ class CharacterPromptCard extends StatelessWidget {
     );
   }
 
-  Widget _buildNegativePrompt(ThemeData theme, ColorScheme colorScheme) {
+  Widget _buildNegativePrompt(
+    BuildContext context,
+    ThemeData theme,
+    ColorScheme colorScheme,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -505,7 +510,7 @@ class CharacterPromptCard extends StatelessWidget {
             ),
             const SizedBox(width: 4),
             Text(
-              '负向:',
+              '${context.l10n.prompt_negativePrompt}:',
               style: theme.textTheme.labelSmall?.copyWith(
                 color: colorScheme.error.withValues(alpha: 0.7),
               ),

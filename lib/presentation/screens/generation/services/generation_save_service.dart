@@ -50,6 +50,8 @@ class GenerationSaveService {
           filePath: img.filePath!,
           cachedBytes: img.bytes,
           id: img.id,
+          initialMetadata: img.metadata,
+          showCopyButton: img.canSave,
         );
       }
 
@@ -57,7 +59,10 @@ class GenerationSaveService {
       // 这种情况只应在 auto-save 关闭且用户未手动保存时发生
       return GeneratedImageDetailData(
         imageBytes: img.bytes,
+        metadata: img.metadata,
         id: img.id,
+        showSaveButton: img.canSave,
+        showCopyButton: img.canSave,
       );
     }).toList();
 
@@ -70,7 +75,10 @@ class GenerationSaveService {
       showMetadataPanel: true,
       showThumbnails: allImages.length > 1,
       callbacks: ImageDetailCallbacks(
-        onSave: (image) => saveImageFromDetail(context, ref, image),
+        onSave: (image) async {
+          if (!image.showSaveButton) return;
+          await saveImageFromDetail(context, ref, image);
+        },
       ),
     );
   }

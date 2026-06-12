@@ -280,7 +280,7 @@ class _ShortcutSettingsPanelState extends ConsumerState<ShortcutSettingsPanel> {
             color: theme.colorScheme.primary,
           ),
           title: Text(
-            shortcutContext.displayName,
+            _getContextDisplayName(shortcutContext),
             style: theme.textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.bold,
               color: theme.colorScheme.primary,
@@ -609,6 +609,31 @@ class _ShortcutSettingsPanelState extends ConsumerState<ShortcutSettingsPanel> {
         return l10n.shortcut_action_toggle_theme;
       default:
         return key.replaceAll('shortcut_action_', '');
+    }
+  }
+
+  String _getContextDisplayName(ShortcutContext shortcutContext) {
+    final l10n = context.l10n;
+
+    switch (shortcutContext) {
+      case ShortcutContext.global:
+        return l10n.shortcut_context_global;
+      case ShortcutContext.generation:
+        return l10n.shortcut_context_generation;
+      case ShortcutContext.gallery:
+        return l10n.shortcut_context_gallery;
+      case ShortcutContext.viewer:
+        return l10n.shortcut_context_viewer;
+      case ShortcutContext.tagLibrary:
+        return l10n.shortcut_context_tag_library;
+      case ShortcutContext.randomConfig:
+        return l10n.shortcut_context_random_config;
+      case ShortcutContext.settings:
+        return l10n.shortcut_context_settings;
+      case ShortcutContext.input:
+        return l10n.shortcut_context_input;
+      case ShortcutContext.vibeDetail:
+        return l10n.shortcut_context_vibe_detail;
     }
   }
 }

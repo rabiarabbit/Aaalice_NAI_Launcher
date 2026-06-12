@@ -57,7 +57,7 @@ class _ShortcutHelpDialogState extends ConsumerState<ShortcutHelpDialog> {
                   ),
                   const SizedBox(width: 12),
                   Text(
-                    '快捷键帮助',
+                    context.l10n.shortcut_help_title,
                     style: theme.textTheme.titleLarge,
                   ),
                   const Spacer(),
@@ -67,7 +67,7 @@ class _ShortcutHelpDialogState extends ConsumerState<ShortcutHelpDialog> {
                     child: TextField(
                       controller: _searchController,
                       decoration: InputDecoration(
-                        hintText: '搜索快捷键...',
+                        hintText: context.l10n.shortcut_help_search,
                         prefixIcon: const Icon(Icons.search, size: 20),
                         isDense: true,
                         border: OutlineInputBorder(
@@ -101,7 +101,7 @@ class _ShortcutHelpDialogState extends ConsumerState<ShortcutHelpDialog> {
               child: Row(
                 children: [
                   FilterChip(
-                    label: const Text('全部'),
+                    label: Text(context.l10n.shortcut_help_all),
                     selected: _selectedContext == null,
                     onSelected: (_) {
                       setState(() {
@@ -110,15 +110,15 @@ class _ShortcutHelpDialogState extends ConsumerState<ShortcutHelpDialog> {
                     },
                   ),
                   const SizedBox(width: 8),
-                  ...ShortcutContext.values.map((context) {
+                  ...ShortcutContext.values.map((shortcutContext) {
                     return Padding(
                       padding: const EdgeInsets.only(right: 8),
                       child: FilterChip(
-                        label: Text(context.displayName),
-                        selected: _selectedContext == context,
+                        label: Text(_getContextDisplayName(shortcutContext)),
+                        selected: _selectedContext == shortcutContext,
                         onSelected: (_) {
                           setState(() {
-                            _selectedContext = context;
+                            _selectedContext = shortcutContext;
                           });
                         },
                       ),
@@ -154,7 +154,7 @@ class _ShortcutHelpDialogState extends ConsumerState<ShortcutHelpDialog> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      '提示：按 F1 或 ? 键可随时打开此帮助对话框',
+                      context.l10n.shortcut_help_tip,
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.outline,
                       ),
@@ -235,7 +235,7 @@ class _ShortcutHelpDialogState extends ConsumerState<ShortcutHelpDialog> {
               ),
               const SizedBox(width: 8),
               Text(
-                shortcutContext.displayName,
+                _getContextDisplayName(shortcutContext),
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: theme.colorScheme.primary,
@@ -322,7 +322,7 @@ class _ShortcutHelpDialogState extends ConsumerState<ShortcutHelpDialog> {
             ),
             const SizedBox(height: 16),
             Text(
-              '未找到匹配的快捷键',
+              context.l10n.shortcut_settings_no_matches,
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     color: Theme.of(context).colorScheme.outline,
                   ),
@@ -479,6 +479,31 @@ class _ShortcutHelpDialogState extends ConsumerState<ShortcutHelpDialog> {
         return key.replaceAll('shortcut_action_', '');
     }
   }
+
+  String _getContextDisplayName(ShortcutContext shortcutContext) {
+    final l10n = context.l10n;
+
+    switch (shortcutContext) {
+      case ShortcutContext.global:
+        return l10n.shortcut_context_global;
+      case ShortcutContext.generation:
+        return l10n.shortcut_context_generation;
+      case ShortcutContext.gallery:
+        return l10n.shortcut_context_gallery;
+      case ShortcutContext.viewer:
+        return l10n.shortcut_context_viewer;
+      case ShortcutContext.tagLibrary:
+        return l10n.shortcut_context_tag_library;
+      case ShortcutContext.randomConfig:
+        return l10n.shortcut_context_random_config;
+      case ShortcutContext.settings:
+        return l10n.shortcut_context_settings;
+      case ShortcutContext.input:
+        return l10n.shortcut_context_input;
+      case ShortcutContext.vibeDetail:
+        return l10n.shortcut_context_vibe_detail;
+    }
+  }
 }
 
 /// 快捷键帮助悬浮按钮
@@ -491,7 +516,7 @@ class ShortcutHelpFab extends ConsumerWidget {
     return FloatingActionButton.small(
       heroTag: 'shortcut_help',
       onPressed: () => ShortcutHelpDialog.show(context),
-      tooltip: '快捷键帮助 (F1)',
+      tooltip: context.l10n.shortcut_help_fabTooltip,
       child: const Icon(Icons.keyboard),
     );
   }

@@ -35,6 +35,22 @@
   "common_added": "Added",
   "common_new": "New",
   "common_confirmDelete": "Confirm Delete",
+  "common_confirmClear": "Confirm Clear",
+  "common_gotIt": "Got it",
+  "common_deleteItemConfirm": "Delete \"{itemName}\"? This action cannot be undone.",
+  "@common_deleteItemConfirm": {
+    "placeholders": {
+      "itemName": {}
+    }
+  },
+  "common_clearAllItemsConfirm": "Clear all {count} {itemType}? This action cannot be undone.",
+  "@common_clearAllItemsConfirm": {
+    "placeholders": {
+      "count": {},
+      "itemType": {}
+    }
+  },
+  "common_clearInputConfirm": "Clear the input content?",
   "common_settings": "Settings",
   "common_today": "Today",
   "common_yesterday": "Yesterday",
@@ -120,6 +136,13 @@
   "auth_tokenInvalid": "Invalid token format, should start with pst-",
   "auth_nicknameOptional": "Nickname (optional)",
   "auth_nicknameHint": "Set a recognizable name for this account",
+  "auth_thirdPartyApiSite": "Third-party API Site",
+  "auth_imageApiSiteOptional": "Image API Site (optional)",
+  "auth_imageApiSiteHint": "Leave empty to use the same third-party API site",
+  "auth_thirdPartyNicknameHint": "For example: self-hosted site / mirror site",
+  "auth_thirdPartyTokenHint": "Enter the API token from the third-party site",
+  "auth_thirdPartyCompatibilityHint": "The third-party site must be compatible with NovelAI subscription and image-generation APIs. The token will be sent as a Bearer token.",
+  "auth_thirdPartyApiSiteRequired": "Enter third-party API site URL",
   "auth_saveAccount": "Save this account",
   "auth_validateAndLogin": "Validate & Login",
   "auth_tokenGuide": "Get Token from NovelAI settings",
@@ -247,6 +270,8 @@
   "settings_pathSavedRestartRequired": "Path updated, restart to apply changes",
   "settings_accountProfile": "Account Profile",
   "settings_accountType": "Account Type",
+  "settings_thirdPartyApiAccount": "Third-party Site API",
+  "settings_apiSite": "API Site",
   "settings_notLoggedIn": "Log in to set avatar and nickname",
   "settings_goToLogin": "Go to Login",
   "settings_tapToChangeAvatar": "Tap to change avatar",
@@ -304,6 +329,8 @@
   "generation_paramsSettings": "Parameter Settings",
   "generation_history": "History",
   "generation_historyRecord": "History Records",
+  "generation_failedStreamSnapshot": "Failed snapshot",
+  "generation_failedStreamSnapshotHint": "Generation did not finish; only the last preview frame is kept. It cannot be saved, favorited, or used for image workflows.",
   "generation_noHistory": "No history records",
   "generation_clearHistory": "Clear History",
   "generation_clearHistoryConfirm": "Are you sure you want to clear all history records? This action cannot be undone.",
@@ -1239,6 +1266,7 @@
   "gallery_applyVibeFromImage": "Extract and apply the image style / character",
   "gallery_noVibeData": "This image does not contain Vibe data",
   "gallery_sendToKrita": "Krita",
+  "gallery_sendToKritaAction": "Send to Krita",
   "gallery_sendToConnectedKrita": "Send to the connected Krita plugin",
   "gallery_upscalePanelLoaded": "Loaded the image-to-image upscale panel",
   "gallery_readImageFailed": "Failed to read image: {error}",
@@ -1899,6 +1927,9 @@
   "warmup_cooccurrenceInit": "Initializing cooccurrence data...",
   "warmup_translationInit": "Initializing translation data...",
   "warmup_danbooruTagsInit": "Initializing Danbooru tags...",
+  "warmup_dataMigration": "Migrating Hive / Vibe / image data...",
+  "warmup_galleryDataSource": "Initializing gallery index...",
+  "warmup_checkAndRecoverData": "Checking data integrity...",
   "warmup_group_dataSourceInitialization": "Initializing data source services...",
   "warmup_group_dataSourceInitialization_complete": "Data source services ready",
 
@@ -1969,10 +2000,12 @@
   "drop_processing": "Processing image...",
   "drop_processingSubtitle": "Please wait",
   "drop_img2img": "Image2Image",
+  "drop_reversePrompt": "Reverse Prompt",
   "drop_vibeTransfer": "Vibe Transfer",
   "drop_characterReference": "Character Reference",
   "drop_unsupportedFormat": "Unsupported file format",
   "drop_addedToImg2Img": "Added to Image2Image",
+  "drop_addedToReversePrompt": "Added to Reverse Prompt",
   "drop_addedToVibe": "Added to Vibe Transfer",
   "drop_addedMultipleToVibe": "Added {count} vibe references",
   "@drop_addedMultipleToVibe": {
@@ -3653,14 +3686,19 @@
   "localGallery_filterBySteps": "Filter by Steps",
   "localGallery_filterByCfg": "Filter by CFG Scale",
   "localGallery_filterByResolution": "Filter by Resolution",
+  "localGallery_filterSubtitle": "Precisely filter your image collection",
   "localGallery_model": "Model",
+  "localGallery_modelHint": "Enter model name...",
   "localGallery_sampler": "Sampler",
+  "localGallery_samplerHint": "Enter sampler name...",
   "localGallery_steps": "Steps",
   "localGallery_cfgScale": "CFG Scale",
   "localGallery_resolution": "Resolution",
+  "localGallery_resolutionHint": "Width x height (e.g. 1024x1024)",
   "localGallery_any": "Any",
   "localGallery_custom": "Custom",
   "localGallery_to": "to",
+  "localGallery_activeFiltersSet": "Filters set",
   "localGallery_applyFilters": "Apply Filters",
   "localGallery_resetAdvancedFilters": "Reset Advanced Filters",
   "localGallery_exportMetadata": "Export Metadata",
@@ -4676,6 +4714,16 @@
   "queue_importStrategyReplace": "Replace",
   "queue_importStrategyReplaceDesc": "Clear existing queue and replace with imported",
   "queue_supportedFormats": "Supported formats:",
+  "queue_supportedFormatJson": "• JSON file (.json)",
+  "queue_supportedFormatCsv": "• CSV file (.csv)",
+  "queue_supportedFormatText": "• Plain text file (.txt) - one prompt per line",
+  "queue_shareSubject": "Queue Export",
+  "queue_unsupportedFileFormat": "Unsupported file format: {extension}",
+  "@queue_unsupportedFileFormat": {
+    "placeholders": {
+      "extension": {}
+    }
+  },
   "queue_exportSuccess": "Export successful",
   "queue_exportFailed": "Export failed: {error}",
   "@queue_exportFailed": {
@@ -5078,14 +5126,28 @@
   "shortcut_help_title": "Keyboard Shortcuts Help",
   "shortcut_help_search": "Search shortcuts...",
   "shortcut_help_customize": "Customize Shortcuts",
+  "shortcut_help_all": "All",
+  "shortcut_help_tip": "Tip: press F1 or ? anytime to open this help dialog",
+  "shortcut_help_fabTooltip": "Keyboard Shortcuts Help (F1)",
+  "shortcut_editor_recordingInline": "Press shortcut...",
+  "shortcut_editor_pressEscToCancel": "Press Esc to cancel",
+  "shortcut_editor_clickToRecord": "Click to start recording",
+  "shortcut_editor_conflictWith": "This shortcut conflicts with \"{action}\"",
+  "@shortcut_editor_conflictWith": {
+    "placeholders": {
+      "action": {}
+    }
+  },
 
   "drop_dialogTitle": "How to use this image?",
   "drop_hint": "Drop image here",
   "drop_img2img": "Image to Image",
+  "drop_reversePrompt": "Reverse Prompt",
   "drop_vibeTransfer": "Vibe Transfer",
   "drop_characterReference": "Precise Reference",
   "drop_unsupportedFormat": "Unsupported file format",
   "drop_addedToImg2Img": "Added to Image to Image",
+  "drop_addedToReversePrompt": "Added to Reverse Prompt",
   "drop_addedToVibe": "Added to Vibe Transfer",
   "drop_addedMultipleToVibe": "Added {count} vibe references",
   "@drop_addedMultipleToVibe": {
@@ -6119,6 +6181,167 @@
   "@common_hoursAgo": {
     "placeholders": {
       "hours": {}
+    }
+  },
+  "common_saving": "Saving...",
+  "common_pleaseWait": "Please wait",
+  "common_change": "Change",
+  "common_expand": "Expand",
+  "common_collapse": "Collapse",
+
+  "vibeLibrary_emptySearchTitle": "No matching Vibes",
+  "vibeLibrary_emptySearchSubtitle": "Try a different keyword",
+  "vibeLibrary_emptyFavoritesTitle": "No favorite Vibes yet",
+  "vibeLibrary_emptyFavoritesSubtitle": "Click the heart icon to favorite a Vibe",
+  "vibeLibrary_emptyCategoryTitle": "No Vibes in this category",
+  "vibeLibrary_emptyCategorySubtitle": "Switch to \"All Vibes\" to see all entries",
+  "vibeLibrary_emptyNoMatchesTitle": "No matching results",
+  "vibeLibrary_emptySaveFromGenerationHint": "Save Vibes from the generation page to add them to the library",
+
+  "vibe_nameRequired": "Name is required",
+  "vibe_import_namingTitle": "Name Vibe",
+  "vibe_import_nameConflictOverwrite": "This name already exists and will be overwritten",
+  "vibe_previewLoadFailed": "Failed to load preview",
+  "vibe_import_applyToRemainingFiles": "Apply to all remaining files",
+  "vibe_import_applyNamingToRemainingFiles": "Use this naming rule for the remaining files",
+  "vibe_encodeImageTitle": "Encode Image as Vibe",
+  "vibe_imagePreview": "Image preview",
+  "vibe_encodeStartButton": "Start Encoding",
+  "vibe_encodeImageInProgress": "Encoding image...",
+  "vibe_encodeErrorImage": "Image: {fileName}",
+  "@vibe_encodeErrorImage": {
+    "placeholders": {
+      "fileName": {}
+    }
+  },
+  "vibe_encodeErrorMessage": "Error: {error}",
+  "@vibe_encodeErrorMessage": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "vibe_encodeSkipImage": "Skip this image",
+
+  "detail_sendToImg2Img": "Send to Image-to-Image",
+  "detail_sendToReversePrompt": "Send to Reverse Prompt",
+  "detail_loadingImage": "Loading image...",
+  "detail_imageLoadFailed": "Failed to load image",
+  "detail_noImage": "No image",
+  "detail_parsingMetadata": "Parsing metadata...",
+  "detail_noMetadata": "This image has no metadata",
+  "detail_metadata": "Metadata",
+  "detail_imageDetails": "Image Details",
+  "detail_basicInfo": "Basic Info",
+  "detail_fileName": "File Name",
+  "detail_modifiedTime": "Modified",
+  "detail_fileSize": "File Size",
+  "detail_noContent": "(No content)",
+  "detail_savePreset": "Save Preset",
+  "detail_copyLabel": "Copy {label}",
+  "@detail_copyLabel": {
+    "placeholders": {
+      "label": {}
+    }
+  },
+  "detail_copyCharacterPrompt": "Copy Character Prompt",
+  "detail_copyAllVibeData": "Copy all Vibe data",
+  "detail_saveToVibeLibrary": "Save to Vibe Library",
+
+  "pagination_firstPage": "First page",
+  "pagination_previousPage": "Previous page",
+  "pagination_nextPage": "Next page",
+  "pagination_lastPage": "Last page",
+  "pagination_jumpToPage": "Jump to page",
+  "pagination_jump": "Jump",
+  "pagination_itemsPerPage": "Per page",
+  "pagination_itemUnit": "items",
+
+  "diyGuide_title": "DIY Feature Guide",
+  "diyGuide_subtitle": "Learn advanced features and create your own library",
+  "diyGuide_intro": "This guide explains the core concepts and advanced features of the DIY system, helping you build powerful dynamic prompt libraries.",
+  "diyGuide_exampleLabel": "Example",
+  "diyGuide_hierarchyTitle": "Hierarchy",
+  "diyGuide_hierarchyDescription": "The DIY system uses a three-level category structure to organize prompts for easier management and lookup.",
+  "diyGuide_hierarchyExample": "Category: Character features\n  -> Group: Hairstyle\n      -> Tag: long hair, short hair, twintails",
+  "diyGuide_selectionModeTitle": "Selection Mode",
+  "diyGuide_selectionModeDescription": "Controls how many tags are selected from a group.",
+  "diyGuide_selectionModeExample": "• Random: select one item each time, such as a random hair color\n• All: select every tag in the group, such as a fixed feature set",
+  "diyGuide_weightTitle": "Weight Control",
+  "diyGuide_weightDescription": "Adjusts the influence of specific prompts during generation.",
+  "diyGuide_weightExample": "• Boost: curly brackets around masterpiece = 1.05x weight\n• Strong boost: triple curly brackets around masterpiece = 1.16x weight\n• Weaken: [bad hands] = 0.95x weight",
+  "diyGuide_genderTitle": "Gender Restriction",
+  "diyGuide_genderDescription": "Limits tags to specific character genders to avoid incompatible generated features.",
+  "diyGuide_genderExample": "• Female: only female characters, such as skirt\n• Male: only male characters, such as beard\n• Any: universal, such as T-shirt",
+  "diyGuide_scopeTitle": "Scope",
+  "diyGuide_scopeDescription": "Defines whether a tag applies to the character, background, or the whole image.",
+  "diyGuide_scopeExample": "• Character: character features, such as eyes and hair\n• Background: environment descriptions, such as blue sky and indoors\n• Global: art style and quality tags, such as best quality",
+  "diyGuide_conditionalTitle": "Conditional Branch",
+  "diyGuide_conditionalDescription": "Dynamically chooses later tags based on selected tags or other conditions.",
+  "diyGuide_conditionalExample": "IF selected \"rain\"\n  THEN add \"umbrella\" and \"wet clothes\"\n  ELSE add \"sunny\"",
+  "diyGuide_dependenciesTitle": "Dependencies",
+  "diyGuide_dependenciesDescription": "Creates links between tags so related tags are automatically introduced when one tag is selected.",
+  "diyGuide_dependenciesExample": "Selecting \"JK uniform\" -> automatically adds \"school background\" and \"school bag\"",
+  "diyGuide_visibilityTitle": "Visibility Rules",
+  "diyGuide_visibilityDescription": "Controls when tags are shown in the UI or become active during generation.",
+  "diyGuide_visibilityExample": "Only show the \"magic wand\" option group when the \"magical girl\" category is selected",
+  "diyGuide_timeTitle": "Time Condition",
+  "diyGuide_timeDescription": "Triggers specific tags based on real time or configured simulated time.",
+  "diyGuide_timeExample": "• 06:00-18:00 -> add \"daylight\"\n• 18:00-06:00 -> add \"night\"",
+  "diyGuide_postProcessingTitle": "Post-processing Rules",
+  "diyGuide_postProcessingDescription": "Runs text replacement or cleanup at the final stage of prompt generation.",
+  "diyGuide_postProcessingExample": "Replace every \"blue eyes\" with \"azure eyes\" for a more distinctive description",
+  "diyGuide_emphasisTitle": "Emphasis Probability",
+  "diyGuide_emphasisDescription": "Randomly adds weight syntax to tags to increase output variety.",
+  "diyGuide_emphasisExample": "Set a 30% probability: about 1/3 of outputs use a weighted tag and 2/3 output the plain tag",
+
+  "naiRules_title": "NAI Random Rules",
+  "naiRules_characterCountProbability": "Character Count Probability",
+  "naiRules_solo": "1 person (Solo)",
+  "naiRules_duo": "2 people (Duo)",
+  "naiRules_trio": "3 people (Trio)",
+  "naiRules_group": "4 people (Group)",
+  "naiRules_genderRules": "Gender Rules",
+  "naiRules_female": "Female",
+  "naiRules_male": "Male",
+  "naiRules_mixed": "Mixed / Other",
+  "naiRules_categoryProbability": "Category Probability",
+  "naiRules_dynamicTagWeightTitle": "Dynamic Tag Weight Adjustment",
+  "naiRules_dynamicTagWeightSubtitle": "Randomly combines multiple dimensions such as action, clothing, expression, and background, then adjusts category weights based on the image theme.",
+  "naiRules_specialMechanisms": "Special Mechanisms",
+  "naiRules_tagStrengthening": "Tag Strengthening",
+  "naiRules_seasonalLibraryTitle": "Seasonal Library",
+  "naiRules_seasonalLibrarySubtitle": "Automatically matches seasonal features, including seasonal clothing, weather, lighting, and atmosphere.",
+  "naiRules_v4CharacterPositioning": "V4 Multi-character Positioning",
+  "naiRules_smartPositionTitle": "Smart Position Assignment",
+  "naiRules_smartPositionSubtitle": "With V4 models, character positioning syntax is used to precisely control multi-character placement.",
+
+  "comfyImport_detectedTitle": "Detected ComfyUI multi-character prompt",
+  "comfyImport_characterList": "Character List ({count})",
+  "@comfyImport_characterList": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "comfyImport_usePositionInfo": "Use position information",
+  "comfyImport_usePositionInfoSubtitle": "Map ComfyUI regions to NAI character positions",
+  "comfyImport_convertCharacters": "Convert {count} characters",
+  "@comfyImport_convertCharacters": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "comfyImport_syntaxCouple": "COUPLE syntax",
+  "comfyImport_syntaxAndMask": "AND+MASK syntax",
+  "comfyImport_syntaxPipe": "Pipe format",
+  "comfyImport_syntaxUnknown": "Unknown syntax",
+  "comfyImport_globalPrompt": "Global Prompt",
+
+  "danbooruPreview_noTagData": "No tag data",
+  "danbooruPreview_noPoolData": "No Pool data",
+  "danbooruPreview_postCount": "{count} posts",
+  "@danbooruPreview_postCount": {
+    "placeholders": {
+      "count": {}
     }
   },
 

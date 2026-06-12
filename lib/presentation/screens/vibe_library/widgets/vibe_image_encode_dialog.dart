@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/utils/app_logger.dart';
+import '../../../../core/utils/localization_extension.dart';
 import '../../../../data/models/vibe/vibe_reference.dart';
 import '../../../widgets/common/editable_double_field.dart';
 import '../../../widgets/common/themed_slider.dart';
@@ -113,7 +114,7 @@ class _VibeImageEncodeDialogState extends State<VibeImageEncodeDialog> {
   /// 验证名称
   bool _validateName(String name) {
     if (name.trim().isEmpty) {
-      setState(() => _errorText = '名称不能为空');
+      setState(() => _errorText = context.l10n.vibe_nameRequired);
       return false;
     }
     setState(() => _errorText = null);
@@ -215,7 +216,7 @@ class _VibeImageEncodeDialogState extends State<VibeImageEncodeDialog> {
         const SizedBox(width: 12),
         Expanded(
           child: Text(
-            '编码图片为 Vibe',
+            context.l10n.vibe_encodeImageTitle,
             style: theme.textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.w600,
             ),
@@ -268,7 +269,7 @@ class _VibeImageEncodeDialogState extends State<VibeImageEncodeDialog> {
         ),
         const SizedBox(height: 8),
         Text(
-          '图片预览',
+          context.l10n.vibe_imagePreview,
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.outline,
           ),
@@ -289,7 +290,7 @@ class _VibeImageEncodeDialogState extends State<VibeImageEncodeDialog> {
         ),
         const SizedBox(height: 8),
         Text(
-          '预览加载失败',
+          context.l10n.vibe_previewLoadFailed,
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.outline,
           ),
@@ -304,8 +305,8 @@ class _VibeImageEncodeDialogState extends State<VibeImageEncodeDialog> {
       controller: _nameController,
       focusNode: _nameFocusNode,
       decoration: InputDecoration(
-        labelText: '名称',
-        hintText: '输入 Vibe 名称',
+        labelText: context.l10n.vibe_saveToLibrary_nameLabel,
+        hintText: context.l10n.vibe_saveToLibrary_nameHint,
         errorText: _errorText,
         prefixIcon: const Icon(Icons.label_outline),
         border: OutlineInputBorder(
@@ -390,7 +391,7 @@ class _VibeImageEncodeDialogState extends State<VibeImageEncodeDialog> {
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                'Info Extracted',
+                context.l10n.vibe_infoExtracted,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w500,
                 ),
@@ -442,7 +443,7 @@ class _VibeImageEncodeDialogState extends State<VibeImageEncodeDialog> {
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              '编码将消耗 2 Anlas',
+              context.l10n.vibe_import_encodingCost,
               style: theme.textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w500,
               ),
@@ -461,14 +462,14 @@ class _VibeImageEncodeDialogState extends State<VibeImageEncodeDialog> {
         // 取消按钮
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('取消'),
+          child: Text(context.l10n.common_cancel),
         ),
         const SizedBox(width: 8),
         // 开始编码按钮
         FilledButton.icon(
           onPressed: _confirm,
           icon: const Icon(Icons.play_arrow),
-          label: const Text('开始编码'),
+          label: Text(context.l10n.vibe_encodeStartButton),
         ),
       ],
     );
@@ -494,6 +495,7 @@ class VibeImageEncodingDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -514,14 +516,14 @@ class VibeImageEncodingDialog extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               Text(
-                '正在编码图片...',
+                l10n.vibe_encodeImageInProgress,
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w500,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
-                '请稍候',
+                l10n.common_pleaseWait,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.outline,
                 ),
@@ -569,18 +571,19 @@ class VibeImageEncodeErrorDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
 
     return AlertDialog(
       icon: Icon(Icons.error_outline, color: theme.colorScheme.error, size: 32),
-      title: const Text('编码失败'),
+      title: Text(l10n.vibe_import_encodingFailed),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('图片: $fileName'),
+          Text(l10n.vibe_encodeErrorImage(fileName)),
           const SizedBox(height: 8),
           Text(
-            '错误: $errorMessage',
+            l10n.vibe_encodeErrorMessage(errorMessage),
             style: TextStyle(color: theme.colorScheme.error),
           ),
         ],
@@ -590,13 +593,13 @@ class VibeImageEncodeErrorDialog extends StatelessWidget {
           onPressed: () =>
               Navigator.of(context).pop(VibeEncodeErrorAction.skip),
           icon: const Icon(Icons.skip_next),
-          label: const Text('跳过此图'),
+          label: Text(l10n.vibe_encodeSkipImage),
         ),
         FilledButton.icon(
           onPressed: () =>
               Navigator.of(context).pop(VibeEncodeErrorAction.retry),
           icon: const Icon(Icons.refresh),
-          label: const Text('重试'),
+          label: Text(l10n.common_retry),
         ),
       ],
     );
