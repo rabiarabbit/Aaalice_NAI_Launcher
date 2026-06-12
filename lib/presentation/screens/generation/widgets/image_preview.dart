@@ -6,11 +6,15 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nai_launcher/l10n/app_localizations.dart';
+import 'package:path/path.dart' as p;
 
+import '../../../../core/enums/precise_ref_type.dart';
 import '../../../../core/utils/app_logger.dart';
+import '../../../../core/utils/file_explorer_utils.dart';
 import '../../../../core/utils/image_save_utils.dart';
 import '../../../../core/utils/localization_extension.dart';
 import '../../../../core/utils/prompt_preset_resolution.dart';
+import '../../../../core/utils/vibe_file_parser.dart';
 import '../../../../data/models/character/character_prompt.dart';
 import '../../../../data/repositories/gallery_folder_repository.dart';
 import '../../../../data/services/alias_resolver_service.dart';
@@ -22,6 +26,7 @@ import '../../../providers/fixed_tags_provider.dart';
 import '../../../providers/image_generation_provider.dart';
 import '../../../providers/local_gallery_provider.dart';
 import '../../../providers/quality_preset_provider.dart';
+import '../../../providers/reverse_prompt_provider.dart';
 import '../../../providers/tag_library_page_provider.dart';
 import '../../../providers/uc_preset_provider.dart';
 import '../../../services/image_workflow_launcher.dart';
@@ -200,45 +205,12 @@ class _ImagePreviewWidgetState extends ConsumerState<ImagePreviewWidget> {
           itemCount: images.length,
           itemBuilder: (context, index) {
             final image = images[index];
-            final imageBytes = image.bytes;
-            return SelectableImageCard(
-              imageBytes: imageBytes,
-              sourceFilePath: image.filePath,
+            return _buildGeneratedImageCard(
+              context: context,
+              ref: ref,
+              image: image,
               index: index,
               showIndex: true,
-              enableSelection: false,
-              onTap: () => _showFullscreenImage(imageBytes),
-              onEditImage: () => ImageWorkflowLauncher.openEditor(
-                context,
-                ref,
-                imageBytes,
-                mode: ImageEditorMode.edit,
-              ),
-              onInpaint: () =>
-                  ImageWorkflowLauncher.openInpaint(context, ref, imageBytes),
-              onGenerateVariations: () =>
-                  ImageWorkflowLauncher.generateVariations(
-                context,
-                ref,
-                imageBytes,
-              ),
-              onDirectorTools: () => ImageWorkflowLauncher.openDirectorTools(
-                context,
-                ref,
-                imageBytes,
-              ),
-              onEnhance: () =>
-                  ImageWorkflowLauncher.openEnhance(ref, imageBytes),
-              onUpscale: () =>
-                  ImageWorkflowLauncher.openUpscale(ref, imageBytes),
-              onSendToKrita: () => KritaSendHelper.sendImageBytes(
-                context,
-                ref,
-                image.bytes,
-                name: 'generation_${image.id}.png',
-              ),
-              onSaveToLibrary: (bytes, _) =>
-                  _showSaveToLibraryDialog(context, bytes),
             );
           },
         );
@@ -291,45 +263,12 @@ class _ImagePreviewWidgetState extends ConsumerState<ImagePreviewWidget> {
 
             // 已完成的图像
             final image = completedImages[index];
-            final imageBytes = image.bytes;
-            return SelectableImageCard(
-              imageBytes: imageBytes,
-              sourceFilePath: image.filePath,
+            return _buildGeneratedImageCard(
+              context: context,
+              ref: ref,
+              image: image,
               index: index,
               showIndex: true,
-              enableSelection: false,
-              onTap: () => _showFullscreenImage(imageBytes),
-              onEditImage: () => ImageWorkflowLauncher.openEditor(
-                context,
-                ref,
-                imageBytes,
-                mode: ImageEditorMode.edit,
-              ),
-              onInpaint: () =>
-                  ImageWorkflowLauncher.openInpaint(context, ref, imageBytes),
-              onGenerateVariations: () =>
-                  ImageWorkflowLauncher.generateVariations(
-                context,
-                ref,
-                imageBytes,
-              ),
-              onDirectorTools: () => ImageWorkflowLauncher.openDirectorTools(
-                context,
-                ref,
-                imageBytes,
-              ),
-              onEnhance: () =>
-                  ImageWorkflowLauncher.openEnhance(ref, imageBytes),
-              onUpscale: () =>
-                  ImageWorkflowLauncher.openUpscale(ref, imageBytes),
-              onSendToKrita: () => KritaSendHelper.sendImageBytes(
-                context,
-                ref,
-                image.bytes,
-                name: 'generation_${image.id}.png',
-              ),
-              onSaveToLibrary: (bytes, _) =>
-                  _showSaveToLibraryDialog(context, bytes),
             );
           },
         );
@@ -506,41 +445,246 @@ class _ImagePreviewWidgetState extends ConsumerState<ImagePreviewWidget> {
   ) {
     return _buildSingleAspectRatioCard(
       aspectRatio: image.aspectRatio,
-      child: SelectableImageCard(
-        imageBytes: image.bytes,
-        sourceFilePath: image.filePath,
+      child: _buildGeneratedImageCard(
+        context: context,
+        ref: ref,
+        image: image,
         showIndex: false,
-        enableSelection: false,
-        onTap: () => _showFullscreenImage(image.bytes),
-        onEditImage: () => ImageWorkflowLauncher.openEditor(
-          context,
-          ref,
-          image.bytes,
-          mode: ImageEditorMode.edit,
-        ),
-        onInpaint: () =>
-            ImageWorkflowLauncher.openInpaint(context, ref, image.bytes),
-        onGenerateVariations: () => ImageWorkflowLauncher.generateVariations(
-          context,
-          ref,
-          image.bytes,
-        ),
-        onDirectorTools: () => ImageWorkflowLauncher.openDirectorTools(
-          context,
-          ref,
-          image.bytes,
-        ),
-        onEnhance: () => ImageWorkflowLauncher.openEnhance(ref, image.bytes),
-        onUpscale: () => ImageWorkflowLauncher.openUpscale(ref, image.bytes),
-        onSendToKrita: () => KritaSendHelper.sendImageBytes(
-          context,
-          ref,
-          image.bytes,
-          name: 'generation_${image.id}.png',
-        ),
-        onSaveToLibrary: (bytes, _) => _showSaveToLibraryDialog(context, bytes),
       ),
     );
+  }
+
+  Widget _buildGeneratedImageCard({
+    required BuildContext context,
+    required WidgetRef ref,
+    required GeneratedImage image,
+    required bool showIndex,
+    int? index,
+  }) {
+    final imageBytes = image.bytes;
+    final canUseAsInput = image.canUseAsGenerationInput;
+    final isFailedSnapshot = image.isFailedStreamSnapshot;
+
+    return SelectableImageCard(
+      imageBytes: imageBytes,
+      sourceFilePath: image.filePath,
+      index: index,
+      showIndex: showIndex,
+      enableSelection: false,
+      enableSaveAction: image.canSave,
+      enableCopyAction: image.canSave,
+      statusBadgeLabel: isFailedSnapshot
+          ? context.l10n.generation_failedStreamSnapshot
+          : null,
+      statusBadgeTooltip: isFailedSnapshot
+          ? context.l10n.generation_failedStreamSnapshotHint
+          : null,
+      onTap: () => _showFullscreenImage(imageBytes),
+      onReversePrompt: canUseAsInput
+          ? () => unawaited(
+                _sendPreviewImageToReversePrompt(context, image),
+              )
+          : null,
+      onImageToImage: canUseAsInput
+          ? () => _sendPreviewImageToImageToImage(context, image)
+          : null,
+      onVibeTransfer: canUseAsInput
+          ? () => unawaited(
+                _sendPreviewImageToVibeTransfer(context, image),
+              )
+          : null,
+      onPreciseReference: canUseAsInput
+          ? () => unawaited(
+                _sendPreviewImageToPreciseReference(context, image),
+              )
+          : null,
+      onEditImage: canUseAsInput
+          ? () => ImageWorkflowLauncher.openEditor(
+                context,
+                ref,
+                imageBytes,
+                mode: ImageEditorMode.edit,
+              )
+          : null,
+      onInpaint: canUseAsInput
+          ? () => ImageWorkflowLauncher.openInpaint(
+                context,
+                ref,
+                imageBytes,
+              )
+          : null,
+      onGenerateVariations: canUseAsInput
+          ? () => ImageWorkflowLauncher.generateVariations(
+                context,
+                ref,
+                imageBytes,
+              )
+          : null,
+      onDirectorTools: canUseAsInput
+          ? () => ImageWorkflowLauncher.openDirectorTools(
+                context,
+                ref,
+                imageBytes,
+              )
+          : null,
+      onEnhance: canUseAsInput
+          ? () => ImageWorkflowLauncher.openEnhance(ref, imageBytes)
+          : null,
+      onUpscale: canUseAsInput
+          ? () => ImageWorkflowLauncher.openUpscale(ref, imageBytes)
+          : null,
+      onSendToKrita: canUseAsInput
+          ? () => KritaSendHelper.sendImageBytes(
+                context,
+                ref,
+                imageBytes,
+                name: _previewImageFileName(image),
+              )
+          : null,
+      onOpenInExplorer:
+          image.canSave ? () => _openImageInExplorer(context, image) : null,
+      onSaveToLibrary: canUseAsInput
+          ? (bytes, _) => _showSaveToLibraryDialog(context, bytes)
+          : null,
+    );
+  }
+
+  String _previewImageFileName(GeneratedImage image) {
+    final filePath = image.filePath;
+    if (filePath != null && filePath.isNotEmpty) {
+      return p.basename(filePath);
+    }
+    return 'generation_${image.id}.png';
+  }
+
+  Future<void> _sendPreviewImageToReversePrompt(
+    BuildContext context,
+    GeneratedImage image,
+  ) async {
+    final l10n = context.l10n;
+
+    try {
+      await ref.read(reversePromptProvider.notifier).addImage(
+            image.bytes,
+            name: _previewImageFileName(image),
+          );
+
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.drop_addedToReversePrompt);
+    } catch (e) {
+      if (context.mounted) {
+        AppToast.error(context, l10n.gallery_sendFailed(e.toString()));
+      }
+    }
+  }
+
+  void _sendPreviewImageToImageToImage(
+    BuildContext context,
+    GeneratedImage image,
+  ) {
+    ImageWorkflowLauncher.openImageToImage(ref, image.bytes);
+    AppToast.success(context, context.l10n.drop_addedToImg2Img);
+  }
+
+  Future<void> _sendPreviewImageToVibeTransfer(
+    BuildContext context,
+    GeneratedImage image,
+  ) async {
+    final l10n = context.l10n;
+
+    try {
+      final currentState = ref.read(generationParamsNotifierProvider);
+      final currentCount = currentState.vibeReferencesV4.length;
+      const maxCount = 16;
+      final vibes = await VibeFileParser.parseFile(
+        _previewImageFileName(image),
+        image.bytes,
+      );
+
+      if (!context.mounted) return;
+      if (currentCount + vibes.length > maxCount) {
+        AppToast.warning(context, l10n.toast_styleReferenceLimit(maxCount));
+        return;
+      }
+
+      ref
+          .read(generationParamsNotifierProvider.notifier)
+          .addVibeReferences(vibes);
+
+      final message = currentCount > 0
+          ? l10n.toast_appendedStyleReferences(vibes.length)
+          : vibes.length == 1
+              ? l10n.drop_addedToVibe
+              : l10n.drop_addedMultipleToVibe(vibes.length);
+      AppToast.success(context, message);
+    } catch (e) {
+      if (context.mounted) {
+        AppToast.error(context, '${l10n.vibeParseFailed}: $e');
+      }
+    }
+  }
+
+  Future<void> _sendPreviewImageToPreciseReference(
+    BuildContext context,
+    GeneratedImage image,
+  ) async {
+    final l10n = context.l10n;
+
+    try {
+      await ref
+          .read(generationParamsNotifierProvider.notifier)
+          .addPreciseReferenceFromImage(
+            image.bytes,
+            type: PreciseRefType.character,
+            strength: 1.0,
+            fidelity: 1.0,
+          );
+
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.drop_addedToCharacterRef);
+    } catch (e) {
+      if (context.mounted) {
+        AppToast.error(context, l10n.gallery_sendFailed(e.toString()));
+      }
+    }
+  }
+
+  /// 在文件夹中定位图片。已保存的图片直接定位原文件，未保存时先保存再定位。
+  Future<void> _openImageInExplorer(
+    BuildContext context,
+    GeneratedImage image,
+  ) async {
+    try {
+      final existingPath = image.filePath;
+      if (existingPath != null &&
+          existingPath.isNotEmpty &&
+          await File(existingPath).exists()) {
+        await FileExplorerUtils.revealFile(existingPath);
+        return;
+      }
+
+      final saveDirPath = await GalleryFolderRepository.instance.getRootPath();
+      if (saveDirPath == null) return;
+      final saveDir = Directory(saveDirPath);
+      if (!await saveDir.exists()) {
+        await saveDir.create(recursive: true);
+      }
+
+      final fileName = 'NAI_${DateTime.now().millisecondsSinceEpoch}.png';
+      final file = File(p.join(saveDirPath, fileName));
+      await file.writeAsBytes(image.bytes);
+
+      ref.read(localGalleryNotifierProvider.notifier).refresh();
+      await FileExplorerUtils.revealFile(file.path);
+
+      if (context.mounted) {
+        AppToast.success(context, context.l10n.image_imageSaved(saveDirPath));
+      }
+    } catch (e) {
+      if (context.mounted) {
+        AppToast.error(context, context.l10n.image_saveFailed(e.toString()));
+      }
+    }
   }
 
   Widget _buildSingleAspectRatioCard({
