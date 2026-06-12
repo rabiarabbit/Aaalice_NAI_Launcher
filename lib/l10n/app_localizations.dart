@@ -19241,6 +19241,408 @@ abstract class AppLocalizations {
   /// **'Include thumbnail preview in export file'**
   String get vibe_export_include_thumbnails_subtitle;
 
+  /// No description provided for @vibe_export_singleFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Single file (.naiv4vibe)'**
+  String get vibe_export_singleFile;
+
+  /// No description provided for @vibe_export_singleFileDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Export each Vibe as a separate file, suitable for sharing one Vibe'**
+  String get vibe_export_singleFileDescription;
+
+  /// No description provided for @vibe_export_bundleFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Bundle file (.naiv4vibebundle)'**
+  String get vibe_export_bundleFile;
+
+  /// No description provided for @vibe_export_bundleFileDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Pack multiple Vibes into one file, suitable for batch backup'**
+  String get vibe_export_bundleFileDescription;
+
+  /// No description provided for @vibe_export_embedIntoPng.
+  ///
+  /// In en, this message translates to:
+  /// **'Embed into PNG'**
+  String get vibe_export_embedIntoPng;
+
+  /// No description provided for @vibe_export_embedIntoPngDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Export a single Vibe by embedding its data into PNG metadata'**
+  String get vibe_export_embedIntoPngDescription;
+
+  /// No description provided for @vibe_export_exportable.
+  ///
+  /// In en, this message translates to:
+  /// **'Exportable'**
+  String get vibe_export_exportable;
+
+  /// No description provided for @vibe_export_notExportable.
+  ///
+  /// In en, this message translates to:
+  /// **'Not exportable'**
+  String get vibe_export_notExportable;
+
+  /// No description provided for @vibe_export_selectVibesToExport.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Vibes to export'**
+  String get vibe_export_selectVibesToExport;
+
+  /// No description provided for @vibe_export_exportSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Export ({count})'**
+  String vibe_export_exportSelected(int count);
+
+  /// No description provided for @vibe_export_strengthPercent.
+  ///
+  /// In en, this message translates to:
+  /// **'Strength: {percent}%'**
+  String vibe_export_strengthPercent(int percent);
+
+  /// No description provided for @vibe_export_pngCarrierImage.
+  ///
+  /// In en, this message translates to:
+  /// **'PNG carrier image'**
+  String get vibe_export_pngCarrierImage;
+
+  /// No description provided for @vibe_export_noUsablePngCarrier.
+  ///
+  /// In en, this message translates to:
+  /// **'This Vibe has no directly usable PNG carrier image. You can choose an external PNG image as the carrier.'**
+  String get vibe_export_noUsablePngCarrier;
+
+  /// No description provided for @vibe_export_selectExternalPngImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Select external PNG image...'**
+  String get vibe_export_selectExternalPngImage;
+
+  /// No description provided for @vibe_export_changeExternalPngImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Change external PNG image...'**
+  String get vibe_export_changeExternalPngImage;
+
+  /// No description provided for @vibe_export_useVibeImageInstead.
+  ///
+  /// In en, this message translates to:
+  /// **'Use Vibe image instead'**
+  String get vibe_export_useVibeImageInstead;
+
+  /// No description provided for @vibe_export_usingExternalPng.
+  ///
+  /// In en, this message translates to:
+  /// **'Using external PNG: {fileName}'**
+  String vibe_export_usingExternalPng(String fileName);
+
+  /// No description provided for @vibe_export_selectPngImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Select PNG image'**
+  String get vibe_export_selectPngImage;
+
+  /// No description provided for @vibe_export_invalidPngImage.
+  ///
+  /// In en, this message translates to:
+  /// **'The selected file is not a valid PNG image'**
+  String get vibe_export_invalidPngImage;
+
+  /// No description provided for @vibe_export_selectPngImageFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to select PNG image: {error}'**
+  String vibe_export_selectPngImageFailed(String error);
+
+  /// No description provided for @vibe_export_embeddingPng.
+  ///
+  /// In en, this message translates to:
+  /// **'Embedding PNG: {name}'**
+  String vibe_export_embeddingPng(String name);
+
+  /// No description provided for @vibe_export_exportCompleteCounts.
+  ///
+  /// In en, this message translates to:
+  /// **'Export complete: {successCount} succeeded, {failCount} failed'**
+  String vibe_export_exportCompleteCounts(int successCount, int failCount);
+
+  /// No description provided for @vibe_export_exportCompletePath.
+  ///
+  /// In en, this message translates to:
+  /// **'Export complete: {path}'**
+  String vibe_export_exportCompletePath(String path);
+
+  /// No description provided for @vibe_export_packingVibes.
+  ///
+  /// In en, this message translates to:
+  /// **'Packing {count} Vibes...'**
+  String vibe_export_packingVibes(int count);
+
+  /// No description provided for @vibe_export_exportingName.
+  ///
+  /// In en, this message translates to:
+  /// **'Exporting: {name}'**
+  String vibe_export_exportingName(String name);
+
+  /// No description provided for @vibe_export_selectExportFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'Select export folder'**
+  String get vibe_export_selectExportFolder;
+
+  /// No description provided for @vibe_export_generatingBundleFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Generating bundle file...'**
+  String get vibe_export_generatingBundleFile;
+
+  /// No description provided for @vibe_export_bundleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Export Bundle: {name}'**
+  String vibe_export_bundleTitle(String name);
+
+  /// No description provided for @vibe_export_vibesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Export Vibes ({count} selected)'**
+  String vibe_export_vibesTitle(int count);
+
+  /// No description provided for @vibe_export_method.
+  ///
+  /// In en, this message translates to:
+  /// **'Export Method'**
+  String get vibe_export_method;
+
+  /// No description provided for @vibe_export_wholeBundle.
+  ///
+  /// In en, this message translates to:
+  /// **'Whole Bundle'**
+  String get vibe_export_wholeBundle;
+
+  /// No description provided for @vibe_export_internalVibe.
+  ///
+  /// In en, this message translates to:
+  /// **'Internal Vibe'**
+  String get vibe_export_internalVibe;
+
+  /// No description provided for @vibe_export_wholeBundleDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Export as a .naiv4vibebundle file containing all {count} vibes'**
+  String vibe_export_wholeBundleDescription(int count);
+
+  /// No description provided for @vibe_export_internalVibeDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Select internal bundle vibes to export separately as .naiv4vibe files ({count} total)'**
+  String vibe_export_internalVibeDescription(int count);
+
+  /// No description provided for @vibe_export_exportBundle.
+  ///
+  /// In en, this message translates to:
+  /// **'Export Bundle'**
+  String get vibe_export_exportBundle;
+
+  /// No description provided for @vibe_export_exportAsFiles.
+  ///
+  /// In en, this message translates to:
+  /// **'Export as Files'**
+  String get vibe_export_exportAsFiles;
+
+  /// No description provided for @vibe_export_exportBundleDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Export as a .naiv4vibebundle file'**
+  String get vibe_export_exportBundleDescription;
+
+  /// No description provided for @vibe_export_exportAsFilesDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Export as .naiv4vibe or .naiv4vibebundle files'**
+  String get vibe_export_exportAsFilesDescription;
+
+  /// No description provided for @vibe_export_compressData.
+  ///
+  /// In en, this message translates to:
+  /// **'Compress data'**
+  String get vibe_export_compressData;
+
+  /// No description provided for @vibe_export_compressDataDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Use compression to reduce file size (recommended for batch export)'**
+  String get vibe_export_compressDataDescription;
+
+  /// No description provided for @vibe_export_exportAsPng.
+  ///
+  /// In en, this message translates to:
+  /// **'Export as PNG'**
+  String get vibe_export_exportAsPng;
+
+  /// No description provided for @vibe_export_pngInternalBundleUnsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'Embedding into an image is not supported when exporting a single internal bundle vibe'**
+  String get vibe_export_pngInternalBundleUnsupported;
+
+  /// No description provided for @vibe_export_embedVibeDataIntoPng.
+  ///
+  /// In en, this message translates to:
+  /// **'Embed Vibe data into PNG metadata'**
+  String get vibe_export_embedVibeDataIntoPng;
+
+  /// No description provided for @vibe_export_batchPngUsesFirstImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Batch export uses each Vibe\'s first available image. Entries without images are skipped automatically.'**
+  String get vibe_export_batchPngUsesFirstImage;
+
+  /// No description provided for @vibe_export_exportCarrierImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Export carrier image'**
+  String get vibe_export_exportCarrierImage;
+
+  /// No description provided for @vibe_export_usingExternalCarrierImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Using an external PNG as the export carrier image'**
+  String get vibe_export_usingExternalCarrierImage;
+
+  /// No description provided for @vibe_export_exportAsEncodings.
+  ///
+  /// In en, this message translates to:
+  /// **'Export as Encodings'**
+  String get vibe_export_exportAsEncodings;
+
+  /// No description provided for @vibe_export_exportAsEncodingsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Export data as encodings (JSON or Base64)'**
+  String get vibe_export_exportAsEncodingsDescription;
+
+  /// No description provided for @vibe_export_jsonDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Export as a formatted JSON file for easier reading and editing'**
+  String get vibe_export_jsonDescription;
+
+  /// No description provided for @vibe_export_base64Description.
+  ///
+  /// In en, this message translates to:
+  /// **'Export as plain Base64 for copying and sharing'**
+  String get vibe_export_base64Description;
+
+  /// No description provided for @vibe_export_selectAtLeastOneMethod.
+  ///
+  /// In en, this message translates to:
+  /// **'Select at least one export method'**
+  String get vibe_export_selectAtLeastOneMethod;
+
+  /// No description provided for @vibe_export_batchPngUnsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'Batch Vibe export does not support embedding into PNG. Use the single Vibe export screen.'**
+  String get vibe_export_batchPngUnsupported;
+
+  /// No description provided for @vibe_export_selectPngCarrier.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a PNG carrier image for export'**
+  String get vibe_export_selectPngCarrier;
+
+  /// No description provided for @vibe_export_selectAtLeastOneInternalVibe.
+  ///
+  /// In en, this message translates to:
+  /// **'Select at least one internal vibe to export'**
+  String get vibe_export_selectAtLeastOneInternalVibe;
+
+  /// No description provided for @vibe_export_selectVibeExportFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Vibe export folder'**
+  String get vibe_export_selectVibeExportFolder;
+
+  /// No description provided for @vibe_export_saveEncodingFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Save encoding file'**
+  String get vibe_export_saveEncodingFile;
+
+  /// No description provided for @vibe_export_preparingExport.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing export...'**
+  String get vibe_export_preparingExport;
+
+  /// No description provided for @vibe_export_exportingBundle.
+  ///
+  /// In en, this message translates to:
+  /// **'Exporting Bundle...'**
+  String get vibe_export_exportingBundle;
+
+  /// No description provided for @vibe_export_embeddingImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Embedding image...'**
+  String get vibe_export_embeddingImage;
+
+  /// No description provided for @vibe_export_exportingEncoding.
+  ///
+  /// In en, this message translates to:
+  /// **'Exporting encoding...'**
+  String get vibe_export_exportingEncoding;
+
+  /// No description provided for @vibe_export_exportFailedWithError.
+  ///
+  /// In en, this message translates to:
+  /// **'Export failed: {error}'**
+  String vibe_export_exportFailedWithError(String error);
+
+  /// No description provided for @vibe_export_bundleFilePathEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Bundle file path is empty'**
+  String get vibe_export_bundleFilePathEmpty;
+
+  /// No description provided for @vibe_export_invalidImageFormatWithError.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid image format: {error}'**
+  String vibe_export_invalidImageFormatWithError(String error);
+
+  /// No description provided for @vibe_export_embedFailedWithError.
+  ///
+  /// In en, this message translates to:
+  /// **'Embed failed: {error}'**
+  String vibe_export_embedFailedWithError(String error);
+
+  /// No description provided for @vibe_export_embedImageFailedWithError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to embed image: {error}'**
+  String vibe_export_embedImageFailedWithError(String error);
+
+  /// No description provided for @vibe_export_extractingVibeProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Extracting vibe {current}/{total}...'**
+  String vibe_export_extractingVibeProgress(int current, int total);
+
+  /// No description provided for @vibe_export_selectImageFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to select image: {error}'**
+  String vibe_export_selectImageFailed(String error);
+
   /// No description provided for @vibe_export_dialogTitle.
   ///
   /// In en, this message translates to:

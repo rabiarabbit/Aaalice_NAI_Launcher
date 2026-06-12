@@ -80,85 +80,98 @@ class BulkActionBar extends StatelessWidget {
               ),
             ),
           ),
-          child: Row(
-            children: [
-              // 退出按钮
-              _ActionButton(
-                icon: Icons.close,
-                label: 'Exit',
-                onPressed: onExit,
-                compact: true,
-              ),
-              const SizedBox(width: 12),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final compactActions = constraints.maxWidth < 900;
 
-              // 选中数量徽章
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color:
-                      theme.colorScheme.primaryContainer.withValues(alpha: 0.8),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  'Selected $selectedCount $itemName',
-                  style: theme.textTheme.labelLarge?.copyWith(
-                    color: theme.colorScheme.onPrimaryContainer,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-
-              // 全选/取消全选按钮
-              _ActionButton(
-                icon: isAllSelected ? Icons.deselect : Icons.select_all,
-                label: isAllSelected ? deselectAllLabel : selectAllLabel,
-                onPressed: onSelectAll,
-                compact: true,
-              ),
-              if (onSelectAllAvailable != null) ...[
-                const SizedBox(width: 8),
-                _ActionButton(
-                  icon: isAllAvailableSelected
-                      ? Icons.deselect
-                      : Icons.library_add_check_outlined,
-                  label: isAllAvailableSelected
-                      ? deselectAllAvailableLabel
-                      : selectAllAvailableLabel,
-                  onPressed: onSelectAllAvailable,
-                  compact: true,
-                ),
-              ],
-
-              const Spacer(),
-
-              // 操作按钮组
-              Row(
-                mainAxisSize: MainAxisSize.min,
+              return Row(
                 children: [
-                  for (int i = 0; i < actions.length; i++) ...[
-                    if (i > 0 && actions[i].showDividerBefore) ...[
-                      const SizedBox(width: 16),
-                      Container(
-                        width: 1,
-                        height: 28,
-                        color: theme.dividerColor.withValues(alpha: 0.3),
+                  // 退出按钮
+                  _ActionButton(
+                    icon: Icons.close,
+                    label: 'Exit',
+                    onPressed: onExit,
+                    compact: true,
+                  ),
+                  const SizedBox(width: 12),
+
+                  // 选中数量徽章
+                  Flexible(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
                       ),
-                      const SizedBox(width: 16),
-                    ] else if (i > 0)
-                      const SizedBox(width: 8),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primaryContainer
+                            .withValues(alpha: 0.8),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        'Selected $selectedCount $itemName',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.labelLarge?.copyWith(
+                          color: theme.colorScheme.onPrimaryContainer,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+
+                  // 全选/取消全选按钮
+                  _ActionButton(
+                    icon: isAllSelected ? Icons.deselect : Icons.select_all,
+                    label: isAllSelected ? deselectAllLabel : selectAllLabel,
+                    onPressed: onSelectAll,
+                    compact: true,
+                  ),
+                  if (onSelectAllAvailable != null) ...[
+                    const SizedBox(width: 8),
                     _ActionButton(
-                      icon: actions[i].icon,
-                      label: actions[i].label,
-                      onPressed: hasSelection ? actions[i].onPressed : null,
-                      color: actions[i].color,
-                      isDanger: actions[i].isDanger,
+                      icon: isAllAvailableSelected
+                          ? Icons.deselect
+                          : Icons.library_add_check_outlined,
+                      label: isAllAvailableSelected
+                          ? deselectAllAvailableLabel
+                          : selectAllAvailableLabel,
+                      onPressed: onSelectAllAvailable,
+                      compact: true,
                     ),
                   ],
+
+                  const Spacer(),
+
+                  // 操作按钮组
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      for (int i = 0; i < actions.length; i++) ...[
+                        if (i > 0 && actions[i].showDividerBefore) ...[
+                          const SizedBox(width: 16),
+                          Container(
+                            width: 1,
+                            height: 28,
+                            color: theme.dividerColor.withValues(alpha: 0.3),
+                          ),
+                          const SizedBox(width: 16),
+                        ] else if (i > 0)
+                          const SizedBox(width: 8),
+                        _ActionButton(
+                          icon: actions[i].icon,
+                          label: actions[i].label,
+                          onPressed: hasSelection ? actions[i].onPressed : null,
+                          color: actions[i].color,
+                          isDanger: actions[i].isDanger,
+                          compact: compactActions,
+                        ),
+                      ],
+                    ],
+                  ),
                 ],
-              ),
-            ],
+              );
+            },
           ),
         ),
       ),

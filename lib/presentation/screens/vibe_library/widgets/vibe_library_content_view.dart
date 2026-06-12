@@ -912,6 +912,9 @@ class _ContextMenuRoute extends PopupRoute {
                   onSelect: (item) {
                     onSelect(item);
                     Navigator.of(context).pop();
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      item.onTap?.call();
+                    });
                   },
                 ),
               ],

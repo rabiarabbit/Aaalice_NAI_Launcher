@@ -237,6 +237,7 @@ void main() {
           child: MaterialApp(
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
+            locale: const Locale('zh'),
             home: Scaffold(
               body: VibeExportDialogAdvanced(
                 entries: [
@@ -251,7 +252,7 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      expect(find.text('Export as PNG'), findsNothing);
+      expect(find.text('导出为 PNG'), findsNothing);
     });
 
     testWidgets('单个 Vibe 导出显示嵌入 PNG 入口', (tester) async {
@@ -263,6 +264,7 @@ void main() {
           child: MaterialApp(
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
+            locale: const Locale('zh'),
             home: Scaffold(
               body: VibeExportDialog(
                 entries: [

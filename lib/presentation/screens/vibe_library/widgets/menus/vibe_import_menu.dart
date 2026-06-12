@@ -66,6 +66,9 @@ class ImportMenu extends PopupRoute<void> {
                   onSelect: (item) {
                     onSelect?.call(item);
                     Navigator.of(context).pop();
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      item.onTap?.call();
+                    });
                   },
                 ),
               ],
