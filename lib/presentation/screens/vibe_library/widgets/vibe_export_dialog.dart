@@ -331,8 +331,10 @@ class _VibeExportDialogState extends ConsumerState<VibeExportDialog> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(context.l10n.vibe_export_format,
-              style: theme.textTheme.titleSmall),
+          Text(
+            context.l10n.vibe_export_format,
+            style: theme.textTheme.titleSmall,
+          ),
           const SizedBox(height: 8),
           ...formats.map((format) {
             final isSelected = _exportFormat == format;
@@ -551,7 +553,8 @@ class _VibeExportDialogState extends ConsumerState<VibeExportDialog> {
       AppLogger.e('选择 PNG 载体图失败', e, stack, 'VibeExportDialog');
       if (mounted) {
         setState(
-            () => _carrierImageErrorMessage = 'Failed to select PNG image: $e');
+          () => _carrierImageErrorMessage = 'Failed to select PNG image: $e',
+        );
       }
     }
   }

@@ -333,6 +333,8 @@ class _QueueExportDialogState extends ConsumerState<QueueExportDialog>
   }
 
   Future<void> _export() async {
+    final l10n = context.l10n;
+
     setState(() {
       _isLoading = true;
       _error = null;
@@ -365,21 +367,29 @@ class _QueueExportDialogState extends ConsumerState<QueueExportDialog>
       // 分享文件
       await Share.shareXFiles(
         [XFile(file.path)],
-        subject: context.l10n.queue_shareSubject,
+        subject: l10n.queue_shareSubject,
       );
 
-      if (mounted) {
-        Navigator.pop(context);
-        AppToast.success(context, context.l10n.queue_exportSuccess);
+      if (!mounted) {
+        return;
       }
+
+      Navigator.pop(context);
+      AppToast.success(context, l10n.queue_exportSuccess);
     } catch (e) {
-      setState(() => _error = context.l10n.queue_exportFailed(e.toString()));
+      if (mounted) {
+        setState(() => _error = l10n.queue_exportFailed(e.toString()));
+      }
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
   Future<void> _import() async {
+    final l10n = context.l10n;
+
     setState(() {
       _isLoading = true;
       _error = null;
@@ -390,6 +400,10 @@ class _QueueExportDialogState extends ConsumerState<QueueExportDialog>
         type: FileType.custom,
         allowedExtensions: ['json', 'csv', 'txt'],
       );
+
+      if (!mounted) {
+        return;
+      }
 
       if (result == null || result.files.isEmpty) {
         setState(() => _isLoading = false);
@@ -413,12 +427,12 @@ class _QueueExportDialogState extends ConsumerState<QueueExportDialog>
           break;
         default:
           throw FormatException(
-            context.l10n.queue_unsupportedFileFormat(extension),
+            l10n.queue_unsupportedFileFormat(extension),
           );
       }
 
       if (tasks.isEmpty) {
-        throw FormatException(context.l10n.queue_noValidTasks);
+        throw FormatException(l10n.queue_noValidTasks);
       }
 
       final queueNotifier = ref.read(replicationQueueNotifierProvider.notifier);
@@ -429,14 +443,20 @@ class _QueueExportDialogState extends ConsumerState<QueueExportDialog>
 
       final added = await queueNotifier.addAll(tasks.cast());
 
-      if (mounted) {
-        Navigator.pop(context);
-        AppToast.success(context, context.l10n.queue_importSuccess(added));
+      if (!mounted) {
+        return;
       }
+
+      Navigator.pop(context);
+      AppToast.success(context, l10n.queue_importSuccess(added));
     } catch (e) {
-      setState(() => _error = context.l10n.queue_importFailed(e.toString()));
+      if (mounted) {
+        setState(() => _error = l10n.queue_importFailed(e.toString()));
+      }
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 }
