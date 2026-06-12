@@ -77,6 +77,18 @@ class SelectableImageCard extends ConsumerStatefulWidget {
   /// 放大回调（用于单图显示放大按钮）
   final VoidCallback? onUpscale;
 
+  /// 发送到反推回调
+  final VoidCallback? onReversePrompt;
+
+  /// 发送到图生图回调
+  final VoidCallback? onImageToImage;
+
+  /// 发送到风格迁移回调
+  final VoidCallback? onVibeTransfer;
+
+  /// 发送到精准参考回调
+  final VoidCallback? onPreciseReference;
+
   /// 编辑图像回调
   final VoidCallback? onEditImage;
 
@@ -156,6 +168,10 @@ class SelectableImageCard extends ConsumerStatefulWidget {
     this.onCompletionPlaceholderSettled,
     this.enableSelection = true,
     this.onUpscale,
+    this.onReversePrompt,
+    this.onImageToImage,
+    this.onVibeTransfer,
+    this.onPreciseReference,
     this.onEditImage,
     this.onInpaint,
     this.onGenerateVariations,
@@ -1121,6 +1137,30 @@ class _SelectableImageCardState extends ConsumerState<SelectableImageCard>
                 tooltip: context.l10n.image_copy,
                 onTap: () => _copyImage(context),
               ),
+            if (widget.onReversePrompt != null)
+              _HoverActionButton(
+                icon: Icons.manage_search_rounded,
+                tooltip: context.l10n.drop_reversePrompt,
+                onTap: widget.onReversePrompt,
+              ),
+            if (widget.onImageToImage != null)
+              _HoverActionButton(
+                icon: Icons.image_outlined,
+                tooltip: context.l10n.drop_img2img,
+                onTap: widget.onImageToImage,
+              ),
+            if (widget.onVibeTransfer != null)
+              _HoverActionButton(
+                icon: Icons.palette_outlined,
+                tooltip: context.l10n.drop_vibeTransfer,
+                onTap: widget.onVibeTransfer,
+              ),
+            if (widget.onPreciseReference != null)
+              _HoverActionButton(
+                icon: Icons.center_focus_strong,
+                tooltip: context.l10n.drop_characterReference,
+                onTap: widget.onPreciseReference,
+              ),
             if (widget.onEditImage != null)
               _HoverActionButton(
                 icon: Icons.edit_outlined,
@@ -1178,6 +1218,10 @@ class _SelectableImageCardState extends ConsumerState<SelectableImageCard>
   bool get _hasHoverActions =>
       widget.enableSaveAction ||
       widget.enableCopyAction ||
+      widget.onReversePrompt != null ||
+      widget.onImageToImage != null ||
+      widget.onVibeTransfer != null ||
+      widget.onPreciseReference != null ||
       widget.onEditImage != null ||
       widget.onInpaint != null ||
       widget.onGenerateVariations != null ||
@@ -1333,89 +1377,174 @@ class _SelectableImageCardState extends ConsumerState<SelectableImageCard>
 
   /// 显示右键菜单
   void _showContextMenu(BuildContext context, Offset position) {
-    final items = <ProMenuItem>[
-      if (widget.enableSaveAction)
+    final items = <ProMenuItem>[];
+
+    void addDividerIfNeeded() {
+      if (items.isNotEmpty && !items.last.isDivider) {
+        items.add(const ProMenuItem.divider());
+      }
+    }
+
+    if (widget.enableSaveAction) {
+      items.add(
         ProMenuItem(
           id: 'save',
           label: '保存图片',
           icon: Icons.save_alt,
           onTap: () => _saveImage(context),
         ),
-      if (widget.enableCopyAction)
+      );
+    }
+
+    if (widget.enableCopyAction) {
+      items.add(
         ProMenuItem(
           id: 'copy',
           label: '复制图片',
           icon: Icons.copy,
           onTap: () => _copyImage(context),
         ),
-      if (widget.onOpenInExplorer != null) ...[
-        const ProMenuItem.divider(),
+      );
+    }
+
+    if (widget.onOpenInExplorer != null) {
+      addDividerIfNeeded();
+      items.add(
         ProMenuItem(
           id: 'open_folder',
           label: '在文件夹中打开',
           icon: Icons.folder_open,
           onTap: widget.onOpenInExplorer!,
         ),
-      ],
-      if (widget.onEditImage != null ||
-          widget.onInpaint != null ||
-          widget.onGenerateVariations != null ||
-          widget.onDirectorTools != null ||
-          widget.onEnhance != null ||
-          widget.onUpscale != null ||
-          widget.onSendToKrita != null) ...[
-        const ProMenuItem.divider(),
-        if (widget.onEditImage != null)
+      );
+    }
+
+    if (widget.onReversePrompt != null ||
+        widget.onImageToImage != null ||
+        widget.onVibeTransfer != null ||
+        widget.onPreciseReference != null) {
+      addDividerIfNeeded();
+      if (widget.onReversePrompt != null) {
+        items.add(
+          ProMenuItem(
+            id: 'reverse_prompt',
+            label: context.l10n.drop_reversePrompt,
+            icon: Icons.manage_search_rounded,
+            onTap: widget.onReversePrompt!,
+          ),
+        );
+      }
+      if (widget.onImageToImage != null) {
+        items.add(
+          ProMenuItem(
+            id: 'image_to_image',
+            label: context.l10n.drop_img2img,
+            icon: Icons.image_outlined,
+            onTap: widget.onImageToImage!,
+          ),
+        );
+      }
+      if (widget.onVibeTransfer != null) {
+        items.add(
+          ProMenuItem(
+            id: 'vibe_transfer',
+            label: context.l10n.drop_vibeTransfer,
+            icon: Icons.palette_outlined,
+            onTap: widget.onVibeTransfer!,
+          ),
+        );
+      }
+      if (widget.onPreciseReference != null) {
+        items.add(
+          ProMenuItem(
+            id: 'precise_reference',
+            label: context.l10n.drop_characterReference,
+            icon: Icons.center_focus_strong,
+            onTap: widget.onPreciseReference!,
+          ),
+        );
+      }
+    }
+
+    if (widget.onEditImage != null ||
+        widget.onInpaint != null ||
+        widget.onGenerateVariations != null ||
+        widget.onDirectorTools != null ||
+        widget.onEnhance != null ||
+        widget.onUpscale != null ||
+        widget.onSendToKrita != null) {
+      addDividerIfNeeded();
+      if (widget.onEditImage != null) {
+        items.add(
           ProMenuItem(
             id: 'edit_image',
             label: context.l10n.img2img_editImage,
             icon: Icons.edit_outlined,
             onTap: widget.onEditImage!,
           ),
-        if (widget.onInpaint != null)
+        );
+      }
+      if (widget.onInpaint != null) {
+        items.add(
           ProMenuItem(
             id: 'inpaint',
             label: context.l10n.img2img_inpaint,
             icon: Icons.draw_outlined,
             onTap: widget.onInpaint!,
           ),
-        if (widget.onGenerateVariations != null)
+        );
+      }
+      if (widget.onGenerateVariations != null) {
+        items.add(
           ProMenuItem(
             id: 'generate_variations',
             label: context.l10n.img2img_generateVariations,
             icon: Icons.auto_awesome_motion_outlined,
             onTap: widget.onGenerateVariations!,
           ),
-        if (widget.onDirectorTools != null)
+        );
+      }
+      if (widget.onDirectorTools != null) {
+        items.add(
           ProMenuItem(
             id: 'director_tools',
             label: context.l10n.img2img_directorTools,
             icon: Icons.auto_fix_high_outlined,
             onTap: widget.onDirectorTools!,
           ),
-        if (widget.onEnhance != null)
+        );
+      }
+      if (widget.onEnhance != null) {
+        items.add(
           ProMenuItem(
             id: 'enhance',
             label: context.l10n.img2img_enhance,
             icon: Icons.auto_awesome_outlined,
             onTap: widget.onEnhance!,
           ),
-        if (widget.onUpscale != null)
+        );
+      }
+      if (widget.onUpscale != null) {
+        items.add(
           ProMenuItem(
             id: 'upscale',
             label: context.l10n.image_upscale,
             icon: Icons.zoom_out_map_rounded,
             onTap: widget.onUpscale!,
           ),
-        if (widget.onSendToKrita != null)
+        );
+      }
+      if (widget.onSendToKrita != null) {
+        items.add(
           ProMenuItem(
             id: 'send_to_krita',
             label: '发送到 Krita',
             icon: Icons.brush_outlined,
             onTap: widget.onSendToKrita!,
           ),
-      ],
-    ];
+        );
+      }
+    }
 
     if (items.isEmpty) {
       return;

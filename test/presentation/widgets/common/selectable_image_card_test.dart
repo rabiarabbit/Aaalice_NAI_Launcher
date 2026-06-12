@@ -69,6 +69,57 @@ void main() {
     expect(find.text('放大'), findsOneWidget);
   });
 
+  testWidgets('hover actions should expose generation destination shortcuts',
+      (tester) async {
+    await tester.pumpWidget(
+      _buildCardApp(
+        onReversePrompt: _noop,
+        onImageToImage: _noop,
+        onVibeTransfer: _noop,
+        onPreciseReference: _noop,
+      ),
+    );
+
+    final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    addTearDown(gesture.removePointer);
+    await gesture.addPointer();
+    await gesture.moveTo(tester.getCenter(find.byType(SelectableImageCard)));
+    await tester.pumpAndSettle();
+
+    expect(find.byTooltip('反推'), findsOneWidget);
+    expect(find.byTooltip('图生图'), findsOneWidget);
+    expect(find.byTooltip('风格迁移'), findsOneWidget);
+    expect(find.byTooltip('精准参考'), findsOneWidget);
+  });
+
+  testWidgets('context menu should expose generation destination shortcuts',
+      (tester) async {
+    await tester.pumpWidget(
+      _buildCardApp(
+        onReversePrompt: _noop,
+        onImageToImage: _noop,
+        onVibeTransfer: _noop,
+        onPreciseReference: _noop,
+      ),
+    );
+
+    final center = tester.getCenter(find.byType(SelectableImageCard));
+    final gesture = await tester.startGesture(
+      center,
+      kind: PointerDeviceKind.mouse,
+      buttons: kSecondaryMouseButton,
+    );
+    addTearDown(gesture.removePointer);
+    await tester.pumpAndSettle();
+    await gesture.up();
+    await tester.pumpAndSettle();
+
+    expect(find.text('反推'), findsOneWidget);
+    expect(find.text('图生图'), findsOneWidget);
+    expect(find.text('风格迁移'), findsOneWidget);
+    expect(find.text('精准参考'), findsOneWidget);
+  });
+
   testWidgets('disabled hover effects should not expose hover action bar',
       (tester) async {
     await tester.pumpWidget(_buildCardApp(hoverEffectsEnabled: false));
@@ -151,6 +202,10 @@ Widget _buildCardApp({
   VoidCallback? onFavoriteToggle,
   VoidCallback? onInpaint = _noop,
   VoidCallback? onUpscale = _noop,
+  VoidCallback? onReversePrompt,
+  VoidCallback? onImageToImage,
+  VoidCallback? onVibeTransfer,
+  VoidCallback? onPreciseReference,
 }) {
   final bytes = Uint8List.fromList(
     img.encodePng(img.Image(width: 32, height: 32)),
@@ -177,6 +232,10 @@ Widget _buildCardApp({
               onFavoriteToggle: onFavoriteToggle,
               onInpaint: onInpaint,
               onUpscale: onUpscale,
+              onReversePrompt: onReversePrompt,
+              onImageToImage: onImageToImage,
+              onVibeTransfer: onVibeTransfer,
+              onPreciseReference: onPreciseReference,
             ),
           ),
         ),

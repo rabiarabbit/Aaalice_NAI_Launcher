@@ -8,9 +8,11 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart' as p;
 
+import '../../../../core/enums/precise_ref_type.dart';
 import '../../../../core/utils/localization_extension.dart';
 import '../../../../core/utils/file_explorer_utils.dart';
 import '../../../../core/utils/image_share_sanitizer.dart';
+import '../../../../core/utils/vibe_file_parser.dart';
 import '../../../../core/utils/zip_utils.dart';
 import '../../../../data/services/alias_resolver_service.dart';
 import '../../../providers/layout_state_provider.dart';
@@ -21,6 +23,7 @@ import '../../../../data/repositories/gallery_folder_repository.dart';
 import '../../../providers/generation/generation_params_selectors.dart';
 import '../../../providers/image_generation_provider.dart';
 import '../../../providers/local_gallery_provider.dart';
+import '../../../providers/reverse_prompt_provider.dart';
 import '../../../providers/share_image_settings_provider.dart';
 import '../../../services/image_workflow_launcher.dart';
 import '../../../widgets/common/app_toast.dart';
@@ -565,6 +568,36 @@ class _HistoryPanelState extends ConsumerState<HistoryPanel> {
                   enableHoverScale: true,
                   hoverEffectsEnabled: !_isHistoryScrolling,
                   shareWarmupEnabled: false,
+                  onReversePrompt: historyImage.canUseAsGenerationInput
+                      ? () => unawaited(
+                            _sendHistoryImageToReversePrompt(
+                              context,
+                              historyImage,
+                            ),
+                          )
+                      : null,
+                  onImageToImage: historyImage.canUseAsGenerationInput
+                      ? () => _sendHistoryImageToImageToImage(
+                            context,
+                            historyImage,
+                          )
+                      : null,
+                  onVibeTransfer: historyImage.canUseAsGenerationInput
+                      ? () => unawaited(
+                            _sendHistoryImageToVibeTransfer(
+                              context,
+                              historyImage,
+                            ),
+                          )
+                      : null,
+                  onPreciseReference: historyImage.canUseAsGenerationInput
+                      ? () => unawaited(
+                            _sendHistoryImageToPreciseReference(
+                              context,
+                              historyImage,
+                            ),
+                          )
+                      : null,
                   onEditImage: historyImage.canUseAsGenerationInput
                       ? () => ImageWorkflowLauncher.openEditor(
                             context,
@@ -739,6 +772,36 @@ class _HistoryPanelState extends ConsumerState<HistoryPanel> {
           enableHoverScale: true,
           hoverEffectsEnabled: !_isHistoryScrolling,
           shareWarmupEnabled: false,
+          onReversePrompt: image.canUseAsGenerationInput
+              ? () => unawaited(
+                    _sendHistoryImageToReversePrompt(
+                      context,
+                      image,
+                    ),
+                  )
+              : null,
+          onImageToImage: image.canUseAsGenerationInput
+              ? () => _sendHistoryImageToImageToImage(
+                    context,
+                    image,
+                  )
+              : null,
+          onVibeTransfer: image.canUseAsGenerationInput
+              ? () => unawaited(
+                    _sendHistoryImageToVibeTransfer(
+                      context,
+                      image,
+                    ),
+                  )
+              : null,
+          onPreciseReference: image.canUseAsGenerationInput
+              ? () => unawaited(
+                    _sendHistoryImageToPreciseReference(
+                      context,
+                      image,
+                    ),
+                  )
+              : null,
           onEditImage: image.canUseAsGenerationInput
               ? () => ImageWorkflowLauncher.openEditor(
                     context,
@@ -915,6 +978,106 @@ class _HistoryPanelState extends ConsumerState<HistoryPanel> {
         .addNewlySavedImages([file.path]);
 
     return file.path;
+  }
+
+  String _historyImageFileName(GeneratedImage image) {
+    final filePath = image.filePath;
+    if (filePath != null && filePath.isNotEmpty) {
+      return p.basename(filePath);
+    }
+    return 'history_${image.id}.png';
+  }
+
+  Future<void> _sendHistoryImageToReversePrompt(
+    BuildContext context,
+    GeneratedImage image,
+  ) async {
+    final l10n = context.l10n;
+
+    try {
+      await ref.read(reversePromptProvider.notifier).addImage(
+            image.bytes,
+            name: _historyImageFileName(image),
+          );
+
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.drop_addedToReversePrompt);
+    } catch (e) {
+      if (context.mounted) {
+        AppToast.error(context, l10n.gallery_sendFailed(e.toString()));
+      }
+    }
+  }
+
+  void _sendHistoryImageToImageToImage(
+    BuildContext context,
+    GeneratedImage image,
+  ) {
+    ImageWorkflowLauncher.openImageToImage(ref, image.bytes);
+    AppToast.success(context, context.l10n.drop_addedToImg2Img);
+  }
+
+  Future<void> _sendHistoryImageToVibeTransfer(
+    BuildContext context,
+    GeneratedImage image,
+  ) async {
+    final l10n = context.l10n;
+
+    try {
+      final currentState = ref.read(generationParamsNotifierProvider);
+      final currentCount = currentState.vibeReferencesV4.length;
+      const maxCount = 16;
+      final vibes = await VibeFileParser.parseFile(
+        _historyImageFileName(image),
+        image.bytes,
+      );
+
+      if (!context.mounted) return;
+      if (currentCount + vibes.length > maxCount) {
+        AppToast.warning(context, l10n.toast_styleReferenceLimit(maxCount));
+        return;
+      }
+
+      ref
+          .read(generationParamsNotifierProvider.notifier)
+          .addVibeReferences(vibes);
+
+      final message = currentCount > 0
+          ? l10n.toast_appendedStyleReferences(vibes.length)
+          : vibes.length == 1
+              ? l10n.drop_addedToVibe
+              : l10n.drop_addedMultipleToVibe(vibes.length);
+      AppToast.success(context, message);
+    } catch (e) {
+      if (context.mounted) {
+        AppToast.error(context, '${l10n.vibeParseFailed}: $e');
+      }
+    }
+  }
+
+  Future<void> _sendHistoryImageToPreciseReference(
+    BuildContext context,
+    GeneratedImage image,
+  ) async {
+    final l10n = context.l10n;
+
+    try {
+      await ref
+          .read(generationParamsNotifierProvider.notifier)
+          .addPreciseReferenceFromImage(
+            image.bytes,
+            type: PreciseRefType.character,
+            strength: 1.0,
+            fidelity: 1.0,
+          );
+
+      if (!context.mounted) return;
+      AppToast.success(context, l10n.drop_addedToCharacterRef);
+    } catch (e) {
+      if (context.mounted) {
+        AppToast.error(context, l10n.gallery_sendFailed(e.toString()));
+      }
+    }
   }
 
   Widget _buildBottomActions(
