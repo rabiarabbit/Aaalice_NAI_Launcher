@@ -96,6 +96,7 @@ String imageDataUri(PromptAssistantImagePart part) {
 Future<PromptAssistantRequest> optimizePromptAssistantRequestImagesForUpload(
   PromptAssistantRequest request, {
   int maxBytes = promptAssistantImageUploadMaxBytes,
+  bool normalizeToJpeg = true,
 }) async {
   var changed = false;
   final parts = <PromptAssistantContentPart>[];
@@ -105,6 +106,7 @@ Future<PromptAssistantRequest> optimizePromptAssistantRequestImagesForUpload(
       final optimized = await optimizePromptAssistantImagePartForUpload(
         part,
         maxBytes: maxBytes,
+        normalizeToJpeg: normalizeToJpeg,
       );
       changed = changed || !identical(optimized, part);
       parts.add(optimized);
@@ -127,8 +129,13 @@ Future<PromptAssistantRequest> optimizePromptAssistantRequestImagesForUpload(
 Future<PromptAssistantImagePart> optimizePromptAssistantImagePartForUpload(
   PromptAssistantImagePart part, {
   int maxBytes = promptAssistantImageUploadMaxBytes,
+  bool normalizeToJpeg = false,
 }) async {
-  if (maxBytes <= 0 || part.bytes.length <= maxBytes) {
+  final shouldNormalizeMime =
+      normalizeToJpeg && part.mimeType.toLowerCase() != 'image/jpeg';
+  final shouldOptimizeSize = maxBytes > 0 && part.bytes.length > maxBytes;
+
+  if (!shouldNormalizeMime && !shouldOptimizeSize) {
     return part;
   }
 
@@ -142,6 +149,11 @@ Future<PromptAssistantImagePart> optimizePromptAssistantImagePartForUpload(
       ),
     );
     if (result == null || result.bytes.length >= part.bytes.length) {
+      if (!shouldNormalizeMime) {
+        return part;
+      }
+    }
+    if (result == null) {
       return part;
     }
     return PromptAssistantImagePart(
@@ -291,10 +303,13 @@ _OptimizedPromptAssistantImage? _optimizePromptAssistantImageBytes(
     return null;
   }
 
-  final initialScale = math.min(
-    0.95,
-    math.sqrt(job.maxBytes / job.bytes.length) * 0.98,
-  );
+  final oversized = job.maxBytes > 0 && job.bytes.length > job.maxBytes;
+  final initialScale = oversized
+      ? math.min(
+          0.95,
+          math.sqrt(job.maxBytes / job.bytes.length) * 0.98,
+        )
+      : 1.0;
   var targetWidth = _scaledImageDimension(source.width, initialScale);
   var targetHeight = _scaledImageDimension(source.height, initialScale);
   _OptimizedPromptAssistantImage? best;
@@ -315,7 +330,7 @@ _OptimizedPromptAssistantImage? _optimizePromptAssistantImageBytes(
       if (best == null || candidate.bytes.length < best.bytes.length) {
         best = candidate;
       }
-      if (bytes.length <= job.maxBytes) {
+      if (job.maxBytes <= 0 || bytes.length <= job.maxBytes) {
         return candidate;
       }
     }

@@ -1729,6 +1729,149 @@ void main() {
         'compressed',
       );
     });
+
+    test('normalizes small PNG image payloads to JPEG before posting',
+        () async {
+      final dio = _MockDio();
+      final client = PromptAssistantApiClient(dio: dio);
+      final originalBytes = _buildNoisyPngBytes(width: 32, height: 24);
+
+      when(
+        () => dio.post<dynamic>(
+          any(),
+          data: any(named: 'data'),
+          options: any(named: 'options'),
+          cancelToken: any(named: 'cancelToken'),
+        ),
+      ).thenAnswer((invocation) async {
+        final payload =
+            Map<String, dynamic>.from(invocation.namedArguments[#data] as Map);
+        final messages = payload['messages'] as List;
+        final userMessage = messages.last as Map;
+        final content = userMessage['content'] as List;
+        final imagePart = content.last as Map;
+        final imageUrl = imagePart['image_url'] as Map;
+        final parsed = parseDataUriImage(imageUrl['url'] as String)!;
+        final decoded = img.decodeImage(parsed.bytes)!;
+
+        expect(parsed.mimeType, 'image/jpeg');
+        expect(decoded.width, 32);
+        expect(decoded.height, 24);
+
+        return Response<dynamic>(
+          data: const {
+            'choices': [
+              {
+                'message': {'content': 'normalized'},
+              },
+            ],
+          },
+          requestOptions: RequestOptions(path: '/v1/chat/completions'),
+          statusCode: 200,
+        );
+      });
+
+      final chunks = await client
+          .streamChat(
+            sessionId: 'test',
+            provider: const ProviderConfig(
+              id: 'openai_custom',
+              name: 'OpenAI Compatible',
+              type: ProviderType.openaiCompatible,
+              baseUrl: 'https://example.invalid/v1',
+            ),
+            model: 'model-a',
+            messages: [
+              {
+                'role': 'user',
+                'content': [
+                  {'type': 'text', 'text': 'describe'},
+                  {
+                    'type': 'image_url',
+                    'image_url': {
+                      'url':
+                          'data:image/png;base64,${base64Encode(originalBytes)}',
+                    },
+                  },
+                ],
+              },
+            ],
+            apiKey: 'key',
+          )
+          .toList();
+
+      expect(
+        chunks.where((chunk) => !chunk.done).map((chunk) => chunk.delta).join(),
+        'normalized',
+      );
+    });
+
+    test('surfaces provider HTTP error bodies', () async {
+      final dio = _MockDio();
+      final client = PromptAssistantApiClient(dio: dio);
+
+      when(
+        () => dio.post<dynamic>(
+          any(),
+          data: any(named: 'data'),
+          options: any(named: 'options'),
+          cancelToken: any(named: 'cancelToken'),
+        ),
+      ).thenThrow(
+        DioException(
+          requestOptions: RequestOptions(path: '/v1/chat/completions'),
+          response: Response<dynamic>(
+            data: const {
+              'error': {
+                'message': 'upstream internal error',
+                'type': 'server_error',
+              },
+            },
+            requestOptions: RequestOptions(
+              path: 'https://example.invalid/v1/chat/completions?key=secret',
+            ),
+            statusCode: 503,
+          ),
+        ),
+      );
+
+      await expectLater(
+        client
+            .streamChat(
+              sessionId: 'test',
+              provider: const ProviderConfig(
+                id: 'openai_custom',
+                name: 'OpenAI Compatible',
+                type: ProviderType.openaiCompatible,
+                baseUrl: 'https://example.invalid/v1',
+              ),
+              model: 'model-a',
+              messages: const [
+                {'role': 'user', 'content': 'test'},
+              ],
+              apiKey: 'key',
+            )
+            .drain<void>(),
+        throwsA(
+          isA<StateError>()
+              .having(
+                (e) => e.toString(),
+                'message',
+                contains('HTTP 503'),
+              )
+              .having(
+                (e) => e.toString(),
+                'message',
+                contains('upstream internal error'),
+              )
+              .having(
+                (e) => e.toString(),
+                'message',
+                isNot(contains('secret')),
+              ),
+        ),
+      );
+    });
   });
 
   group('Prompt assistant fixed tag scope', () {
