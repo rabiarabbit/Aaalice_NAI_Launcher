@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 
 import '../../../core/utils/app_logger.dart';
@@ -79,6 +81,8 @@ class PromptAssistantApiClient {
       );
       yield StreamingChunk(delta: trimmed);
       yield const StreamingChunk(delta: '', done: true);
+    } on DioException catch (e) {
+      throw StateError(_formatDioException(e, request));
     } finally {
       if (identical(_cancelTokens[request.sessionId], cancelToken)) {
         _cancelTokens.remove(request.sessionId);
@@ -192,5 +196,68 @@ class PromptAssistantApiClient {
       return normalized;
     }
     return '${normalized.substring(0, 300)}...';
+  }
+
+  String _formatDioException(
+    DioException error,
+    PromptAssistantRequest request,
+  ) {
+    final response = error.response;
+    final status = response?.statusCode;
+    final target = _safeRequestTarget(response?.requestOptions);
+    final detail = _extractDioErrorDetail(response?.data) ??
+        error.message ??
+        error.error?.toString();
+
+    return [
+      'LLM request failed',
+      if (status != null) 'HTTP $status',
+      'provider=${request.provider.name}',
+      'model=${request.model}',
+      if (target != null) 'endpoint=$target',
+      if (detail != null && detail.trim().isNotEmpty) detail.trim(),
+    ].join(': ');
+  }
+
+  String? _extractDioErrorDetail(dynamic data) {
+    if (data == null) return null;
+    if (data is Map<String, dynamic>) {
+      final message = extractErrorMessage(data);
+      if (message != null) return message;
+      return _previewBody(_encodeErrorData(data));
+    }
+    if (data is Map) {
+      final normalized = data.map(
+        (key, value) => MapEntry(key.toString(), value),
+      );
+      final message = extractErrorMessage(normalized);
+      if (message != null) return message;
+      return _previewBody(_encodeErrorData(normalized));
+    }
+    if (data is String) {
+      final trimmed = data.trim();
+      return trimmed.isEmpty ? null : _previewBody(trimmed);
+    }
+    return _previewBody(_encodeErrorData(data));
+  }
+
+  String _encodeErrorData(dynamic data) {
+    try {
+      return jsonEncode(data);
+    } catch (_) {
+      return data.toString();
+    }
+  }
+
+  String? _safeRequestTarget(RequestOptions? options) {
+    if (options == null) return null;
+    final uri = options.uri;
+    if (uri.hasScheme && uri.host.isNotEmpty) {
+      final port = uri.hasPort ? ':${uri.port}' : '';
+      final query = uri.hasQuery ? '?<redacted>' : '';
+      return '${uri.scheme}://${uri.host}$port${uri.path}$query';
+    }
+    final query = uri.hasQuery ? '?<redacted>' : '';
+    return '${uri.path}$query';
   }
 }
