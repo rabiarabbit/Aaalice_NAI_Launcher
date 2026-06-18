@@ -2,6 +2,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/services.dart';
 
 import '../../../../core/utils/localization_extension.dart';
 import '../../../providers/tag_library_page_provider.dart';
@@ -52,11 +53,12 @@ class TagLibraryToolbar extends ConsumerStatefulWidget {
 
 class _TagLibraryToolbarState extends ConsumerState<TagLibraryToolbar> {
   final TextEditingController _searchController = TextEditingController();
-  final FocusNode _searchFocusNode = FocusNode();
+  late final FocusNode _searchFocusNode;
 
   @override
   void initState() {
     super.initState();
+    _searchFocusNode = FocusNode(onKeyEvent: _handleSearchKeyEvent);
     _syncSearchController(
       ref.read(tagLibraryPageNotifierProvider).searchQuery,
     );
@@ -254,6 +256,23 @@ class _TagLibraryToolbarState extends ConsumerState<TagLibraryToolbar> {
       text: query,
       selection: TextSelection.collapsed(offset: query.length),
     );
+  }
+
+  KeyEventResult _handleSearchKeyEvent(FocusNode node, KeyEvent event) {
+    if (event is! KeyDownEvent || event.logicalKey != LogicalKeyboardKey.keyA) {
+      return KeyEventResult.ignored;
+    }
+
+    final keyboard = HardwareKeyboard.instance;
+    if (!keyboard.isControlPressed && !keyboard.isMetaPressed) {
+      return KeyEventResult.ignored;
+    }
+
+    _searchController.selection = TextSelection(
+      baseOffset: 0,
+      extentOffset: _searchController.text.length,
+    );
+    return KeyEventResult.handled;
   }
 
   /// 构建搜索框

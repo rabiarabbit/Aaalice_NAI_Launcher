@@ -228,6 +228,54 @@ void main() {
       expect(editable.controller.text, 'rabbit');
     });
 
+    testWidgets('词库搜索框 Ctrl+A 应选择文本而不是触发词条全选', (tester) async {
+      var selectedAllTags = false;
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            tagLibraryPageNotifierProvider.overrideWith(
+              _FakeTagLibraryPageNotifier.new,
+            ),
+            shortcutConfigNotifierProvider.overrideWith(
+              _FakeShortcutConfigNotifier.new,
+            ),
+          ],
+          child: MaterialApp(
+            locale: const Locale('zh'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(
+              body: PageShortcuts(
+                contextType: ShortcutContext.tagLibrary,
+                shortcuts: {
+                  ShortcutIds.selectAllTags: () {
+                    selectedAllTags = true;
+                  },
+                },
+                child: const TagLibraryToolbar(),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+      final textField = find.byType(TextField);
+      await tester.tap(textField);
+      await tester.pump();
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyA);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+      await tester.pump();
+
+      final editable = tester.widget<EditableText>(find.byType(EditableText));
+      expect(editable.controller.selection.baseOffset, 0);
+      expect(editable.controller.selection.extentOffset, 'rabbit'.length);
+      expect(selectedAllTags, isFalse);
+    });
+
     testWidgets('批量 Vibe 导出不显示嵌入 PNG 入口', (tester) async {
       await tester.binding.setSurfaceSize(const Size(1000, 900));
       addTearDown(() => tester.binding.setSurfaceSize(null));
