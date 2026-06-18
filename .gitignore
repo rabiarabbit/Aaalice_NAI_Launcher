@@ -268,6 +268,7 @@ test/presentation/screens/prompt_config/*
 test/presentation/widgets/*
 !test/presentation/widgets/drop/
 test/presentation/widgets/drop/*
+!test/presentation/widgets/drop/global_drop_handler_test.dart
 !test/presentation/widgets/drop/image_destination_dialog_test.dart
 !test/presentation/widgets/common/
 test/presentation/widgets/common/*
