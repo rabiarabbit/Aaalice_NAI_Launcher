@@ -17,7 +17,6 @@ class SidebarEntryTile extends StatefulWidget {
     required this.categoryColor,
     required this.isListMode,
     required this.onToggle,
-    required this.onWeightChanged,
     required this.onEdit,
     required this.onDelete,
     this.categoryName,
@@ -30,7 +29,6 @@ class SidebarEntryTile extends StatefulWidget {
   final Color categoryColor;
   final bool isListMode;
   final VoidCallback onToggle;
-  final ValueChanged<double> onWeightChanged;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
   final String? categoryName;
@@ -288,20 +286,6 @@ class _SidebarEntryTileState extends State<SidebarEntryTile> {
       key: const ValueKey('actions'),
       mainAxisSize: MainAxisSize.min,
       children: [
-        _ActionButton(
-          icon: Icons.remove_rounded,
-          tooltip: '降低权重',
-          onPressed: () => widget.onWeightChanged(
-            (widget.entry.weight - 0.05).clamp(0.5, 2.0).toDouble(),
-          ),
-        ),
-        _ActionButton(
-          icon: Icons.add_rounded,
-          tooltip: '提高权重',
-          onPressed: () => widget.onWeightChanged(
-            (widget.entry.weight + 0.05).clamp(0.5, 2.0).toDouble(),
-          ),
-        ),
         _ActionButton(
           icon: Icons.copy_rounded,
           tooltip: '复制内容',
