@@ -13,8 +13,10 @@ class NaiSyntaxController extends TextEditingController {
   // 1. weight::content::  - 完整格式 (数字::内容::)
   // 2. weight::content    - 只有开头权重 (数字::内容)
   // 3. content::          - 只有结尾 :: (内容::)
-  static final RegExp _weightPatternFull = RegExp(r'(-?\d+\.?\d*)::(.+?)::(?=,|\s|$)');
-  static final RegExp _weightPatternLeading = RegExp(r'(-?\d+\.?\d*)::([a-z0-9_:]+)(?=,|\s|$)');
+  static final RegExp _weightPatternFull =
+      RegExp(r'(-?\d+\.?\d*)::(.+?)::(?=,|\s|$)');
+  static final RegExp _weightPatternLeading =
+      RegExp(r'(-?\d+\.?\d*)::([a-z0-9_:]+)(?=,|\s|$)');
   static final RegExp _weightPatternTrailing = RegExp(r'([a-z0-9_:]+)::$');
 
   /// NAI 动态随机语法 ||A|B|C|| 或 ||n$$A|B|C||
@@ -26,6 +28,9 @@ class NaiSyntaxController extends TextEditingController {
   bool? _cachedIsDark;
   List<TextSpan>? _cachedSpans;
 
+  List<TextRange> _searchMatches = const [];
+  int _activeSearchMatchIndex = -1;
+
   // 语法错误信息（用于 UI 显示）
   List<String> _syntaxErrors = [];
 
@@ -36,6 +41,28 @@ class NaiSyntaxController extends TextEditingController {
   bool get hasSyntaxErrors => _syntaxErrors.isNotEmpty;
 
   NaiSyntaxController({super.text, this.highlightEnabled = true});
+
+  bool get _hasSearchHighlights => _searchMatches.isNotEmpty;
+
+  void updateSearchHighlights({
+    required List<TextRange> matches,
+    required int activeMatchIndex,
+  }) {
+    _searchMatches = List.unmodifiable(matches);
+    _activeSearchMatchIndex = activeMatchIndex;
+    clearCache();
+    notifyListeners();
+  }
+
+  void clearSearchHighlights() {
+    if (_searchMatches.isEmpty && _activeSearchMatchIndex == -1) {
+      return;
+    }
+    _searchMatches = const [];
+    _activeSearchMatchIndex = -1;
+    clearCache();
+    notifyListeners();
+  }
 
   /// 清除缓存（当主题变化等情况时调用）
   void clearCache() {
@@ -53,7 +80,7 @@ class NaiSyntaxController extends TextEditingController {
     final baseStyle = style ?? const TextStyle();
 
     // 如果禁用高亮，直接返回普通文本
-    if (!highlightEnabled) {
+    if (!highlightEnabled && !_hasSearchHighlights) {
       return TextSpan(text: text, style: baseStyle);
     }
 
@@ -69,14 +96,107 @@ class NaiSyntaxController extends TextEditingController {
     }
 
     // 解析并高亮文本
-    final spans = _parseAndHighlight(text, baseStyle, colors);
+    final spans = highlightEnabled
+        ? _parseAndHighlight(text, baseStyle, colors)
+        : [
+            TextSpan(
+              text: text,
+              style: baseStyle.copyWith(height: 1.35),
+            ),
+          ];
+    final resolvedSpans = _applySearchHighlights(spans, baseStyle, colors);
 
     // 更新缓存
     _cachedText = text;
     _cachedIsDark = isDark;
-    _cachedSpans = spans;
+    _cachedSpans = resolvedSpans;
 
-    return TextSpan(style: baseStyle, children: spans);
+    return TextSpan(style: baseStyle, children: resolvedSpans);
+  }
+
+  List<TextSpan> _applySearchHighlights(
+    List<TextSpan> spans,
+    TextStyle baseStyle,
+    NaiSyntaxColors colors,
+  ) {
+    if (!_hasSearchHighlights) {
+      return spans;
+    }
+
+    final highlighted = <TextSpan>[];
+    var globalOffset = 0;
+
+    for (final span in spans) {
+      final spanText = span.text;
+      if (spanText == null || spanText.isEmpty) {
+        highlighted.add(span);
+        continue;
+      }
+
+      final spanStart = globalOffset;
+      final spanEnd = spanStart + spanText.length;
+      var localOffset = 0;
+
+      while (localOffset < spanText.length) {
+        final absoluteOffset = spanStart + localOffset;
+        final matchIndex = _searchMatchIndexForOffset(absoluteOffset);
+
+        if (matchIndex == null) {
+          final nextStart = _nextSearchStartAfter(absoluteOffset, spanEnd);
+          highlighted.add(
+            TextSpan(
+              text: spanText.substring(
+                localOffset,
+                nextStart - spanStart,
+              ),
+              style: span.style ?? baseStyle,
+            ),
+          );
+          localOffset = nextStart - spanStart;
+          continue;
+        }
+
+        final match = _searchMatches[matchIndex];
+        final segmentEnd = match.end < spanEnd ? match.end : spanEnd;
+        highlighted.add(
+          TextSpan(
+            text: spanText.substring(localOffset, segmentEnd - spanStart),
+            style: (span.style ?? baseStyle).copyWith(
+              backgroundColor: colors._getSearchColor(
+                matchIndex == _activeSearchMatchIndex,
+              ),
+            ),
+          ),
+        );
+        localOffset = segmentEnd - spanStart;
+      }
+
+      globalOffset = spanEnd;
+    }
+
+    return highlighted;
+  }
+
+  int? _searchMatchIndexForOffset(int offset) {
+    for (var i = 0; i < _searchMatches.length; i++) {
+      final match = _searchMatches[i];
+      if (offset < match.start) {
+        return null;
+      }
+      if (offset >= match.start && offset < match.end) {
+        return i;
+      }
+    }
+    return null;
+  }
+
+  int _nextSearchStartAfter(int offset, int fallback) {
+    for (final match in _searchMatches) {
+      if (match.start > offset) {
+        return match.start < fallback ? match.start : fallback;
+      }
+    }
+    return fallback;
   }
 
   /// 解析文本并生成带背景色的 TextSpan 列表
@@ -138,7 +258,7 @@ class NaiSyntaxController extends TextEditingController {
     for (final match in leadingMatches) {
       // 跳过已被完整格式匹配的部分
       if (text.substring(match.end).startsWith('::')) continue;
-      
+
       final weightStr = match.group(1)!;
       final weight = double.tryParse(weightStr) ?? 1.0;
 
@@ -157,7 +277,8 @@ class NaiSyntaxController extends TextEditingController {
     // 格式3: content:: (只有结尾 ::，无开头权重)
     for (final match in _weightPatternTrailing.allMatches(text)) {
       // 跳过已被前面规则匹配的部分（检查前面是否有 ::）
-      if (match.start >= 2 && text.substring(match.start - 2, match.start) == '::') {
+      if (match.start >= 2 &&
+          text.substring(match.start - 2, match.start) == '::') {
         continue;
       }
       final content = match.group(1)!;
@@ -574,5 +695,12 @@ class NaiSyntaxColors {
   Color _getDynamicRandomColor() {
     final alpha = isDark ? 0.55 : 0.50;
     return HSLColor.fromAHSL(alpha, 280, 0.60, 0.35).toColor();
+  }
+
+  Color _getSearchColor(bool active) {
+    if (active) {
+      return isDark ? const Color(0xCCB45309) : const Color(0xFFFFD54F);
+    }
+    return isDark ? const Color(0x995A4B00) : const Color(0x99FFF59D);
   }
 }

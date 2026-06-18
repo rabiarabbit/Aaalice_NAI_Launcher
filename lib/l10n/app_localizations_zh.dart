@@ -994,6 +994,23 @@ class AppLocalizationsZh extends AppLocalizations {
   String get prompt_describeImageWithHint => '输入提示词描述画面，输入 < 引用词库，支持自动补全标签';
 
   @override
+  String get prompt_searchHint => '搜索提示词';
+
+  @override
+  String prompt_searchMatchCount(Object current, Object total) {
+    return '$current / $total';
+  }
+
+  @override
+  String get prompt_searchPrevious => '上一个命中';
+
+  @override
+  String get prompt_searchNext => '下一个命中';
+
+  @override
+  String get prompt_searchClose => '关闭搜索';
+
+  @override
   String get promptAssistant_needPrompt => '请输入提示词后再操作';
 
   @override

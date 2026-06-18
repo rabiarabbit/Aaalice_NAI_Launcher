@@ -127,6 +127,12 @@ class _UnifiedPromptInputState extends ConsumerState<UnifiedPromptInput> {
   Future<AutocompleteStrategy>? _autocompleteStrategyFuture;
   StreamSubscription<StreamingChunk>? _assistantStreamSub;
   late String _sessionId;
+  late final TextEditingController _searchController;
+  late final FocusNode _searchFocusNode;
+  bool _searchVisible = false;
+  List<TextRange> _searchMatches = const [];
+  int _activeSearchMatchIndex = -1;
+  String _lastSearchSourceText = '';
 
   bool get _isDesktop {
     switch (defaultTargetPlatform) {
@@ -140,9 +146,13 @@ class _UnifiedPromptInputState extends ConsumerState<UnifiedPromptInput> {
   }
 
   bool _handleHardwareKeyEvent(KeyEvent event) {
-    if (!_isDesktop ||
-        !_effectiveFocusNode.hasFocus ||
-        event is! KeyDownEvent) {
+    if (!_isDesktop || event is! KeyDownEvent) {
+      return false;
+    }
+
+    final promptFocused = _effectiveFocusNode.hasFocus;
+    final searchFocused = _searchFocusNode.hasFocus;
+    if (!promptFocused && !searchFocused) {
       return false;
     }
 
@@ -150,6 +160,30 @@ class _UnifiedPromptInputState extends ConsumerState<UnifiedPromptInput> {
 
     final isCtrl = HardwareKeyboard.instance.isControlPressed;
     final isShift = HardwareKeyboard.instance.isShiftPressed;
+    final isMeta = HardwareKeyboard.instance.isMetaPressed;
+
+    if ((isCtrl || isMeta) &&
+        !isShift &&
+        logicalKey == LogicalKeyboardKey.keyF) {
+      _openSearch();
+      return true;
+    }
+
+    if (_searchVisible && searchFocused) {
+      if (logicalKey == LogicalKeyboardKey.escape) {
+        _closeSearch();
+        return true;
+      }
+      if (logicalKey == LogicalKeyboardKey.enter) {
+        _goToSearchMatch(previous: isShift);
+        return true;
+      }
+    }
+
+    if (!promptFocused || searchFocused) {
+      return false;
+    }
+
     if (!widget.enableAssistant) {
       return false;
     }
@@ -235,6 +269,9 @@ class _UnifiedPromptInputState extends ConsumerState<UnifiedPromptInput> {
     if (widget.focusNode == null) {
       _internalFocusNode = FocusNode();
     }
+    _searchController = TextEditingController();
+    _searchFocusNode = FocusNode();
+    _searchController.addListener(_onSearchQueryChanged);
 
     // 监听外部控制器变化
     widget.controller?.addListener(_syncFromExternalController);
@@ -302,12 +339,16 @@ class _UnifiedPromptInputState extends ConsumerState<UnifiedPromptInput> {
   @override
   void dispose() {
     _assistantStreamSub?.cancel();
+    _searchController.removeListener(_onSearchQueryChanged);
+    _clearSearchHighlights();
     HardwareKeyboard.instance.removeHandler(_handleHardwareKeyEvent);
     _effectiveFocusNode.removeListener(_onFocusChanged);
     widget.controller?.removeListener(_syncFromExternalController);
     _internalController?.dispose();
     _syntaxController?.dispose();
     _internalFocusNode?.dispose();
+    _searchController.dispose();
+    _searchFocusNode.dispose();
     super.dispose();
   }
 
@@ -471,6 +512,10 @@ class _UnifiedPromptInputState extends ConsumerState<UnifiedPromptInput> {
     if (_syntaxController != null && _syntaxController!.text != externalText) {
       _syntaxController!.text = externalText;
     }
+
+    if (_searchVisible && externalText != _lastSearchSourceText) {
+      _refreshSearchMatches(preserveActive: true);
+    }
   }
 
   /// 处理文本变化
@@ -482,6 +527,10 @@ class _UnifiedPromptInputState extends ConsumerState<UnifiedPromptInput> {
 
     // 触发回调
     widget.onChanged?.call(text);
+
+    if (_searchVisible && text != _lastSearchSourceText) {
+      _refreshSearchMatches(preserveActive: true);
+    }
   }
 
   /// 处理清空操作
@@ -494,6 +543,173 @@ class _UnifiedPromptInputState extends ConsumerState<UnifiedPromptInput> {
 
     widget.onChanged?.call('');
     widget.config.onClearPressed?.call();
+  }
+
+  void _openSearch() {
+    final selectedText = _selectedPromptText();
+    final shouldUseSelection = !_searchVisible && selectedText.isNotEmpty;
+
+    if (!_searchVisible) {
+      setState(() {
+        _searchVisible = true;
+      });
+    }
+
+    if (shouldUseSelection) {
+      _searchController.text = selectedText;
+    } else {
+      _refreshSearchMatches(preserveActive: false);
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _searchFocusNode.requestFocus();
+      _searchController.selection = TextSelection(
+        baseOffset: 0,
+        extentOffset: _searchController.text.length,
+      );
+    });
+  }
+
+  void _closeSearch() {
+    if (!_searchVisible) {
+      return;
+    }
+    setState(() {
+      _searchVisible = false;
+      _searchMatches = const [];
+      _activeSearchMatchIndex = -1;
+    });
+    _clearSearchHighlights();
+    _effectiveFocusNode.requestFocus();
+  }
+
+  String _selectedPromptText() {
+    final selection = _effectiveController.selection;
+    final text = _effectiveController.text;
+    if (!selection.isValid || selection.isCollapsed) {
+      return '';
+    }
+    final start = selection.start.clamp(0, text.length);
+    final end = selection.end.clamp(0, text.length);
+    if (start >= end) {
+      return '';
+    }
+    return text.substring(start, end);
+  }
+
+  void _onSearchQueryChanged() {
+    if (!_searchVisible) {
+      return;
+    }
+    _refreshSearchMatches(preserveActive: false);
+  }
+
+  void _refreshSearchMatches({required bool preserveActive}) {
+    final sourceText = _effectiveController.text;
+    final matches = _findSearchMatches(sourceText, _searchController.text);
+    final activeIndex = _resolveActiveSearchIndex(
+      matches,
+      preserveActive: preserveActive,
+    );
+
+    setState(() {
+      _searchMatches = matches;
+      _activeSearchMatchIndex = activeIndex;
+      _lastSearchSourceText = sourceText;
+    });
+    _syncSearchHighlights();
+    _selectActiveSearchMatch();
+  }
+
+  List<TextRange> _findSearchMatches(String source, String query) {
+    final needle = query.trim();
+    if (source.isEmpty || needle.isEmpty) {
+      return const [];
+    }
+
+    final lowerSource = source.toLowerCase();
+    final lowerNeedle = needle.toLowerCase();
+    final matches = <TextRange>[];
+    var start = 0;
+
+    while (start < lowerSource.length) {
+      final index = lowerSource.indexOf(lowerNeedle, start);
+      if (index < 0) {
+        break;
+      }
+      matches.add(TextRange(start: index, end: index + needle.length));
+      start = index + needle.length;
+    }
+
+    return matches;
+  }
+
+  int _resolveActiveSearchIndex(
+    List<TextRange> matches, {
+    required bool preserveActive,
+  }) {
+    if (matches.isEmpty) {
+      return -1;
+    }
+    if (preserveActive &&
+        _activeSearchMatchIndex >= 0 &&
+        _activeSearchMatchIndex < matches.length) {
+      return _activeSearchMatchIndex;
+    }
+    final selection = _effectiveController.selection;
+    if (selection.isValid) {
+      final index = matches.indexWhere((match) => match.start >= selection.end);
+      if (index >= 0) {
+        return index;
+      }
+    }
+    return 0;
+  }
+
+  void _goToSearchMatch({required bool previous}) {
+    if (_searchMatches.isEmpty) {
+      return;
+    }
+    final nextIndex = previous
+        ? (_activeSearchMatchIndex - 1 + _searchMatches.length) %
+            _searchMatches.length
+        : (_activeSearchMatchIndex + 1) % _searchMatches.length;
+
+    setState(() {
+      _activeSearchMatchIndex = nextIndex;
+    });
+    _syncSearchHighlights();
+    _selectActiveSearchMatch();
+  }
+
+  void _selectActiveSearchMatch() {
+    if (_activeSearchMatchIndex < 0 ||
+        _activeSearchMatchIndex >= _searchMatches.length) {
+      return;
+    }
+    final match = _searchMatches[_activeSearchMatchIndex];
+    _effectiveController.selection = TextSelection(
+      baseOffset: match.start,
+      extentOffset: match.end,
+    );
+  }
+
+  void _syncSearchHighlights() {
+    final controller = _effectiveController;
+    if (controller is NaiSyntaxController) {
+      controller.updateSearchHighlights(
+        matches: _searchMatches,
+        activeMatchIndex: _activeSearchMatchIndex,
+      );
+    }
+  }
+
+  void _clearSearchHighlights() {
+    final controller = _effectiveController;
+    if (controller is NaiSyntaxController) {
+      controller.clearSearchHighlights();
+    }
   }
 
   /// 构建自定义上下文菜单，添加"保存到词库"选项
@@ -562,7 +778,7 @@ class _UnifiedPromptInputState extends ConsumerState<UnifiedPromptInput> {
       );
     }
 
-    return Stack(
+    final inputStack = Stack(
       fit: StackFit.expand,
       children: [
         result,
@@ -573,6 +789,122 @@ class _UnifiedPromptInputState extends ConsumerState<UnifiedPromptInput> {
             onOpenSettings: widget.onOpenAssistantSettings,
           ),
       ],
+    );
+
+    if (!_searchVisible) {
+      return inputStack;
+    }
+
+    if (widget.expands) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _buildSearchToolbar(context),
+          const SizedBox(height: 8),
+          Expanded(child: inputStack),
+        ],
+      );
+    }
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildSearchToolbar(context),
+        const SizedBox(height: 8),
+        inputStack,
+      ],
+    );
+  }
+
+  Widget _buildSearchToolbar(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final total = _searchMatches.length;
+    final current = total == 0 ? 0 : _activeSearchMatchIndex + 1;
+
+    return Align(
+      alignment: Alignment.centerRight,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 360),
+        child: Material(
+          elevation: 0,
+          color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.72),
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: colorScheme.outlineVariant.withValues(alpha: 0.7),
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Expanded(
+                  child: SizedBox(
+                    height: 34,
+                    child: TextField(
+                      key: const ValueKey('prompt_input_search_field'),
+                      controller: _searchController,
+                      focusNode: _searchFocusNode,
+                      textInputAction: TextInputAction.search,
+                      style: theme.textTheme.bodyMedium,
+                      decoration: InputDecoration(
+                        hintText: context.l10n.prompt_searchHint,
+                        prefixIcon: const Icon(Icons.search, size: 18),
+                        isDense: true,
+                        filled: true,
+                        fillColor: colorScheme.surface.withValues(alpha: 0.86),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(9),
+                          borderSide: BorderSide.none,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 8,
+                        ),
+                      ),
+                      onSubmitted: (_) => _goToSearchMatch(previous: false),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  context.l10n.prompt_searchMatchCount(current, total),
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: total == 0 && _searchController.text.isNotEmpty
+                        ? colorScheme.error
+                        : colorScheme.onSurfaceVariant,
+                    fontFeatures: const [FontFeature.tabularFigures()],
+                  ),
+                ),
+                const SizedBox(width: 2),
+                _PromptSearchIconButton(
+                  icon: Icons.keyboard_arrow_up,
+                  tooltip: context.l10n.prompt_searchPrevious,
+                  onPressed: total == 0
+                      ? null
+                      : () => _goToSearchMatch(previous: true),
+                ),
+                _PromptSearchIconButton(
+                  icon: Icons.keyboard_arrow_down,
+                  tooltip: context.l10n.prompt_searchNext,
+                  onPressed: total == 0
+                      ? null
+                      : () => _goToSearchMatch(previous: false),
+                ),
+                _PromptSearchIconButton(
+                  icon: Icons.close,
+                  tooltip: context.l10n.prompt_searchClose,
+                  onPressed: _closeSearch,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -665,5 +997,29 @@ class _UnifiedPromptInputState extends ConsumerState<UnifiedPromptInput> {
     }
 
     return result;
+  }
+}
+
+class _PromptSearchIconButton extends StatelessWidget {
+  const _PromptSearchIconButton({
+    required this.icon,
+    required this.tooltip,
+    required this.onPressed,
+  });
+
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      icon: Icon(icon, size: 18),
+      tooltip: tooltip,
+      onPressed: onPressed,
+      visualDensity: VisualDensity.compact,
+      padding: EdgeInsets.zero,
+      constraints: const BoxConstraints.tightFor(width: 30, height: 30),
+    );
   }
 }

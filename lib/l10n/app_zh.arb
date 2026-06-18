@@ -384,6 +384,17 @@
   "prompt_inputNegativePrompt": "输入负向提示词...",
   "prompt_describeImage": "描述你想要生成的图像...",
   "prompt_describeImageWithHint": "输入提示词描述画面，输入 < 引用词库，支持自动补全标签",
+  "prompt_searchHint": "搜索提示词",
+  "prompt_searchMatchCount": "{current} / {total}",
+  "@prompt_searchMatchCount": {
+    "placeholders": {
+      "current": {},
+      "total": {}
+    }
+  },
+  "prompt_searchPrevious": "上一个命中",
+  "prompt_searchNext": "下一个命中",
+  "prompt_searchClose": "关闭搜索",
   "promptAssistant_needPrompt": "请输入提示词后再操作",
   "promptAssistant_requestFailed": "助手请求失败: {error}",
   "@promptAssistant_requestFailed": {

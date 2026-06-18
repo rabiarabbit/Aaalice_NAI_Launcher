@@ -1017,6 +1017,23 @@ class AppLocalizationsEn extends AppLocalizations {
       'Enter prompt to describe image, type < to reference library, supports tag autocomplete';
 
   @override
+  String get prompt_searchHint => 'Search prompt';
+
+  @override
+  String prompt_searchMatchCount(Object current, Object total) {
+    return '$current / $total';
+  }
+
+  @override
+  String get prompt_searchPrevious => 'Previous match';
+
+  @override
+  String get prompt_searchNext => 'Next match';
+
+  @override
+  String get prompt_searchClose => 'Close search';
+
+  @override
   String get promptAssistant_needPrompt =>
       'Enter a prompt before using the assistant';
 
