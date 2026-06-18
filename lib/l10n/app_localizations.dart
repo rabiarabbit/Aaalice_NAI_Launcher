@@ -1946,6 +1946,36 @@ abstract class AppLocalizations {
   /// **'Enter prompt to describe image, type < to reference library, supports tag autocomplete'**
   String get prompt_describeImageWithHint;
 
+  /// No description provided for @prompt_searchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search prompt'**
+  String get prompt_searchHint;
+
+  /// No description provided for @prompt_searchMatchCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{current} / {total}'**
+  String prompt_searchMatchCount(Object current, Object total);
+
+  /// No description provided for @prompt_searchPrevious.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous match'**
+  String get prompt_searchPrevious;
+
+  /// No description provided for @prompt_searchNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next match'**
+  String get prompt_searchNext;
+
+  /// No description provided for @prompt_searchClose.
+  ///
+  /// In en, this message translates to:
+  /// **'Close search'**
+  String get prompt_searchClose;
+
   /// No description provided for @promptAssistant_needPrompt.
   ///
   /// In en, this message translates to:

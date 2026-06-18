@@ -38,6 +38,18 @@ import '../metadata/metadata_import_dialog.dart';
 import 'image_destination_dialog.dart';
 import 'tag_library_drop_handler.dart';
 
+Future<void> appendDroppedCharacterReference({
+  required GenerationParamsNotifier notifier,
+  required Uint8List image,
+}) {
+  return notifier.addPreciseReferenceFromImage(
+    image,
+    type: PreciseRefType.character,
+    strength: 1.0,
+    fidelity: 1.0,
+  );
+}
+
 /// 全局拖拽处理器
 ///
 /// 包装整个生成界面，监听拖拽事件
@@ -640,27 +652,13 @@ class _GlobalDropHandlerState extends ConsumerState<GlobalDropHandler> {
     GenerationParamsNotifier notifier,
     AppLocalizations l10n,
   ) async {
-    final currentState = ref.read(generationParamsNotifierProvider);
-    final hasExisting = currentState.preciseReferences.isNotEmpty;
-
-    if (hasExisting) {
-      notifier.clearPreciseReferences();
-    }
-
-    await notifier.addPreciseReferenceFromImage(
-      bytes,
-      type: PreciseRefType.character,
-      strength: 1.0,
-      fidelity: 1.0,
+    await appendDroppedCharacterReference(
+      notifier: notifier,
+      image: bytes,
     );
 
     if (mounted) {
-      AppToast.success(
-        context,
-        hasExisting
-            ? l10n.toast_replacedCharacterReference
-            : l10n.drop_addedToCharacterRef,
-      );
+      AppToast.success(context, l10n.drop_addedToCharacterRef);
     }
   }
 

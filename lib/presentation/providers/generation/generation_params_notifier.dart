@@ -330,6 +330,14 @@ class GenerationParamsNotifier extends _$GenerationParamsNotifier {
     state = state.copyWith(inpaintStrength: strength);
   }
 
+  /// 更新当前 infill 请求是否为扩图请求。
+  void updateIsOutpaint(bool isOutpaint) {
+    if (state.isOutpaint == isOutpaint) {
+      return;
+    }
+    state = state.copyWith(isOutpaint: isOutpaint);
+  }
+
   /// 清除 img2img 设置
   void clearImg2Img() {
     state = state.copyWith(
@@ -338,6 +346,7 @@ class GenerationParamsNotifier extends _$GenerationParamsNotifier {
       strength: 0.7,
       noise: 0.0,
       inpaintStrength: 1.0,
+      isOutpaint: false,
     );
   }
 
@@ -355,6 +364,7 @@ class GenerationParamsNotifier extends _$GenerationParamsNotifier {
       sourceImage: null,
       maskImage: null,
       inpaintStrength: 1.0,
+      isOutpaint: false,
     );
   }
 

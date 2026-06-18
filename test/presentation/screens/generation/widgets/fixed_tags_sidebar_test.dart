@@ -671,7 +671,6 @@ void main() {
                 categoryColor: Colors.blue,
                 isListMode: true,
                 onToggle: () {},
-                onWeightChanged: (_) {},
                 onEdit: () => edited = true,
                 onDelete: () {},
               ),
@@ -686,6 +685,9 @@ void main() {
     addTearDown(gesture.removePointer);
     await gesture.moveTo(tester.getCenter(find.byType(SidebarEntryTile)));
     await tester.pumpAndSettle();
+
+    expect(find.byIcon(Icons.remove_rounded), findsNothing);
+    expect(find.byIcon(Icons.add_rounded), findsNothing);
 
     await tester.tap(find.byIcon(Icons.edit_rounded));
 

@@ -319,32 +319,44 @@ class OutpaintVirtualFrame {
       return [canvasRect];
     }
     if (sourceRect.top > 0) {
-      rects.add(Rect.fromLTRB(0, 0, canvasRect.right, sourceRect.top));
+      final bottom = (sourceRect.top + 1) > canvasRect.bottom
+          ? canvasRect.bottom
+          : sourceRect.top + 1;
+      rects.add(Rect.fromLTRB(0, 0, canvasRect.right, bottom));
     }
     if (sourceRect.bottom < canvasRect.bottom) {
+      final top = (sourceRect.bottom - 1) < canvasRect.top
+          ? canvasRect.top
+          : sourceRect.bottom - 1;
       rects.add(
         Rect.fromLTRB(
           0,
-          sourceRect.bottom,
+          top,
           canvasRect.right,
           canvasRect.bottom,
         ),
       );
     }
     if (sourceRect.left > 0) {
+      final right = (sourceRect.left + 1) > canvasRect.right
+          ? canvasRect.right
+          : sourceRect.left + 1;
       rects.add(
         Rect.fromLTRB(
           0,
           sourceRect.top,
-          sourceRect.left,
+          right,
           sourceRect.bottom,
         ),
       );
     }
     if (sourceRect.right < canvasRect.right) {
+      final left = (sourceRect.right - 1) < canvasRect.left
+          ? canvasRect.left
+          : sourceRect.right - 1;
       rects.add(
         Rect.fromLTRB(
-          sourceRect.right,
+          left,
           sourceRect.top,
           canvasRect.right,
           sourceRect.bottom,

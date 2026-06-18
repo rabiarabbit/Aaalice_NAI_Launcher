@@ -859,6 +859,9 @@ class NAIImageGenerationApiService {
     if (focusedRequest != null) {
       return focusedRequest.compositeGeneratedImage(imageBytes);
     }
+    if (params.isOutpaint) {
+      return imageBytes;
+    }
     if (params.action != ImageGenerationAction.infill ||
         params.sourceImage == null ||
         params.maskImage == null) {

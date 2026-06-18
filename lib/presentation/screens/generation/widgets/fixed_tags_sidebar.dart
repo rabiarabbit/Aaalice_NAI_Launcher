@@ -624,11 +624,6 @@ class _FixedTagsSidebarState extends ConsumerState<FixedTagsSidebar> {
       linkAnchor: _buildLinkAnchor(entry),
       onToggle: () =>
           ref.read(fixedTagsNotifierProvider.notifier).toggleEnabled(entry.id),
-      onWeightChanged: (weight) {
-        ref.read(fixedTagsNotifierProvider.notifier).updateEntry(
-              entry.copyWith(weight: weight, updatedAt: DateTime.now()),
-            );
-      },
       onEdit: () => _editEntry(entry),
       onDelete: () => _deleteEntry(entry),
     );
