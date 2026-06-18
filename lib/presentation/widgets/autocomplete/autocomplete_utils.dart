@@ -10,20 +10,17 @@ import 'autocomplete_controller.dart';
 class AutocompleteUtils {
   AutocompleteUtils._();
 
+  static final RegExp _leadingWhitespacePattern = RegExp(r'^\s*');
+  static final RegExp _trailingWhitespacePattern = RegExp(r'\s*$');
+
   /// 获取当前正在输入的标签
   /// 支持 NAI 特殊语法：权重语法 (1.5::tag)、括号语法 ({tag})、双竖线 (||)
   static String getCurrentTag(String text, int cursorPosition) {
-    if (cursorPosition < 0 || cursorPosition > text.length) {
-      return '';
-    }
+    final segment = _parseCurrentTagSegment(text, cursorPosition);
+    if (segment == null) return '';
 
-    final textBeforeCursor = text.substring(0, cursorPosition);
-    final lastSeparatorIndex = _findLastSeparator(textBeforeCursor);
-
-    // 获取当前标签
-    final currentTag =
-        textBeforeCursor.substring(lastSeparatorIndex + 1).trim();
-
+    final queryEnd = cursorPosition.clamp(segment.coreStart, segment.coreEnd);
+    final currentTag = text.substring(segment.coreStart, queryEnd);
     return TagNormalizer.normalizeAutocompleteTag(currentTag);
   }
 
@@ -51,25 +48,11 @@ class AutocompleteUtils {
   /// 返回 (tagStart, tagEnd, weightPrefix)
   /// weightPrefix 是权重语法前缀 (如 "1.10::")
   static (int, int, String) findTagRange(String text, int cursorPosition) {
-    if (cursorPosition < 0 || cursorPosition > text.length) {
+    final segment = _parseCurrentTagSegment(text, cursorPosition);
+    if (segment == null) {
       return (-1, -1, '');
     }
-
-    final textBeforeCursor = text.substring(0, cursorPosition);
-    final tagStart = _findLastSeparator(textBeforeCursor) + 1;
-    final tagEnd = _findNextSeparator(text, cursorPosition);
-
-    // 提取当前标签文本（包含权重前缀）
-    final tagText = text.substring(tagStart, tagEnd).trim();
-
-    // 检测并提取权重前缀
-    String weightPrefix = '';
-    final weightMatch = TagNormalizer.weightPrefixPattern.firstMatch(tagText);
-    if (weightMatch != null) {
-      weightPrefix = weightMatch.group(0)!; // 包含 "::"
-    }
-
-    return (tagStart, tagEnd, weightPrefix);
+    return (segment.coreStart, segment.coreEnd, segment.weightPrefix);
   }
 
   /// 查找下一个分隔符位置（从光标位置开始）
@@ -95,9 +78,9 @@ class AutocompleteUtils {
     required LocalTag suggestion,
     required AutocompleteConfig config,
   }) {
-    final (tagStart, tagEnd, weightPrefix) = findTagRange(text, cursorPosition);
+    final segment = _parseCurrentTagSegment(text, cursorPosition);
 
-    if (tagStart < 0 || tagEnd > text.length || tagStart > tagEnd) {
+    if (segment == null) {
       // 无法确定标签范围，尝试使用当前标签
       final currentTag = getCurrentTag(text, cursorPosition);
       if (currentTag.isNotEmpty) {
@@ -105,9 +88,11 @@ class AutocompleteUtils {
         if (tagStartFromCurrent >= 0) {
           return _buildReplacedText(
             text: text,
-            tagStart: tagStartFromCurrent,
-            tagEnd: cursorPosition,
-            weightPrefix: weightPrefix,
+            segmentStart: tagStartFromCurrent,
+            segmentEnd: cursorPosition,
+            leadingWhitespace: '',
+            syntaxPrefix: '',
+            syntaxSuffix: '',
             suggestion: suggestion,
             config: config,
           );
@@ -119,9 +104,11 @@ class AutocompleteUtils {
 
     return _buildReplacedText(
       text: text,
-      tagStart: tagStart,
-      tagEnd: tagEnd,
-      weightPrefix: weightPrefix,
+      segmentStart: segment.segmentStart,
+      segmentEnd: segment.segmentEnd,
+      leadingWhitespace: segment.leadingWhitespace,
+      syntaxPrefix: segment.syntaxPrefix,
+      syntaxSuffix: segment.syntaxSuffix,
       suggestion: suggestion,
       config: config,
     );
@@ -130,25 +117,27 @@ class AutocompleteUtils {
   /// 构建替换后的文本
   static (String, int) _buildReplacedText({
     required String text,
-    required int tagStart,
-    required int tagEnd,
-    required String weightPrefix,
+    required int segmentStart,
+    required int segmentEnd,
+    required String leadingWhitespace,
+    required String syntaxPrefix,
+    required String syntaxSuffix,
     required LocalTag suggestion,
     required AutocompleteConfig config,
   }) {
-    final prefix = text.substring(0, tagStart);
-    final suffix = text.substring(tagEnd);
+    final prefix = text.substring(0, segmentStart);
+    final suffix = text.substring(segmentEnd);
 
     // NAI 语法：保留下划线，不替换为空格
     final tagName = suggestion.tag;
 
-    // 如果有权重前缀，保留权重前缀并添加结尾的 "::"
-    final weightedTagName =
-        weightPrefix.isNotEmpty ? '$weightPrefix$tagName::' : tagName;
+    final wrappedTagName = '$syntaxPrefix$tagName$syntaxSuffix';
 
     // 添加前导空格（如果前面有内容）
-    final needsLeadingSpace = prefix.isNotEmpty && !prefix.endsWith(' ');
-    final leadingSpace = needsLeadingSpace ? ' ' : '';
+    final needsInsertedLeadingSpace =
+        leadingWhitespace.isEmpty && prefix.isNotEmpty && !prefix.endsWith(' ');
+    final effectiveLeadingWhitespace =
+        needsInsertedLeadingSpace ? ' ' : leadingWhitespace;
 
     // 添加逗号和空格（如果配置了自动插入）
     final trailingComma = config.autoInsertComma &&
@@ -156,13 +145,155 @@ class AutocompleteUtils {
         ? ', '
         : '';
 
-    final newText = '$prefix$leadingSpace$weightedTagName$trailingComma$suffix';
+    final newText =
+        '$prefix$effectiveLeadingWhitespace$wrappedTagName$trailingComma$suffix';
     final newCursorPosition = prefix.length +
-        leadingSpace.length +
-        weightedTagName.length +
+        effectiveLeadingWhitespace.length +
+        wrappedTagName.length +
         trailingComma.length;
 
     return (newText, newCursorPosition);
+  }
+
+  static _CurrentTagSegment? _parseCurrentTagSegment(
+    String text,
+    int cursorPosition,
+  ) {
+    if (cursorPosition < 0 || cursorPosition > text.length) {
+      return null;
+    }
+
+    final textBeforeCursor = text.substring(0, cursorPosition);
+    final segmentStart = _findLastSeparator(textBeforeCursor) + 1;
+    final segmentEnd = _findNextSeparator(text, cursorPosition);
+    final segmentText = text.substring(segmentStart, segmentEnd);
+
+    final leadingWhitespace =
+        _leadingWhitespacePattern.firstMatch(segmentText)?.group(0) ?? '';
+    final trailingWhitespace =
+        _trailingWhitespacePattern.firstMatch(segmentText)?.group(0) ?? '';
+
+    var tokenStart = leadingWhitespace.length;
+    var tokenEnd = segmentText.length - trailingWhitespace.length;
+    if (tokenStart > tokenEnd) {
+      return null;
+    }
+
+    if (tokenStart == tokenEnd) {
+      return null;
+    }
+
+    var syntaxPrefix = '';
+    var syntaxSuffix = '';
+    var weightPrefix = '';
+    var openedBracketCount = 0;
+    var weightPrefixBracketDepth = 0;
+
+    var changed = true;
+    while (changed && tokenStart < tokenEnd) {
+      changed = false;
+      final token = segmentText.substring(tokenStart, tokenEnd);
+
+      final weightMatch = TagNormalizer.weightPrefixPattern.firstMatch(token);
+      if (weightMatch != null) {
+        final matchedWeightPrefix = weightMatch.group(0)!;
+        if (weightPrefix.isEmpty) {
+          weightPrefix = matchedWeightPrefix;
+          weightPrefixBracketDepth = openedBracketCount;
+        }
+        syntaxPrefix += matchedWeightPrefix;
+        tokenStart += matchedWeightPrefix.length;
+        changed = true;
+        continue;
+      }
+
+      final opener = segmentText[tokenStart];
+      final closer = _matchingClosingBracket(opener);
+      if (closer != null) {
+        syntaxPrefix += opener;
+        openedBracketCount += 1;
+        tokenStart += 1;
+        changed = true;
+        continue;
+      }
+
+      if (tokenEnd - tokenStart >= 2 &&
+          segmentText.substring(tokenEnd - 2, tokenEnd) == '::') {
+        syntaxSuffix = '::$syntaxSuffix';
+        tokenEnd -= 2;
+        changed = true;
+        continue;
+      }
+
+      final trailingChar = segmentText[tokenEnd - 1];
+      if (_isClosingBracket(trailingChar)) {
+        syntaxSuffix = '$trailingChar$syntaxSuffix';
+        tokenEnd -= 1;
+        changed = true;
+      }
+    }
+
+    if (weightPrefix.isNotEmpty && !syntaxSuffix.contains('::')) {
+      syntaxSuffix = _insertImplicitWeightSuffix(
+        syntaxSuffix,
+        closingBracketDepth: weightPrefixBracketDepth,
+      );
+    }
+
+    final coreStart = segmentStart + tokenStart;
+    final coreEnd = segmentStart + tokenEnd;
+    if (coreStart > coreEnd) {
+      return null;
+    }
+
+    return _CurrentTagSegment(
+      segmentStart: segmentStart,
+      segmentEnd: segmentEnd,
+      coreStart: coreStart,
+      coreEnd: coreEnd,
+      leadingWhitespace: leadingWhitespace,
+      syntaxPrefix: syntaxPrefix,
+      syntaxSuffix: syntaxSuffix,
+      weightPrefix: weightPrefix,
+    );
+  }
+
+  static String? _matchingClosingBracket(String opener) {
+    switch (opener) {
+      case '{':
+        return '}';
+      case '[':
+        return ']';
+      case '(':
+        return ')';
+      default:
+        return null;
+    }
+  }
+
+  static bool _isClosingBracket(String char) {
+    return char == '}' || char == ']' || char == ')';
+  }
+
+  static String _insertImplicitWeightSuffix(
+    String suffix, {
+    required int closingBracketDepth,
+  }) {
+    if (closingBracketDepth <= 0 || suffix.isEmpty) {
+      return '$suffix::';
+    }
+
+    var insertIndex = suffix.length;
+    var remainingClosers = closingBracketDepth;
+    while (insertIndex > 0 && remainingClosers > 0) {
+      final char = suffix[insertIndex - 1];
+      insertIndex -= 1;
+      if (_isClosingBracket(char)) {
+        remainingClosers -= 1;
+      }
+    }
+
+    return '${suffix.substring(0, insertIndex)}::${suffix.substring(insertIndex)}';
   }
 
   /// 计算光标在文本框内的位置
@@ -264,4 +395,26 @@ class AutocompleteUtils {
       topPadding + visibleCursorY + lineHeight,
     );
   }
+}
+
+class _CurrentTagSegment {
+  final int segmentStart;
+  final int segmentEnd;
+  final int coreStart;
+  final int coreEnd;
+  final String leadingWhitespace;
+  final String syntaxPrefix;
+  final String syntaxSuffix;
+  final String weightPrefix;
+
+  const _CurrentTagSegment({
+    required this.segmentStart,
+    required this.segmentEnd,
+    required this.coreStart,
+    required this.coreEnd,
+    required this.leadingWhitespace,
+    required this.syntaxPrefix,
+    required this.syntaxSuffix,
+    required this.weightPrefix,
+  });
 }

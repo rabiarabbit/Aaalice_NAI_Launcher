@@ -16,6 +16,7 @@ import 'package:nai_launcher/core/comfyui/workflow_node_validator.dart';
 import 'package:nai_launcher/core/comfyui/workflow_template_manager.dart';
 import 'package:nai_launcher/core/constants/api_constants.dart';
 import 'package:nai_launcher/core/constants/storage_keys.dart';
+import 'package:nai_launcher/core/services/danbooru_tags_lazy_service.dart';
 import 'package:nai_launcher/core/shortcuts/default_shortcuts.dart';
 import 'package:nai_launcher/core/shortcuts/shortcut_config.dart';
 import 'package:nai_launcher/core/utils/file_explorer_utils.dart';
@@ -24,6 +25,7 @@ import 'package:nai_launcher/data/models/fixed_tag/fixed_tag_entry.dart';
 import 'package:nai_launcher/data/models/gallery/gallery_statistics.dart';
 import 'package:nai_launcher/data/models/gallery/local_image_record.dart';
 import 'package:nai_launcher/data/models/gallery/nai_image_metadata.dart';
+import 'package:nai_launcher/data/models/tag/local_tag.dart';
 import 'package:nai_launcher/data/models/vibe/vibe_library_entry.dart';
 import 'package:nai_launcher/data/models/vibe/vibe_reference.dart';
 import 'package:nai_launcher/data/services/local_onnx_tagger_service.dart';
@@ -50,13 +52,20 @@ import 'package:nai_launcher/presentation/screens/vibe_library/widgets/vibe_expo
 import 'package:nai_launcher/presentation/screens/vibe_library/widgets/vibe_export_dialog_advanced.dart';
 import 'package:nai_launcher/presentation/utils/dropped_file_reader.dart';
 import 'package:nai_launcher/presentation/widgets/gallery/local_gallery_toolbar.dart';
+import 'package:nai_launcher/presentation/widgets/autocomplete/autocomplete_controller.dart';
 import 'package:nai_launcher/presentation/widgets/autocomplete/autocomplete_strategy.dart';
+import 'package:nai_launcher/presentation/widgets/autocomplete/autocomplete_utils.dart';
 import 'package:nai_launcher/presentation/widgets/autocomplete/autocomplete_wrapper.dart';
 import 'package:nai_launcher/presentation/widgets/autocomplete/generic_suggestion_tile.dart';
 import 'package:nai_launcher/presentation/widgets/metadata/metadata_import_dialog.dart';
+import 'package:nai_launcher/presentation/widgets/prompt/unified/unified_prompt_config.dart';
+import 'package:nai_launcher/presentation/widgets/prompt/unified/unified_prompt_input.dart';
 import 'package:nai_launcher/presentation/widgets/shortcuts/shortcut_aware_widget.dart';
 
 class _MockDio extends Mock implements Dio {}
+
+class _MockDanbooruTagsLazyService extends Mock
+    implements DanbooruTagsLazyService {}
 
 /// 简单的 Widget 测试示例
 ///
@@ -429,6 +438,37 @@ void main() {
   });
 
   group('AutocompleteWrapper', () {
+    test('preserves prompt syntax wrappers when applying a tag suggestion', () {
+      const suggestion = LocalTag(tag: 'raiden_shogun');
+      const config = AutocompleteConfig(autoInsertComma: true);
+
+      (String, int) apply(String text, int cursorPosition) {
+        return AutocompleteUtils.applySuggestion(
+          text: text,
+          cursorPosition: cursorPosition,
+          suggestion: suggestion,
+          config: config,
+        );
+      }
+
+      expect(apply('{rai}', 4).$1, '{raiden_shogun}, ');
+      expect(apply('{rai}', 5).$1, '{raiden_shogun}, ');
+      expect(apply('[rai]', 4).$1, '[raiden_shogun], ');
+      expect(apply('[rai]', 5).$1, '[raiden_shogun], ');
+      expect(apply('(rai)', 4).$1, '(raiden_shogun), ');
+      expect(apply('(rai)', 5).$1, '(raiden_shogun), ');
+      expect(apply('{{rai}}', 5).$1, '{{raiden_shogun}}, ');
+      expect(apply('{{rai}}', 7).$1, '{{raiden_shogun}}, ');
+      expect(apply('{2::rai::}', 10).$1, '{2::raiden_shogun::}, ');
+      expect(apply('{2::rai}', 8).$1, '{2::raiden_shogun::}, ');
+      expect(apply('2::rai::', 6).$1, '2::raiden_shogun::, ');
+      expect(apply('2::rai ::', 6).$1, '2::raiden_shogun::, ');
+      expect(apply('2::rai', 6).$1, '2::raiden_shogun::, ');
+      expect(apply('rai::', 3).$1, 'raiden_shogun::, ');
+      expect(apply('2::{rai}::', 7).$1, '2::{raiden_shogun}::, ');
+      expect(apply('2::{rai}::', 10).$1, '2::{raiden_shogun}::, ');
+    });
+
     testWidgets('hides suggestions immediately after selecting an item', (
       tester,
     ) async {
@@ -473,6 +513,155 @@ void main() {
       expect(find.byType(GenericSuggestionTile), findsNothing);
 
       await tester.pump(const Duration(milliseconds: 350));
+      expect(find.byType(GenericSuggestionTile), findsNothing);
+    });
+
+    Future<void> pumpAutocompleteWrapper(
+      WidgetTester tester,
+      TextEditingController controller,
+      FocusNode focusNode,
+      AutocompleteStrategy strategy,
+    ) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(
+              body: AutocompleteWrapper(
+                controller: controller,
+                focusNode: focusNode,
+                strategy: strategy,
+                child: TextField(
+                  controller: controller,
+                  focusNode: focusNode,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    Future<void> selectWrappedTag(
+      WidgetTester tester,
+      TextEditingController controller,
+      String text, {
+      int? cursorOffset,
+    }) async {
+      await tester.tap(find.byType(TextField));
+      await tester.enterText(find.byType(TextField), text);
+      controller.selection = TextSelection.collapsed(
+        offset: cursorOffset ?? text.length,
+      );
+      await tester.pump(const Duration(milliseconds: 80));
+      await tester.pump();
+
+      expect(find.byType(GenericSuggestionTile), findsOneWidget);
+
+      await tester.tap(find.text('raiden shogun', findRichText: true));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 350));
+    }
+
+    testWidgets('keeps prompt syntax wrappers after selecting a local tag', (
+      tester,
+    ) async {
+      final controller = TextEditingController();
+      final focusNode = FocusNode();
+      final strategy = _FakeLocalTagAutocompleteStrategy();
+      addTearDown(controller.dispose);
+      addTearDown(focusNode.dispose);
+      addTearDown(strategy.dispose);
+
+      await pumpAutocompleteWrapper(tester, controller, focusNode, strategy);
+      await selectWrappedTag(tester, controller, '{rai}');
+      expect(controller.text, '{raiden_shogun}, ');
+      expect(find.byType(GenericSuggestionTile), findsNothing);
+
+      await selectWrappedTag(tester, controller, '[rai]');
+      expect(controller.text, '[raiden_shogun], ');
+      expect(find.byType(GenericSuggestionTile), findsNothing);
+
+      await selectWrappedTag(tester, controller, '(rai)');
+      expect(controller.text, '(raiden_shogun), ');
+      expect(find.byType(GenericSuggestionTile), findsNothing);
+
+      await selectWrappedTag(tester, controller, '{{rai}}');
+      expect(controller.text, '{{raiden_shogun}}, ');
+      expect(find.byType(GenericSuggestionTile), findsNothing);
+
+      await selectWrappedTag(tester, controller, '2::{rai}::');
+      expect(controller.text, '2::{raiden_shogun}::, ');
+      expect(find.byType(GenericSuggestionTile), findsNothing);
+    });
+
+    testWidgets('keeps wrappers through the unified prompt input stack', (
+      tester,
+    ) async {
+      final controller = TextEditingController();
+      final focusNode = FocusNode();
+      final service = _MockDanbooruTagsLazyService();
+      addTearDown(controller.dispose);
+      addTearDown(focusNode.dispose);
+
+      when(
+        () => service.searchTags(
+          any(),
+          category: any(named: 'category'),
+          limit: any(named: 'limit'),
+        ),
+      ).thenAnswer(
+        (_) async => const [
+          LocalTag(tag: 'raiden_shogun', category: 4, count: 1000),
+        ],
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            danbooruTagsLazyServiceProvider.overrideWith((ref) async {
+              return service;
+            }),
+          ],
+          child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(
+              body: SizedBox(
+                width: 500,
+                height: 180,
+                child: UnifiedPromptInput(
+                  controller: controller,
+                  focusNode: focusNode,
+                  enableAssistant: false,
+                  config: const UnifiedPromptConfig(
+                    enableAutocomplete: true,
+                    enableSyntaxHighlight: true,
+                    enableAutoFormat: true,
+                    autocompleteConfig: AutocompleteConfig(
+                      autoInsertComma: true,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.byType(TextField));
+      await tester.enterText(find.byType(TextField), '{rai}');
+      await tester.pump(const Duration(milliseconds: 250));
+      await tester.pump();
+
+      expect(find.byType(GenericSuggestionTile), findsOneWidget);
+
+      await tester.tap(find.text('raiden shogun', findRichText: true));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 350));
+
+      expect(controller.text, '{raiden_shogun}, ');
       expect(find.byType(GenericSuggestionTile), findsNothing);
     });
   });
@@ -2135,6 +2324,58 @@ class _FakeAutocompleteStrategy extends AutocompleteStrategy<String> {
     int cursorPosition,
   ) {
     return (item, item.length);
+  }
+}
+
+class _FakeLocalTagAutocompleteStrategy extends AutocompleteStrategy<LocalTag> {
+  List<LocalTag> _suggestions = const [];
+
+  @override
+  List<LocalTag> get suggestions => _suggestions;
+
+  @override
+  bool get isLoading => false;
+
+  @override
+  Future<void> search(
+    String text,
+    int cursorPosition, {
+    bool immediate = false,
+  }) async {
+    _suggestions = const [
+      LocalTag(tag: 'raiden_shogun', category: 4, count: 1000),
+    ];
+    notifyListeners();
+  }
+
+  @override
+  void clear() {
+    _suggestions = const [];
+    notifyListeners();
+  }
+
+  @override
+  SuggestionData toSuggestionData(LocalTag item) {
+    return SuggestionData(
+      tag: item.tag,
+      category: item.category,
+      count: item.count,
+      translation: item.translation,
+    );
+  }
+
+  @override
+  (String, int) applySuggestion(
+    LocalTag item,
+    String text,
+    int cursorPosition,
+  ) {
+    return AutocompleteUtils.applySuggestion(
+      text: text,
+      cursorPosition: cursorPosition,
+      suggestion: item,
+      config: const AutocompleteConfig(autoInsertComma: true),
+    );
   }
 }
 
