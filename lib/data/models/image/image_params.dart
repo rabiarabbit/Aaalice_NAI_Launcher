@@ -189,6 +189,11 @@ class ImageParams with _$ImageParams {
     @JsonKey(includeFromJson: false, includeToJson: false)
     int inpaintMaskExpansionIterations,
 
+    /// 当前 infill 请求是否来自扩图画布。
+    @Default(false)
+    @JsonKey(includeFromJson: false, includeToJson: false)
+    bool isOutpaint,
+
     // ========== Vibe Transfer 参数 ==========
 
     /// V4 Vibe 参考列表 (支持预编码和原始图片)

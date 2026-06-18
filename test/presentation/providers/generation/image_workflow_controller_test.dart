@@ -277,6 +277,7 @@ void main() {
       expect(params.width, equals(1536));
       expect(params.height, equals(2304));
       expect(params.maskImage, isNotNull);
+      expect(params.isOutpaint, isFalse);
       expect(params.action, ImageGenerationAction.infill);
       expect(
         params.model,
@@ -314,12 +315,14 @@ void main() {
       expect(workflow.mode, ImageWorkflowMode.inpaint);
       expect(workflow.sourceWidth, equals(1472));
       expect(workflow.sourceHeight, equals(1664));
+      expect(workflow.isOutpaint, isTrue);
       expect(workflow.focusedInpaintEnabled, isFalse);
       expect(workflow.focusedSelectionRect, isNull);
       expect(params.sourceImage, same(expandedSource));
       expect(params.maskImage, same(expandedMask));
       expect(params.width, equals(1472));
       expect(params.height, equals(1664));
+      expect(params.isOutpaint, isTrue);
       expect(params.action, ImageGenerationAction.infill);
     });
 

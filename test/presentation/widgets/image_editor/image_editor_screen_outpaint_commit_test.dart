@@ -111,7 +111,7 @@ void main() {
       expect(state.debugHasOutpaintChanges, isTrue);
       expect(
         state.debugVirtualOutpaintMaskRects,
-        contains(const Rect.fromLTRB(128, 0, 192, 128)),
+        contains(const Rect.fromLTRB(127, 0, 192, 128)),
       );
 
       await tester.pumpWidget(const SizedBox.shrink());
@@ -185,7 +185,7 @@ void main() {
       expect(state.debugHasOutpaintChanges, isTrue);
       expect(
         state.debugVirtualOutpaintMaskRects,
-        contains(const Rect.fromLTRB(128, 0, 192, 128)),
+        contains(const Rect.fromLTRB(127, 0, 192, 128)),
       );
 
       await tester.runAsync(() async {

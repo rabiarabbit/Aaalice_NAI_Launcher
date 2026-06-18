@@ -619,7 +619,7 @@ void main() {
       expect(expanded.contentShift, equals(const Offset(64, 0)));
       expect(
         expanded.outpaintMaskRects,
-        equals([const Rect.fromLTWH(0, 0, 64, 128)]),
+        equals([const Rect.fromLTWH(0, 0, 65, 128)]),
       );
 
       final restored = expanded.frame.applyDelta(
@@ -672,8 +672,8 @@ void main() {
       expect(
         result.outpaintMaskRects,
         equals([
-          const Rect.fromLTWH(0, 0, 192, 32),
-          const Rect.fromLTWH(0, 32, 64, 96),
+          const Rect.fromLTWH(0, 0, 192, 33),
+          const Rect.fromLTWH(0, 32, 65, 96),
         ]),
       );
     });

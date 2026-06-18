@@ -303,6 +303,7 @@ class ImageWorkflowState {
     this.enhance = const EnhanceWorkflowSettings(),
     this.upscale = const UpscaleWorkflowSettings(),
     this.isPanelExpanded = false,
+    this.isOutpaint = false,
     this.focusedInpaintEnabled = false,
     this.minimumContextMegaPixels = 88.0,
     this.focusedSelectionRect,
@@ -319,6 +320,7 @@ class ImageWorkflowState {
   final EnhanceWorkflowSettings enhance;
   final UpscaleWorkflowSettings upscale;
   final bool isPanelExpanded;
+  final bool isOutpaint;
   final bool focusedInpaintEnabled;
   final double minimumContextMegaPixels;
   final Rect? focusedSelectionRect;
@@ -339,6 +341,7 @@ class ImageWorkflowState {
     EnhanceWorkflowSettings? enhance,
     UpscaleWorkflowSettings? upscale,
     bool? isPanelExpanded,
+    bool? isOutpaint,
     bool? focusedInpaintEnabled,
     double? minimumContextMegaPixels,
     Rect? focusedSelectionRect,
@@ -360,6 +363,7 @@ class ImageWorkflowState {
       enhance: enhance ?? this.enhance,
       upscale: upscale ?? this.upscale,
       isPanelExpanded: isPanelExpanded ?? this.isPanelExpanded,
+      isOutpaint: isOutpaint ?? this.isOutpaint,
       focusedInpaintEnabled:
           focusedInpaintEnabled ?? this.focusedInpaintEnabled,
       minimumContextMegaPixels:
@@ -726,6 +730,7 @@ class ImageWorkflowController extends Notifier<ImageWorkflowState> {
     }
 
     _paramsNotifier.setSourceImage(effectiveBytes);
+    _paramsNotifier.updateIsOutpaint(false);
 
     final resolvedSize = _resolveImageSize(
       effectiveBytes,
@@ -735,6 +740,7 @@ class ImageWorkflowController extends Notifier<ImageWorkflowState> {
     state = state.copyWith(
       sourceWidth: resolvedSize?.$1,
       sourceHeight: resolvedSize?.$2,
+      isOutpaint: false,
       clearFocusedSelectionRect: true,
     );
 
@@ -753,6 +759,7 @@ class ImageWorkflowController extends Notifier<ImageWorkflowState> {
         _paramsNotifier.setMaskImage(null);
         state = state.copyWith(
           mode: ImageWorkflowMode.base,
+          isOutpaint: false,
           clearBaseSnapshot: true,
           clearFocusedSelectionRect: true,
         );
@@ -813,8 +820,10 @@ class ImageWorkflowController extends Notifier<ImageWorkflowState> {
     state = state.copyWith(
       mode: ImageWorkflowMode.upscale,
       isPanelExpanded: true,
+      isOutpaint: false,
     );
     _applySourceSizeToParams();
+    _paramsNotifier.updateIsOutpaint(false);
     _paramsNotifier.updateAction(ImageGenerationAction.img2img);
   }
 
@@ -826,8 +835,10 @@ class ImageWorkflowController extends Notifier<ImageWorkflowState> {
     _restoreBaseParams();
     state = state.copyWith(
       mode: ImageWorkflowMode.base,
+      isOutpaint: false,
       clearBaseSnapshot: true,
     );
+    _paramsNotifier.updateIsOutpaint(false);
     _paramsNotifier.updateAction(
       _params.sourceImage != null
           ? ImageGenerationAction.img2img
@@ -971,6 +982,7 @@ class ImageWorkflowController extends Notifier<ImageWorkflowState> {
       sourceWidth: hasOutpaintSource ? sourceWidth : null,
       sourceHeight: hasOutpaintSource ? sourceHeight : null,
       isPanelExpanded: true,
+      isOutpaint: hasOutpaintSource,
       focusedInpaintEnabled: effectiveFocusedInpaintEnabled,
       minimumContextMegaPixels: minimumContextMegaPixels.clamp(0.0, 192.0),
       focusedSelectionRect: effectiveFocusedSelectionRect,
@@ -995,7 +1007,9 @@ class ImageWorkflowController extends Notifier<ImageWorkflowState> {
     state = state.copyWith(
       mode: ImageWorkflowMode.enhance,
       isPanelExpanded: true,
+      isOutpaint: false,
     );
+    _paramsNotifier.updateIsOutpaint(false);
     _applyEnhanceToParams();
   }
 
@@ -1007,8 +1021,10 @@ class ImageWorkflowController extends Notifier<ImageWorkflowState> {
     _restoreBaseParams();
     state = state.copyWith(
       mode: ImageWorkflowMode.base,
+      isOutpaint: false,
       clearBaseSnapshot: true,
     );
+    _paramsNotifier.updateIsOutpaint(false);
     _paramsNotifier.updateAction(
       _params.sourceImage != null
           ? ImageGenerationAction.img2img
@@ -1032,6 +1048,7 @@ class ImageWorkflowController extends Notifier<ImageWorkflowState> {
     state = state.copyWith(
       mode: ImageWorkflowMode.inpaint,
       isPanelExpanded: true,
+      isOutpaint: false,
     );
 
     _applySourceSizeToParams();
@@ -1053,10 +1070,12 @@ class ImageWorkflowController extends Notifier<ImageWorkflowState> {
 
     state = state.copyWith(
       mode: ImageWorkflowMode.base,
+      isOutpaint: false,
       clearBaseSnapshot: shouldRestoreBaseSnapshot,
       clearFocusedSelectionRect: clearMask,
     );
     _applySourceSizeToParams();
+    _paramsNotifier.updateIsOutpaint(false);
     _paramsNotifier.updateAction(
       _params.sourceImage != null
           ? ImageGenerationAction.img2img
@@ -1212,11 +1231,13 @@ class ImageWorkflowController extends Notifier<ImageWorkflowState> {
 
     if (_params.maskImage != null) {
       _applyInpaintModel();
+      _paramsNotifier.updateIsOutpaint(state.isOutpaint);
       _paramsNotifier.updateAction(ImageGenerationAction.infill);
       return;
     }
 
     _restoreBaseModel();
+    _paramsNotifier.updateIsOutpaint(false);
     _paramsNotifier.updateAction(ImageGenerationAction.img2img);
   }
 
