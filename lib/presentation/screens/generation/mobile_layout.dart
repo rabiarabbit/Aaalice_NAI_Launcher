@@ -159,10 +159,14 @@ class _MobileGenerationLayoutState
                 child: _MobileGenerateButton(
                   isGenerating: isGenerating,
                   showCancel: isLauncherGenerating,
+                  generationState: generationState,
                   onGenerate: () => _handleGenerate(context, ref),
                   onCancel: () => ref
                       .read(imageGenerationNotifierProvider.notifier)
                       .cancel(),
+                  onSkipCurrent: () => ref
+                      .read(imageGenerationNotifierProvider.notifier)
+                      .skipCurrentRequest(),
                 ),
               ),
             ],
@@ -250,36 +254,74 @@ class _MobileRandomModeToggle extends ConsumerWidget {
 class _MobileGenerateButton extends ConsumerWidget {
   final bool isGenerating;
   final bool showCancel;
+  final ImageGenerationState generationState;
   final VoidCallback onGenerate;
   final VoidCallback onCancel;
+  final VoidCallback onSkipCurrent;
 
   const _MobileGenerateButton({
     required this.isGenerating,
     required this.showCancel,
+    required this.generationState,
     required this.onGenerate,
     required this.onCancel,
+    required this.onSkipCurrent,
   });
+
+  bool get _canSkipCurrentBatch =>
+      showCancel &&
+      generationState.currentImage > 0 &&
+      generationState.totalImages > generationState.currentImage;
+
+  String _progressText() =>
+      '${generationState.currentImage}/${generationState.totalImages}';
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    if (showCancel) {
+      return Row(
+        children: [
+          if (_canSkipCurrentBatch) ...[
+            Expanded(
+              child: ThemedButton(
+                onPressed: onSkipCurrent,
+                icon: const Icon(Icons.skip_next),
+                label: Text(
+                  '${context.l10n.generation_skipCurrentBatch} ${_progressText()}',
+                ),
+                style: ThemedButtonStyle.outlined,
+              ),
+            ),
+            const SizedBox(width: 8),
+          ],
+          Expanded(
+            child: ThemedButton(
+              onPressed: onCancel,
+              icon: const Icon(Icons.stop_circle_outlined),
+              label: Text(context.l10n.generation_stopAllGeneration),
+              style: ThemedButtonStyle.outlined,
+            ),
+          ),
+        ],
+      );
+    }
+
     return ThemedButton(
-      onPressed: showCancel ? onCancel : onGenerate,
-      icon: showCancel
-          ? const Icon(Icons.stop)
-          : (isGenerating ? null : const Icon(Icons.auto_awesome)),
-      isLoading: isGenerating && !showCancel,
+      onPressed: isGenerating ? null : onGenerate,
+      icon: isGenerating ? null : const Icon(Icons.auto_awesome),
+      isLoading: isGenerating,
       label: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
             isGenerating
-                ? context.l10n.generation_cancelGeneration
+                ? context.l10n.generation_generating
                 : context.l10n.generation_generate,
           ),
           AnlasCostBadge(isGenerating: isGenerating),
         ],
       ),
-      style: showCancel ? ThemedButtonStyle.outlined : ThemedButtonStyle.filled,
+      style: ThemedButtonStyle.filled,
     );
   }
 }

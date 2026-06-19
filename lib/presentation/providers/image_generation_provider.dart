@@ -53,6 +53,16 @@ export 'generation/retry_policy_notifier.dart';
 
 part 'image_generation_provider.g.dart';
 
+class _RememberedStreamPreview {
+  const _RememberedStreamPreview({
+    required this.bytes,
+    required this.params,
+  });
+
+  final Uint8List bytes;
+  final ImageParams params;
+}
+
 /// 图像生成状态 Notifier
 @Riverpod(keepAlive: true)
 class ImageGenerationNotifier extends _$ImageGenerationNotifier {
@@ -82,24 +92,27 @@ class ImageGenerationNotifier extends _$ImageGenerationNotifier {
   bool _isCancelled = false;
   int _generationRunCounter = 0;
   int _activeGenerationRunId = 0;
-  Uint8List? _lastStreamPreviewBytes;
-  ImageParams? _lastStreamPreviewParams;
-  String? _lastStreamPreviewSnapshotKey;
+  final Map<String, _RememberedStreamPreview> _streamPreviewsForSnapshots =
+      <String, _RememberedStreamPreview>{};
   final Set<String> _failedStreamSnapshotKeys = <String>{};
+  int? _activeRequestGenerationRunId;
+  int? _activeRequestStartImage;
+  int? _activeRequestEndImage;
+  bool _activeRequestCancelRequested = false;
 
   int _startGenerationRun() {
     _isCancelled = false;
     _activeGenerationRunId = ++_generationRunCounter;
-    _lastStreamPreviewBytes = null;
-    _lastStreamPreviewParams = null;
-    _lastStreamPreviewSnapshotKey = null;
+    _streamPreviewsForSnapshots.clear();
     _failedStreamSnapshotKeys.clear();
+    _clearActiveRequest();
     return _activeGenerationRunId;
   }
 
   void _invalidateGenerationRun() {
     _isCancelled = true;
     _activeGenerationRunId = ++_generationRunCounter;
+    _clearActiveRequest();
   }
 
   bool _isCurrentGenerationRun(int generationRunId) =>
@@ -119,6 +132,44 @@ class ImageGenerationNotifier extends _$ImageGenerationNotifier {
   String _streamSnapshotKey(int generationRunId, int imageNumber) =>
       '$generationRunId:$imageNumber';
 
+  void _beginActiveRequest({
+    required int generationRunId,
+    required int startImage,
+    required int requestSize,
+  }) {
+    _activeRequestGenerationRunId = generationRunId;
+    _activeRequestStartImage = startImage;
+    _activeRequestEndImage = startImage + requestSize - 1;
+    _activeRequestCancelRequested = false;
+  }
+
+  void _endActiveRequest({
+    required int generationRunId,
+    required int startImage,
+  }) {
+    if (_activeRequestGenerationRunId == generationRunId &&
+        _activeRequestStartImage == startImage) {
+      _clearActiveRequest();
+    }
+  }
+
+  void _clearActiveRequest() {
+    _activeRequestGenerationRunId = null;
+    _activeRequestStartImage = null;
+    _activeRequestEndImage = null;
+    _activeRequestCancelRequested = false;
+  }
+
+  bool _isActiveRequestCancel(int generationRunId, int startImage) =>
+      _activeRequestCancelRequested &&
+      _activeRequestGenerationRunId == generationRunId &&
+      _activeRequestStartImage == startImage;
+
+  bool _activeRequestHasRemainingImages() {
+    final endImage = _activeRequestEndImage;
+    return endImage != null && state.totalImages > endImage;
+  }
+
   void _rememberStreamPreview({
     required Uint8List bytes,
     required ImageParams params,
@@ -129,10 +180,12 @@ class ImageGenerationNotifier extends _$ImageGenerationNotifier {
       return;
     }
 
-    _lastStreamPreviewBytes = Uint8List.fromList(bytes);
-    _lastStreamPreviewParams = params;
-    _lastStreamPreviewSnapshotKey =
-        _streamSnapshotKey(generationRunId, imageNumber);
+    _streamPreviewsForSnapshots[
+            _streamSnapshotKey(generationRunId, imageNumber)] =
+        _RememberedStreamPreview(
+      bytes: Uint8List.fromList(bytes),
+      params: params,
+    );
   }
 
   void _clearRememberedStreamPreview({
@@ -140,13 +193,13 @@ class ImageGenerationNotifier extends _$ImageGenerationNotifier {
     int? imageNumber,
   }) {
     if (generationRunId != null && imageNumber != null) {
-      final key = _streamSnapshotKey(generationRunId, imageNumber);
-      if (_lastStreamPreviewSnapshotKey != key) return;
+      _streamPreviewsForSnapshots.remove(
+        _streamSnapshotKey(generationRunId, imageNumber),
+      );
+      return;
     }
 
-    _lastStreamPreviewBytes = null;
-    _lastStreamPreviewParams = null;
-    _lastStreamPreviewSnapshotKey = null;
+    _streamPreviewsForSnapshots.clear();
   }
 
   bool _appendFailedStreamSnapshotToHistory({
@@ -156,15 +209,14 @@ class ImageGenerationNotifier extends _$ImageGenerationNotifier {
     if (!_isCurrentGenerationRun(generationRunId)) return false;
 
     final key = _streamSnapshotKey(generationRunId, imageNumber);
-    if (_lastStreamPreviewSnapshotKey != key) return false;
-
-    final previewBytes = _lastStreamPreviewBytes;
-    final params = _lastStreamPreviewParams;
-    if (previewBytes == null || previewBytes.isEmpty || params == null) {
+    final rememberedPreview = _streamPreviewsForSnapshots[key];
+    if (rememberedPreview == null || rememberedPreview.bytes.isEmpty) {
       return false;
     }
     if (!_failedStreamSnapshotKeys.add(key)) return false;
 
+    final previewBytes = rememberedPreview.bytes;
+    final params = rememberedPreview.params;
     final resolvedSize = _resolveImageSize(
           previewBytes,
           width: params.width,
@@ -189,6 +241,44 @@ class ImageGenerationNotifier extends _$ImageGenerationNotifier {
       imageNumber: imageNumber,
     );
     return true;
+  }
+
+  bool _appendFailedStreamSnapshotsForCurrentSlots(int generationRunId) {
+    var appended = false;
+    final slots = state.streamPreviewSlots;
+    if (slots.isNotEmpty) {
+      for (final slot in slots.reversed) {
+        appended = _appendFailedStreamSnapshotToHistory(
+              generationRunId: generationRunId,
+              imageNumber: slot.imageNumber,
+            ) ||
+            appended;
+      }
+      return appended;
+    }
+
+    if (state.currentImage > 0) {
+      appended = _appendFailedStreamSnapshotToHistory(
+        generationRunId: generationRunId,
+        imageNumber: state.currentImage,
+      );
+    }
+    return appended;
+  }
+
+  List<StreamPreviewSlot> _replaceStreamPreviewSlot(
+    List<StreamPreviewSlot> slots,
+    StreamPreviewSlot replacement,
+  ) {
+    var replaced = false;
+    final updated = <StreamPreviewSlot>[
+      for (final slot in slots)
+        if (slot.imageNumber == replacement.imageNumber) replacement else slot,
+    ];
+    replaced = slots.any((slot) => slot.imageNumber == replacement.imageNumber);
+    if (!replaced) updated.add(replacement);
+
+    return updated..sort((a, b) => a.imageNumber.compareTo(b.imageNumber));
   }
 
   NaiImageMetadata _metadataFromParams(ImageParams params) {
@@ -526,10 +616,7 @@ class ImageGenerationNotifier extends _$ImageGenerationNotifier {
       } catch (e) {
         if (_isCancelledError(e, generationRunId)) {
           if (_isCurrentGenerationRun(generationRunId)) {
-            _appendFailedStreamSnapshotToHistory(
-              generationRunId: generationRunId,
-              imageNumber: generatedImages + 1,
-            );
+            _appendFailedStreamSnapshotsForCurrentSlots(generationRunId);
             state = state.copyWith(
               status: GenerationStatus.cancelled,
               progress: 0.0,
@@ -556,10 +643,7 @@ class ImageGenerationNotifier extends _$ImageGenerationNotifier {
           }
         }
         // 本批次失败，继续下一批
-        _appendFailedStreamSnapshotToHistory(
-          generationRunId: generationRunId,
-          imageNumber: generatedImages + 1,
-        );
+        _appendFailedStreamSnapshotsForCurrentSlots(generationRunId);
         lastBatchError = e;
         AppLogger.e('生成第 ${batch + 1} 批失败: $e');
         generatedImages += batchSize;
@@ -987,8 +1071,7 @@ class ImageGenerationNotifier extends _$ImageGenerationNotifier {
 
   /// 使用流式 API 生成批次图像（支持预览）
   ///
-  /// 对于多批次生成，每次生成一张图像并显示流式预览
-  /// [params] 生成参数（nSamples 表示本批次要生成的数量）
+  /// [params] 生成参数（nSamples 表示本次请求要生成的图片数量）
   /// [currentStart] 当前批次起始图像编号
   /// [total] 总图像数量
   Future<List<Uint8List>> _generateBatchWithStream(
@@ -999,67 +1082,102 @@ class ImageGenerationNotifier extends _$ImageGenerationNotifier {
   ) async {
     final apiService = ref.read(naiImageGenerationApiServiceProvider);
     final workflow = ref.read(imageWorkflowControllerProvider);
-    final seededParams = _materializeRandomSeed(params);
-    final batchSize = seededParams.nSamples;
-    final images = <Uint8List>[];
-    bool useNonStreamFallback = false; // 记录是否需要回退到非流式
+    final requestParams = _materializeRandomSeed(params);
+    final batchSize = max(1, requestParams.nSamples);
+    final useFocusedNonStream = workflow.focusedInpaintEnabled &&
+        requestParams.action == ImageGenerationAction.infill;
+    var useNonStreamFallback = false;
 
-    // 逐张生成以支持流式预览
-    for (int i = 0; i < batchSize; i++) {
-      if (_shouldAbortGenerationRun(generationRunId)) break;
-      final imageAddedBefore = images.length;
+    int imageNumberForSample(int sampleIndex) {
+      final sampleOffset = sampleIndex.clamp(0, batchSize - 1).toInt();
+      return currentStart + sampleOffset;
+    }
 
-      // 更新当前进度
-      state = state.copyWith(
-        currentImage: currentStart + i,
-        progress: (currentStart + i - 1) / total,
-        clearStreamPreview: true,
+    double progressForBatch({
+      required int completedSamples,
+      double inFlightProgress = 0.0,
+    }) {
+      final batchProgress = (completedSamples + inFlightProgress)
+          .clamp(0.0, batchSize.toDouble())
+          .toDouble();
+      return ((currentStart - 1) + batchProgress) / total;
+    }
+
+    void clearRememberedPreviewsForRequest(int count) {
+      for (var i = 0; i < count; i++) {
+        _clearRememberedStreamPreview(
+          generationRunId: generationRunId,
+          imageNumber: currentStart + i,
+        );
+      }
+    }
+
+    Future<List<Uint8List>> runNonStreamFallback() async {
+      final fallback = await apiService.generateImageCancellable(
+        requestParams,
+        onProgress: (_, __) {},
+        focusedInpaintEnabled: workflow.focusedInpaintEnabled,
+        minimumContextMegaPixels: workflow.minimumContextMegaPixels,
+        focusedSelectionRect: workflow.focusedSelectionRect,
       );
+      if (_shouldAbortGenerationRun(generationRunId) ||
+          _isActiveRequestCancel(generationRunId, currentStart)) {
+        return const <Uint8List>[];
+      }
+      clearRememberedPreviewsForRequest(fallback.length);
+      return fallback;
+    }
 
-      // 为每张图使用不同的种子
-      // 在 provider 层实体化随机种子，确保失败快照和真实请求使用同一个 seed。
-      final singleParams = seededParams.copyWith(
-        nSamples: 1,
-        seed: seededParams.seed + i,
-      );
-      final useFocusedNonStream = workflow.focusedInpaintEnabled &&
-          singleParams.action == ImageGenerationAction.infill;
+    final initialSlots = [
+      for (var i = 0; i < batchSize; i++)
+        StreamPreviewSlot(
+          imageNumber: currentStart + i,
+          totalImages: total,
+          progress: 0.0,
+        ),
+    ];
+    _beginActiveRequest(
+      generationRunId: generationRunId,
+      startImage: currentStart,
+      requestSize: batchSize,
+    );
+    state = state.copyWith(
+      currentImage: currentStart,
+      progress: progressForBatch(completedSamples: 0),
+      streamPreviewSlots: initialSlots,
+      clearStreamPreview: true,
+    );
 
-      Uint8List? image;
+    try {
       for (int retry = 0; retry <= _maxRetries; retry++) {
+        final finalImages = <int, Uint8List>{};
+
         try {
-          // 使用非流式回退
           if (useNonStreamFallback || useFocusedNonStream) {
-            final fallback = await apiService.generateImageCancellable(
-              singleParams,
-              onProgress: (_, __) {},
-              focusedInpaintEnabled: workflow.focusedInpaintEnabled,
-              minimumContextMegaPixels: workflow.minimumContextMegaPixels,
-              focusedSelectionRect: workflow.focusedSelectionRect,
-            );
-            if (_shouldAbortGenerationRun(generationRunId)) return images;
-            if (fallback.isNotEmpty) {
-              images.add(fallback.first);
-              _clearRememberedStreamPreview(
-                generationRunId: generationRunId,
-                imageNumber: currentStart + i,
-              );
-              break;
-            }
-            continue;
+            return await runNonStreamFallback();
           }
 
-          // 尝试流式生成
           var streamingNotAllowed = false;
           await for (final chunk in apiService.generateImageStream(
-            singleParams,
+            requestParams,
             focusedInpaintEnabled: workflow.focusedInpaintEnabled,
             minimumContextMegaPixels: workflow.minimumContextMegaPixels,
             focusedSelectionRect: workflow.focusedSelectionRect,
           )) {
-            if (_shouldAbortGenerationRun(generationRunId)) return images;
+            if (_shouldAbortGenerationRun(generationRunId)) {
+              return const <Uint8List>[];
+            }
+            if (_isActiveRequestCancel(generationRunId, currentStart)) {
+              _appendFailedStreamSnapshotsForCurrentSlots(generationRunId);
+              return const <Uint8List>[];
+            }
 
             if (chunk.hasError) {
+              if (_isActiveRequestCancel(generationRunId, currentStart) &&
+                  _hasCancelledText(chunk.error ?? '')) {
+                _appendFailedStreamSnapshotsForCurrentSlots(generationRunId);
+                return const <Uint8List>[];
+              }
               if (_isStreamingNotAllowed(chunk.error ?? '')) {
                 AppLogger.w(
                   'Streaming not allowed, falling back to non-stream API',
@@ -1072,85 +1190,98 @@ class ImageGenerationNotifier extends _$ImageGenerationNotifier {
               throw Exception(chunk.error);
             }
 
+            final imageNumber = imageNumberForSample(chunk.sampleIndex);
             if (chunk.hasPreview) {
-              if (_shouldAbortGenerationRun(generationRunId)) return images;
               _rememberStreamPreview(
                 bytes: chunk.previewImage!,
-                params: singleParams,
+                params: requestParams,
                 generationRunId: generationRunId,
-                imageNumber: currentStart + i,
+                imageNumber: imageNumber,
+              );
+              final slot = StreamPreviewSlot(
+                imageNumber: imageNumber,
+                totalImages: total,
+                progress: chunk.progress.clamp(0.0, 0.99).toDouble(),
+                previewBytes: chunk.previewImage,
               );
               state = state.copyWith(
-                progress: (currentStart + i - 1 + chunk.progress) / total,
+                currentImage: imageNumber,
+                progress: progressForBatch(
+                  completedSamples: finalImages.length,
+                  inFlightProgress: slot.progress,
+                ),
                 streamPreview: chunk.previewImage,
+                streamPreviewSlots: _replaceStreamPreviewSlot(
+                  state.streamPreviewSlots,
+                  slot,
+                ),
               );
             }
 
             if (chunk.isComplete && chunk.hasFinalImage) {
-              image = chunk.finalImage;
+              finalImages[chunk.sampleIndex] = chunk.finalImage!;
+              _rememberStreamPreview(
+                bytes: chunk.finalImage!,
+                params: requestParams,
+                generationRunId: generationRunId,
+                imageNumber: imageNumber,
+              );
+              final slot = StreamPreviewSlot(
+                imageNumber: imageNumber,
+                totalImages: total,
+                progress: 1.0,
+                previewBytes: chunk.finalImage,
+              );
+              state = state.copyWith(
+                currentImage: imageNumber,
+                progress: progressForBatch(
+                  completedSamples: finalImages.length,
+                ),
+                streamPreview: chunk.finalImage,
+                streamPreviewSlots: _replaceStreamPreviewSlot(
+                  state.streamPreviewSlots,
+                  slot,
+                ),
+              );
             }
           }
 
-          // 流式不支持，使用非流式回退
+          if (_shouldAbortGenerationRun(generationRunId)) {
+            return const <Uint8List>[];
+          }
+          if (_isActiveRequestCancel(generationRunId, currentStart)) {
+            _appendFailedStreamSnapshotsForCurrentSlots(generationRunId);
+            return const <Uint8List>[];
+          }
+
           if (streamingNotAllowed) {
-            final fallback = await apiService.generateImageCancellable(
-              singleParams,
-              onProgress: (_, __) {},
-              focusedInpaintEnabled: workflow.focusedInpaintEnabled,
-              minimumContextMegaPixels: workflow.minimumContextMegaPixels,
-              focusedSelectionRect: workflow.focusedSelectionRect,
-            );
-            if (_shouldAbortGenerationRun(generationRunId)) return images;
-            if (fallback.isNotEmpty) {
-              images.add(fallback.first);
-              _clearRememberedStreamPreview(
-                generationRunId: generationRunId,
-                imageNumber: currentStart + i,
-              );
-              break;
-            }
+            final fallback = await runNonStreamFallback();
+            if (fallback.isNotEmpty) return fallback;
             continue;
           }
 
-          if (image != null) {
-            images.add(image);
-            _clearRememberedStreamPreview(
-              generationRunId: generationRunId,
-              imageNumber: currentStart + i,
-            );
-            break;
+          if (finalImages.isNotEmpty) {
+            final orderedImages = finalImages.entries.toList()
+              ..sort((a, b) => a.key.compareTo(b.key));
+            clearRememberedPreviewsForRequest(batchSize);
+            return orderedImages.map((entry) => entry.value).toList();
           }
 
-          // 流式未返回图像，尝试非流式
-          final fallback = await apiService.generateImageCancellable(
-            singleParams,
-            onProgress: (_, __) {},
-            focusedInpaintEnabled: workflow.focusedInpaintEnabled,
-            minimumContextMegaPixels: workflow.minimumContextMegaPixels,
-            focusedSelectionRect: workflow.focusedSelectionRect,
-          );
-          if (_shouldAbortGenerationRun(generationRunId)) return images;
-          if (fallback.isNotEmpty) {
-            images.add(fallback.first);
-            _clearRememberedStreamPreview(
-              generationRunId: generationRunId,
-              imageNumber: currentStart + i,
-            );
-            break;
-          }
+          final fallback = await runNonStreamFallback();
+          if (fallback.isNotEmpty) return fallback;
         } catch (e) {
+          if (_isActiveRequestCancel(generationRunId, currentStart)) {
+            _appendFailedStreamSnapshotsForCurrentSlots(generationRunId);
+            return const <Uint8List>[];
+          }
           if (_isCancelledError(e, generationRunId)) {
-            _appendFailedStreamSnapshotToHistory(
-              generationRunId: generationRunId,
-              imageNumber: currentStart + i,
-            );
-            return images;
+            _appendFailedStreamSnapshotsForCurrentSlots(generationRunId);
+            final orderedImages = finalImages.entries.toList()
+              ..sort((a, b) => a.key.compareTo(b.key));
+            return orderedImages.map((entry) => entry.value).toList();
           }
           if (_isRemoteCancelledError(e, generationRunId)) {
-            _appendFailedStreamSnapshotToHistory(
-              generationRunId: generationRunId,
-              imageNumber: currentStart + i,
-            );
+            _appendFailedStreamSnapshotsForCurrentSlots(generationRunId);
             rethrow;
           }
           if (_isConcurrencyLimited(e)) rethrow; // 交给上层等待并发额度释放
@@ -1162,26 +1293,10 @@ class ImageGenerationNotifier extends _$ImageGenerationNotifier {
             );
             useNonStreamFallback = true;
             try {
-              final fallback = await apiService.generateImageCancellable(
-                singleParams,
-                onProgress: (_, __) {},
-                focusedInpaintEnabled: workflow.focusedInpaintEnabled,
-                minimumContextMegaPixels: workflow.minimumContextMegaPixels,
-                focusedSelectionRect: workflow.focusedSelectionRect,
-              );
-              if (_shouldAbortGenerationRun(generationRunId)) return images;
-              if (fallback.isNotEmpty) {
-                images.add(fallback.first);
-                _clearRememberedStreamPreview(
-                  generationRunId: generationRunId,
-                  imageNumber: currentStart + i,
-                );
-              }
+              final fallback = await runNonStreamFallback();
+              if (fallback.isNotEmpty) return fallback;
             } catch (fallbackError) {
-              _appendFailedStreamSnapshotToHistory(
-                generationRunId: generationRunId,
-                imageNumber: currentStart + i,
-              );
+              _appendFailedStreamSnapshotsForCurrentSlots(generationRunId);
               AppLogger.e('非流式回退生成失败: $fallbackError');
             }
             break;
@@ -1192,27 +1307,25 @@ class ImageGenerationNotifier extends _$ImageGenerationNotifier {
               '生成失败，${_retryDelays[retry]}ms 后重试 (${retry + 1}/$_maxRetries): $e',
             );
             await Future.delayed(Duration(milliseconds: _retryDelays[retry]));
-            if (_shouldAbortGenerationRun(generationRunId)) return images;
+            if (_shouldAbortGenerationRun(generationRunId)) {
+              return const <Uint8List>[];
+            }
           } else {
-            AppLogger.e('生成第 ${currentStart + i} 张图像失败: $e');
-            _appendFailedStreamSnapshotToHistory(
-              generationRunId: generationRunId,
-              imageNumber: currentStart + i,
-            );
+            AppLogger.e('生成第 $currentStart 批图像失败: $e');
+            _appendFailedStreamSnapshotsForCurrentSlots(generationRunId);
             rethrow;
           }
         }
       }
 
-      if (images.length == imageAddedBefore) {
-        _appendFailedStreamSnapshotToHistory(
-          generationRunId: generationRunId,
-          imageNumber: currentStart + i,
-        );
-      }
+      _appendFailedStreamSnapshotsForCurrentSlots(generationRunId);
+      return const <Uint8List>[];
+    } finally {
+      _endActiveRequest(
+        generationRunId: generationRunId,
+        startImage: currentStart,
+      );
     }
-
-    return images;
   }
 
   /// 生成单张（使用流式 API 支持渐进式预览）
@@ -1613,16 +1726,30 @@ class ImageGenerationNotifier extends _$ImageGenerationNotifier {
     }
   }
 
-  /// 取消生成
+  /// 跳过当前请求，继续后续批次。
+  void skipCurrentRequest() {
+    final generationRunId = _activeGenerationRunId;
+    final apiService = ref.read(naiImageGenerationApiServiceProvider);
+
+    if (_activeRequestGenerationRunId != generationRunId ||
+        !_activeRequestHasRemainingImages()) {
+      cancel();
+      return;
+    }
+
+    _activeRequestCancelRequested = true;
+    _appendFailedStreamSnapshotsForCurrentSlots(generationRunId);
+    apiService.cancelGeneration();
+    state = state.copyWith(clearStreamPreview: true);
+  }
+
+  /// 取消生成并停止后续批次。
   void cancel() {
     final generationRunId = _activeGenerationRunId;
-    final imageNumber = state.currentImage > 0 ? state.currentImage : 1;
-    _appendFailedStreamSnapshotToHistory(
-      generationRunId: generationRunId,
-      imageNumber: imageNumber,
-    );
-    _invalidateGenerationRun();
     final apiService = ref.read(naiImageGenerationApiServiceProvider);
+
+    _appendFailedStreamSnapshotsForCurrentSlots(generationRunId);
+    _invalidateGenerationRun();
     apiService.cancelGeneration();
 
     state = state.copyWith(
@@ -1630,6 +1757,7 @@ class ImageGenerationNotifier extends _$ImageGenerationNotifier {
       progress: 0.0,
       currentImage: 0,
       totalImages: 0,
+      clearStreamPreview: true,
     );
   }
 

@@ -17,9 +17,13 @@ import 'package:nai_launcher/data/models/fixed_tag/fixed_tag_prompt_type.dart';
 import 'package:nai_launcher/data/models/gallery/nai_image_metadata.dart';
 import 'package:nai_launcher/data/services/metadata/unified_metadata_parser.dart';
 import 'package:nai_launcher/data/models/image/image_params.dart';
+import 'package:nai_launcher/data/models/image/image_stream_chunk.dart';
+import 'package:nai_launcher/data/models/user/user_subscription.dart';
 import 'package:nai_launcher/data/models/vibe/vibe_reference.dart';
 import 'package:nai_launcher/presentation/providers/generation/image_workflow_controller.dart';
 import 'package:nai_launcher/presentation/providers/image_generation_provider.dart';
+import 'package:nai_launcher/presentation/providers/image_save_settings_provider.dart';
+import 'package:nai_launcher/presentation/providers/subscription_provider.dart';
 import 'package:nai_launcher/presentation/providers/notification_settings_provider.dart';
 
 class MockNAIImageGenerationApiService extends Mock
@@ -27,6 +31,24 @@ class MockNAIImageGenerationApiService extends Mock
 
 class FakeNAIImageEnhancementApiService extends Mock
     implements NAIImageEnhancementApiService {}
+
+class TestSubscriptionNotifier extends SubscriptionNotifier {
+  @override
+  SubscriptionState build() {
+    return const SubscriptionState.loaded(
+      UserSubscription(
+        tier: 3,
+        active: true,
+        trainingStepsLeft: TrainingStepsInfo(
+          fixedTrainingStepsLeft: 10000,
+        ),
+      ),
+    );
+  }
+
+  @override
+  Future<bool> refreshBalance() async => true;
+}
 
 void main() {
   late Directory hiveTempDir;
@@ -44,8 +66,16 @@ void main() {
 
   tearDownAll(() async {
     await Hive.close();
-    if (await hiveTempDir.exists()) {
-      await hiveTempDir.delete(recursive: true);
+    if (!await hiveTempDir.exists()) return;
+
+    for (var attempt = 0; attempt < 5; attempt++) {
+      try {
+        await hiveTempDir.delete(recursive: true);
+        return;
+      } on FileSystemException {
+        if (attempt == 4) rethrow;
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+      }
     }
   });
 
@@ -180,6 +210,83 @@ void main() {
       );
     });
 
+    test('imagesPerRequest sends one multi-sample request per repeat',
+        () async {
+      final mockApiService = MockNAIImageGenerationApiService();
+      final firstImage = _validImageBytes(width: 512, height: 768);
+      final secondImage = _validImageBytes(width: 512, height: 768);
+      final thirdImage = _validImageBytes(width: 512, height: 768);
+      final requestSampleCounts = <int>[];
+
+      when(
+        () => mockApiService.generateImage(
+          any(),
+          onProgress: any(named: 'onProgress'),
+          focusedInpaintEnabled: any(named: 'focusedInpaintEnabled'),
+          minimumContextMegaPixels: any(named: 'minimumContextMegaPixels'),
+          focusedSelectionRect: any(named: 'focusedSelectionRect'),
+        ),
+      ).thenAnswer((_) async => fail('non-stream fallback was not expected'));
+      when(
+        () => mockApiService.generateImageCancellable(
+          any(),
+          onProgress: any(named: 'onProgress'),
+          focusedInpaintEnabled: any(named: 'focusedInpaintEnabled'),
+          minimumContextMegaPixels: any(named: 'minimumContextMegaPixels'),
+          focusedSelectionRect: any(named: 'focusedSelectionRect'),
+        ),
+      ).thenAnswer((_) async => fail('cancellable fallback was not expected'));
+      when(
+        () => mockApiService.generateImageStream(
+          any(),
+          focusedInpaintEnabled: any(named: 'focusedInpaintEnabled'),
+          minimumContextMegaPixels: any(named: 'minimumContextMegaPixels'),
+          focusedSelectionRect: any(named: 'focusedSelectionRect'),
+        ),
+      ).thenAnswer((invocation) {
+        final params = invocation.positionalArguments.first as ImageParams;
+        requestSampleCounts.add(params.nSamples);
+        return Stream<ImageStreamChunk>.fromIterable([
+          ImageStreamChunk.complete(firstImage, sampleIndex: 0),
+          ImageStreamChunk.complete(secondImage, sampleIndex: 1),
+          ImageStreamChunk.complete(thirdImage, sampleIndex: 2),
+        ]);
+      });
+
+      container.dispose();
+      container = ProviderContainer(
+        overrides: [
+          naiImageGenerationApiServiceProvider
+              .overrideWithValue(mockApiService),
+          subscriptionNotifierProvider
+              .overrideWith(TestSubscriptionNotifier.new),
+        ],
+      );
+      await container
+          .read(notificationSettingsNotifierProvider.notifier)
+          .setSoundEnabled(false);
+      await container
+          .read(imageSaveSettingsNotifierProvider.notifier)
+          .setAutoSave(false);
+      container.read(imagesPerRequestProvider.notifier).set(3);
+
+      final params = container.read(generationParamsNotifierProvider).copyWith(
+            prompt: 'multi sample',
+            width: 512,
+            height: 768,
+            nSamples: 2,
+          );
+
+      await container.read(imageGenerationNotifierProvider.notifier).generate(
+            params,
+          );
+
+      final state = container.read(imageGenerationNotifierProvider);
+      expect(requestSampleCounts, equals([3, 3]));
+      expect(state.status, GenerationStatus.completed);
+      expect(state.currentImages, hasLength(6));
+      expect(state.displayImages, hasLength(6));
+    });
     test('registerExternalImage should prepend external result to history',
         () async {
       final notifier = container.read(imageGenerationNotifierProvider.notifier);

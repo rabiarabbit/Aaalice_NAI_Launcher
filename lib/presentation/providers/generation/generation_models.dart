@@ -102,6 +102,35 @@ enum GenerationStatus {
   cancelled,
 }
 
+/// 单个流式预览槽位。
+class StreamPreviewSlot {
+  const StreamPreviewSlot({
+    required this.imageNumber,
+    required this.totalImages,
+    required this.progress,
+    this.previewBytes,
+  });
+
+  final int imageNumber;
+  final int totalImages;
+  final double progress;
+  final Uint8List? previewBytes;
+
+  StreamPreviewSlot copyWith({
+    int? imageNumber,
+    int? totalImages,
+    double? progress,
+    Uint8List? previewBytes,
+  }) {
+    return StreamPreviewSlot(
+      imageNumber: imageNumber ?? this.imageNumber,
+      totalImages: totalImages ?? this.totalImages,
+      progress: progress ?? this.progress,
+      previewBytes: previewBytes ?? this.previewBytes,
+    );
+  }
+}
+
 /// 图像生成状态
 class ImageGenerationState {
   final GenerationStatus status;
@@ -112,8 +141,11 @@ class ImageGenerationState {
   final int currentImage; // 当前第几张 (1-based)
   final int totalImages; // 总共几张
 
-  /// 流式预览图像（渐进式生成过程中的预览）
+  /// 流式预览图像（渐进式生成过程中的最新预览）
   final Uint8List? streamPreview;
+
+  /// 当前请求中的流式预览槽位（用于一次请求多张时稳定历史位置）。
+  final List<StreamPreviewSlot> streamPreviewSlots;
 
   /// 当前批次的分辨率（点击生成时捕获）
   final int? batchWidth;
@@ -135,6 +167,7 @@ class ImageGenerationState {
     this.currentImage = 0,
     this.totalImages = 0,
     this.streamPreview,
+    this.streamPreviewSlots = const [],
     this.batchWidth,
     this.batchHeight,
     this.displayImages = const [],
@@ -151,6 +184,7 @@ class ImageGenerationState {
     int? currentImage,
     int? totalImages,
     Uint8List? streamPreview,
+    List<StreamPreviewSlot>? streamPreviewSlots,
     bool clearStreamPreview = false,
     int? batchWidth,
     int? batchHeight,
@@ -168,6 +202,9 @@ class ImageGenerationState {
       totalImages: totalImages ?? this.totalImages,
       streamPreview:
           clearStreamPreview ? null : (streamPreview ?? this.streamPreview),
+      streamPreviewSlots: clearStreamPreview
+          ? (streamPreviewSlots ?? const [])
+          : (streamPreviewSlots ?? this.streamPreviewSlots),
       batchWidth: batchWidth ?? this.batchWidth,
       batchHeight: batchHeight ?? this.batchHeight,
       displayImages: displayImages ?? this.displayImages,
@@ -181,5 +218,6 @@ class ImageGenerationState {
 
   /// 是否有流式预览图像
   bool get hasStreamPreview =>
-      streamPreview != null && streamPreview!.isNotEmpty;
+      (streamPreview != null && streamPreview!.isNotEmpty) ||
+      streamPreviewSlots.any((slot) => slot.previewBytes?.isNotEmpty == true);
 }

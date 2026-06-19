@@ -66,6 +66,11 @@ class _ParameterPanelState extends ConsumerState<ParameterPanel> {
     final isLauncherGenerating = generationState.isGenerating;
     final isGenerating =
         isLauncherGenerating || kritaBridgeState.isBridgeGenerating;
+    final canSkipCurrentBatch = isLauncherGenerating &&
+        generationState.currentImage > 0 &&
+        generationState.totalImages > generationState.currentImage;
+    final generationProgressText =
+        '${generationState.currentImage}/${generationState.totalImages}';
 
     _syncSeedController(params.seed);
 
@@ -82,59 +87,82 @@ class _ParameterPanelState extends ConsumerState<ParameterPanel> {
           // 生成按钮
           SizedBox(
             height: 48,
-            child: ThemedButton(
-              onPressed: isGenerating
-                  ? (isLauncherGenerating
-                      ? () => ref
-                          .read(imageGenerationNotifierProvider.notifier)
-                          .cancel()
-                      : null)
-                  : () async {
-                      if (ref
-                          .read(kritaBridgeNotifierProvider)
-                          .isBridgeGenerating) {
-                        AppToast.warning(
-                          context,
-                          context.l10n.kritaBridge_busyGenerating,
-                        );
-                        return;
-                      }
-                      if (params.prompt.isEmpty) {
-                        AppToast.info(
-                          context,
-                          context.l10n.generation_pleaseInputPrompt,
-                        );
-                        return;
-                      }
-                      final confirmed =
-                          await AssetProtectionGuard.confirmHighAnlasCost(
-                        context: context,
-                        ref: ref,
-                      );
-                      if (!confirmed || !context.mounted) {
-                        return;
-                      }
-                      ref
-                          .read(imageGenerationNotifierProvider.notifier)
-                          .generate(ref.read(generationParamsNotifierProvider));
-                    },
-              icon: isGenerating
-                  ? (isLauncherGenerating ? const Icon(Icons.stop) : null)
-                  : const Icon(Icons.auto_awesome),
-              isLoading: isGenerating && !isLauncherGenerating,
-              label: Text(
-                isGenerating
-                    ? (isLauncherGenerating
-                        ? context.l10n.generation_cancelGeneration
-                        : context.l10n.generation_generating)
-                    : context.l10n.generation_generateImage,
-              ),
-              style: isLauncherGenerating
-                  ? ThemedButtonStyle.outlined
-                  : ThemedButtonStyle.filled,
-            ),
-          ),
-          const SizedBox(height: 24),
+            child: isLauncherGenerating
+                ? Row(
+                    children: [
+                      if (canSkipCurrentBatch) ...[
+                        Expanded(
+                          child: ThemedButton(
+                            onPressed: () => ref
+                                .read(imageGenerationNotifierProvider.notifier)
+                                .skipCurrentRequest(),
+                            icon: const Icon(Icons.skip_next),
+                            label: Text(
+                              '${context.l10n.generation_skipCurrentBatch} $generationProgressText',
+                            ),
+                            style: ThemedButtonStyle.outlined,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                      ],
+                      Expanded(
+                        child: ThemedButton(
+                          onPressed: () => ref
+                              .read(imageGenerationNotifierProvider.notifier)
+                              .cancel(),
+                          icon: const Icon(Icons.stop_circle_outlined),
+                          label: Text(
+                            context.l10n.generation_stopAllGeneration,
+                          ),
+                          style: ThemedButtonStyle.outlined,
+                        ),
+                      ),
+                    ],
+                  )
+                : ThemedButton(
+                    onPressed: isGenerating
+                        ? null
+                        : () async {
+                            if (ref
+                                .read(kritaBridgeNotifierProvider)
+                                .isBridgeGenerating) {
+                              AppToast.warning(
+                                context,
+                                context.l10n.kritaBridge_busyGenerating,
+                              );
+                              return;
+                            }
+                            if (params.prompt.isEmpty) {
+                              AppToast.info(
+                                context,
+                                context.l10n.generation_pleaseInputPrompt,
+                              );
+                              return;
+                            }
+                            final confirmed =
+                                await AssetProtectionGuard.confirmHighAnlasCost(
+                              context: context,
+                              ref: ref,
+                            );
+                            if (!confirmed || !context.mounted) {
+                              return;
+                            }
+                            ref
+                                .read(imageGenerationNotifierProvider.notifier)
+                                .generate(
+                                  ref.read(generationParamsNotifierProvider),
+                                );
+                          },
+                    icon: isGenerating ? null : const Icon(Icons.auto_awesome),
+                    isLoading: isGenerating,
+                    label: Text(
+                      isGenerating
+                          ? context.l10n.generation_generating
+                          : context.l10n.generation_generateImage,
+                    ),
+                    style: ThemedButtonStyle.filled,
+                  ),
+          ),          const SizedBox(height: 24),
           const ThemedDivider(),
           const SizedBox(height: 16),
         ],

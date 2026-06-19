@@ -299,6 +299,8 @@
   "generation_cancel": "取消",
   "generation_generating": "生成中...",
   "generation_cancelGeneration": "取消生成",
+  "generation_skipCurrentBatch": "跳过当前批次",
+  "generation_stopAllGeneration": "停止全部",
   "generation_generateImage": "生成图像",
   "generation_pleaseInputPrompt": "请输入提示词",
   "generation_emptyPromptHint": "输入提示词并点击生成",

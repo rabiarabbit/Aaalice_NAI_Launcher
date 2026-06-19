@@ -17,12 +17,33 @@ import 'package:nai_launcher/data/models/character/character_prompt.dart'
 import 'package:nai_launcher/data/models/gallery/nai_image_metadata.dart';
 import 'package:nai_launcher/data/models/image/image_params.dart';
 import 'package:nai_launcher/data/models/image/image_stream_chunk.dart';
+import 'package:nai_launcher/data/models/user/user_subscription.dart';
 import 'package:nai_launcher/presentation/providers/character_prompt_provider.dart';
 import 'package:nai_launcher/presentation/providers/image_generation_provider.dart';
+import 'package:nai_launcher/presentation/providers/image_save_settings_provider.dart';
 import 'package:nai_launcher/presentation/providers/notification_settings_provider.dart';
+import 'package:nai_launcher/presentation/providers/subscription_provider.dart';
 
 class MockNAIImageGenerationApiService extends Mock
     implements NAIImageGenerationApiService {}
+
+class TestSubscriptionNotifier extends SubscriptionNotifier {
+  @override
+  SubscriptionState build() {
+    return const SubscriptionState.loaded(
+      UserSubscription(
+        tier: 3,
+        active: true,
+        trainingStepsLeft: TrainingStepsInfo(
+          fixedTrainingStepsLeft: 10000,
+        ),
+      ),
+    );
+  }
+
+  @override
+  Future<bool> refreshBalance() async => true;
+}
 
 /// 记录请求与取消状态的假 HTTP 适配器。
 ///
@@ -321,6 +342,312 @@ void main() {
     expect(snapshot.metadata!.scale, equals(5));
     expect(snapshot.metadata!.seed, equals(1234));
     expect(snapshot.metadata!.model, equals(ImageModels.animeDiffusionV45Full));
+  });
+
+  test('multi-sample request cancel keeps failed snapshot for each sample',
+      () async {
+    final mockApiService = MockNAIImageGenerationApiService();
+    final stream = StreamController<ImageStreamChunk>();
+    final firstPreview = _validImageBytes(width: 512, height: 768);
+    final secondPreview = _validImageBytes(width: 640, height: 768);
+    final requestSampleCounts = <int>[];
+
+    when(
+      () => mockApiService.generateImage(
+        any(),
+        onProgress: any(named: 'onProgress'),
+        focusedInpaintEnabled: any(named: 'focusedInpaintEnabled'),
+        minimumContextMegaPixels: any(named: 'minimumContextMegaPixels'),
+        focusedSelectionRect: any(named: 'focusedSelectionRect'),
+      ),
+    ).thenAnswer((_) async => (<Uint8List>[], <int, String>{}));
+    when(
+      () => mockApiService.generateImageStream(
+        any(),
+        focusedInpaintEnabled: any(named: 'focusedInpaintEnabled'),
+        minimumContextMegaPixels: any(named: 'minimumContextMegaPixels'),
+        focusedSelectionRect: any(named: 'focusedSelectionRect'),
+      ),
+    ).thenAnswer((invocation) {
+      final params = invocation.positionalArguments.first as ImageParams;
+      requestSampleCounts.add(params.nSamples);
+      return stream.stream;
+    });
+    when(() => mockApiService.cancelGeneration()).thenReturn(null);
+
+    final container = ProviderContainer(
+      overrides: [
+        naiImageGenerationApiServiceProvider.overrideWithValue(mockApiService),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container
+        .read(notificationSettingsNotifierProvider.notifier)
+        .setSoundEnabled(false);
+    container.read(imagesPerRequestProvider.notifier).set(2);
+
+    final notifier = container.read(imageGenerationNotifierProvider.notifier);
+    final params = container.read(generationParamsNotifierProvider).copyWith(
+          prompt: 'multi sample cancel',
+          width: 512,
+          height: 768,
+          nSamples: 1,
+          model: ImageModels.animeDiffusionV45Full,
+        );
+
+    final generation = notifier.generate(params);
+    await _pumpUntil(
+      () => requestSampleCounts.isNotEmpty,
+      reason: 'stream request was not started',
+    );
+
+    stream.add(
+      ImageStreamChunk.progress(
+        progress: 0.25,
+        sampleIndex: 0,
+        currentStep: 7,
+        totalSteps: 28,
+        previewImage: firstPreview,
+      ),
+    );
+    stream.add(
+      ImageStreamChunk.progress(
+        progress: 0.35,
+        sampleIndex: 1,
+        currentStep: 10,
+        totalSteps: 28,
+        previewImage: secondPreview,
+      ),
+    );
+    await _pumpUntil(
+      () {
+        final slots =
+            container.read(imageGenerationNotifierProvider).streamPreviewSlots;
+        return slots.length == 2 &&
+            slots.every((slot) => slot.previewBytes?.isNotEmpty == true);
+      },
+      reason: 'both stream preview slots were not published before cancel',
+    );
+
+    final streamingState = container.read(imageGenerationNotifierProvider);
+    expect(requestSampleCounts, equals([2]));
+    expect(
+      streamingState.streamPreviewSlots.map((slot) => slot.imageNumber),
+      orderedEquals([1, 2]),
+    );
+
+    notifier.cancel();
+    await stream.close();
+    await generation;
+
+    final state = container.read(imageGenerationNotifierProvider);
+    expect(state.status, GenerationStatus.cancelled);
+    expect(state.currentImages, isEmpty);
+    expect(state.displayImages, isEmpty);
+    expect(state.history, hasLength(2));
+    expect(state.history[0].kind, GeneratedImageKind.failedStreamSnapshot);
+    expect(state.history[0].bytes, orderedEquals(firstPreview));
+    expect(state.history[1].kind, GeneratedImageKind.failedStreamSnapshot);
+    expect(state.history[1].bytes, orderedEquals(secondPreview));
+    verify(() => mockApiService.cancelGeneration()).called(1);
+  });
+
+  test('sequential repeat cancel stops all remaining batches', () async {
+    final mockApiService = MockNAIImageGenerationApiService();
+    final firstStream = StreamController<ImageStreamChunk>();
+    final failedPreview = _validImageBytes(width: 512, height: 768);
+    final finalImage = _validImageBytes(width: 640, height: 768);
+    final requestSampleCounts = <int>[];
+
+    when(
+      () => mockApiService.generateImage(
+        any(),
+        onProgress: any(named: 'onProgress'),
+        focusedInpaintEnabled: any(named: 'focusedInpaintEnabled'),
+        minimumContextMegaPixels: any(named: 'minimumContextMegaPixels'),
+        focusedSelectionRect: any(named: 'focusedSelectionRect'),
+      ),
+    ).thenAnswer((_) async => (<Uint8List>[], <int, String>{}));
+    when(
+      () => mockApiService.generateImageStream(
+        any(),
+        focusedInpaintEnabled: any(named: 'focusedInpaintEnabled'),
+        minimumContextMegaPixels: any(named: 'minimumContextMegaPixels'),
+        focusedSelectionRect: any(named: 'focusedSelectionRect'),
+      ),
+    ).thenAnswer((invocation) {
+      final params = invocation.positionalArguments.first as ImageParams;
+      requestSampleCounts.add(params.nSamples);
+      if (requestSampleCounts.length == 1) {
+        return firstStream.stream;
+      }
+      return Stream<ImageStreamChunk>.value(
+        ImageStreamChunk.complete(finalImage),
+      );
+    });
+    when(() => mockApiService.cancelGeneration()).thenReturn(null);
+
+    final container = ProviderContainer(
+      overrides: [
+        naiImageGenerationApiServiceProvider.overrideWithValue(mockApiService),
+        subscriptionNotifierProvider.overrideWith(TestSubscriptionNotifier.new),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container
+        .read(notificationSettingsNotifierProvider.notifier)
+        .setSoundEnabled(false);
+    await container
+        .read(imageSaveSettingsNotifierProvider.notifier)
+        .setAutoSave(false);
+    container.read(imagesPerRequestProvider.notifier).set(1);
+
+    final notifier = container.read(imageGenerationNotifierProvider.notifier);
+    final params = container.read(generationParamsNotifierProvider).copyWith(
+          prompt: 'sequential cancel',
+          width: 512,
+          height: 768,
+          nSamples: 2,
+          model: ImageModels.animeDiffusionV45Full,
+        );
+
+    final generation = notifier.generate(params);
+    await _pumpUntil(
+      () => requestSampleCounts.length == 1,
+      reason: 'first stream request was not started',
+    );
+
+    firstStream.add(
+      ImageStreamChunk.progress(
+        progress: 0.5,
+        sampleIndex: 0,
+        currentStep: 14,
+        totalSteps: 28,
+        previewImage: failedPreview,
+      ),
+    );
+    await _pumpUntil(
+      () => container
+          .read(imageGenerationNotifierProvider)
+          .streamPreviewSlots
+          .any((slot) => slot.previewBytes?.isNotEmpty == true),
+      reason: 'first preview was not published before stop-all cancel',
+    );
+
+    notifier.cancel();
+    await firstStream.close();
+    await generation;
+
+    final state = container.read(imageGenerationNotifierProvider);
+    expect(requestSampleCounts, equals([1]));
+    expect(state.status, GenerationStatus.cancelled);
+    expect(state.currentImages, isEmpty);
+    expect(state.displayImages, isEmpty);
+    expect(state.history, hasLength(1));
+    expect(state.history.single.kind, GeneratedImageKind.failedStreamSnapshot);
+    expect(state.history.single.bytes, orderedEquals(failedPreview));
+    verify(() => mockApiService.cancelGeneration()).called(1);
+  });
+
+  test('skip current request continues remaining repeat batches', () async {
+    final mockApiService = MockNAIImageGenerationApiService();
+    final firstStream = StreamController<ImageStreamChunk>();
+    final failedPreview = _validImageBytes(width: 512, height: 768);
+    final finalImage = _validImageBytes(width: 640, height: 768);
+    final requestSampleCounts = <int>[];
+
+    when(
+      () => mockApiService.generateImage(
+        any(),
+        onProgress: any(named: 'onProgress'),
+        focusedInpaintEnabled: any(named: 'focusedInpaintEnabled'),
+        minimumContextMegaPixels: any(named: 'minimumContextMegaPixels'),
+        focusedSelectionRect: any(named: 'focusedSelectionRect'),
+      ),
+    ).thenAnswer((_) async => (<Uint8List>[], <int, String>{}));
+    when(
+      () => mockApiService.generateImageStream(
+        any(),
+        focusedInpaintEnabled: any(named: 'focusedInpaintEnabled'),
+        minimumContextMegaPixels: any(named: 'minimumContextMegaPixels'),
+        focusedSelectionRect: any(named: 'focusedSelectionRect'),
+      ),
+    ).thenAnswer((invocation) {
+      final params = invocation.positionalArguments.first as ImageParams;
+      requestSampleCounts.add(params.nSamples);
+      if (requestSampleCounts.length == 1) {
+        return firstStream.stream;
+      }
+      return Stream<ImageStreamChunk>.value(
+        ImageStreamChunk.complete(finalImage),
+      );
+    });
+    when(() => mockApiService.cancelGeneration()).thenReturn(null);
+
+    final container = ProviderContainer(
+      overrides: [
+        naiImageGenerationApiServiceProvider.overrideWithValue(mockApiService),
+        subscriptionNotifierProvider.overrideWith(TestSubscriptionNotifier.new),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container
+        .read(notificationSettingsNotifierProvider.notifier)
+        .setSoundEnabled(false);
+    await container
+        .read(imageSaveSettingsNotifierProvider.notifier)
+        .setAutoSave(false);
+    container.read(imagesPerRequestProvider.notifier).set(1);
+
+    final notifier = container.read(imageGenerationNotifierProvider.notifier);
+    final params = container.read(generationParamsNotifierProvider).copyWith(
+          prompt: 'sequential skip current request',
+          width: 512,
+          height: 768,
+          nSamples: 2,
+          model: ImageModels.animeDiffusionV45Full,
+        );
+
+    final generation = notifier.generate(params);
+    await _pumpUntil(
+      () => requestSampleCounts.length == 1,
+      reason: 'first stream request was not started',
+    );
+
+    firstStream.add(
+      ImageStreamChunk.progress(
+        progress: 0.5,
+        sampleIndex: 0,
+        currentStep: 14,
+        totalSteps: 28,
+        previewImage: failedPreview,
+      ),
+    );
+    await _pumpUntil(
+      () => container
+          .read(imageGenerationNotifierProvider)
+          .streamPreviewSlots
+          .any((slot) => slot.previewBytes?.isNotEmpty == true),
+      reason: 'first preview was not published before skipping request',
+    );
+
+    notifier.skipCurrentRequest();
+    await firstStream.close();
+    await generation;
+
+    final state = container.read(imageGenerationNotifierProvider);
+    expect(requestSampleCounts, equals([1, 1]));
+    expect(state.status, GenerationStatus.completed);
+    expect(state.currentImages, hasLength(1));
+    expect(state.currentImages.single.bytes, orderedEquals(finalImage));
+    expect(state.displayImages, hasLength(1));
+    expect(state.displayImages.single.bytes, orderedEquals(finalImage));
+    expect(state.history, hasLength(2));
+    expect(state.history[0].kind, GeneratedImageKind.completed);
+    expect(state.history[0].bytes, orderedEquals(finalImage));
+    expect(state.history[1].kind, GeneratedImageKind.failedStreamSnapshot);
+    expect(state.history[1].bytes, orderedEquals(failedPreview));
+    verify(() => mockApiService.cancelGeneration()).called(1);
   });
 
   test('random seed is materialized for failed stream snapshot metadata',
@@ -657,7 +984,6 @@ void main() {
       isEmpty,
     );
   });
-
   test(
       'non-cancelled batch cancelled error must surface instead of completing empty',
       () async {

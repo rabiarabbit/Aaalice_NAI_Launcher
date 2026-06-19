@@ -445,12 +445,23 @@ class _HistoryPanelState extends ConsumerState<HistoryPanel> {
     setState(() {});
   }
 
+  List<StreamPreviewSlot> _visibleStreamPreviewSlots(
+    ImageGenerationState state,
+  ) {
+    final completedCount = state.currentImages.length;
+    return [
+      for (final slot in state.streamPreviewSlots)
+        if (slot.imageNumber > completedCount) slot,
+    ]..sort((a, b) => a.imageNumber.compareTo(b.imageNumber));
+  }
+
   /// 计算当前生成区块的项目数
   int _getCurrentGenerationCount(ImageGenerationState state) {
     if (!_hasCurrentGeneration(state)) return 0;
     int count = state.currentImages.length;
     if (state.isGenerating) {
-      count += 1; // 加上生成中卡片
+      final previewSlotCount = _visibleStreamPreviewSlots(state).length;
+      count += previewSlotCount > 0 ? previewSlotCount : 1;
     }
     return count;
   }
@@ -707,21 +718,6 @@ class _HistoryPanelState extends ConsumerState<HistoryPanel> {
   }) {
     final completedImages = state.currentImages;
 
-    // 如果正在生成，最后一个位置显示生成中卡片
-    if (state.isGenerating && index == completedImages.length) {
-      return SelectableImageCard(
-        isGenerating: true,
-        currentImage: state.currentImage,
-        totalImages: state.totalImages,
-        progress: state.progress,
-        streamPreview: state.streamPreview,
-        imageWidth: imageWidth,
-        imageHeight: imageHeight,
-        enableSelection: false,
-        enableContextMenu: false,
-      );
-    }
-
     // 已完成的当前图像（支持选择）
     if (index < completedImages.length) {
       final image = completedImages[index];
@@ -852,6 +848,40 @@ class _HistoryPanelState extends ConsumerState<HistoryPanel> {
               : null,
         ),
       );
+    }
+
+    if (state.isGenerating) {
+      final generationIndex = index - completedImages.length;
+      final previewSlots = _visibleStreamPreviewSlots(state);
+
+      if (previewSlots.isNotEmpty && generationIndex < previewSlots.length) {
+        final slot = previewSlots[generationIndex];
+        return SelectableImageCard(
+          isGenerating: true,
+          currentImage: slot.imageNumber,
+          totalImages: slot.totalImages,
+          progress: slot.progress,
+          streamPreview: slot.previewBytes,
+          imageWidth: imageWidth,
+          imageHeight: imageHeight,
+          enableSelection: false,
+          enableContextMenu: false,
+        );
+      }
+
+      if (previewSlots.isEmpty && generationIndex == 0) {
+        return SelectableImageCard(
+          isGenerating: true,
+          currentImage: state.currentImage,
+          totalImages: state.totalImages,
+          progress: state.progress,
+          streamPreview: state.streamPreview,
+          imageWidth: imageWidth,
+          imageHeight: imageHeight,
+          enableSelection: false,
+          enableContextMenu: false,
+        );
+      }
     }
 
     return const SizedBox.shrink();
