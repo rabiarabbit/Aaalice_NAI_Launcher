@@ -16,6 +16,7 @@ import 'package:nai_launcher/core/comfyui/workflow_node_validator.dart';
 import 'package:nai_launcher/core/comfyui/workflow_template_manager.dart';
 import 'package:nai_launcher/core/constants/api_constants.dart';
 import 'package:nai_launcher/core/constants/storage_keys.dart';
+import 'package:nai_launcher/core/storage/local_storage_service.dart';
 import 'package:nai_launcher/core/services/danbooru_tags_lazy_service.dart';
 import 'package:nai_launcher/core/shortcuts/default_shortcuts.dart';
 import 'package:nai_launcher/core/shortcuts/shortcut_config.dart';
@@ -28,6 +29,7 @@ import 'package:nai_launcher/data/models/gallery/nai_image_metadata.dart';
 import 'package:nai_launcher/data/models/tag/local_tag.dart';
 import 'package:nai_launcher/data/models/vibe/vibe_library_entry.dart';
 import 'package:nai_launcher/data/models/vibe/vibe_reference.dart';
+import 'package:nai_launcher/data/services/local_onnx_model_service.dart';
 import 'package:nai_launcher/data/services/local_onnx_tagger_service.dart';
 import 'package:nai_launcher/data/services/statistics_service.dart';
 import 'package:nai_launcher/l10n/app_localizations.dart';
@@ -61,6 +63,7 @@ import 'package:nai_launcher/presentation/widgets/metadata/metadata_import_dialo
 import 'package:nai_launcher/presentation/widgets/prompt/unified/unified_prompt_config.dart';
 import 'package:nai_launcher/presentation/widgets/prompt/unified/unified_prompt_input.dart';
 import 'package:nai_launcher/presentation/widgets/shortcuts/shortcut_aware_widget.dart';
+import 'package:path/path.dart' as p;
 
 class _MockDio extends Mock implements Dio {}
 
@@ -2180,6 +2183,92 @@ void main() {
     });
   });
 
+  group('ONNX tagger CL Tagger v2 support', () {
+    test('discovers official subdirectory layout', () async {
+      final root = await Directory.systemTemp.createTemp(
+        'nai_launcher_cl_tagger_v2_',
+      );
+      try {
+        final modelDir = Directory(
+          p.join(root.path, 'cl_tagger_v2', 'v2_01a'),
+        );
+        await modelDir.create(recursive: true);
+        final modelFile = File(p.join(modelDir.path, 'model.onnx'));
+        await modelFile.writeAsBytes(const [0]);
+        final externalDataFile = File('${modelFile.path}.data');
+        await externalDataFile.writeAsBytes(const [1]);
+        final vocabularyFile = File(
+          p.join(modelDir.path, 'model_vocabulary.json'),
+        );
+        await vocabularyFile.writeAsString('{}');
+
+        final service = LocalOnnxModelService(
+          _MemoryLocalStorageService({
+            StorageKeys.onnxTaggerModelDirectory: root.path,
+          }),
+        );
+        final models = await service.scanTaggerModels();
+
+        expect(models, hasLength(1));
+        final model = models.single;
+        expect(model.name, p.join('cl_tagger_v2', 'v2_01a', 'model.onnx'));
+        expect(model.kind, LocalOnnxModelKind.clTaggerV2);
+        expect(model.labelsPath, vocabularyFile.path);
+        expect(model.externalDataPath, externalDataFile.path);
+      } finally {
+        await root.delete(recursive: true);
+      }
+    });
+
+    test('parses model_vocabulary labels by index with categories', () async {
+      final root = await Directory.systemTemp.createTemp(
+        'nai_launcher_cl_tagger_v2_vocab_',
+      );
+      try {
+        final vocabularyFile = File(p.join(root.path, 'model_vocabulary.json'));
+        await vocabularyFile.writeAsString(
+          jsonEncode({
+            'idx_to_tag': {
+              '2': 'touhou',
+              '0': '1girl',
+              '1': 'hakurei_reimu',
+            },
+            'tag_to_category': {
+              '1girl': 'General',
+              'hakurei_reimu': 'Character',
+              'touhou': 'Copyright',
+            },
+            'categories': {
+              'General': ['1girl'],
+              'Character': ['hakurei_reimu'],
+              'Copyright': ['touhou'],
+            },
+          }),
+        );
+
+        final labels = await const LocalOnnxTaggerService().loadLabels(
+          vocabularyFile.path,
+        );
+
+        expect(labels.map((label) => label.name), [
+          '1girl',
+          'hakurei_reimu',
+          'touhou',
+        ]);
+        expect(labels.map((label) => label.category), [
+          'General',
+          'Character',
+          'Copyright',
+        ]);
+        expect(labels[0].labelCategory, OnnxTaggerLabelCategory.general);
+        expect(labels[1].labelCategory, OnnxTaggerLabelCategory.character);
+        expect(labels[2].labelCategory, OnnxTaggerLabelCategory.other);
+      } finally {
+        await root.delete(recursive: true);
+      }
+    });
+  });
+
   group('Prompt injected history', () {
     test('supports external undo and redo for injected prompts', () {
       final history = PromptAssistantHistoryNotifier();
@@ -2324,6 +2413,27 @@ class _FakeAutocompleteStrategy extends AutocompleteStrategy<String> {
     int cursorPosition,
   ) {
     return (item, item.length);
+  }
+}
+
+class _MemoryLocalStorageService extends LocalStorageService {
+  _MemoryLocalStorageService(this.values);
+
+  final Map<String, Object?> values;
+
+  @override
+  T? getSetting<T>(String key, {T? defaultValue}) {
+    return values.containsKey(key) ? values[key] as T? : defaultValue;
+  }
+
+  @override
+  Future<void> setSetting<T>(String key, T value) async {
+    values[key] = value;
+  }
+
+  @override
+  Future<void> deleteSetting(String key) async {
+    values.remove(key);
   }
 }
 
