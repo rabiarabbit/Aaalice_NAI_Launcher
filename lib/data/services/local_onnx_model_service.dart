@@ -6,7 +6,7 @@ import 'package:path/path.dart' as p;
 import '../../core/constants/storage_keys.dart';
 import '../../core/storage/local_storage_service.dart';
 
-enum LocalOnnxModelKind { wd14Tagger, clTagger, unknown }
+enum LocalOnnxModelKind { wd14Tagger, clTagger, clTaggerV2, unknown }
 
 class LocalOnnxModelDescriptor {
   const LocalOnnxModelDescriptor({
@@ -14,12 +14,14 @@ class LocalOnnxModelDescriptor {
     required this.path,
     required this.kind,
     this.labelsPath,
+    this.externalDataPath,
   });
 
   final String name;
   final String path;
   final LocalOnnxModelKind kind;
   final String? labelsPath;
+  final String? externalDataPath;
 
   bool get isOnnx => p.extension(path).toLowerCase() == '.onnx';
 }
@@ -46,6 +48,7 @@ class LocalOnnxModelService {
       allowedKinds: const {
         LocalOnnxModelKind.wd14Tagger,
         LocalOnnxModelKind.clTagger,
+        LocalOnnxModelKind.clTaggerV2,
         LocalOnnxModelKind.unknown,
       },
     );
@@ -66,19 +69,29 @@ class LocalOnnxModelService {
     }
 
     final result = <LocalOnnxModelDescriptor>[];
-    await for (final entity in directory.list(followLinks: false)) {
+    await for (final entity in directory.list(
+      recursive: true,
+      followLinks: false,
+    )) {
       if (entity is! File) continue;
       if (p.extension(entity.path).toLowerCase() != '.onnx') continue;
+      if (!_isDirectOrChildFile(
+        rootPath: directory.path,
+        filePath: entity.path,
+      )) {
+        continue;
+      }
 
-      final kind = _inferKind(entity.path);
+      final kind = await _inferKind(entity.path);
       if (!allowedKinds.contains(kind)) continue;
 
       result.add(
         LocalOnnxModelDescriptor(
-          name: p.basename(entity.path),
+          name: _displayName(directory.path, entity.path),
           path: entity.path,
           kind: kind,
           labelsPath: await _findLabelsFile(entity.path),
+          externalDataPath: await _findExternalDataFile(entity.path),
         ),
       );
     }
@@ -87,8 +100,27 @@ class LocalOnnxModelService {
     return result;
   }
 
-  LocalOnnxModelKind _inferKind(String filePath) {
+  bool _isDirectOrChildFile({
+    required String rootPath,
+    required String filePath,
+  }) {
+    final relative = p.relative(filePath, from: rootPath);
+    return p.split(relative).length <= 3;
+  }
+
+  String _displayName(String rootPath, String filePath) {
+    final relative = p.relative(filePath, from: rootPath);
+    return p.split(relative).length > 1 ? relative : p.basename(filePath);
+  }
+
+  Future<LocalOnnxModelKind> _inferKind(String filePath) async {
     final lower = p.basenameWithoutExtension(filePath).toLowerCase();
+    final lowerDirectory = p.basename(p.dirname(filePath)).toLowerCase();
+    if (await _hasClTaggerV2Sidecar(filePath) ||
+        lowerDirectory.contains('cl_tagger_v2') ||
+        lowerDirectory.contains('cl-tagger-v2')) {
+      return LocalOnnxModelKind.clTaggerV2;
+    }
     if (lower.contains('wd14') ||
         lower.contains('wd-v1-4') ||
         lower.contains('wd-v1-5') ||
@@ -97,10 +129,16 @@ class LocalOnnxModelService {
         lower.contains('swinv2')) {
       return LocalOnnxModelKind.wd14Tagger;
     }
-    if (lower.contains('cl') && lower.contains('tagger')) {
+    if ((lower.contains('cl') && lower.contains('tagger')) ||
+        lowerDirectory.contains('cl_tagger')) {
       return LocalOnnxModelKind.clTagger;
     }
     return LocalOnnxModelKind.unknown;
+  }
+
+  Future<bool> _hasClTaggerV2Sidecar(String onnxPath) async {
+    final directory = p.dirname(onnxPath);
+    return File(p.join(directory, 'model_vocabulary.json')).exists();
   }
 
   Future<String?> _findLabelsFile(String onnxPath) async {
@@ -123,6 +161,7 @@ class LocalOnnxModelService {
     }
 
     for (final name in const [
+      'model_vocabulary.json',
       'selected_tags.csv',
       'tags.csv',
       'labels.csv',
@@ -134,6 +173,14 @@ class LocalOnnxModelService {
       if (await File(candidate).exists()) {
         return candidate;
       }
+    }
+    return null;
+  }
+
+  Future<String?> _findExternalDataFile(String onnxPath) async {
+    final candidate = '$onnxPath.data';
+    if (await File(candidate).exists()) {
+      return candidate;
     }
     return null;
   }

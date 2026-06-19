@@ -13,18 +13,21 @@ import '../prompt_assistant/services/prompt_assistant_service.dart';
 
 final reversePromptProvider =
     StateNotifierProvider<ReversePromptNotifier, ReversePromptState>((ref) {
-  return ReversePromptNotifier(ref);
-});
+      return ReversePromptNotifier(ref);
+    });
 
-final reversePromptCharacterProvider = StateNotifierProvider<
-    ReversePromptCharacterNotifier, CharacterPromptConfig>((ref) {
-  return ReversePromptCharacterNotifier(ref);
-});
+final reversePromptCharacterProvider =
+    StateNotifierProvider<
+      ReversePromptCharacterNotifier,
+      CharacterPromptConfig
+    >((ref) {
+      return ReversePromptCharacterNotifier(ref);
+    });
 
 class ReversePromptCharacterNotifier
     extends StateNotifier<CharacterPromptConfig> {
   ReversePromptCharacterNotifier(this._ref)
-      : super(const CharacterPromptConfig()) {
+    : super(const CharacterPromptConfig()) {
     _load();
   }
 
@@ -42,8 +45,9 @@ class ReversePromptCharacterNotifier
   }
 
   void _load() {
-    final raw = _storage
-        .getSetting<String>(StorageKeys.reversePromptCharacterConfigJson);
+    final raw = _storage.getSetting<String>(
+      StorageKeys.reversePromptCharacterConfigJson,
+    );
     if (raw == null || raw.isEmpty) {
       return;
     }
@@ -64,9 +68,7 @@ class ReversePromptCharacterNotifier
 
   void setReplacementCharacter(CharacterPrompt character) {
     state = CharacterPromptConfig(
-      characters: [
-        character.copyWith(enabled: true),
-      ],
+      characters: [character.copyWith(enabled: true)],
     );
     _save();
   }
@@ -78,11 +80,7 @@ class ReversePromptCharacterNotifier
 }
 
 class ReversePromptImage {
-  const ReversePromptImage({
-    required this.id,
-    required this.bytes,
-    this.name,
-  });
+  const ReversePromptImage({required this.id, required this.bytes, this.name});
 
   final String id;
   final Uint8List bytes;
@@ -181,21 +179,22 @@ class ReversePromptState {
           characterReplacePrompt ?? this.characterReplacePrompt,
       finalPrompt: finalPrompt ?? this.finalPrompt,
       isProcessing: isProcessing ?? this.isProcessing,
-      processingStage:
-          clearProcessingStage ? null : processingStage ?? this.processingStage,
+      processingStage: clearProcessingStage
+          ? null
+          : processingStage ?? this.processingStage,
       error: clearError ? null : error ?? this.error,
     );
   }
 
   Map<String, dynamic> toPersistedJson() => {
-        'useOnnxTagger': useOnnxTagger,
-        'useLlmReverse': useLlmReverse,
-        'useCharacterReplace': useCharacterReplace,
-        'selectedTaggerModelPath': selectedTaggerModelPath,
-        'selectedCharacterId': selectedCharacterId,
-        'taggerGeneralThreshold': taggerGeneralThreshold,
-        'taggerCharacterThreshold': taggerCharacterThreshold,
-      };
+    'useOnnxTagger': useOnnxTagger,
+    'useLlmReverse': useLlmReverse,
+    'useCharacterReplace': useCharacterReplace,
+    'selectedTaggerModelPath': selectedTaggerModelPath,
+    'selectedCharacterId': selectedCharacterId,
+    'taggerGeneralThreshold': taggerGeneralThreshold,
+    'taggerCharacterThreshold': taggerCharacterThreshold,
+  };
 
   factory ReversePromptState.fromPersistedJson(Map<String, dynamic> json) {
     final useOnnx = json['useOnnxTagger'] as bool? ?? true;
@@ -208,12 +207,12 @@ class ReversePromptState {
       selectedCharacterId: json['selectedCharacterId'] as String?,
       taggerGeneralThreshold:
           (json['taggerGeneralThreshold'] as num?)?.toDouble() ??
-              (json['taggerThreshold'] as num?)?.toDouble() ??
-              0.35,
+          (json['taggerThreshold'] as num?)?.toDouble() ??
+          0.35,
       taggerCharacterThreshold:
           (json['taggerCharacterThreshold'] as num?)?.toDouble() ??
-              (json['taggerThreshold'] as num?)?.toDouble() ??
-              0.35,
+          (json['taggerThreshold'] as num?)?.toDouble() ??
+          0.35,
     );
   }
 }
@@ -253,15 +252,13 @@ class ReversePromptNotifier extends StateNotifier<ReversePromptState> {
       bytes: bytes,
       name: name,
     );
-    state = state.copyWith(
-      images: [...state.images, next],
-      clearError: true,
-    );
+    state = state.copyWith(images: [...state.images, next], clearError: true);
   }
 
   void removeImage(String id) {
-    state =
-        state.copyWith(images: state.images.where((e) => e.id != id).toList());
+    state = state.copyWith(
+      images: state.images.where((e) => e.id != id).toList(),
+    );
   }
 
   void clearImages() {
@@ -344,8 +341,11 @@ class ReversePromptNotifier extends StateNotifier<ReversePromptState> {
         state = state.copyWith(
           processingStage: ReversePromptProcessingStage.onnxTagger,
         );
+        await Future<void>.delayed(Duration.zero);
         final model = await _resolveSelectedTaggerModel();
-        final result = await _ref.read(localOnnxTaggerServiceProvider).tagImage(
+        final result = await _ref
+            .read(localOnnxTaggerServiceProvider)
+            .tagImage(
               imageBytes: image.bytes,
               model: model,
               generalThreshold: state.taggerGeneralThreshold,
@@ -364,8 +364,11 @@ class ReversePromptNotifier extends StateNotifier<ReversePromptState> {
         state = state.copyWith(
           processingStage: ReversePromptProcessingStage.llmReverse,
         );
+        await Future<void>.delayed(Duration.zero);
         currentPrompt = await _collectStream(
-          _ref.read(promptAssistantServiceProvider).reverseImagePrompt(
+          _ref
+              .read(promptAssistantServiceProvider)
+              .reverseImagePrompt(
                 image.bytes,
                 sessionId: 'reverse_prompt_panel',
                 taggerPrompt: currentPrompt,
@@ -392,6 +395,7 @@ class ReversePromptNotifier extends StateNotifier<ReversePromptState> {
         state = state.copyWith(
           processingStage: ReversePromptProcessingStage.characterReplace,
         );
+        await Future<void>.delayed(Duration.zero);
         currentPrompt = await _runCharacterReplace(
           inputPrompt: currentPrompt,
           character: character,
@@ -417,8 +421,9 @@ class ReversePromptNotifier extends StateNotifier<ReversePromptState> {
   }
 
   Future<LocalOnnxModelDescriptor> _resolveSelectedTaggerModel() async {
-    final models =
-        await _ref.read(localOnnxModelServiceProvider).scanTaggerModels();
+    final models = await _ref
+        .read(localOnnxModelServiceProvider)
+        .scanTaggerModels();
     if (models.isEmpty) {
       throw const _ReversePromptUiError('reversePrompt_noOnnxModel');
     }
@@ -442,7 +447,9 @@ class ReversePromptNotifier extends StateNotifier<ReversePromptState> {
     required CharacterPrompt character,
   }) {
     return _collectStream(
-      _ref.read(promptAssistantServiceProvider).replaceCharacterPrompt(
+      _ref
+          .read(promptAssistantServiceProvider)
+          .replaceCharacterPrompt(
             inputPrompt,
             sessionId: 'reverse_prompt_character_replace',
             characterName: character.name,
