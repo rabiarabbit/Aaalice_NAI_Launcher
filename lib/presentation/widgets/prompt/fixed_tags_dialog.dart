@@ -217,8 +217,9 @@ class _FixedTagsDialogState extends ConsumerState<FixedTagsDialog> {
 
   Widget _buildHeader(ThemeData theme, bool isDark) {
     final fixedTagsState = ref.watch(fixedTagsNotifierProvider);
-    final enabledCount =
-        fixedTagsState.entries.where((entry) => entry.enabled).length;
+    final enabledCount = fixedTagsState.entries
+        .where((entry) => entry.enabled)
+        .length;
     final totalCount = fixedTagsState.entries.length;
     final linkCount = fixedTagsState.links.length;
 
@@ -293,17 +294,16 @@ class _FixedTagsDialogState extends ConsumerState<FixedTagsDialog> {
                         ),
                         decoration: BoxDecoration(
                           color: enabledCount > 0
-                              ? theme.colorScheme.secondary
-                                  .withValues(alpha: 0.15)
-                              : theme.colorScheme.outline
-                                  .withValues(alpha: 0.1),
+                              ? theme.colorScheme.secondary.withValues(
+                                  alpha: 0.15,
+                                )
+                              : theme.colorScheme.outline.withValues(
+                                  alpha: 0.1,
+                                ),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
-                          '${context.l10n.fixedTags_enabledCount(
-                            enabledCount.toString(),
-                            totalCount.toString(),
-                          )} · ${context.l10n.fixedTags_linkCount(linkCount)}',
+                          '${context.l10n.fixedTags_enabledCount(enabledCount.toString(), totalCount.toString())} · ${context.l10n.fixedTags_linkCount(linkCount)}',
                           style: theme.textTheme.labelSmall?.copyWith(
                             color: enabledCount > 0
                                 ? theme.colorScheme.secondary
@@ -393,11 +393,7 @@ class _FixedTagsDialogState extends ConsumerState<FixedTagsDialog> {
     );
   }
 
-  Widget _buildListBody(
-    ThemeData theme,
-    FixedTagsState state,
-    bool isDark,
-  ) {
+  Widget _buildListBody(ThemeData theme, FixedTagsState state, bool isDark) {
     if (!state.negativePanelExpanded) {
       _scheduledLinkGeometryHash = null;
     }
@@ -487,7 +483,7 @@ class _FixedTagsDialogState extends ConsumerState<FixedTagsDialog> {
         final entry = entries[index];
         return buildTile(entry, index);
       },
-      onReorder: (oldIndex, newIndex) {
+      onReorderItem: (oldIndex, newIndex) {
         ref
             .read(fixedTagsNotifierProvider.notifier)
             .reorderWithinPromptType(promptType, oldIndex, newIndex);
@@ -508,10 +504,7 @@ class _FixedTagsDialogState extends ConsumerState<FixedTagsDialog> {
       state.negativeEntries.sortedByOrder(),
       _negativeSearchQuery,
     );
-    _scheduleLinkGeometryRefresh(
-      positives: positives,
-      negatives: negatives,
-    );
+    _scheduleLinkGeometryRefresh(positives: positives, negatives: negatives);
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -651,10 +644,8 @@ class _FixedTagsDialogState extends ConsumerState<FixedTagsDialog> {
                 icon: Icons.add_rounded,
                 label: context.l10n.fixedTags_new,
                 tooltip: context.l10n.fixedTags_newTarget(title),
-                onPressed: () => _showEditDialog(
-                  null,
-                  initialPromptType: promptType,
-                ),
+                onPressed: () =>
+                    _showEditDialog(null, initialPromptType: promptType),
               ),
               const SizedBox(width: 4),
               _buildColumnActionButton(
@@ -769,13 +760,13 @@ class _FixedTagsDialogState extends ConsumerState<FixedTagsDialog> {
         : state.linkedPositivesOf(entry.id).length;
     final linkedNames = entry.promptType == FixedTagPromptType.positive
         ? state
-            .linkedNegativesOf(entry.id)
-            .map((entry) => entry.displayName)
-            .join(', ')
+              .linkedNegativesOf(entry.id)
+              .map((entry) => entry.displayName)
+              .join(', ')
         : state
-            .linkedPositivesOf(entry.id)
-            .map((entry) => entry.displayName)
-            .join(', ');
+              .linkedPositivesOf(entry.id)
+              .map((entry) => entry.displayName)
+              .join(', ');
     final tooltip = linkCount == 0
         ? context.l10n.fixedTags_dragToLink
         : context.l10n.fixedTags_linkedToNames(linkedNames);
@@ -852,13 +843,15 @@ class _FixedTagsDialogState extends ConsumerState<FixedTagsDialog> {
       child: DragTarget<String>(
         onWillAcceptWithDetails: (details) {
           final positive = state.entries.cast<FixedTagEntry?>().firstWhere(
-                (entry) => entry?.id == details.data,
-                orElse: () => null,
-              );
+            (entry) => entry?.id == details.data,
+            orElse: () => null,
+          );
           return positive?.promptType == FixedTagPromptType.positive;
         },
         onAcceptWithDetails: (details) {
-          ref.read(fixedTagsNotifierProvider.notifier).createLink(
+          ref
+              .read(fixedTagsNotifierProvider.notifier)
+              .createLink(
                 positiveEntryId: details.data,
                 negativeEntryId: entry.id,
               );
@@ -933,8 +926,9 @@ class _FixedTagsDialogState extends ConsumerState<FixedTagsDialog> {
 
   Widget _buildFooter(ThemeData theme, bool isDark) {
     final hasEntries = ref.watch(fixedTagsNotifierProvider).entries.isNotEmpty;
-    final negativeExpanded =
-        ref.watch(fixedTagsNotifierProvider).negativePanelExpanded;
+    final negativeExpanded = ref
+        .watch(fixedTagsNotifierProvider)
+        .negativePanelExpanded;
 
     return Container(
       padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
@@ -974,8 +968,10 @@ class _FixedTagsDialogState extends ConsumerState<FixedTagsDialog> {
                 style: TextStyle(color: theme.colorScheme.error),
               ),
               style: OutlinedButton.styleFrom(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 10,
+                ),
                 side: BorderSide(
                   color: theme.colorScheme.error.withValues(alpha: 0.5),
                 ),
@@ -999,21 +995,23 @@ class _FixedTagsDialogState extends ConsumerState<FixedTagsDialog> {
               icon: const Icon(Icons.add_rounded, size: 17),
               label: Text(context.l10n.fixedTags_newPositive),
               style: FilledButton.styleFrom(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 10,
+                ),
               ),
             ),
             const SizedBox(width: 10),
             FilledButton.icon(
-              onPressed: () => _showLibraryPicker(
-                theme,
-                FixedTagPromptType.positive,
-              ),
+              onPressed: () =>
+                  _showLibraryPicker(theme, FixedTagPromptType.positive),
               icon: const Icon(Icons.playlist_add_rounded, size: 17),
               label: Text(context.l10n.fixedTags_addPositiveFromLibraryShort),
               style: FilledButton.styleFrom(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
               ),
             ),
           ],
@@ -1046,7 +1044,9 @@ class _FixedTagsDialogState extends ConsumerState<FixedTagsDialog> {
     TagLibraryEntry entry,
     FixedTagPromptType promptType,
   ) async {
-    await ref.read(fixedTagsNotifierProvider.notifier).addEntry(
+    await ref
+        .read(fixedTagsNotifierProvider.notifier)
+        .addEntry(
           name: entry.name,
           content: entry.content,
           weight: 1.0,
@@ -1073,7 +1073,9 @@ class _FixedTagsDialogState extends ConsumerState<FixedTagsDialog> {
     if (result != null) {
       if (entry == null) {
         // 新建
-        await ref.read(fixedTagsNotifierProvider.notifier).addEntry(
+        await ref
+            .read(fixedTagsNotifierProvider.notifier)
+            .addEntry(
               name: result.name,
               content: result.content,
               weight: result.weight,
@@ -1130,10 +1132,7 @@ class _LibraryPickerDialog extends StatefulWidget {
   final List<TagLibraryEntry> entries;
   final ValueChanged<TagLibraryEntry> onSelect;
 
-  const _LibraryPickerDialog({
-    required this.entries,
-    required this.onSelect,
-  });
+  const _LibraryPickerDialog({required this.entries, required this.onSelect});
 
   @override
   State<_LibraryPickerDialog> createState() => _LibraryPickerDialogState();
@@ -1166,10 +1165,7 @@ class _LibraryPickerDialogState extends State<_LibraryPickerDialog> {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
       child: ConstrainedBox(
-        constraints: const BoxConstraints(
-          maxWidth: 420,
-          maxHeight: 480,
-        ),
+        constraints: const BoxConstraints(maxWidth: 420, maxHeight: 480),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -1186,8 +1182,9 @@ class _LibraryPickerDialogState extends State<_LibraryPickerDialog> {
                   const SizedBox(width: 10),
                   Text(
                     context.l10n.fixedTags_addFromLibrary,
-                    style: theme.textTheme.titleMedium
-                        ?.copyWith(fontWeight: FontWeight.w600),
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   const Spacer(),
                   IconButton(
@@ -1210,8 +1207,10 @@ class _LibraryPickerDialogState extends State<_LibraryPickerDialog> {
                     color: theme.colorScheme.outline,
                   ),
                   isDense: true,
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide(color: theme.colorScheme.outline),
@@ -1350,14 +1349,17 @@ class _FixedTagEntryTileState extends State<_FixedTagEntryTile> {
     final isDark = widget.isDark;
 
     // 位置颜色
-    final posColor =
-        entry.isPrefix ? theme.colorScheme.primary : theme.colorScheme.tertiary;
+    final posColor = entry.isPrefix
+        ? theme.colorScheme.primary
+        : theme.colorScheme.tertiary;
 
     // 禁用状态透明度
     final disabledOpacity = entry.enabled ? 1.0 : 0.5;
-    final hasPositiveAnchor = entry.promptType == FixedTagPromptType.positive &&
+    final hasPositiveAnchor =
+        entry.promptType == FixedTagPromptType.positive &&
         widget.linkAnchor != null;
-    final hasNegativeAnchor = entry.promptType == FixedTagPromptType.negative &&
+    final hasNegativeAnchor =
+        entry.promptType == FixedTagPromptType.negative &&
         widget.linkAnchor != null;
 
     return ReorderableDragStartListener(
@@ -1374,24 +1376,26 @@ class _FixedTagEntryTileState extends State<_FixedTagEntryTile> {
             // 色差背景：启用时用主题色深背景，禁用时发灰
             color: entry.enabled
                 ? (isDark
-                    ? theme.colorScheme.surfaceContainerHigh
-                    : theme.colorScheme.surfaceContainerHighest)
+                      ? theme.colorScheme.surfaceContainerHigh
+                      : theme.colorScheme.surfaceContainerHighest)
                 : theme.colorScheme.surfaceContainerLow.withValues(alpha: 0.6),
             borderRadius: BorderRadius.circular(12),
             // 无边框 + 阴影
             boxShadow: entry.enabled
                 ? [
                     BoxShadow(
-                      color: theme.colorScheme.shadow
-                          .withValues(alpha: isDark ? 0.3 : 0.1),
+                      color: theme.colorScheme.shadow.withValues(
+                        alpha: isDark ? 0.3 : 0.1,
+                      ),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                       spreadRadius: -2,
                     ),
                     if (_isHovering)
                       BoxShadow(
-                        color:
-                            theme.colorScheme.primary.withValues(alpha: 0.15),
+                        color: theme.colorScheme.primary.withValues(
+                          alpha: 0.15,
+                        ),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -1438,13 +1442,16 @@ class _FixedTagEntryTileState extends State<_FixedTagEntryTile> {
                           fontWeight: FontWeight.w500,
                           color: entry.enabled
                               ? theme.colorScheme.onSurface
-                              : theme.colorScheme.onSurface
-                                  .withValues(alpha: 0.5),
+                              : theme.colorScheme.onSurface.withValues(
+                                  alpha: 0.5,
+                                ),
                           // 禁用时显示删除线
-                          decoration:
-                              entry.enabled ? null : TextDecoration.lineThrough,
-                          decorationColor:
-                              theme.colorScheme.outline.withValues(alpha: 0.6),
+                          decoration: entry.enabled
+                              ? null
+                              : TextDecoration.lineThrough,
+                          decorationColor: theme.colorScheme.outline.withValues(
+                            alpha: 0.6,
+                          ),
                           decorationThickness: 2,
                         ),
                         overflow: TextOverflow.ellipsis,
@@ -1459,10 +1466,12 @@ class _FixedTagEntryTileState extends State<_FixedTagEntryTile> {
                             style: TextStyle(
                               fontSize: 11,
                               color: entry.enabled
-                                  ? theme.colorScheme.outline
-                                      .withValues(alpha: 0.8)
-                                  : theme.colorScheme.outline
-                                      .withValues(alpha: 0.5),
+                                  ? theme.colorScheme.outline.withValues(
+                                      alpha: 0.8,
+                                    )
+                                  : theme.colorScheme.outline.withValues(
+                                      alpha: 0.5,
+                                    ),
                               height: 1.2,
                               decoration: entry.enabled
                                   ? null
@@ -1534,10 +1543,12 @@ class _FixedTagEntryTileState extends State<_FixedTagEntryTile> {
                         ),
                         decoration: BoxDecoration(
                           color: entry.enabled
-                              ? theme.colorScheme.secondary
-                                  .withValues(alpha: 0.15)
-                              : theme.colorScheme.outline
-                                  .withValues(alpha: 0.1),
+                              ? theme.colorScheme.secondary.withValues(
+                                  alpha: 0.15,
+                                )
+                              : theme.colorScheme.outline.withValues(
+                                  alpha: 0.1,
+                                ),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
@@ -1568,16 +1579,18 @@ class _FixedTagEntryTileState extends State<_FixedTagEntryTile> {
                         icon: Icons.edit_outlined,
                         onPressed: widget.onEdit,
                         tooltip: context.l10n.common_edit,
-                        color:
-                            theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.6,
+                        ),
                         hoverColor: theme.colorScheme.primary,
                       ),
                       _CompactIconButton(
                         icon: Icons.close_rounded,
                         onPressed: widget.onDelete,
                         tooltip: context.l10n.common_delete,
-                        color:
-                            theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.5,
+                        ),
                         hoverColor: theme.colorScheme.error,
                       ),
                     ],
@@ -1697,14 +1710,16 @@ class _FixedTagLinkPainter extends CustomPainter {
         continue;
       }
 
-      final start = positiveAnchors[link.positiveEntryId] ??
+      final start =
+          positiveAnchors[link.positiveEntryId] ??
           Offset(
             positiveAnchorX,
             _fixedTagLinkTopOffset +
                 startIndex * _fixedTagLinkRowHeight -
                 positiveScrollOffset,
           );
-      final end = negativeAnchors[link.negativeEntryId] ??
+      final end =
+          negativeAnchors[link.negativeEntryId] ??
           Offset(
             negativeAnchorX,
             _fixedTagLinkTopOffset +
@@ -1717,14 +1732,7 @@ class _FixedTagLinkPainter extends CustomPainter {
       }
       final path = Path()
         ..moveTo(start.dx, start.dy)
-        ..cubicTo(
-          start.dx + 28,
-          start.dy,
-          end.dx - 28,
-          end.dy,
-          end.dx,
-          end.dy,
-        );
+        ..cubicTo(start.dx + 28, start.dy, end.dx - 28, end.dy, end.dx, end.dy);
       final paint = Paint()
         ..color = color.withValues(alpha: isMismatched(link) ? 0.35 : 0.65)
         ..strokeWidth = 1.6

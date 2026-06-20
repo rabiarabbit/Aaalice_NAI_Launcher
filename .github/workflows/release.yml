@@ -1,0 +1,197 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to build, for example v1.0.0-beta13"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+env:
+  FLUTTER_VERSION: "3.44.2"
+  RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+
+jobs:
+  build-windows:
+    name: Build Windows
+    runs-on: windows-2022
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.RELEASE_TAG }}
+          lfs: true
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Pull LFS databases
+        shell: pwsh
+        run: |
+          git lfs install
+          git lfs pull --include="assets/databases/*.db"
+
+      - name: Verify bundled databases
+        shell: pwsh
+        run: |
+          $files = @(
+            "assets/databases/translation.db",
+            "assets/databases/cooccurrence.db"
+          )
+          foreach ($file in $files) {
+            if (!(Test-Path $file)) {
+              throw "Missing database: $file"
+            }
+            $info = Get-Item $file
+            if ($info.Length -lt 1024) {
+              throw "Database looks too small, probably an LFS pointer: $file"
+            }
+            $stream = [System.IO.File]::OpenRead($file)
+            try {
+              $buffer = New-Object byte[] 16
+              [void]$stream.Read($buffer, 0, 16)
+              $header = [System.Text.Encoding]::ASCII.GetString($buffer)
+              if (!$header.StartsWith("SQLite format 3")) {
+                throw "Database is not a SQLite file: $file"
+              }
+            } finally {
+              $stream.Dispose()
+            }
+          }
+
+      - name: Resolve dependencies
+        run: flutter pub get
+
+      - name: Generate code
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Build Windows release
+        run: flutter build windows --release
+
+      - name: Package Windows artifact
+        shell: pwsh
+        run: |
+          $match = Select-String -Path pubspec.yaml -Pattern '^version:\s*(.+)$'
+          $version = $match.Matches[0].Groups[1].Value.Trim()
+          New-Item -ItemType Directory -Force dist | Out-Null
+          Compress-Archive `
+            -Path 'build/windows/x64/runner/Release/*' `
+            -DestinationPath "dist/NAI_Launcher_Windows_$version.zip" `
+            -Force
+
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-release
+          path: dist/NAI_Launcher_Windows_*.zip
+          if-no-files-found: error
+
+  build-macos:
+    name: Build macOS
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.RELEASE_TAG }}
+          lfs: true
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Prepare CocoaPods
+        run: |
+          pod --version
+
+      - name: Pull LFS databases
+        run: |
+          git lfs install
+          git lfs pull --include="assets/databases/*.db"
+
+      - name: Verify bundled databases
+        run: |
+          for file in assets/databases/translation.db assets/databases/cooccurrence.db; do
+            test -f "$file"
+            size="$(wc -c < "$file")"
+            if [ "$size" -lt 1024 ]; then
+              echo "Database looks too small, probably an LFS pointer: $file" >&2
+              exit 1
+            fi
+            header="$(dd if="$file" bs=15 count=1 2>/dev/null)"
+            if [ "$header" != "SQLite format 3" ]; then
+              echo "Database is not a SQLite file: $file" >&2
+              exit 1
+            fi
+          done
+
+      - name: Resolve dependencies
+        run: flutter pub get
+
+      - name: Generate code
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Build macOS release
+        run: flutter build macos --release
+
+      - name: Package macOS artifact
+        run: |
+          version="$(sed -n 's/^version:[[:space:]]*//p' pubspec.yaml | tr -d '\r')"
+          mkdir -p dist
+          cd "build/macos/Build/Products/Release"
+          ditto -c -k --sequesterRsrc --keepParent "Aaalice NAI Launcher.app" "$GITHUB_WORKSPACE/dist/NAI_Launcher_macOS_$version.zip"
+
+      - name: Upload macOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-release
+          path: dist/NAI_Launcher_macOS_*.zip
+          if-no-files-found: error
+
+  publish:
+    name: Publish GitHub Release
+    runs-on: ubuntu-latest
+    needs:
+      - build-windows
+      - build-macos
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.RELEASE_TAG }}
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+          merge-multiple: true
+
+      - name: Show assets
+        run: ls -lh release-assets
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: NAI Launcher ${{ env.RELEASE_TAG }}
+          body_path: dist/release_notes_${{ env.RELEASE_TAG }}.md
+          files: release-assets/*.zip
+          draft: false
+          prerelease: false

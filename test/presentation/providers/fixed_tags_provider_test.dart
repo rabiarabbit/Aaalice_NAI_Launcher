@@ -34,8 +34,7 @@ void main() {
         name: 'negative',
         content: 'bad hands',
         position: FixedTagPosition.prefix,
-      ).toJson()
-        ..['promptType'] = 'negative';
+      ).toJson()..['promptType'] = 'negative';
       final positiveEntry = FixedTagEntry.create(
         name: 'positive',
         content: 'masterpiece',
@@ -43,10 +42,7 @@ void main() {
       );
 
       final state = FixedTagsState(
-        entries: [
-          FixedTagEntry.fromJson(negativeJson),
-          positiveEntry,
-        ],
+        entries: [FixedTagEntry.fromJson(negativeJson), positiveEntry],
       );
 
       expect(state.applyToPrompt('1girl'), 'masterpiece, 1girl');
@@ -79,10 +75,7 @@ void main() {
         ],
       );
 
-      expect(
-        state.applyToNegativePrompt('lowres'),
-        'bad hands, lowres, text',
-      );
+      expect(state.applyToNegativePrompt('lowres'), 'bad hands, lowres, text');
       expect(state.applyToPrompt('1girl'), 'masterpiece, 1girl');
       expect(state.negativeEnabledCount, 2);
     });
@@ -111,10 +104,7 @@ void main() {
       expect(state.linkedNegativesOf(positive.id), [negative]);
       expect(state.linkedPositivesOf(negative.id), [positive]);
       expect(state.isMismatched(link), isTrue);
-      expect(
-        FixedTagLink.fromJson(link.toJson()).negativeEntryId,
-        negative.id,
-      );
+      expect(FixedTagLink.fromJson(link.toJson()).negativeEntryId, negative.id);
     });
   });
 
@@ -159,44 +149,45 @@ void main() {
     });
 
     test(
-        'inferFixedTagCategories copies categoryId from linked library entries',
-        () {
-      final fixed = FixedTagEntry.create(
-        name: 'linked',
-        content: 'tag',
-        sourceEntryId: 'lib-1',
-      );
-      final untouched = FixedTagEntry.create(
-        name: 'already',
-        content: 'tag',
-        sourceEntryId: 'lib-2',
-        categoryId: 'existing',
-      );
-      final inferred = inferFixedTagCategories(
-        [fixed, untouched],
-        [
-          TagLibraryEntry(
-            id: 'lib-1',
-            name: 'linked',
-            content: 'tag',
-            categoryId: 'from-lib',
-            createdAt: DateTime(2026),
-            updatedAt: DateTime(2026),
-          ),
-          TagLibraryEntry(
-            id: 'lib-2',
-            name: 'already',
-            content: 'tag',
-            categoryId: 'should-not-overwrite',
-            createdAt: DateTime(2026),
-            updatedAt: DateTime(2026),
-          ),
-        ],
-      );
+      'inferFixedTagCategories copies categoryId from linked library entries',
+      () {
+        final fixed = FixedTagEntry.create(
+          name: 'linked',
+          content: 'tag',
+          sourceEntryId: 'lib-1',
+        );
+        final untouched = FixedTagEntry.create(
+          name: 'already',
+          content: 'tag',
+          sourceEntryId: 'lib-2',
+          categoryId: 'existing',
+        );
+        final inferred = inferFixedTagCategories(
+          [fixed, untouched],
+          [
+            TagLibraryEntry(
+              id: 'lib-1',
+              name: 'linked',
+              content: 'tag',
+              categoryId: 'from-lib',
+              createdAt: DateTime(2026),
+              updatedAt: DateTime(2026),
+            ),
+            TagLibraryEntry(
+              id: 'lib-2',
+              name: 'already',
+              content: 'tag',
+              categoryId: 'should-not-overwrite',
+              createdAt: DateTime(2026),
+              updatedAt: DateTime(2026),
+            ),
+          ],
+        );
 
-      expect(inferred[0].categoryId, 'from-lib');
-      expect(inferred[1].categoryId, 'existing');
-    });
+        expect(inferred[0].categoryId, 'from-lib');
+        expect(inferred[1].categoryId, 'existing');
+      },
+    );
   });
 
   group('filtered reorder', () {
@@ -225,7 +216,7 @@ void main() {
         promptType: FixedTagPromptType.positive,
         visibleIds: [a1.id, a2.id],
         oldIndex: 0,
-        newIndex: 2,
+        newIndex: 1,
       );
 
       expect(reordered.map((e) => e.id), [a2.id, b.id, a1.id]);

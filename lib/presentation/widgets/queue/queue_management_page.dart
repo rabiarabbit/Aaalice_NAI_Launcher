@@ -148,8 +148,8 @@ class _QueueManagementPageState extends ConsumerState<QueueManagementPage>
           color: isHighlighted
               ? theme.colorScheme.primary
               : onPressed == null
-                  ? theme.disabledColor
-                  : null,
+              ? theme.disabledColor
+              : null,
         ),
         tooltip: tooltip,
         onPressed: onPressed,
@@ -222,8 +222,9 @@ class _QueueManagementPageState extends ConsumerState<QueueManagementPage>
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
               decoration: BoxDecoration(
-                color: (color ?? theme.colorScheme.primary)
-                    .withValues(alpha: 0.15),
+                color: (color ?? theme.colorScheme.primary).withValues(
+                  alpha: 0.15,
+                ),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Text(
@@ -298,8 +299,8 @@ class _QueueManagementPageState extends ConsumerState<QueueManagementPage>
             onPressed: queueState.selectedCount == 0
                 ? null
                 : () => ref
-                    .read(replicationQueueNotifierProvider.notifier)
-                    .pinSelectedToTop(),
+                      .read(replicationQueueNotifierProvider.notifier)
+                      .pinSelectedToTop(),
             icon: const Icon(Icons.vertical_align_top_rounded, size: 16),
             label: Text(l10n.queue_pinToTop),
             style: FilledButton.styleFrom(
@@ -309,8 +310,9 @@ class _QueueManagementPageState extends ConsumerState<QueueManagementPage>
           ),
           const SizedBox(width: 6),
           FilledButton.tonalIcon(
-            onPressed:
-                queueState.selectedCount == 0 ? null : _confirmDeleteSelected,
+            onPressed: queueState.selectedCount == 0
+                ? null
+                : _confirmDeleteSelected,
             icon: const Icon(Icons.delete_rounded, size: 16),
             label: Text(l10n.queue_delete),
             style: FilledButton.styleFrom(
@@ -358,7 +360,7 @@ class _QueueManagementPageState extends ConsumerState<QueueManagementPage>
       buildDefaultDragHandles: false,
       padding: const EdgeInsets.symmetric(vertical: 8),
       itemCount: queueState.tasks.length,
-      onReorder: (oldIndex, newIndex) {
+      onReorderItem: (oldIndex, newIndex) {
         ref
             .read(replicationQueueNotifierProvider.notifier)
             .reorder(oldIndex, newIndex);
@@ -367,8 +369,10 @@ class _QueueManagementPageState extends ConsumerState<QueueManagementPage>
         return AnimatedBuilder(
           animation: animation,
           builder: (context, _) {
-            final elevation =
-                Tween<double>(begin: 0, end: 6).evaluate(animation);
+            final elevation = Tween<double>(
+              begin: 0,
+              end: 6,
+            ).evaluate(animation);
             return Material(
               elevation: elevation,
               borderRadius: BorderRadius.circular(12),
@@ -450,9 +454,7 @@ class _QueueManagementPageState extends ConsumerState<QueueManagementPage>
                     .clearFailedTasks(),
                 icon: const Icon(Icons.delete_sweep_rounded, size: 18),
                 label: Text(l10n.queue_clearFailedTasks),
-                style: TextButton.styleFrom(
-                  foregroundColor: Colors.red,
-                ),
+                style: TextButton.styleFrom(foregroundColor: Colors.red),
               ),
             ],
           ),
@@ -543,9 +545,7 @@ class _QueueManagementPageState extends ConsumerState<QueueManagementPage>
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            style: FilledButton.styleFrom(
-              backgroundColor: Colors.red,
-            ),
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
             child: Text(l10n.common_confirm),
           ),
         ],
@@ -559,8 +559,9 @@ class _QueueManagementPageState extends ConsumerState<QueueManagementPage>
 
   Future<void> _confirmDeleteSelected() async {
     final l10n = context.l10n;
-    final selectedCount =
-        ref.read(replicationQueueNotifierProvider).selectedCount;
+    final selectedCount = ref
+        .read(replicationQueueNotifierProvider)
+        .selectedCount;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -573,9 +574,7 @@ class _QueueManagementPageState extends ConsumerState<QueueManagementPage>
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            style: FilledButton.styleFrom(
-              backgroundColor: Colors.red,
-            ),
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
             child: Text(l10n.common_confirm),
           ),
         ],

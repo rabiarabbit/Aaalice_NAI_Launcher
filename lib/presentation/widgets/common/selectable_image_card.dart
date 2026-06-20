@@ -10,6 +10,7 @@ import '../../../core/utils/localization_extension.dart';
 import '../../../data/repositories/gallery_folder_repository.dart';
 import '../../providers/share_image_settings_provider.dart';
 import '../../themes/theme_extension.dart';
+import '../../utils/clipboard_image.dart';
 import 'pro_context_menu.dart';
 import 'app_toast.dart';
 import 'decoded_memory_image.dart';
@@ -1309,33 +1310,14 @@ class _SelectableImageCardState extends ConsumerState<SelectableImageCard>
         throw StateError(l10n.toast_imageDataUnavailable);
       }
       _shareTransferCache = cache;
-      final transferFile = await cache.prepareFile(
+      final shareImage = await cache.prepareImage(
         stripMetadata: stripMetadata,
       );
 
-      // 使用 PowerShell 复制图像到剪贴板
-      // 使用 [System.Windows.Forms.Clipboard]::SetImage() 正确复制图像数据
-      final result = await Process.run('powershell', [
-        '-NoProfile',
-        '-ExecutionPolicy',
-        'Bypass',
-        '-Command',
-        'Add-Type -AssemblyName System.Windows.Forms; Add-Type -AssemblyName System.Drawing; \$image = [System.Drawing.Image]::FromFile("${transferFile.path}"); [System.Windows.Forms.Clipboard]::SetImage(\$image); \$image.Dispose();',
-      ]);
-
-      // 检查 PowerShell 命令执行结果
-      if (result.exitCode != 0) {
-        final errorOutput = result.stderr.toString();
-        throw Exception(
-          l10n.toast_powershellCommandFailed(
-            result.exitCode,
-            errorOutput,
-          ),
-        );
-      }
-
-      // 延迟删除临时文件，确保 PowerShell 完成读取
-      await Future.delayed(const Duration(milliseconds: 500));
+      // 跨平台复制到剪贴板（原 Windows 端走 PowerShell + System.Drawing，
+      // macOS/Linux 不可用）。统一规范化为 PNG 写入，避免 jpg/webp 原始字节
+      // 被当成 PNG 导致粘贴失败。
+      await writeImageBytesToClipboardAsPng(shareImage.bytes);
 
       if (context.mounted) {
         AppToast.success(context, l10n.image_copiedToClipboard);

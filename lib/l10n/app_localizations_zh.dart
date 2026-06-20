@@ -12015,11 +12015,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get toast_tempFileCreateFailed => '临时文件创建失败';
 
   @override
-  String toast_powershellCommandFailed(Object exitCode, Object error) {
-    return 'PowerShell 命令失败 (exitCode: $exitCode): $error';
-  }
-
-  @override
   String get toast_vibeDataCopied => 'Vibe 数据已复制';
 
   @override

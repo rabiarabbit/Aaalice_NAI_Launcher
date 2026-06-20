@@ -135,9 +135,7 @@ class ReplicationQueueNotifier extends _$ReplicationQueueNotifier {
     if (state.isFull) {
       return false;
     }
-    state = state.copyWith(
-      tasks: [...state.tasks, task],
-    );
+    state = state.copyWith(tasks: [...state.tasks, task]);
     await _saveToStorage();
 
     // 添加任务时重置悬浮球关闭状态，确保悬浮球可见
@@ -156,9 +154,7 @@ class ReplicationQueueNotifier extends _$ReplicationQueueNotifier {
     if (remaining <= 0) return 0;
 
     final toAdd = tasks.take(remaining).toList();
-    state = state.copyWith(
-      tasks: [...state.tasks, ...toAdd],
-    );
+    state = state.copyWith(tasks: [...state.tasks, ...toAdd]);
     await _saveToStorage();
 
     // 添加任务时重置悬浮球关闭状态，确保悬浮球可见
@@ -187,10 +183,7 @@ class ReplicationQueueNotifier extends _$ReplicationQueueNotifier {
 
     final tasks = List<ReplicationTask>.from(state.tasks);
     final task = tasks.removeAt(oldIndex);
-
-    // 如果是向后移动，需要减 1（因为已经移除了原位置的元素）
-    final adjustedIndex = newIndex > oldIndex ? newIndex - 1 : newIndex;
-    tasks.insert(adjustedIndex, task);
+    tasks.insert(newIndex, task);
 
     state = state.copyWith(tasks: tasks);
     await _saveToStorage();
@@ -375,10 +368,7 @@ class ReplicationQueueNotifier extends _$ReplicationQueueNotifier {
 
   /// 退出选择模式
   void exitSelectionMode() {
-    state = state.copyWith(
-      isSelectionMode: false,
-      selectedTaskIds: {},
-    );
+    state = state.copyWith(isSelectionMode: false, selectedTaskIds: {});
   }
 
   /// 切换任务选中状态
@@ -429,8 +419,9 @@ class ReplicationQueueNotifier extends _$ReplicationQueueNotifier {
   Future<void> pinSelectedToTop() async {
     if (state.selectedTaskIds.isEmpty) return;
 
-    final selectedTasks =
-        state.tasks.where((t) => state.selectedTaskIds.contains(t.id)).toList();
+    final selectedTasks = state.tasks
+        .where((t) => state.selectedTaskIds.contains(t.id))
+        .toList();
     final otherTasks = state.tasks
         .where((t) => !state.selectedTaskIds.contains(t.id))
         .toList();
@@ -493,9 +484,6 @@ class ReplicationQueueNotifier extends _$ReplicationQueueNotifier {
       return task;
     }).toList();
 
-    state = state.copyWith(
-      tasks: restoredTasks,
-      isLoading: false,
-    );
+    state = state.copyWith(tasks: restoredTasks, isLoading: false);
   }
 }

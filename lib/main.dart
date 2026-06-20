@@ -9,6 +9,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:video_player_media_kit/video_player_media_kit.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:screen_retriever/screen_retriever.dart';
 
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -307,9 +308,10 @@ Future<void> _bootstrapApplication() async {
   PaintingBinding.instance.imageCache.maximumSize = 500; // 最大缓存 500 张图片
   PaintingBinding.instance.imageCache.maximumSizeBytes = 200 << 20; // 200MB
 
-  // 初始化 Windows 视频播放支持
+  // 初始化桌面端视频播放支持 (media_kit: Windows + macOS)
   VideoPlayerMediaKit.ensureInitialized(
-    windows: true,
+    windows: Platform.isWindows,
+    macOS: Platform.isMacOS,
   );
 
   // 日志系统已自动初始化，无需显式调用
@@ -524,10 +526,36 @@ Future<void> _bootstrapApplication() async {
     final savedX = box.get(StorageKeys.windowX) as double?;
     final savedY = box.get(StorageKeys.windowY) as double?;
 
+    // 读取屏幕可用工作区
+    double effWidth = savedWidth;
+    double effHeight = savedHeight;
+    Rect? fillBounds; // macOS 首次启动：铺满工作区时使用
+    try {
+      final display = await screenRetriever.getPrimaryDisplay();
+      final work = display.visibleSize ?? display.size;
+      final workPos = display.visiblePosition ?? Offset.zero;
+
+      if (Platform.isMacOS) {
+        // macOS：启动时自适应屏幕，铺满可用工作区（紧贴屏幕，保留菜单栏/Dock）
+        effWidth = work.width;
+        effHeight = work.height;
+        fillBounds =
+            Rect.fromLTWH(workPos.dx, workPos.dy, work.width, work.height);
+      } else {
+        // 其它情况：clamp 到工作区，避免窗口超出屏幕
+        final maxW = (work.width - 40).clamp(800.0, double.infinity).toDouble();
+        final maxH = (work.height - 40).clamp(600.0, double.infinity).toDouble();
+        effWidth = savedWidth.clamp(800.0, maxW).toDouble();
+        effHeight = savedHeight.clamp(600.0, maxH).toDouble();
+      }
+    } catch (e) {
+      AppLogger.w('获取屏幕工作区失败，使用默认窗口尺寸: $e', 'Main');
+    }
+
     final windowOptions = WindowOptions(
-      size: Size(savedWidth, savedHeight),
+      size: Size(effWidth, effHeight),
       minimumSize: const Size(800, 600),
-      center: savedX == null || savedY == null, // 首次启动居中，之后恢复位置',
+      center: fillBounds == null && (savedX == null || savedY == null),
       backgroundColor: const Color(0xFF121212), // 深色背景，避免窗口透明
       skipTaskbar: false,
       titleBarStyle: TitleBarStyle.normal,
@@ -535,16 +563,22 @@ Future<void> _bootstrapApplication() async {
     );
 
     await windowManager.waitUntilReadyToShow(windowOptions, () async {
-      // 如果有保存的位置，恢复窗口位置',
-      if (savedX != null && savedY != null) {
+      if (fillBounds != null) {
+        // macOS 首次启动：精确铺满屏幕工作区
+        await windowManager.setBounds(fillBounds);
+        AppLogger.d(
+          'Window filled to work area: ${effWidth}x$effHeight',
+          'Main',
+        );
+      } else if (savedX != null && savedY != null) {
         await windowManager.setPosition(Offset(savedX, savedY));
         AppLogger.d(
-          'Window state restored: ${savedWidth}x$savedHeight at ($savedX, $savedY)',
+          'Window state restored: ${effWidth}x$effHeight at ($savedX, $savedY)',
           'Main',
         );
       } else {
         AppLogger.d(
-          'Window initialized with default state: ${savedWidth}x$savedHeight (centered)',
+          'Window initialized with default state: ${effWidth}x$effHeight (centered)',
           'Main',
         );
       }

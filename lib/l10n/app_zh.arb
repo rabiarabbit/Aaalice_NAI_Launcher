@@ -5780,13 +5780,6 @@
   "toast_imageHasNoMetadata": "此图片没有元数据",
   "toast_imageDataUnavailable": "图像数据不可用，无法复制",
   "toast_tempFileCreateFailed": "临时文件创建失败",
-  "toast_powershellCommandFailed": "PowerShell 命令失败 (exitCode: {exitCode}): {error}",
-  "@toast_powershellCommandFailed": {
-    "placeholders": {
-      "exitCode": {},
-      "error": {}
-    }
-  },
   "toast_vibeDataCopied": "Vibe 数据已复制",
   "toast_tagCopied": "标签已复制",
   "toast_characterPromptCopied": "角色提示词已复制",

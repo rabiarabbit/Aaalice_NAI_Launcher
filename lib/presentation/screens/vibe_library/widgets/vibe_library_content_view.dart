@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -70,9 +71,7 @@ class _VibeLibraryContentViewState
 
     // 加载中状态
     if (state.isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+      return const Center(child: CircularProgressIndicator());
     }
 
     // 空状态处理
@@ -103,7 +102,9 @@ class _VibeLibraryContentViewState
     return GridView.builder(
       key: const PageStorageKey<String>(_vibeLibraryGridKey),
       padding: const EdgeInsets.all(16),
-      cacheExtent: computeVibeGridCacheExtent(widget.itemWidth),
+      scrollCacheExtent: ScrollCacheExtent.pixels(
+        computeVibeGridCacheExtent(widget.itemWidth),
+      ),
       addAutomaticKeepAlives: false,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: widget.columns,
@@ -150,7 +151,7 @@ class _VibeLibraryContentViewState
             final physicalKeys = HardwareKeyboard.instance.physicalKeysPressed;
             final isShiftPressed =
                 physicalKeys.contains(PhysicalKeyboardKey.shiftLeft) ||
-                    physicalKeys.contains(PhysicalKeyboardKey.shiftRight);
+                physicalKeys.contains(PhysicalKeyboardKey.shiftRight);
             await _sendEntryToGeneration(context, entry, isShiftPressed);
           },
           onExport: () => unawaited(_exportSingleEntry(context, entry)),
@@ -168,10 +169,7 @@ class _VibeLibraryContentViewState
   ) async {
     final span = VibePerformanceDiagnostics.start(
       'content.detailOpen',
-      details: {
-        'entryId': entry.id,
-        'isBundle': entry.isBundle,
-      },
+      details: {'entryId': entry.id, 'isBundle': entry.isBundle},
     );
     var resolved = false;
     final storage = ref.read(vibeLibraryStorageServiceProvider);
@@ -187,24 +185,25 @@ class _VibeLibraryContentViewState
         entry: resolvedEntry,
         heroTag: 'vibe_${resolvedEntry.id}',
         callbacks: VibeDetailCallbacks(
-          onSendToGeneration: (
-            entry,
-            strength,
-            infoExtracted,
-            isShiftPressed, {
-            required bool applyParamOverrides,
-            int? bundleChildParamOverrideIndex,
-          }) async {
-            await _sendEntryToGenerationWithParams(
-              context,
-              entry,
-              strength,
-              infoExtracted,
-              isShiftPressed,
-              applyParamOverrides: applyParamOverrides,
-              bundleChildParamOverrideIndex: bundleChildParamOverrideIndex,
-            );
-          },
+          onSendToGeneration:
+              (
+                entry,
+                strength,
+                infoExtracted,
+                isShiftPressed, {
+                required bool applyParamOverrides,
+                int? bundleChildParamOverrideIndex,
+              }) async {
+                await _sendEntryToGenerationWithParams(
+                  context,
+                  entry,
+                  strength,
+                  infoExtracted,
+                  isShiftPressed,
+                  applyParamOverrides: applyParamOverrides,
+                  bundleChildParamOverrideIndex: bundleChildParamOverrideIndex,
+                );
+              },
           onExport: (entry) {
             unawaited(_exportSingleEntry(context, entry));
           },
@@ -214,28 +213,20 @@ class _VibeLibraryContentViewState
           onRename: (entry, newName) {
             return _renameSingleEntry(context, entry, newName);
           },
-          onSaveParams: (
-            entry,
-            strength,
-            infoExtracted,
-            bundleChildIndex,
-          ) async {
-            return _updateEntryParams(
-              context,
-              entry,
-              strength,
-              infoExtracted,
-              bundleChildIndex: bundleChildIndex,
-            );
-          },
+          onSaveParams:
+              (entry, strength, infoExtracted, bundleChildIndex) async {
+                return _updateEntryParams(
+                  context,
+                  entry,
+                  strength,
+                  infoExtracted,
+                  bundleChildIndex: bundleChildIndex,
+                );
+              },
         ),
       );
     } finally {
-      span.finish(
-        details: {
-          'resolved': resolved,
-        },
-      );
+      span.finish(details: {'resolved': resolved});
     }
   }
 
@@ -320,8 +311,9 @@ class _VibeLibraryContentViewState
       final storage = ref.read(vibeLibraryStorageServiceProvider);
       final actualEntry = await storage.getEntry(entry.id) ?? entry;
       hydrated = true;
-      final paramsNotifier =
-          ref.read(generationParamsNotifierProvider.notifier);
+      final paramsNotifier = ref.read(
+        generationParamsNotifierProvider.notifier,
+      );
       final currentParams = ref.read(generationParamsNotifierProvider);
 
       // 处理 Bundle 条目：从文件读取所有 vibes
@@ -428,9 +420,7 @@ class _VibeLibraryContentViewState
       if (context.mounted) {
         final message = isShiftPressed
             ? context.l10n.toast_replacedVibe(actualEntry.displayName)
-            : context.l10n.toast_sentVibeToGeneration(
-                actualEntry.displayName,
-              );
+            : context.l10n.toast_sentVibeToGeneration(actualEntry.displayName);
         AppToast.success(context, message);
         context.go(AppRoutes.home);
       }
@@ -468,8 +458,9 @@ class _VibeLibraryContentViewState
     var sentVibeCount = 0;
     var abortedReason = '';
     try {
-      final paramsNotifier =
-          ref.read(generationParamsNotifierProvider.notifier);
+      final paramsNotifier = ref.read(
+        generationParamsNotifierProvider.notifier,
+      );
       final currentParams = ref.read(generationParamsNotifierProvider);
 
       // 检查是否超过16个限制（仅在追加模式下检查）
@@ -560,9 +551,9 @@ class _VibeLibraryContentViewState
       // 普通条目或 Bundle 文件不存在时，使用单个 vibe
       final vibeRef = applyParamOverrides
           ? entry.toVibeReference().copyWith(
-                strength: strength,
-                infoExtracted: infoExtracted,
-              )
+              strength: strength,
+              infoExtracted: infoExtracted,
+            )
           : entry.toVibeReference();
 
       if (isShiftPressed) {
@@ -597,10 +588,7 @@ class _VibeLibraryContentViewState
   ) async {
     final span = VibePerformanceDiagnostics.start(
       'content.exportSingleEntry',
-      details: {
-        'entryId': entry.id,
-        'isBundle': entry.isBundle,
-      },
+      details: {'entryId': entry.id, 'isBundle': entry.isBundle},
     );
     var hydrated = false;
     var categoryCount = 0;
@@ -611,24 +599,18 @@ class _VibeLibraryContentViewState
       if (!mounted || !context.mounted) {
         return;
       }
-      final categories =
-          ref.read(vibeLibraryCategoryNotifierProvider).categories;
+      final categories = ref
+          .read(vibeLibraryCategoryNotifierProvider)
+          .categories;
       categoryCount = categories.length;
 
       showDialog<void>(
         context: context,
-        builder: (context) => VibeExportDialog(
-          entries: [actualEntry],
-          categories: categories,
-        ),
+        builder: (context) =>
+            VibeExportDialog(entries: [actualEntry], categories: categories),
       );
     } finally {
-      span.finish(
-        details: {
-          'hydrated': hydrated,
-          'categories': categoryCount,
-        },
-      );
+      span.finish(details: {'hydrated': hydrated, 'categories': categoryCount});
     }
   }
 
@@ -648,9 +630,9 @@ class _VibeLibraryContentViewState
     );
 
     if (confirmed) {
-      await ref
-          .read(vibeLibraryNotifierProvider.notifier)
-          .deleteEntries([entry.id]);
+      await ref.read(vibeLibraryNotifierProvider.notifier).deleteEntries([
+        entry.id,
+      ]);
       if (context.mounted) {
         AppToast.success(
           context,
@@ -767,15 +749,14 @@ class _VibeLibraryContentViewState
         );
     if (preparedVibeData == null) {
       if (context.mounted) {
-        AppToast.error(
-          context,
-          context.l10n.toast_vibeParamSaveReencodeFailed,
-        );
+        AppToast.error(context, context.l10n.toast_vibeParamSaveReencodeFailed);
       }
       return null;
     }
 
-    return ref.read(vibeLibraryNotifierProvider.notifier).saveEntryParams(
+    return ref
+        .read(vibeLibraryNotifierProvider.notifier)
+        .saveEntryParams(
           entry.id,
           strength: strength,
           infoExtracted: infoExtracted,
@@ -814,13 +795,8 @@ Future<VibeLibraryEntry> resolveVibeDetailEntryForOpen(
   return VibePerformanceDiagnostics.measure(
     'content.resolveVibeDetailEntryForOpen',
     () async => await storage.getEntry(entry.id) ?? entry,
-    details: {
-      'entryId': entry.id,
-      'isBundle': entry.isBundle,
-    },
-    resultDetails: (entry) => {
-      'resolvedId': entry.id,
-    },
+    details: {'entryId': entry.id, 'isBundle': entry.isBundle},
+    resultDetails: (entry) => {'resolvedId': entry.id},
   );
 }
 
@@ -831,20 +807,22 @@ List<VibeReference> buildBundleVibesForGeneration(
   double? infoExtractedOverride,
   int? overrideIndex,
 }) {
-  return vibes.indexed.map((item) {
-    final (index, vibe) = item;
-    var next = vibe.copyWith(bundleSource: bundleSource);
-    final shouldOverride =
-        (strengthOverride != null || infoExtractedOverride != null) &&
+  return vibes.indexed
+      .map((item) {
+        final (index, vibe) = item;
+        var next = vibe.copyWith(bundleSource: bundleSource);
+        final shouldOverride =
+            (strengthOverride != null || infoExtractedOverride != null) &&
             (overrideIndex == null || overrideIndex == index);
-    if (shouldOverride) {
-      next = next.copyWith(
-        strength: strengthOverride ?? next.strength,
-        infoExtracted: infoExtractedOverride ?? next.infoExtracted,
-      );
-    }
-    return next;
-  }).toList(growable: false);
+        if (shouldOverride) {
+          next = next.copyWith(
+            strength: strengthOverride ?? next.strength,
+            infoExtracted: infoExtractedOverride ?? next.infoExtracted,
+          );
+        }
+        return next;
+      })
+      .toList(growable: false);
 }
 
 /// 自定义上下文菜单路由
@@ -885,7 +863,8 @@ class _ContextMenuRoute extends PopupRoute {
           // 计算调整后的位置以保持菜单在屏幕边界内
           final screenSize = MediaQuery.of(context).size;
           const menuWidth = 180.0;
-          final menuHeight = items.where((i) => !i.isDivider).length * 36.0 +
+          final menuHeight =
+              items.where((i) => !i.isDivider).length * 36.0 +
               items.where((i) => i.isDivider).length * 1.0;
 
           double left = position.dx;

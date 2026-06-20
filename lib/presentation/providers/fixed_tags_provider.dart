@@ -227,13 +227,13 @@ class FixedTagsState {
   /// 判断联动两端是否被用户手动改成不一致状态。
   bool isMismatched(FixedTagLink link) {
     final positive = entries.cast<FixedTagEntry?>().firstWhere(
-          (entry) => entry?.id == link.positiveEntryId,
-          orElse: () => null,
-        );
+      (entry) => entry?.id == link.positiveEntryId,
+      orElse: () => null,
+    );
     final negative = entries.cast<FixedTagEntry?>().firstWhere(
-          (entry) => entry?.id == link.negativeEntryId,
-          orElse: () => null,
-        );
+      (entry) => entry?.id == link.negativeEntryId,
+      orElse: () => null,
+    );
     if (positive == null || negative == null) {
       return false;
     }
@@ -298,8 +298,10 @@ class FixedTagsState {
     if (!trimmedText.endsWith(trimmedSegment)) {
       return trimmedText;
     }
-    final rest =
-        trimmedText.substring(0, trimmedText.length - trimmedSegment.length);
+    final rest = trimmedText.substring(
+      0,
+      trimmedText.length - trimmedSegment.length,
+    );
     final trimmedRest = rest.trimRight();
     if (!trimmedRest.endsWith(',')) {
       return trimmedText;
@@ -342,12 +344,12 @@ List<FixedTagEntry> reorderFixedTagsWithinVisibleIds({
       .toList()
       .sortedByOrder();
   final visibleSet = visibleIds.toSet();
-  final visible =
-      sameType.where((entry) => visibleSet.contains(entry.id)).toList();
+  final visible = sameType
+      .where((entry) => visibleSet.contains(entry.id))
+      .toList();
 
   if (oldIndex < 0 || oldIndex >= visible.length) return entries;
   if (newIndex < 0 || newIndex > visible.length) return entries;
-  if (newIndex > oldIndex) newIndex--;
   if (oldIndex == newIndex) return entries;
 
   final moved = visible.removeAt(oldIndex);
@@ -410,21 +412,23 @@ class FixedTagsNotifier extends _$FixedTagsNotifier {
       final entries = json == null || json.isEmpty
           ? <FixedTagEntry>[]
           : (jsonDecode(json) as List<dynamic>)
-              .map((e) => FixedTagEntry.fromJson(Map<String, dynamic>.from(e)))
-              .toList();
+                .map(
+                  (e) => FixedTagEntry.fromJson(Map<String, dynamic>.from(e)),
+                )
+                .toList();
 
       final linksJson = _storage.getFixedTagLinksJson();
       final links = linksJson == null || linksJson.isEmpty
           ? <FixedTagLink>[]
           : (jsonDecode(linksJson) as List<dynamic>)
-              .map((e) => FixedTagLink.fromJson(Map<String, dynamic>.from(e)))
-              .toList();
+                .map((e) => FixedTagLink.fromJson(Map<String, dynamic>.from(e)))
+                .toList();
 
       // 按排序顺序排列
       final sortedEntries = entries.sortedByOrder();
       final sanitizedLinks = _sanitizeLinks(sortedEntries, links);
-      final negativePanelExpanded =
-          _storage.getFixedTagsNegativePanelExpanded();
+      final negativePanelExpanded = _storage
+          .getFixedTagsNegativePanelExpanded();
       AppLogger.d(
         'Loaded ${entries.length} fixed tags and ${sanitizedLinks.length} links',
         'FixedTagsProvider',
@@ -441,11 +445,7 @@ class FixedTagsNotifier extends _$FixedTagsNotifier {
         stack,
         'FixedTagsProvider',
       );
-      return FixedTagsState(
-        entries: [],
-        links: [],
-        error: e.toString(),
-      );
+      return FixedTagsState(entries: [], links: [], error: e.toString());
     }
   }
 
@@ -588,10 +588,7 @@ class FixedTagsNotifier extends _$FixedTagsNotifier {
     _commitState(state.copyWith(entries: newEntries));
     await _saveEntries();
 
-    AppLogger.d(
-      'Added fixed tag: ${entry.displayName}',
-      'FixedTagsProvider',
-    );
+    AppLogger.d('Added fixed tag: ${entry.displayName}', 'FixedTagsProvider');
     return entry;
   }
 
@@ -648,8 +645,9 @@ class FixedTagsNotifier extends _$FixedTagsNotifier {
   ///
   /// 当词库条目更新时，更新所有 sourceEntryId 匹配的固定词
   Future<void> syncFromTagLibrary(TagLibraryEntry tagEntry) async {
-    final entriesToSync =
-        state.entries.where((e) => e.sourceEntryId == tagEntry.id).toList();
+    final entriesToSync = state.entries
+        .where((e) => e.sourceEntryId == tagEntry.id)
+        .toList();
 
     if (entriesToSync.isEmpty) return;
 
@@ -707,8 +705,9 @@ class FixedTagsNotifier extends _$FixedTagsNotifier {
     }
 
     try {
-      final tagLibraryNotifier =
-          ref.read(tagLibraryPageNotifierProvider.notifier);
+      final tagLibraryNotifier = ref.read(
+        tagLibraryPageNotifierProvider.notifier,
+      );
       final tagLibraryState = ref.read(tagLibraryPageNotifierProvider);
 
       AppLogger.d(
@@ -731,11 +730,12 @@ class FixedTagsNotifier extends _$FixedTagsNotifier {
       }
 
       // 查找关联的词库条目
-      final tagEntry =
-          tagLibraryState.entries.cast<TagLibraryEntry?>().firstWhere(
-                (e) => e?.id == fixedTag.sourceEntryId,
-                orElse: () => null,
-              );
+      final tagEntry = tagLibraryState.entries
+          .cast<TagLibraryEntry?>()
+          .firstWhere(
+            (e) => e?.id == fixedTag.sourceEntryId,
+            orElse: () => null,
+          );
 
       if (tagEntry == null) {
         AppLogger.w(
@@ -776,8 +776,10 @@ class FixedTagsNotifier extends _$FixedTagsNotifier {
 
   /// 删除固定词
   Future<void> deleteEntry(String entryId) async {
-    final newEntries =
-        state.entries.where((e) => e.id != entryId).toList().reindex();
+    final newEntries = state.entries
+        .where((e) => e.id != entryId)
+        .toList()
+        .reindex();
     final newLinks = state.links
         .where(
           (link) =>
@@ -870,7 +872,6 @@ class FixedTagsNotifier extends _$FixedTagsNotifier {
         .sortedByOrder();
     if (oldIndex < 0 || oldIndex >= sameType.length) return;
     if (newIndex < 0 || newIndex > sameType.length) return;
-    if (newIndex > oldIndex) newIndex--;
 
     final moved = sameType.removeAt(oldIndex);
     sameType.insert(newIndex, moved);
@@ -987,9 +988,9 @@ class FixedTagsNotifier extends _$FixedTagsNotifier {
   /// 根据ID获取条目
   FixedTagEntry? getEntry(String entryId) {
     return state.entries.cast<FixedTagEntry?>().firstWhere(
-          (e) => e?.id == entryId,
-          orElse: () => null,
-        );
+      (e) => e?.id == entryId,
+      orElse: () => null,
+    );
   }
 
   /// 清空所有固定词
@@ -1049,7 +1050,8 @@ class FixedTagsNotifier extends _$FixedTagsNotifier {
   Future<void> setAllNegativeEnabled(bool enabled) async {
     final newEntries = state.entries
         .map(
-          (entry) => entry.promptType == FixedTagPromptType.negative &&
+          (entry) =>
+              entry.promptType == FixedTagPromptType.negative &&
                   entry.enabled != enabled
               ? entry.copyWith(enabled: enabled, updatedAt: DateTime.now())
               : entry,

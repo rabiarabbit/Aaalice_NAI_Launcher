@@ -29,6 +29,12 @@ class SecureStorageService {
           lOptions: LinuxOptions(),
           // Windows: 使用默认配置
           wOptions: WindowsOptions(),
+          // macOS: 使用传统 login keychain（useDataProtectionKeyChain: false）。
+          // data protection keychain 需要 keychain-access-groups entitlement，
+          // 而该 entitlement 要求开发者证书签名，ad-hoc 无证书时无法构建。
+          mOptions: MacOsOptions(
+            useDataProtectionKeyChain: false,
+          ),
         );
 
   // ==================== Access Token ====================

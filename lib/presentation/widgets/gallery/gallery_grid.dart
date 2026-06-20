@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 import '../../../core/utils/localization_extension.dart';
@@ -18,8 +19,8 @@ class ResponsiveLayout {
     double padding = 16,
   }) {
     final availableWidth = screenWidth - padding * 2;
-    final columns =
-        ((availableWidth + spacing) / (fixedCardWidth + spacing)).floor();
+    final columns = ((availableWidth + spacing) / (fixedCardWidth + spacing))
+        .floor();
     return columns.clamp(2, 8);
   }
 
@@ -42,7 +43,8 @@ class GalleryGrid extends StatefulWidget {
     LocalImageRecord record,
     int index,
     TapDownDetails details,
-  )? onSecondaryTapDown;
+  )?
+  onSecondaryTapDown;
   final void Function(LocalImageRecord record, int index)? onFavoriteToggle;
   final void Function(LocalImageRecord record, int index)? onSendToHome;
   final void Function(LocalImageRecord record, int index)? onSendToImg2Img;
@@ -160,8 +162,10 @@ class _GalleryGridState extends State<GalleryGrid> {
           controller: _scrollController,
           primary: false,
           padding: EdgeInsets.symmetric(
-            horizontal:
-                horizontalPadding.clamp(widget.padding.left, double.infinity),
+            horizontal: horizontalPadding.clamp(
+              widget.padding.left,
+              double.infinity,
+            ),
             vertical: widget.padding.top,
           ),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -172,7 +176,9 @@ class _GalleryGridState extends State<GalleryGrid> {
           ),
           itemCount: widget.images.length,
           // 限制缓存范围，减少内存占用和重建开销
-          cacheExtent: _viewportHeight * widget.preloadScreens,
+          scrollCacheExtent: ScrollCacheExtent.pixels(
+            _viewportHeight * widget.preloadScreens,
+          ),
           itemBuilder: (context, index) {
             final record = widget.images[index];
             final isSelected = widget.selectedIndices?.contains(index) ?? false;
@@ -240,8 +246,10 @@ class _GalleryGridState extends State<GalleryGrid> {
     final itemsPerScreen = itemsPerRow * rowsPerScreen;
     final preloadCount = (itemsPerScreen * widget.preloadScreens).round();
 
-    final (int forwardPreload, int backwardPreload) =
-        switch (_scrollDirection) {
+    final (
+      int forwardPreload,
+      int backwardPreload,
+    ) = switch (_scrollDirection) {
       _ScrollDirection.down => (preloadCount, preloadCount ~/ 3),
       _ScrollDirection.up => (preloadCount ~/ 3, preloadCount),
       _ScrollDirection.idle => (preloadCount, preloadCount ~/ 2),
@@ -327,9 +335,7 @@ class _GalleryImageCardState extends State<_GalleryImageCard> {
       // 使用 dragWrapper 将拖拽功能注入到卡片内部
       // 解决 GestureDetector 与拖拽手势的冲突问题
       dragWrapper: widget.enableDrag
-          ? DraggableImageCard.createDragWrapper(
-              record: widget.record,
-            )
+          ? DraggableImageCard.createDragWrapper(record: widget.record)
           : null,
     );
   }

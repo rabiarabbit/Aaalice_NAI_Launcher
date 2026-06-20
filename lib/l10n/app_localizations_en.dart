@@ -12425,11 +12425,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get toast_tempFileCreateFailed => 'Failed to create temporary file';
 
   @override
-  String toast_powershellCommandFailed(Object exitCode, Object error) {
-    return 'PowerShell command failed (exitCode: $exitCode): $error';
-  }
-
-  @override
   String get toast_vibeDataCopied => 'Vibe data copied';
 
   @override

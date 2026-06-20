@@ -3,7 +3,6 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:path_provider/path_provider.dart';
 
 import '../../../core/cache/thumbnail_cache_service.dart';
 import '../../../core/utils/app_logger.dart';
@@ -14,6 +13,7 @@ import '../../../data/services/thumbnail_service.dart';
 import '../../providers/share_image_settings_provider.dart';
 import '../../services/image_workflow_launcher.dart';
 import '../../themes/theme_extension.dart';
+import '../../utils/clipboard_image.dart';
 import '../common/app_toast.dart';
 import '../common/floating_action_buttons.dart';
 
@@ -207,7 +207,6 @@ class _LocalImageCard3DState extends ConsumerState<LocalImageCard3D>
   }
 
   Future<void> _copyImageToClipboard() async {
-    File? tempFile;
     try {
       final sourceFile = File(widget.record.path);
       if (!await sourceFile.exists()) {
@@ -228,44 +227,17 @@ class _LocalImageCard3DState extends ConsumerState<LocalImageCard3D>
         stripMetadata: stripMetadata,
       );
 
-      final tempDir = await getTemporaryDirectory();
-      tempFile = File(
-        '${tempDir.path}/NAI_${DateTime.now().millisecondsSinceEpoch}_${shareImage.fileName}',
-      );
-      await tempFile.writeAsBytes(shareImage.bytes, flush: true);
+      // 跨平台复制到剪贴板（原 Windows 端走 PowerShell + System.Drawing，
+      // macOS/Linux 不可用）。统一规范化为 PNG，避免 jpg/webp 原始字节被当成
+      // PNG 导致粘贴失败。
+      await writeImageBytesToClipboardAsPng(shareImage.bytes);
 
-      const psCommand = r'''
-Add-Type -AssemblyName System.Windows.Forms;
-Add-Type -AssemblyName System.Drawing;
-$image = [System.Drawing.Image]::FromFile("''';
-      final result = await Process.run('powershell', [
-        '-NoProfile',
-        '-ExecutionPolicy',
-        'Bypass',
-        '-Command',
-        '$psCommand${tempFile.path}"); [System.Windows.Forms.Clipboard]::SetImage(\$image); \$image.Dispose();',
-      ]);
-
-      if (result.exitCode != 0) throw Exception('PowerShell command failed');
-
-      await Future.delayed(const Duration(milliseconds: 500));
       if (mounted) {
         AppToast.success(context, context.l10n.gallery_copiedToClipboard);
       }
     } catch (e) {
       if (mounted) {
         AppToast.error(context, context.l10n.gallery_copyFailed('$e'));
-      }
-    } finally {
-      if (tempFile != null && await tempFile.exists()) {
-        try {
-          await tempFile.delete();
-        } catch (e) {
-          AppLogger.d(
-            'Failed to delete temporary shared image: $e',
-            'LocalImageCard3D',
-          );
-        }
       }
     }
   }

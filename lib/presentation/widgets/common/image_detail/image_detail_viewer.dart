@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nai_launcher/core/utils/localization_extension.dart';
-import 'package:path_provider/path_provider.dart';
 
 import '../../../../core/shortcuts/shortcuts.dart';
 import '../../../../core/utils/app_logger.dart';
@@ -12,6 +11,7 @@ import '../../../../core/utils/image_share_sanitizer.dart';
 import '../../../../core/utils/window_focus_tracker.dart';
 import '../../../../data/models/metadata/metadata_import_options.dart';
 import '../../../providers/share_image_settings_provider.dart';
+import '../../../utils/clipboard_image.dart';
 import '../../shortcuts/shortcuts.dart';
 import '../app_toast.dart';
 import '../../metadata/metadata_import_dialog.dart';
@@ -665,7 +665,6 @@ class _ImageDetailViewerState extends ConsumerState<ImageDetailViewer> {
   /// 复制图像到剪贴板
   Future<void> _copyImageToClipboard(BuildContext context) async {
     final l10n = context.l10n;
-    File? tempFile;
     try {
       final imageBytes = await _currentImage.getImageBytes();
       final fileName = _currentImage.fileInfo?.fileName ?? 'shared.png';
@@ -678,37 +677,10 @@ class _ImageDetailViewerState extends ConsumerState<ImageDetailViewer> {
         stripMetadata: stripMetadata,
       );
 
-      final tempDir = await getTemporaryDirectory();
-      tempFile = File(
-        '${tempDir.path}/NAI_${DateTime.now().millisecondsSinceEpoch}_${shareImage.fileName}',
-      );
-      await tempFile.writeAsBytes(shareImage.bytes, flush: true);
-
-      if (!await tempFile.exists()) {
-        throw Exception(l10n.toast_tempFileCreateFailed);
-      }
-
-      final result = await Process.run('powershell', [
-        '-NoProfile',
-        '-ExecutionPolicy',
-        'Bypass',
-        '-Command',
-        'Add-Type -AssemblyName System.Windows.Forms; Add-Type -AssemblyName System.Drawing; \$image = [System.Drawing.Image]::FromFile("${tempFile.path}"); [System.Windows.Forms.Clipboard]::SetImage(\$image); \$image.Dispose();',
-      ]);
-
-      // 检查 PowerShell 命令执行结果
-      if (result.exitCode != 0) {
-        final errorOutput = result.stderr.toString();
-        throw Exception(
-          l10n.toast_powershellCommandFailed(
-            result.exitCode,
-            errorOutput,
-          ),
-        );
-      }
-
-      // 延迟删除临时文件，确保 PowerShell 完成读取
-      await Future.delayed(const Duration(milliseconds: 500));
+      // 跨平台复制到剪贴板（原 Windows 端走 PowerShell + System.Drawing，
+      // macOS/Linux 不可用）。统一规范化为 PNG，避免 jpg/webp 原始字节被当成
+      // PNG 导致粘贴失败。
+      await writeImageBytesToClipboardAsPng(shareImage.bytes);
 
       if (context.mounted) {
         AppToast.success(context, l10n.image_copiedToClipboard);
@@ -716,15 +688,6 @@ class _ImageDetailViewerState extends ConsumerState<ImageDetailViewer> {
     } catch (e) {
       if (context.mounted) {
         AppToast.error(context, l10n.image_copyFailed(e.toString()));
-      }
-    } finally {
-      // 清理临时文件
-      if (tempFile != null && await tempFile.exists()) {
-        try {
-          await tempFile.delete();
-        } catch (_) {
-          // 忽略删除错误
-        }
       }
     }
   }

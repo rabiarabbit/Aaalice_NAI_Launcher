@@ -22069,12 +22069,6 @@ abstract class AppLocalizations {
   /// **'Failed to create temporary file'**
   String get toast_tempFileCreateFailed;
 
-  /// No description provided for @toast_powershellCommandFailed.
-  ///
-  /// In en, this message translates to:
-  /// **'PowerShell command failed (exitCode: {exitCode}): {error}'**
-  String toast_powershellCommandFailed(Object exitCode, Object error);
-
   /// No description provided for @toast_vibeDataCopied.
   ///
   /// In en, this message translates to:

@@ -118,6 +118,11 @@ Desktop.ini
 # Windows（Flutter 特定）
 **/windows/flutter/ephemeral
 
+# macOS（Flutter 特定）
+**/macos/Flutter/ephemeral/
+**/macos/Flutter/GeneratedPluginRegistrant.swift
+**/macos/Pods/
+
 
 # ===========================================================================
 # 忽略模式例外
@@ -298,7 +303,6 @@ test/presentation/widgets/image_editor/widgets/panels/*
 !test/presentation/widgets/image_editor/widgets/panels/shift_edges_dialog_test.dart
 
 # 项目管理文件
-AGENTS.md
 CLAUDE.md
 GEMINI.md
 
@@ -348,6 +352,8 @@ SUBTASK_*.md
 VERIFICATION_*.md
 mask_upload_*.md
 flutter/
+!macos/Flutter/
+!macos/Flutter/*.xcconfig
 flutter_windows.zip
 dist/*.zip
 .claude_settings.json

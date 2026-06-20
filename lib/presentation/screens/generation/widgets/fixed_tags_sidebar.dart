@@ -251,9 +251,7 @@ class _FixedTagsSidebarState extends ConsumerState<FixedTagsSidebar> {
             horizontal: 12,
             vertical: 10,
           ),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
         ),
         onChanged: (value) => setState(() => _searchQuery = value.trim()),
       ),
@@ -397,7 +395,7 @@ class _FixedTagsSidebarState extends ConsumerState<FixedTagsSidebar> {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: entries.length,
-              onReorder: (oldIndex, newIndex) {
+              onReorderItem: (oldIndex, newIndex) {
                 ref
                     .read(fixedTagsNotifierProvider.notifier)
                     .reorderWithinVisibleIds(
@@ -420,9 +418,9 @@ class _FixedTagsSidebarState extends ConsumerState<FixedTagsSidebar> {
                     isListMode: isListMode,
                     dragHandleBuilder: entries.length > 1
                         ? (child) => ReorderableDragStartListener(
-                              index: index,
-                              child: child,
-                            )
+                            index: index,
+                            child: child,
+                          )
                         : null,
                   ),
                 );
@@ -440,15 +438,13 @@ class _FixedTagsSidebarState extends ConsumerState<FixedTagsSidebar> {
     );
   }
 
-  Widget _buildNegativeResizeDivider(
-    ThemeData theme,
-    LayoutState layoutState,
-  ) {
+  Widget _buildNegativeResizeDivider(ThemeData theme, LayoutState layoutState) {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onVerticalDragUpdate: (details) {
-        final currentHeight =
-            ref.read(layoutStateNotifierProvider).fixedTagsNegativeHeight;
+        final currentHeight = ref
+            .read(layoutStateNotifierProvider)
+            .fixedTagsNegativeHeight;
         ref
             .read(layoutStateNotifierProvider.notifier)
             .setFixedTagsNegativeHeight(currentHeight - details.delta.dy);
@@ -519,51 +515,52 @@ class _FixedTagsSidebarState extends ConsumerState<FixedTagsSidebar> {
                     ),
                   )
                 : isListMode
-                    ? ReorderableListView.builder(
-                        buildDefaultDragHandles: false,
-                        padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-                        itemCount: entries.length,
-                        scrollController: _negativeScrollController,
-                        onReorder: (oldIndex, newIndex) {
-                          ref
-                              .read(fixedTagsNotifierProvider.notifier)
-                              .reorderWithinVisibleIds(
-                                promptType: FixedTagPromptType.negative,
-                                visibleIds:
-                                    entries.map((entry) => entry.id).toList(),
-                                oldIndex: oldIndex,
-                                newIndex: newIndex,
-                              );
-                        },
-                        itemBuilder: (context, index) {
-                          final entry = entries[index];
-                          return Padding(
-                            key: ValueKey('negative-${entry.id}'),
-                            padding: const EdgeInsets.only(bottom: 7),
-                            child: _buildEntryTile(
-                              entry: entry,
-                              categoryColor: theme.colorScheme.error,
-                              libraryEntries: libraryEntries,
-                              isListMode: isListMode,
-                              dragHandleBuilder: entries.length > 1
-                                  ? (child) => ReorderableDragStartListener(
-                                        index: index,
-                                        child: child,
-                                      )
-                                  : null,
-                            ),
+                ? ReorderableListView.builder(
+                    buildDefaultDragHandles: false,
+                    padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                    itemCount: entries.length,
+                    scrollController: _negativeScrollController,
+                    onReorderItem: (oldIndex, newIndex) {
+                      ref
+                          .read(fixedTagsNotifierProvider.notifier)
+                          .reorderWithinVisibleIds(
+                            promptType: FixedTagPromptType.negative,
+                            visibleIds: entries
+                                .map((entry) => entry.id)
+                                .toList(),
+                            oldIndex: oldIndex,
+                            newIndex: newIndex,
                           );
-                        },
-                      )
-                    : SingleChildScrollView(
-                        controller: _negativeScrollController,
-                        padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-                        child: _buildEntryGrid(
-                          entries: entries,
+                    },
+                    itemBuilder: (context, index) {
+                      final entry = entries[index];
+                      return Padding(
+                        key: ValueKey('negative-${entry.id}'),
+                        padding: const EdgeInsets.only(bottom: 7),
+                        child: _buildEntryTile(
+                          entry: entry,
                           categoryColor: theme.colorScheme.error,
                           libraryEntries: libraryEntries,
+                          isListMode: isListMode,
+                          dragHandleBuilder: entries.length > 1
+                              ? (child) => ReorderableDragStartListener(
+                                  index: index,
+                                  child: child,
+                                )
+                              : null,
                         ),
-                      ),
+                      );
+                    },
+                  )
+                : SingleChildScrollView(
+                    controller: _negativeScrollController,
+                    padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                    child: _buildEntryGrid(
+                      entries: entries,
+                      categoryColor: theme.colorScheme.error,
+                      libraryEntries: libraryEntries,
+                    ),
+                  ),
           ),
         ],
       ),
@@ -579,10 +576,13 @@ class _FixedTagsSidebarState extends ConsumerState<FixedTagsSidebar> {
     const spacing = 7.0;
     return LayoutBuilder(
       builder: (context, constraints) {
-        final availableWidth =
-            constraints.maxWidth.isFinite ? constraints.maxWidth : 320.0;
-        final itemWidth =
-            ((availableWidth - spacing * 2) / 3).clamp(0.0, availableWidth);
+        final availableWidth = constraints.maxWidth.isFinite
+            ? constraints.maxWidth
+            : 320.0;
+        final itemWidth = ((availableWidth - spacing * 2) / 3).clamp(
+          0.0,
+          availableWidth,
+        );
         return Wrap(
           spacing: spacing,
           runSpacing: spacing,
@@ -679,10 +679,7 @@ class _FixedTagsSidebarState extends ConsumerState<FixedTagsSidebar> {
       );
     }
 
-    return KeyedSubtree(
-      key: _anchorKeyFor(entry),
-      child: visual,
-    );
+    return KeyedSubtree(key: _anchorKeyFor(entry), child: visual);
   }
 
   Widget _buildLinkEndpointOverlay(FixedTagsState fixedState) {
@@ -697,9 +694,11 @@ class _FixedTagsSidebarState extends ConsumerState<FixedTagsSidebar> {
               if (_positiveAnchorCenters.containsKey(link.positiveEntryId) &&
                   _negativeAnchorCenters.containsKey(link.negativeEntryId))
                 Positioned(
-                  left: _negativeAnchorCenters[link.negativeEntryId]!.dx -
+                  left:
+                      _negativeAnchorCenters[link.negativeEntryId]!.dx -
                       _linkEndpointHitSize / 2,
-                  top: _negativeAnchorCenters[link.negativeEntryId]!.dy -
+                  top:
+                      _negativeAnchorCenters[link.negativeEntryId]!.dy -
                       _linkEndpointHitSize / 2,
                   width: _linkEndpointHitSize,
                   height: _linkEndpointHitSize,
@@ -834,7 +833,9 @@ class _FixedTagsSidebarState extends ConsumerState<FixedTagsSidebar> {
     if (dragEnd != null &&
         endpoint != null &&
         (dragEnd - endpoint).distance >= _linkDetachDistance) {
-      ref.read(fixedTagsNotifierProvider.notifier).removeLinkByPair(
+      ref
+          .read(fixedTagsNotifierProvider.notifier)
+          .removeLinkByPair(
             positiveEntryId: positiveEntryId,
             negativeEntryId: negativeEntryId,
           );
@@ -893,7 +894,9 @@ class _FixedTagsSidebarState extends ConsumerState<FixedTagsSidebar> {
       builder: (context) => FixedTagEditDialog(initialPromptType: promptType),
     );
     if (result == null || !mounted) return;
-    await ref.read(fixedTagsNotifierProvider.notifier).addEntry(
+    await ref
+        .read(fixedTagsNotifierProvider.notifier)
+        .addEntry(
           name: result.name,
           content: result.content,
           weight: result.weight,
@@ -909,7 +912,9 @@ class _FixedTagsSidebarState extends ConsumerState<FixedTagsSidebar> {
       builder: (context) => const TagLibraryPickerDialog(),
     );
     if (entry == null || !mounted) return;
-    await ref.read(fixedTagsNotifierProvider.notifier).addEntry(
+    await ref
+        .read(fixedTagsNotifierProvider.notifier)
+        .addEntry(
           name: entry.name,
           content: entry.content,
           promptType: promptType,
@@ -942,8 +947,9 @@ class _FixedTagsSidebarState extends ConsumerState<FixedTagsSidebar> {
     final grouped = fixedState.positiveByCategory;
     final sections = <_PositiveSection>[];
     for (final category in categories.sortedByOrder()) {
-      final entries = (grouped[category.id] ?? const <FixedTagEntry>[])
-          .search(_searchQuery);
+      final entries = (grouped[category.id] ?? const <FixedTagEntry>[]).search(
+        _searchQuery,
+      );
       if (entries.isEmpty) continue;
       sections.add(
         _PositiveSection(
@@ -959,8 +965,9 @@ class _FixedTagsSidebarState extends ConsumerState<FixedTagsSidebar> {
       (id) => id != null && !categoriesById.containsKey(id),
     );
     for (final categoryId in unknownCategoryIds) {
-      final entries =
-          (grouped[categoryId] ?? const <FixedTagEntry>[]).search(_searchQuery);
+      final entries = (grouped[categoryId] ?? const <FixedTagEntry>[]).search(
+        _searchQuery,
+      );
       if (entries.isEmpty) continue;
       sections.add(
         _PositiveSection(
@@ -972,8 +979,9 @@ class _FixedTagsSidebarState extends ConsumerState<FixedTagsSidebar> {
       );
     }
 
-    final uncategorized =
-        (grouped[null] ?? const <FixedTagEntry>[]).search(_searchQuery);
+    final uncategorized = (grouped[null] ?? const <FixedTagEntry>[]).search(
+      _searchQuery,
+    );
     if (uncategorized.isNotEmpty) {
       sections.add(
         _PositiveSection(
@@ -1052,12 +1060,7 @@ class _FixedTagsSidebarState extends ConsumerState<FixedTagsSidebar> {
   }
 }
 
-enum _AddAction {
-  positive,
-  negative,
-  libraryPositive,
-  libraryNegative,
-}
+enum _AddAction { positive, negative, libraryPositive, libraryNegative }
 
 class _LinkDragPayload {
   const _LinkDragPayload(this.positiveEntryId);

@@ -6255,13 +6255,6 @@
   "toast_imageHasNoMetadata": "This image has no metadata",
   "toast_imageDataUnavailable": "Image data is unavailable and cannot be copied",
   "toast_tempFileCreateFailed": "Failed to create temporary file",
-  "toast_powershellCommandFailed": "PowerShell command failed (exitCode: {exitCode}): {error}",
-  "@toast_powershellCommandFailed": {
-    "placeholders": {
-      "exitCode": {},
-      "error": {}
-    }
-  },
   "toast_vibeDataCopied": "Vibe data copied",
   "toast_tagCopied": "Tags copied",
   "toast_characterPromptCopied": "Character prompt copied",

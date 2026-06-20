@@ -13,10 +13,7 @@ import 'package:nai_launcher/presentation/widgets/common/themed_input.dart';
 class LayerPanel extends StatefulWidget {
   final EditorState state;
 
-  const LayerPanel({
-    super.key,
-    required this.state,
-  });
+  const LayerPanel({super.key, required this.state});
 
   @override
   State<LayerPanel> createState() => _LayerPanelState();
@@ -66,8 +63,9 @@ class _LayerPanelState extends State<LayerPanel> {
     final layers = widget.state.layerManager.layers;
 
     // 只获取需要更新的图层
-    final layersToUpdate =
-        layers.where((layer) => layer.needsThumbnailUpdate).toList();
+    final layersToUpdate = layers
+        .where((layer) => layer.needsThumbnailUpdate)
+        .toList();
 
     // 如果没有需要更新的图层，直接返回
     if (layersToUpdate.isEmpty) return;
@@ -154,12 +152,9 @@ class _LayerPanelState extends State<LayerPanel> {
                           buildDefaultDragHandles: false,
                           // Krita 风格：顶部图层在列表顶部
                           itemCount: layers.length,
-                          onReorder: (oldIndex, newIndex) {
+                          onReorderItem: (oldIndex, newIndex) {
                             // UI索引转换为实际图层索引
                             // UI index 0 = 顶部图层 = layers[length-1]
-                            if (oldIndex < newIndex) {
-                              newIndex -= 1;
-                            }
                             final actualOldIndex = layers.length - 1 - oldIndex;
                             final actualNewIndex = layers.length - 1 - newIndex;
                             state.layerManager.reorderLayer(
@@ -186,26 +181,32 @@ class _LayerPanelState extends State<LayerPanel> {
                                     state.layerManager.setActiveLayer(layer.id);
                                   },
                                   onVisibilityToggle: () {
-                                    state.layerManager
-                                        .toggleVisibility(layer.id);
+                                    state.layerManager.toggleVisibility(
+                                      layer.id,
+                                    );
                                   },
                                   onLockToggle: () {
                                     state.layerManager.toggleLock(layer.id);
                                   },
                                   onDelete: layers.length > 1
-                                      ? () => state.layerManager
-                                          .removeLayer(layer.id)
+                                      ? () => state.layerManager.removeLayer(
+                                          layer.id,
+                                        )
                                       : null,
                                   onDuplicate: () {
                                     state.layerManager.duplicateLayer(layer.id);
                                   },
                                   onRename: (newName) {
-                                    state.layerManager
-                                        .renameLayer(layer.id, newName);
+                                    state.layerManager.renameLayer(
+                                      layer.id,
+                                      newName,
+                                    );
                                   },
                                   onOpacityChanged: (opacity) {
-                                    state.layerManager
-                                        .setLayerOpacity(layer.id, opacity);
+                                    state.layerManager.setLayerOpacity(
+                                      layer.id,
+                                      opacity,
+                                    );
                                   },
                                   state: state,
                                 );
@@ -228,10 +229,7 @@ class _LayerPanelHeader extends StatelessWidget {
   final VoidCallback onAddLayer;
   final VoidCallback? onMergeDown;
 
-  const _LayerPanelHeader({
-    required this.onAddLayer,
-    this.onMergeDown,
-  });
+  const _LayerPanelHeader({required this.onAddLayer, this.onMergeDown});
 
   @override
   Widget build(BuildContext context) {
@@ -353,10 +351,7 @@ class _LayerTileState extends State<_LayerTile>
               children: [
                 // 缩略图
                 if (widget.showThumbnail) ...[
-                  _LayerThumbnail(
-                    layer: widget.layer,
-                    size: 40,
-                  ),
+                  _LayerThumbnail(layer: widget.layer, size: 40),
                   const SizedBox(width: 8),
                 ],
 
@@ -417,8 +412,9 @@ class _LayerTileState extends State<_LayerTile>
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: widget.layer.visible
                                   ? null
-                                  : theme.colorScheme.onSurface
-                                      .withValues(alpha: 0.5),
+                                  : theme.colorScheme.onSurface.withValues(
+                                      alpha: 0.5,
+                                    ),
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -644,10 +640,7 @@ class _LayerThumbnail extends StatelessWidget {
   final Layer layer;
   final double size;
 
-  const _LayerThumbnail({
-    required this.layer,
-    this.size = 40,
-  });
+  const _LayerThumbnail({required this.layer, this.size = 40});
 
   @override
   Widget build(BuildContext context) {
@@ -661,10 +654,7 @@ class _LayerThumbnail extends StatelessWidget {
         height: size,
         decoration: BoxDecoration(
           color: theme.colorScheme.surfaceContainerHighest,
-          border: Border.all(
-            color: theme.dividerColor,
-            width: 1,
-          ),
+          border: Border.all(color: theme.dividerColor, width: 1),
           borderRadius: BorderRadius.circular(4),
         ),
         child: ClipRRect(
