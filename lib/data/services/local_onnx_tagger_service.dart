@@ -90,20 +90,16 @@ class LocalOnnxTaggerService {
   Future<OnnxTaggerResult> tagImage({
     required Uint8List imageBytes,
     required LocalOnnxModelDescriptor model,
-    double? threshold,
     double generalThreshold = 0.35,
     double characterThreshold = 0.35,
-    bool includeRatings = false,
   }) {
     final imageData = TransferableTypedData.fromList([imageBytes]);
     return Isolate.run(
       () => const LocalOnnxTaggerService()._tagImageInCurrentIsolate(
         imageData: imageData,
         model: model,
-        threshold: threshold,
         generalThreshold: generalThreshold,
         characterThreshold: characterThreshold,
-        includeRatings: includeRatings,
       ),
     );
   }
@@ -111,10 +107,8 @@ class LocalOnnxTaggerService {
   Future<OnnxTaggerResult> _tagImageInCurrentIsolate({
     required TransferableTypedData imageData,
     required LocalOnnxModelDescriptor model,
-    double? threshold,
     double generalThreshold = 0.35,
     double characterThreshold = 0.35,
-    bool includeRatings = false,
   }) async {
     if (model.labelsPath == null || model.labelsPath!.isEmpty) {
       throw StateError(
@@ -161,9 +155,8 @@ class LocalOnnxTaggerService {
         tags: _buildTags(
           labels: labels,
           scores: scores,
-          generalThreshold: threshold ?? generalThreshold,
-          characterThreshold: threshold ?? characterThreshold,
-          includeRatings: includeRatings,
+          generalThreshold: generalThreshold,
+          characterThreshold: characterThreshold,
         ),
       );
     } finally {
@@ -513,29 +506,21 @@ class LocalOnnxTaggerService {
     required List<double> scores,
     required double generalThreshold,
     required double characterThreshold,
-    required bool includeRatings,
   }) {
     final count = math.min(labels.length, scores.length);
     final tags = <OnnxTaggerTag>[];
     for (var i = 0; i < count; i++) {
       final label = labels[i];
       final category = label.labelCategory;
-      if (category == OnnxTaggerLabelCategory.rating && !includeRatings) {
-        continue;
-      }
       if (category != OnnxTaggerLabelCategory.general &&
-          category != OnnxTaggerLabelCategory.character &&
-          !(includeRatings && category == OnnxTaggerLabelCategory.rating)) {
+          category != OnnxTaggerLabelCategory.character) {
         continue;
       }
 
       final score = scores[i];
-      final effectiveThreshold = switch (category) {
-        OnnxTaggerLabelCategory.character => characterThreshold,
-        OnnxTaggerLabelCategory.rating => generalThreshold,
-        OnnxTaggerLabelCategory.general => generalThreshold,
-        OnnxTaggerLabelCategory.other => generalThreshold,
-      };
+      final effectiveThreshold = category == OnnxTaggerLabelCategory.character
+          ? characterThreshold
+          : generalThreshold;
       if (score < effectiveThreshold) continue;
       tags.add(
         OnnxTaggerTag(name: label.name, score: score, category: label.category),
