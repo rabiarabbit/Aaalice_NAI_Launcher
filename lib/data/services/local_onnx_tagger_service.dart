@@ -5,15 +5,18 @@ import 'dart:isolate';
 import 'dart:math' as math;
 import 'dart:typed_data';
 
+import 'package:crypto/crypto.dart';
 import 'package:csv/csv.dart';
 import 'package:ffi/ffi.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image/image.dart' as img;
 import 'package:onnxruntime/onnxruntime.dart';
+import 'package:path/path.dart' as p;
 // ignore: implementation_imports
 import 'package:onnxruntime/src/bindings/onnxruntime_bindings_generated.dart'
     as bg;
 
+import '../../core/utils/isolate_pool.dart';
 import 'local_onnx_model_service.dart';
 
 final localOnnxTaggerServiceProvider = Provider<LocalOnnxTaggerService>((ref) {
@@ -82,10 +85,51 @@ class _OnnxImageInput {
   final List<int> shape;
 }
 
+enum OnnxSessionLoadMode { externalDataFile, patchedSingleFile }
+
+class OnnxLetterboxLayout {
+  const OnnxLetterboxLayout({
+    required this.canvasWidth,
+    required this.canvasHeight,
+    required this.resizedWidth,
+    required this.resizedHeight,
+    required this.offsetX,
+    required this.offsetY,
+  });
+
+  final int canvasWidth;
+  final int canvasHeight;
+  final int resizedWidth;
+  final int resizedHeight;
+  final int offsetX;
+  final int offsetY;
+
+  int get canvasPixels => canvasWidth * canvasHeight;
+}
+
 class LocalOnnxTaggerService {
   const LocalOnnxTaggerService();
 
   static const int defaultInputSize = 448;
+  static const int _opsetPatchTailBytes = 4096;
+
+  static OnnxLetterboxLayout debugLetterboxLayoutForTesting({
+    required int sourceWidth,
+    required int sourceHeight,
+    required int inputSize,
+  }) {
+    return _computeLetterboxLayout(
+      sourceWidth: sourceWidth,
+      sourceHeight: sourceHeight,
+      inputSize: inputSize,
+    );
+  }
+
+  static OnnxSessionLoadMode debugSessionLoadModeForTesting(
+    LocalOnnxModelDescriptor model,
+  ) {
+    return _resolveSessionLoadMode(model);
+  }
 
   Future<OnnxTaggerResult> tagImage({
     required Uint8List imageBytes,
@@ -94,7 +138,7 @@ class LocalOnnxTaggerService {
     double characterThreshold = 0.35,
   }) {
     final imageData = TransferableTypedData.fromList([imageBytes]);
-    return Isolate.run(
+    return ComputeGate.singleTask().runIsolate(
       () => const LocalOnnxTaggerService()._tagImageInCurrentIsolate(
         imageData: imageData,
         model: model,
@@ -191,20 +235,20 @@ class LocalOnnxTaggerService {
     LocalOnnxModelDescriptor model,
     OrtSessionOptions options,
   ) async {
-    if (_requiresFileSession(model)) {
-      if (Platform.isWindows) {
-        return _createWindowsFileSession(model.path);
-      }
-      return OrtSession.fromFile(File(model.path), options);
+    final loadMode = _resolveSessionLoadMode(model);
+    if (loadMode == OnnxSessionLoadMode.externalDataFile) {
+      return _createFileSession(model.path, options);
     }
 
-    // The onnxruntime package passes file paths through UTF-8 `CreateSession`,
-    // which is not reliable on Windows where ONNX Runtime expects wide paths.
-    // Loading from bytes avoids garbled path failures for single-file models.
-    final modelBytes = _patchUnsupportedOpsetImports(
-      await File(model.path).readAsBytes(),
-    );
-    return OrtSession.fromBuffer(modelBytes, options);
+    final patchedPath = await _ensurePatchedSingleFileModelPath(model.path);
+    return _createFileSession(patchedPath, options);
+  }
+
+  OrtSession _createFileSession(String modelPath, OrtSessionOptions options) {
+    if (Platform.isWindows) {
+      return _createWindowsFileSession(modelPath);
+    }
+    return OrtSession.fromFile(File(modelPath), options);
   }
 
   OrtSession _createWindowsFileSession(String modelPath) {
@@ -292,9 +336,84 @@ class LocalOnnxTaggerService {
     );
   }
 
-  bool _requiresFileSession(LocalOnnxModelDescriptor model) {
-    return model.externalDataPath?.isNotEmpty == true ||
+  Future<String> _ensurePatchedSingleFileModelPath(String modelPath) async {
+    final source = File(modelPath);
+    final stat = await source.stat();
+    final cacheDirectory = Directory(
+      p.join(Directory.systemTemp.path, 'nai_launcher_onnx_cache'),
+    );
+    await cacheDirectory.create(recursive: true);
+
+    final baseName = p
+        .basenameWithoutExtension(modelPath)
+        .replaceAll(RegExp(r'[^a-zA-Z0-9._-]+'), '_');
+    final cacheKey = _singleFileModelCacheKey(source.absolute.path, stat);
+    final target = File(
+      p.join(cacheDirectory.path, '${baseName}_$cacheKey.onnx'),
+    );
+    if (await target.exists() && await target.length() == stat.size) {
+      return target.path;
+    }
+
+    final partial = File(
+      '${target.path}.${DateTime.now().microsecondsSinceEpoch}.partial',
+    );
+    try {
+      await _copyPatchedSingleFileModel(source, partial);
+      if (await target.exists()) {
+        await target.delete();
+      }
+      return (await partial.rename(target.path)).path;
+    } catch (_) {
+      if (await partial.exists()) {
+        await partial.delete();
+      }
+      rethrow;
+    }
+  }
+
+  String _singleFileModelCacheKey(String modelPath, FileStat stat) {
+    final digest = sha1.convert(
+      utf8.encode(
+        [
+          'opset_patch_v1',
+          modelPath,
+          stat.size.toString(),
+          stat.modified.millisecondsSinceEpoch.toString(),
+        ].join('|'),
+      ),
+    );
+    return digest.toString().substring(0, 16);
+  }
+
+  Future<void> _copyPatchedSingleFileModel(File source, File target) async {
+    final length = await source.length();
+    final tailStart = math.max(0, length - _opsetPatchTailBytes);
+    final tail = BytesBuilder(copy: false);
+    await for (final chunk in source.openRead(tailStart)) {
+      tail.add(chunk);
+    }
+    final patchedTail = _patchUnsupportedOpsetImports(tail.takeBytes());
+    final sink = target.openWrite();
+    try {
+      await for (final chunk in source.openRead(0, tailStart)) {
+        sink.add(chunk);
+      }
+      sink.add(patchedTail);
+    } finally {
+      await sink.close();
+    }
+  }
+
+  static OnnxSessionLoadMode _resolveSessionLoadMode(
+    LocalOnnxModelDescriptor model,
+  ) {
+    final hasExternalData =
+        model.externalDataPath?.isNotEmpty == true ||
         File('${model.path}.data').existsSync();
+    return hasExternalData
+        ? OnnxSessionLoadMode.externalDataFile
+        : OnnxSessionLoadMode.patchedSingleFile;
   }
 
   String _resolveInputName(OrtSession session, LocalOnnxModelDescriptor model) {
@@ -351,21 +470,27 @@ class LocalOnnxTaggerService {
     int inputSize,
     LocalOnnxModelDescriptor model,
   ) {
-    final squareSize = math.max(source.width, source.height);
-    final canvas = img.Image(width: squareSize, height: squareSize);
-    img.fill(canvas, color: img.ColorRgb8(255, 255, 255));
-    img.compositeImage(
-      canvas,
-      source,
-      dstX: (squareSize - source.width) ~/ 2,
-      dstY: (squareSize - source.height) ~/ 2,
+    final layout = _computeLetterboxLayout(
+      sourceWidth: source.width,
+      sourceHeight: source.height,
+      inputSize: inputSize,
     );
-
-    final resized = img.copyResize(
-      canvas,
-      width: inputSize,
-      height: inputSize,
+    final resizedSource = img.copyResize(
+      source,
+      width: layout.resizedWidth,
+      height: layout.resizedHeight,
       interpolation: img.Interpolation.cubic,
+    );
+    final resized = img.Image(
+      width: layout.canvasWidth,
+      height: layout.canvasHeight,
+    );
+    img.fill(resized, color: img.ColorRgb8(255, 255, 255));
+    img.compositeImage(
+      resized,
+      resizedSource,
+      dstX: layout.offsetX,
+      dstY: layout.offsetY,
     );
 
     final data = Float32List(inputSize * inputSize * 3);
@@ -413,6 +538,25 @@ class LocalOnnxTaggerService {
     return _OnnxImageInput(data: data, shape: [1, inputSize, inputSize, 3]);
   }
 
+  static OnnxLetterboxLayout _computeLetterboxLayout({
+    required int sourceWidth,
+    required int sourceHeight,
+    required int inputSize,
+  }) {
+    final longestSide = math.max(1, math.max(sourceWidth, sourceHeight));
+    final scale = inputSize / longestSide;
+    final resizedWidth = math.max(1, (sourceWidth * scale).round());
+    final resizedHeight = math.max(1, (sourceHeight * scale).round());
+    return OnnxLetterboxLayout(
+      canvasWidth: inputSize,
+      canvasHeight: inputSize,
+      resizedWidth: math.min(inputSize, resizedWidth),
+      resizedHeight: math.min(inputSize, resizedHeight),
+      offsetX: (inputSize - resizedWidth) ~/ 2,
+      offsetY: (inputSize - resizedHeight) ~/ 2,
+    );
+  }
+
   List<double> _flattenScores(Object? value) {
     final scores = <double>[];
 
@@ -446,7 +590,7 @@ class LocalOnnxTaggerService {
   }
 
   void _patchDefaultDomainOpsetImport(Uint8List bytes) {
-    final start = math.max(0, bytes.length - 4096);
+    final start = math.max(0, bytes.length - _opsetPatchTailBytes);
     for (var i = start; i < bytes.length - 3; i++) {
       // ModelProto.opset_import field = 8 (0x42), OperatorSetIdProto with
       // only version field: [0x42, 0x02, 0x10, version]. CL tagger uses
@@ -480,7 +624,7 @@ class LocalOnnxTaggerService {
     required int maxVersion,
   }) {
     final needle = utf8.encode(domain);
-    final start = math.max(0, bytes.length - 4096);
+    final start = math.max(0, bytes.length - _opsetPatchTailBytes);
     for (var i = start; i <= bytes.length - needle.length; i++) {
       var matched = true;
       for (var j = 0; j < needle.length; j++) {
