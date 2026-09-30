@@ -7,6 +7,7 @@ import 'package:image/image.dart' as img;
 import 'package:path/path.dart' as p;
 import 'package:uuid/uuid.dart';
 
+import '../../core/utils/exif_orientation.dart';
 import '../../core/utils/isolate_pool.dart';
 import '../../core/utils/nai_resolution_adapter.dart';
 import '../models/inpaint/inpaint_draft.dart';
@@ -100,7 +101,7 @@ class InpaintDraftFileStore {
       throw InpaintDraftIntegrityException('$label checksum or size mismatch');
     }
     final data = bytes is Uint8List ? bytes : Uint8List.fromList(bytes);
-    // Headers skip JPEG EXIF rotation; only a mismatch needs a full decode.
+    // GIF-like headers may report a canvas larger than the decoded frame.
     if (_hasDimensions(NaiResolutionAdapter.readImageSize(data), expected) ||
         _hasDimensions(await _decodeImageSize(data), expected)) {
       return;
@@ -136,7 +137,7 @@ class InpaintDraftFileStore {
 
   static (int, int)? _decodeImageSizeSync(Uint8List bytes) {
     final decoded = img.decodeImage(bytes);
-    return decoded == null ? null : (decoded.width, decoded.height);
+    return decoded == null ? null : ExifOrientation.uprightSize(bytes, decoded);
   }
 
   Future<void> _atomicWriteBytesUnlocked(File target, List<int> bytes) async {

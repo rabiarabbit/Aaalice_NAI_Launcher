@@ -9,6 +9,8 @@ import 'package:nai_launcher/data/models/inpaint/inpaint_draft.dart';
 import 'package:nai_launcher/data/services/inpaint_draft_file_store.dart';
 import 'package:nai_launcher/data/services/inpaint_draft_repository.dart';
 
+import '../../helpers/exif_orientation_fixture.dart';
+
 void main() {
   group('inspectImage', () {
     test('decodes through the injected decoder', () async {
@@ -114,6 +116,22 @@ void main() {
       final asset = await store.inspectImage(bytes, label: 'source');
 
       await expectLater(store.verifyBytes(bytes, asset, 'source'), completes);
+    });
+
+    test('default decoder records an EXIF-rotated WebP as displayed', () async {
+      final store = InpaintDraftFileStore();
+      for (final orientation in [1, 2, 3, 4, 5, 6, 7, 8]) {
+        final bytes = orientedCameraWebp(orientation: orientation);
+
+        final asset = await store.inspectImage(bytes, label: 'source');
+
+        expect(
+          (asset.width, asset.height),
+          orientation >= 5 ? (14, 20) : (20, 14),
+          reason: '$orientation',
+        );
+        await expectLater(store.verifyBytes(bytes, asset, 'source'), completes);
+      }
     });
   });
 }

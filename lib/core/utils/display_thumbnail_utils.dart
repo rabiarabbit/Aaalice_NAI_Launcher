@@ -4,6 +4,8 @@ import 'dart:typed_data';
 
 import 'package:image/image.dart' as img;
 
+import 'exif_orientation.dart';
+
 /// 展示用缩略图压缩工具
 ///
 /// 与 Vibe 库使用相同的压缩策略：最长边 256px、JPEG q78，
@@ -26,7 +28,7 @@ class DisplayThumbnailUtils {
   static Uint8List? resizeSync(Uint8List sourceBytes) {
     final img.Image? source;
     try {
-      source = img.decodeImage(sourceBytes);
+      source = ExifOrientation.decodeUpright(sourceBytes);
     } catch (_) {
       return null;
     }
