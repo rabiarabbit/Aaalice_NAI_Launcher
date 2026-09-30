@@ -23,6 +23,10 @@ class InpaintMaskUtils {
     return mask == null ? bytes : BinaryMaskCodec.encode(mask);
   }
 
+  static Future<Uint8List> normalizeMaskBytesAsync(Uint8List bytes) {
+    return ComputeGate().runIsolate(() => normalizeMaskBytes(bytes));
+  }
+
   /// 将蒙版按最近邻重采样到编辑器工作画布，保持硬边和二值语义。
   static Uint8List resizeMaskBytes(
     Uint8List bytes, {
