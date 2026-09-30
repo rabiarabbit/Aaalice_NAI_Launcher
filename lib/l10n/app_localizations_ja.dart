@@ -12206,6 +12206,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get diy_targetCategory => '対象カテゴリ';
 
   @override
+  String get diy_targetCurrentGroup => 'このタググループ';
+
+  @override
   String get diy_conditionType => '条件タイプ';
 
   @override
