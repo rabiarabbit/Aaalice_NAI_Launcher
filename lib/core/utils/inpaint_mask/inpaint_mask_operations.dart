@@ -1,6 +1,5 @@
 import 'dart:collection';
 import 'dart:convert';
-import 'dart:isolate';
 import 'dart:math' as math;
 import 'dart:typed_data';
 import 'dart:ui' show Rect;
@@ -379,7 +378,7 @@ class InpaintMaskUtils {
     required int y,
     int overlayAlpha = 140,
   }) {
-    return Isolate.run(
+    return ComputeGate().runIsolate(
       () => fillEditorMaskRegionAtPoint(
         bytes,
         x: x,
@@ -734,6 +733,9 @@ class InpaintMaskUtils {
         requestHeight: targetHeight,
         latentWidth: latentWidth,
         latentHeight: latentHeight,
+        latentGridSize: latentGridSize,
+        // Undecodable bytes are forwarded untouched, so emptiness is unknown.
+        isLatentMaskEmpty: false,
       );
     }
 
@@ -843,6 +845,8 @@ class InpaintMaskUtils {
       requestHeight: targetHeight,
       latentWidth: latentWidth,
       latentHeight: latentHeight,
+      latentGridSize: latentGridSize,
+      isLatentMaskEmpty: !latentBinaryMask.contains(1),
     );
   }
 
@@ -1091,7 +1095,7 @@ class InpaintMaskUtils {
     Uint8List bytes, {
     int overlayAlpha = 140,
   }) {
-    return Isolate.run(
+    return ComputeGate().runIsolate(
       () => maskToEditorOverlay(bytes, overlayAlpha: overlayAlpha),
     );
   }

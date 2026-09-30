@@ -7,6 +7,7 @@ import 'package:nai_launcher/core/constants/api_constants.dart';
 import 'package:nai_launcher/core/enums/image_model_mode.dart';
 import 'package:nai_launcher/core/enums/precise_ref_type.dart';
 import 'package:nai_launcher/core/network/request_builders/nai_image_request_builder.dart';
+import 'package:nai_launcher/core/utils/inpaint_mask_utils.dart';
 import 'package:nai_launcher/core/utils/nai_api_utils.dart';
 import 'package:nai_launcher/data/models/image/image_params.dart';
 import 'package:nai_launcher/data/models/vibe/vibe_reference.dart';
@@ -1421,6 +1422,58 @@ void main() {
       },
     );
 
+    test('should reject infill masks that sample to no latent cell', () async {
+      img.Image blackMask({int channels = 4}) {
+        final mask = img.Image(width: 128, height: 128, numChannels: channels);
+        if (channels == 4) {
+          img.fill(mask, color: img.ColorRgba8(0, 0, 0, 255));
+        }
+        return mask;
+      }
+
+      final thinLine = blackMask();
+      for (var y = 0; y < 128; y++) {
+        thinLine.setPixelRgba(10, y, 255, 255, 255, 255);
+      }
+      final lowGrayPluginMask = blackMask(channels: 1);
+      for (var y = 32; y < 96; y++) {
+        for (var x = 32; x < 96; x++) {
+          lowGrayPluginMask.setPixelR(x, y, 39);
+        }
+      }
+      final masks = {
+        'thin line': thinLine,
+        'raw 39 gray selection': lowGrayPluginMask,
+        'all black': blackMask(),
+      };
+
+      for (final entry in masks.entries) {
+        final builder = NAIImageRequestBuilder(
+          params: ImageParams(
+            action: ImageGenerationAction.infill,
+            model: 'nai-diffusion-4-5-full',
+            width: 128,
+            height: 128,
+            sourceImage: _validPngBytes(width: 128, height: 128),
+            maskImage: Uint8List.fromList(img.encodePng(entry.value)),
+          ),
+          encodeVibe: _fakeEncodeVibe,
+        );
+
+        await expectLater(
+          builder.build(sampler: 'k_euler'),
+          throwsA(
+            isA<EmptyInpaintMaskException>().having(
+              (error) => error.latentGridSize,
+              'latentGridSize',
+              8,
+            ),
+          ),
+          reason: entry.key,
+        );
+      }
+    });
+
     test(
       'should normalize infill source image to request dimensions',
       () async {
@@ -1430,7 +1483,7 @@ void main() {
           width: 128,
           height: 128,
           sourceImage: _validPngBytes(width: 256, height: 128),
-          maskImage: _validPngBytes(width: 128, height: 128),
+          maskImage: _solidPngBytes(width: 128, height: 128),
         );
 
         final builder = NAIImageRequestBuilder(
@@ -2342,7 +2395,142 @@ void main() {
       }
     });
   });
+
+  group('NAIImageRequestBuilder EXIF-oriented sources', () {
+    Future<Map<String, dynamic>> buildSource(
+      ImageGenerationAction action,
+      Uint8List source, {
+      required int width,
+      required int height,
+    }) async {
+      final params = ImageParams(
+        action: action,
+        model: ImageModels.animeDiffusionV45Curated,
+        width: width,
+        height: height,
+        sourceImage: source,
+        maskImage: action == ImageGenerationAction.infill
+            ? _solidPngBytes(width: width, height: height)
+            : null,
+      );
+      final result = await NAIImageRequestBuilder(
+        params: params,
+        encodeVibe: _fakeEncodeVibe,
+      ).build(sampler: 'k_euler');
+      return result.requestParameters;
+    }
+
+    test('img2img and infill send a png at the declared size', () async {
+      for (final action in [
+        ImageGenerationAction.img2img,
+        ImageGenerationAction.infill,
+      ]) {
+        final parameters = await buildSource(
+          action,
+          _orientedJpeg(96, 64, 6),
+          width: 64,
+          height: 96,
+        );
+
+        final sent = img.decodePng(base64Decode(parameters['image'] as String));
+        expect(sent, isNotNull, reason: action.name);
+        expect(
+          (sent!.width, sent.height),
+          (parameters['width'], parameters['height']),
+          reason: action.name,
+        );
+      }
+    });
+
+    test('unrotated sources keep their exact request bytes', () async {
+      final cases = <String, Uint8List>{
+        'jpeg orientation 1': _orientedJpeg(64, 96, 1),
+        'png': _solidPngBytes(width: 64, height: 96),
+        'webp': _webpLossless,
+      };
+
+      for (final MapEntry(key: name, value: source) in cases.entries) {
+        final decoded = img.decodeImage(source)!;
+        final parameters = await buildSource(
+          ImageGenerationAction.img2img,
+          source,
+          width: decoded.width,
+          height: decoded.height,
+        );
+
+        expect(parameters['image'], base64Encode(source), reason: name);
+      }
+    });
+
+    test('V3 raw vibes upload an oriented png', () async {
+      final unrotated = _orientedJpeg(96, 64, 1);
+      final params = ImageParams(
+        model: ImageModels.animeDiffusionV3,
+        vibeReferencesV4: [
+          VibeReference(
+            displayName: 'rotated',
+            vibeEncoding: '',
+            rawImageData: _orientedJpeg(96, 64, 6),
+            sourceType: VibeSourceType.rawImage,
+          ),
+          VibeReference(
+            displayName: 'unrotated',
+            vibeEncoding: '',
+            rawImageData: unrotated,
+            sourceType: VibeSourceType.rawImage,
+          ),
+        ],
+      );
+
+      final result = await NAIImageRequestBuilder(
+        params: params,
+        encodeVibe: _fakeEncodeVibe,
+      ).build(sampler: 'k_euler');
+      final uploads =
+          result.requestParameters['reference_image_multiple'] as List;
+
+      final rotated = img.decodePng(base64Decode(uploads.first as String))!;
+      expect((rotated.width, rotated.height), (64, 96));
+      expect(uploads.last, base64Encode(unrotated));
+    });
+
+    test('precise references are fitted to the oriented canvas', () async {
+      final params = ImageParams(
+        model: 'nai-diffusion-4-5-full',
+        preciseReferences: [
+          PreciseReference(
+            image: _orientedJpeg(96, 64, 6),
+            type: PreciseRefType.character,
+          ),
+        ],
+      );
+
+      final result = await NAIImageRequestBuilder(
+        params: params,
+        encodeVibe: _fakeEncodeVibe,
+      ).build(sampler: 'k_euler');
+      final images =
+          result.requestParameters['director_reference_images'] as List;
+
+      final sent = img.decodePng(base64Decode(images.single as String))!;
+      expect((sent.width, sent.height), (1024, 1536));
+    });
+  });
 }
+
+Uint8List _orientedJpeg(int width, int height, int orientation) {
+  final image = img.Image(width: width, height: height)
+    ..exif.imageIfd.orientation = orientation;
+  img.fill(image, color: img.ColorRgb8(200, 40, 90));
+  return Uint8List.fromList(img.encodeJpg(image));
+}
+
+final _webpLossless = base64Decode(
+  'UklGRqAAAABXRUJQVlA4TJQAAAAvE0ADALkyRPQ/FgrSNmC6419vpZhp28b8Ebfdjuh//CUC'
+  'gEEjSYrqSQH617p0EhS3bePGmFx79WMUSZLi+Ebk8Yvxdx6YJFxMAOGaVt4jYOUS3RKsMPhm'
+  'JIIJEyqwAwNK8ECyAPfQYkXeIGEBAIVto8UCABfAbebs4ATAXzkF+FEcULLiAwANBxB2ALwg'
+  '1Xr3AwAS',
+);
 
 Future<String> _fakeEncodeVibe(
   Uint8List image, {

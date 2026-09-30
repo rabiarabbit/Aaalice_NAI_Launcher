@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:isolate';
 
 import 'package:flutter/foundation.dart';
 import 'package:image/image.dart' as img;
 
 import '../../data/models/vibe/vibe_reference.dart';
 import 'app_logger.dart';
+import 'isolate_pool.dart';
 import 'novelai_vibe_codec.dart';
 
 // 注意：已移除 png_chunks_extract 依赖，使用 image 包替代
@@ -152,14 +152,15 @@ class VibeFileParser {
 
     try {
       // 使用 compute 将耗时操作移到 Isolate
-      final result = await compute(
+      final result = await ComputeGate().runCompute(
         _parsePngIsolate,
         _PngParseParams(
           fileName: fileName,
           bytes: bytes,
           defaultStrength: defaultStrength,
         ),
-      ).timeout(_parseTimeout);
+        timeLimit: _parseTimeout,
+      );
       return result;
     } on TimeoutException {
       AppLogger.w(
@@ -204,14 +205,15 @@ class VibeFileParser {
     double defaultStrength = 0.6,
   }) async {
     try {
-      final result = await compute(
+      final result = await ComputeGate().runCompute(
         _extractBundleFromPngIsolate,
         _PngParseParams(
           fileName: 'bundle.png',
           bytes: bytes,
           defaultStrength: defaultStrength,
         ),
-      ).timeout(_parseTimeout);
+        timeLimit: _parseTimeout,
+      );
       return result;
     } catch (e, stack) {
       AppLogger.e('Failed to extract bundle from PNG', e, stack, 'VibeParser');
@@ -722,7 +724,7 @@ class VibeFileParser {
       );
     }
 
-    return Isolate.run(
+    return ComputeGate().runIsolate(
       () => _parseBundleBytesSync(
         fileName,
         bytes,
@@ -748,7 +750,7 @@ class VibeFileParser {
       );
     }
 
-    return Isolate.run(() {
+    return ComputeGate().runIsolate(() {
       return _parseBundleBytesSync(
         fileName,
         File(filePath).readAsBytesSync(),

@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:nai_launcher/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -242,6 +243,7 @@ class _TagGroupCardState extends ConsumerState<TagGroupCard> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
+        scrollable: true,
         title: Text(context.l10n.randomManager_deleteTagGroupTitle),
         content: Text(
           context.l10n.randomManager_deleteTagGroupConfirm(
@@ -350,6 +352,7 @@ class _TagGroupCardState extends ConsumerState<TagGroupCard> {
         tagGroup: widget.tagGroup,
         categoryId: widget.categoryId,
         presetId: widget.presetId,
+        scrollController: scrollController,
         isPresetDefault: widget.isPresetDefault,
         initialTabIndex: initialTabIndex,
       ),
@@ -365,6 +368,7 @@ class _TagGroupEditDialog extends ConsumerStatefulWidget {
     required this.tagGroup,
     required this.categoryId,
     required this.presetId,
+    required this.scrollController,
     this.isPresetDefault = false,
     this.initialTabIndex = 0,
   });
@@ -372,6 +376,7 @@ class _TagGroupEditDialog extends ConsumerStatefulWidget {
   final RandomTagGroup tagGroup;
   final String categoryId;
   final String presetId;
+  final ScrollController scrollController;
   final bool isPresetDefault;
   final int initialTabIndex;
 
@@ -437,10 +442,86 @@ class _TagGroupEditDialogState extends ConsumerState<_TagGroupEditDialog>
     super.dispose();
   }
 
+  // 低于此高度时标签栏与操作栏随正文滚动，否则两者固定后正文视口不足以编辑
+  static const double _minBodyHeightForFixedChrome = 320;
+
+  // 标签栏与操作栏在固定和随正文滚动之间切换时保留焦点
+  final _tabBarKey = GlobalKey();
+  final _actionsKey = GlobalKey();
+
+  double _swipeDistance = 0;
+
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final colorScheme = Theme.of(context).colorScheme;
+    final tagCount = ref.watch(groupTagCountProvider(_editingTagGroup));
+    final tagList = _watchTagList();
+    final tabBar = _buildTabBar(context, tagCount: tagCount);
+    final actions = _buildActions(context);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final chromeScrolls =
+            constraints.maxHeight < _minBodyHeightForFixedChrome;
+        // 两种排布下标签栏都是首个 sliver，正文滚动偏移与输入状态不因切换而变
+        return Column(
+          children: [
+            Expanded(
+              child: Padding(
+                padding: chromeScrolls
+                    ? const EdgeInsets.fromLTRB(16, 8, 16, 8)
+                    : const EdgeInsets.fromLTRB(16, 12, 16, 16),
+                child: Container(
+                  key: const ValueKey('tag-group-editor-surface'),
+                  decoration: BoxDecoration(
+                    color: sectionSurfaceColor(colorScheme),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: InkHost(
+                    child: ListenableBuilder(
+                      listenable: _tabController,
+                      builder: (context, _) => RawGestureDetector(
+                        gestures: _tabSwipeGestures(
+                          context,
+                          constraints.maxWidth,
+                        ),
+                        child: CustomScrollView(
+                          key: const ValueKey('tag-group-editor-scroll'),
+                          controller: widget.scrollController,
+                          slivers: [
+                            if (chromeScrolls)
+                              SliverToBoxAdapter(child: tabBar)
+                            else
+                              PinnedHeaderSliver(child: tabBar),
+                            KeyedSubtree(
+                              key: ValueKey(
+                                'tag-group-editor-tab-${_tabController.index}',
+                              ),
+                              child: _buildTabContent(
+                                context,
+                                tagCount: tagCount,
+                                tagList: tagList,
+                                fillViewport: !chromeScrolls,
+                              ),
+                            ),
+                            if (chromeScrolls)
+                              SliverToBoxAdapter(child: actions),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            if (!chromeScrolls) actions,
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildTabBar(BuildContext context, {required int tagCount}) {
     final l10n = AppLocalizations.of(context)!;
     final compactTabs = MediaQuery.textScalerOf(context).scale(1) >= 2;
 
@@ -465,88 +546,142 @@ class _TagGroupEditDialogState extends ConsumerState<_TagGroupEditDialog>
       );
     }
 
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-          child: Container(
-            decoration: BoxDecoration(
-              color: sectionSurfaceColor(colorScheme),
-              borderRadius: BorderRadius.circular(10),
+    return KeyedSubtree(
+      key: _tabBarKey,
+      // 固定时正文从标签栏下方滚过，需要不透明底色遮住
+      child: ColoredBox(
+        color: sectionSurfaceColor(Theme.of(context).colorScheme),
+        child: TabBar(
+          controller: _tabController,
+          isScrollable: true,
+          tabAlignment: TabAlignment.start,
+          dividerColor: Colors.transparent,
+          indicatorSize: TabBarIndicatorSize.tab,
+          onTap: (_) => _scrollToContentStart(),
+          tabs: [
+            editorTab(Icons.tune_rounded, l10n.randomManager_basicTab),
+            editorTab(
+              Icons.sell_outlined,
+              l10n.randomManager_tagsTab(tagCount),
             ),
-            child: TabBar(
-              controller: _tabController,
-              isScrollable: true,
-              tabAlignment: TabAlignment.start,
-              dividerColor: Colors.transparent,
-              indicatorSize: TabBarIndicatorSize.tab,
-              tabs: [
-                editorTab(Icons.tune_rounded, l10n.randomManager_basicTab),
-                editorTab(
-                  Icons.sell_outlined,
-                  l10n.randomManager_tagsTab(
-                    ref.watch(groupTagCountProvider(_editingTagGroup)),
-                  ),
-                ),
-                editorTab(
-                  Icons.account_tree_outlined,
-                  l10n.randomManager_diyAbilitiesTab,
-                ),
-              ],
+            editorTab(
+              Icons.account_tree_outlined,
+              l10n.randomManager_diyAbilitiesTab,
             ),
-          ),
+          ],
         ),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Container(
-              decoration: BoxDecoration(
-                color: sectionSurfaceColor(colorScheme),
-                borderRadius: BorderRadius.circular(10),
+      ),
+    );
+  }
+
+  // 各标签共用同一个滚动视图，切换后从新内容的开头显示
+  void _scrollToContentStart() {
+    final controller = widget.scrollController;
+    if (controller.hasClients) controller.jumpTo(0);
+  }
+
+  // 沿用滚动配置的拖动设备与速度追踪，横滑切页的触发条件与原 TabBarView 一致
+  Map<Type, GestureRecognizerFactory> _tabSwipeGestures(
+    BuildContext context,
+    double width,
+  ) {
+    final scrollConfiguration = ScrollConfiguration.of(context);
+    return {
+      _TabSwipeGestureRecognizer:
+          GestureRecognizerFactoryWithHandlers<_TabSwipeGestureRecognizer>(
+            () => _TabSwipeGestureRecognizer(
+              startsOnChrome: _startsOnChrome,
+              supportedDevices: scrollConfiguration.dragDevices,
+            ),
+            (instance) => instance
+              ..velocityTrackerBuilder = scrollConfiguration
+                  .velocityTrackerBuilder(context)
+              ..gestureSettings = MediaQuery.gestureSettingsOf(context)
+              ..supportedDevices = scrollConfiguration.dragDevices
+              ..onStart = _startTabSwipe
+              ..onUpdate = _updateTabSwipe
+              ..onEnd = (details) => _finishTabSwipe(details, width),
+          ),
+    };
+  }
+
+  void _startTabSwipe(DragStartDetails details) => _swipeDistance = 0;
+
+  void _updateTabSwipe(DragUpdateDetails details) =>
+      _swipeDistance += details.primaryDelta ?? 0;
+
+  bool _startsOnChrome(Offset position) => [_tabBarKey, _actionsKey].any((key) {
+    final box = key.currentContext?.findRenderObject();
+    if (box is! RenderBox || !box.attached || !box.hasSize) return false;
+    return (Offset.zero & box.size).contains(box.globalToLocal(position));
+  });
+
+  // 甩动按速度方向切页；慢速拖动需越过正文一半宽度，与 PageView 的吸附规则相同
+  void _finishTabSwipe(DragEndDetails details, double width) {
+    final velocity = details.primaryVelocity ?? 0;
+    final movement = velocity != 0
+        ? velocity
+        : _swipeDistance.abs() > width / 2
+        ? _swipeDistance
+        : 0.0;
+    if (movement == 0) return;
+    final ltr = Directionality.of(context) == TextDirection.ltr;
+    final target = _tabController.index + ((movement < 0) == ltr ? 1 : -1);
+    if (target < 0 || target >= _tabController.length) return;
+    _tabController.animateTo(target);
+    _scrollToContentStart();
+  }
+
+  Widget _buildTabContent(
+    BuildContext context, {
+    required int tagCount,
+    required List<String> tagList,
+    required bool fillViewport,
+  }) {
+    return switch (_tabController.index) {
+      0 => SliverToBoxAdapter(child: _buildBasicTab(context)),
+      1 => _buildTagsTab(context, tagCount: tagCount, tagList: tagList),
+      // 锁定说明只在操作栏固定时居中撑满；随正文滚动时撑满会把关闭按钮推出视口
+      _ when widget.isPresetDefault && fillViewport => SliverFillRemaining(
+        hasScrollBody: false,
+        child: _buildDiyTab(context),
+      ),
+      _ => SliverToBoxAdapter(child: _buildDiyTab(context)),
+    };
+  }
+
+  Widget _buildActions(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return KeyedSubtree(
+      key: _actionsKey,
+      child: SafeArea(
+        top: false,
+        child: Container(
+          color: sectionSurfaceColor(Theme.of(context).colorScheme),
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
+          child: Wrap(
+            alignment: WrapAlignment.end,
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(
+                  widget.isPresetDefault
+                      ? l10n.common_close
+                      : l10n.common_cancel,
+                ),
               ),
-              clipBehavior: Clip.antiAlias,
-              child: InkHost(
-                child: TabBarView(
-                  controller: _tabController,
-                  children: [
-                    _buildBasicTab(context),
-                    _buildTagsTab(context),
-                    _buildDiyTab(context),
-                  ],
+              if (!widget.isPresetDefault)
+                FilledButton.icon(
+                  onPressed: _saveChanges,
+                  icon: const Icon(Icons.check_rounded, size: 18),
+                  label: Text(l10n.common_save),
                 ),
-              ),
-            ),
+            ],
           ),
         ),
-        SafeArea(
-          top: false,
-          child: Container(
-            color: sectionSurfaceColor(colorScheme),
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
-            child: Wrap(
-              alignment: WrapAlignment.end,
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text(
-                    widget.isPresetDefault
-                        ? l10n.common_close
-                        : l10n.common_cancel,
-                  ),
-                ),
-                if (!widget.isPresetDefault)
-                  FilledButton.icon(
-                    onPressed: _saveChanges,
-                    icon: const Icon(Icons.check_rounded, size: 18),
-                    label: Text(l10n.common_save),
-                  ),
-              ],
-            ),
-          ),
-        ),
-      ],
+      ),
     );
   }
 
@@ -556,7 +691,7 @@ class _TagGroupEditDialogState extends ConsumerState<_TagGroupEditDialog>
     final l10n = AppLocalizations.of(context)!;
     final isReadOnly = widget.isPresetDefault;
 
-    return SingleChildScrollView(
+    return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -717,89 +852,88 @@ class _TagGroupEditDialogState extends ConsumerState<_TagGroupEditDialog>
     );
   }
 
+  List<String> _watchTagList() {
+    if (_editingTagGroup.sourceType != TagGroupSourceType.builtin) {
+      // 其他类型：使用 tags 字段的标签名
+      return _editingTagGroup.tags.map((t) => t.tag).toList();
+    }
+    // 内置词库类型：从 TagLibrary 获取
+    final libraryState = ref.watch(tagLibraryNotifierProvider);
+    if (libraryState.library == null || _editingTagGroup.sourceId == null) {
+      return const [];
+    }
+    final category = TagSubCategory.values.cast<TagSubCategory?>().firstWhere(
+      (c) => c?.name == _editingTagGroup.sourceId,
+      orElse: () => null,
+    );
+    if (category == null) return const [];
+    return libraryState.library!
+        .getCategory(category)
+        .map((t) => t.tag)
+        .toList();
+  }
+
   /// 构建标签列表Tab
-  Widget _buildTagsTab(BuildContext context) {
+  Widget _buildTagsTab(
+    BuildContext context, {
+    required int tagCount,
+    required List<String> tagList,
+  }) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final l10n = AppLocalizations.of(context)!;
-    final tagCount = ref.watch(groupTagCountProvider(_editingTagGroup));
 
-    // 获取标签列表
-    List<String> tagList = [];
-
-    if (_editingTagGroup.sourceType == TagGroupSourceType.builtin) {
-      // 内置词库类型：从 TagLibrary 获取
-      final libraryState = ref.watch(tagLibraryNotifierProvider);
-      if (libraryState.library != null && _editingTagGroup.sourceId != null) {
-        final category = TagSubCategory.values
-            .cast<TagSubCategory?>()
-            .firstWhere(
-              (c) => c?.name == _editingTagGroup.sourceId,
-              orElse: () => null,
-            );
-        if (category != null) {
-          tagList = libraryState.library!
-              .getCategory(category)
-              .map((t) => t.tag)
-              .toList();
-        }
-      }
-    } else {
-      // 其他类型：使用 tags 字段的标签名
-      tagList = _editingTagGroup.tags.map((t) => t.tag).toList();
-    }
-
-    final isEmpty = tagList.isEmpty;
-
-    return Padding(
+    return SliverPadding(
       padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+      sliver: SliverMainAxisGroup(
+        slivers: [
           // 标签列表标题
-          Text(
-            l10n.randomManager_tagsTab(tagCount),
-            style: theme.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.bold,
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Text(
+                l10n.randomManager_tagsTab(tagCount),
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ),
-          const SizedBox(height: 12),
-          // 标签列表容器
-          Expanded(
-            child: Container(
+          // 内置词库的标签可达数千条，按需构建
+          DecoratedSliver(
+            decoration: BoxDecoration(
+              color: controlSurfaceColor(colorScheme),
+              borderRadius: BorderRadius.circular(8),
+              boxShadow: [
+                BoxShadow(
+                  color: colorScheme.shadow.withValues(alpha: 0.05),
+                  blurRadius: 4,
+                  offset: const Offset(0, 1),
+                ),
+              ],
+            ),
+            sliver: SliverPadding(
               padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: controlSurfaceColor(colorScheme),
-                borderRadius: BorderRadius.circular(8),
-                boxShadow: [
-                  BoxShadow(
-                    color: colorScheme.shadow.withValues(alpha: 0.05),
-                    blurRadius: 4,
-                    offset: const Offset(0, 1),
-                  ),
-                ],
-              ),
-              child: isEmpty
-                  ? Center(
-                      child: Text(
-                        l10n.randomManager_noTags,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
+              sliver: tagList.isEmpty
+                  ? SliverToBoxAdapter(
+                      child: Center(
+                        child: Text(
+                          l10n.randomManager_noTags,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
                         ),
                       ),
                     )
-                  : ListView.builder(
+                  : SliverList.builder(
                       itemCount: tagList.length,
-                      itemBuilder: (context, index) {
-                        final tag = tagList[index];
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 4),
-                          child: TranslatedTagText(
-                            tag,
-                            style: theme.textTheme.bodyMedium,
-                          ),
-                        );
-                      },
+                      itemBuilder: (context, index) => Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: TranslatedTagText(
+                          tagList[index],
+                          style: theme.textTheme.bodyMedium,
+                        ),
+                      ),
                     ),
             ),
           ),
@@ -815,29 +949,34 @@ class _TagGroupEditDialogState extends ConsumerState<_TagGroupEditDialog>
 
     // 默认预设不支持 DIY 配置
     if (widget.isPresetDefault) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.lock_outline, size: 48, color: colorScheme.outline),
-            const SizedBox(height: 16),
-            Text(
-              l10n.diyNotAvailableForDefault,
-              style: theme.textTheme.titleMedium,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              l10n.diyNotAvailableHint,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: colorScheme.outline,
+      return Padding(
+        padding: const EdgeInsets.all(16),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.lock_outline, size: 48, color: colorScheme.outline),
+              const SizedBox(height: 16),
+              Text(
+                l10n.diyNotAvailableForDefault,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.titleMedium,
               ),
-            ),
-          ],
+              const SizedBox(height: 8),
+              Text(
+                l10n.diyNotAvailableHint,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colorScheme.outline,
+                ),
+              ),
+            ],
+          ),
         ),
       );
     }
 
-    return SingleChildScrollView(
+    return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1138,6 +1277,24 @@ class _TagGroupEditDialogState extends ConsumerState<_TagGroupEditDialog>
     notifier.updateCategory(updatedCategory);
     Navigator.pop(context);
   }
+}
+
+/// 从标签栏或操作栏开始的横滑不切换标签页，与它们位于原 TabBarView 之外时一致
+class _TabSwipeGestureRecognizer extends HorizontalDragGestureRecognizer {
+  _TabSwipeGestureRecognizer({
+    required this.startsOnChrome,
+    super.supportedDevices,
+  });
+
+  final bool Function(Offset position) startsOnChrome;
+
+  @override
+  bool isPointerAllowed(PointerEvent event) =>
+      !startsOnChrome(event.position) && super.isPointerAllowed(event);
+
+  @override
+  bool isPointerPanZoomAllowed(PointerPanZoomStartEvent event) =>
+      !startsOnChrome(event.position) && super.isPointerPanZoomAllowed(event);
 }
 
 class _DiySection extends StatefulWidget {

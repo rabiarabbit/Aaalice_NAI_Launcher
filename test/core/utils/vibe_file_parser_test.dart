@@ -4,8 +4,11 @@ import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nai_launcher/core/constants/api_constants.dart';
+import 'package:image/image.dart' as img;
 import 'package:nai_launcher/core/utils/vibe_file_parser.dart';
 import 'package:nai_launcher/data/models/vibe/vibe_reference.dart';
+
+import '../../helpers/shared_compute_gate.dart';
 
 void main() {
   test('.naiv4vibe 的 type=image 文件会按原图 Vibe 解析', () async {
@@ -219,5 +222,75 @@ void main() {
 
     expect(timerRan, isTrue);
     expect(references.single.vibeEncoding, 'background-encoding');
+  });
+
+  test('大型 .naiv4vibebundle 的后台解析经过共享计算闸门排队', () async {
+    final bundleBytes = Uint8List.fromList(
+      utf8.encode(
+        jsonEncode({
+          'padding': ''.padRight(2 * 1024 * 1024, 'x'),
+          'vibes': [
+            {
+              'name': 'Gated bundle',
+              'encodings': {
+                'v4full': {
+                  'variant': {'encoding': 'gated-encoding'},
+                },
+              },
+            },
+          ],
+        }),
+      ),
+    );
+
+    final references = await expectQueuedBehindSharedComputeGate(
+      () => VibeFileParser.fromBundle('gated.naiv4vibebundle', bundleBytes),
+    );
+
+    expect(references.single.displayName, 'Gated bundle');
+    expect(references.single.vibeEncoding, 'gated-encoding');
+  });
+
+  test('PNG 内嵌 Vibe 的解析经过共享计算闸门排队且不退回原图', () async {
+    Uint8List pngWithText(String keyword, String value) {
+      final image = img.Image(width: 2, height: 2)..textData = {keyword: value};
+      return Uint8List.fromList(img.encodePng(image));
+    }
+
+    final encodingPng = pngWithText(
+      'NovelAI_Vibe_Encoding_Base64',
+      'gated-png-encoding',
+    );
+    final bundlePng = pngWithText(
+      'naidata',
+      base64Encode(
+        utf8.encode(
+          jsonEncode({
+            'vibes': [
+              {
+                'name': 'Gated bundle vibe',
+                'encodings': {
+                  'v4full': {
+                    'variant': {'encoding': 'gated-bundle-encoding'},
+                  },
+                },
+              },
+            ],
+          }),
+        ),
+      ),
+    );
+
+    final parsed = await expectQueuedBehindSharedComputeGate(
+      () => VibeFileParser.fromPng('gated.png', encodingPng),
+    );
+    final bundle = await expectQueuedBehindSharedComputeGate(
+      () => VibeFileParser.extractBundleFromPng(bundlePng),
+    );
+
+    expect(parsed.sourceType, VibeSourceType.png);
+    expect(parsed.vibeEncoding, 'gated-png-encoding');
+    expect(bundle.single.displayName, 'Gated bundle vibe');
+    expect(bundle.single.vibeEncoding, 'gated-bundle-encoding');
   });
 }

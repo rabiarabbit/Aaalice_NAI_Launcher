@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:isolate';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
@@ -10,6 +9,7 @@ import '../../data/models/gallery/nai_image_metadata.dart';
 import '../../data/models/watermark/watermark_settings.dart';
 import '../../data/services/metadata/unified_metadata_parser.dart';
 import '../utils/image_share_sanitizer.dart';
+import '../utils/isolate_pool.dart';
 import 'watermark_scene.dart';
 
 class WatermarkCancelledException implements Exception {
@@ -251,6 +251,7 @@ class WatermarkRenderService {
       output = UnifiedMetadataParser.copySupportedMetadata(
         source: source,
         targetPng: output,
+        decodedBy: SourcePixelDecoder.flutterEngine,
       );
     } on FormatException catch (error) {
       throw WatermarkRenderException(
@@ -317,7 +318,7 @@ class WatermarkRenderService {
 Future<_MetadataTransfer> _preserveMetadataInBackground(
   Uint8List source,
   Uint8List targetPng,
-) => Isolate.run(
+) => ComputeGate().runIsolate(
   () => WatermarkRenderService._preserveSupportedMetadata(
     source: source,
     targetPng: targetPng,
