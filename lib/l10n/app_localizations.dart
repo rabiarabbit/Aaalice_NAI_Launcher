@@ -21720,6 +21720,12 @@ abstract class AppLocalizations {
   /// **'Invalid preset data: {error}'**
   String diy_presetInvalidData(String error);
 
+  /// No description provided for @diy_presetVersionTooNew.
+  ///
+  /// In en, this message translates to:
+  /// **'This preset was exported by a newer app version (data version {version}). Update the app, then import it again'**
+  String diy_presetVersionTooNew(int version);
+
   /// No description provided for @diy_presetExportTitle.
   ///
   /// In en, this message translates to:
@@ -21815,6 +21821,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Target Category'**
   String get diy_targetCategory;
+
+  /// No description provided for @diy_targetCurrentGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'This tag group'**
+  String get diy_targetCurrentGroup;
 
   /// No description provided for @diy_conditionType.
   ///

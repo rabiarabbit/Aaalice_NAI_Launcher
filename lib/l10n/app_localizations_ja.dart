@@ -12166,6 +12166,11 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String diy_presetVersionTooNew(int version) {
+    return 'このプリセットは新しいバージョンのアプリで書き出されています（データバージョン $version）。アプリを更新してからインポートしてください';
+  }
+
+  @override
   String get diy_presetExportTitle => 'プリセットをエクスポート';
 
   @override
@@ -12212,6 +12217,9 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get diy_targetCategory => '対象カテゴリ';
+
+  @override
+  String get diy_targetCurrentGroup => 'このタググループ';
 
   @override
   String get diy_conditionType => '条件タイプ';

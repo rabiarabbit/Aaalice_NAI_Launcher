@@ -6054,6 +6054,12 @@
       "error": {"type": "String"}
     }
   },
+  "diy_presetVersionTooNew": "This preset was exported by a newer app version (data version {version}). Update the app, then import it again",
+  "@diy_presetVersionTooNew": {
+    "placeholders": {
+      "version": {"type": "int"}
+    }
+  },
   "diy_presetExportTitle": "Export Preset",
   "diy_presetImportTitle": "Import Preset",
   "diy_unknown": "Unknown",
@@ -6071,6 +6077,7 @@
   "diy_noVisibilityRulesHint": "Add rules to control category visibility from the current composition",
   "diy_notSet": "Not set",
   "diy_targetCategory": "Target Category",
+  "diy_targetCurrentGroup": "This tag group",
   "diy_conditionType": "Condition Type",
   "diy_conditionValue": "Condition Value",
   "diy_conditionValueHint": "Tag name or value",

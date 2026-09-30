@@ -5892,6 +5892,14 @@
       }
     }
   },
+  "diy_presetVersionTooNew": "此預設由較新版本的應用程式匯出（資料版本 {version}），請更新應用程式後再匯入",
+  "@diy_presetVersionTooNew": {
+    "placeholders": {
+      "version": {
+        "type": "int"
+      }
+    }
+  },
   "diy_presetExportTitle": "匯出預設",
   "diy_presetImportTitle": "匯入預設",
   "diy_unknown": "未知",
@@ -5908,6 +5916,7 @@
   "diy_noVisibilityRulesHint": "新增規則以根據當前構圖控制類別可見性",
   "diy_notSet": "未設定",
   "diy_targetCategory": "目標類別",
+  "diy_targetCurrentGroup": "本片語",
   "diy_conditionType": "條件型別",
   "diy_conditionValue": "條件值",
   "diy_conditionValueHint": "標籤名或值",
