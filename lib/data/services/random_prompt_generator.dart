@@ -21,6 +21,7 @@ import 'bracket_formatter.dart';
 import 'character_count_resolver.dart';
 import 'no_repeat_round_sampler.dart';
 import 'random_preset_generation_context.dart';
+import 'random_preset_rules.dart';
 import 'sequential_state_service.dart';
 import 'strategies/catalog_random_generator_strategy.dart';
 import 'tag_library_service.dart';
@@ -202,12 +203,13 @@ class RandomPromptGenerator {
           : category.count,
     );
     context.addVariable('character_count_category', category.id);
+    final rules = RandomPresetRules(preset);
 
     // 3. 根据人数分支处理
     if (category.count == 0) {
       // 无人场景
       return _generateNoHumanFromPreset(
-        preset,
+        rules,
         random,
         seed,
         tagOption,
@@ -217,18 +219,12 @@ class RandomPromptGenerator {
 
     if (!isV4Model) {
       // 非 V4 模型：传统单提示词模式
-      return _generateLegacyFromPreset(
-        preset,
-        random,
-        seed,
-        tagOption,
-        context,
-      );
+      return _generateLegacyFromPreset(rules, random, seed, tagOption, context);
     }
 
     // V4+ 模型：多角色模式
     return _generateMultiCharacterFromPreset(
-      preset,
+      rules,
       random,
       seed,
       tagOption,
@@ -265,7 +261,7 @@ class RandomPromptGenerator {
 
   /// 从预设生成多角色结果（V4+ 模型）
   Future<RandomPromptResult> _generateMultiCharacterFromPreset(
-    RandomPreset preset,
+    RandomPresetRules rules,
     Random random,
     int? seed,
     CharacterTagOption? tagOption,
@@ -281,7 +277,7 @@ class RandomPromptGenerator {
 
     // 2. 生成全局标签（scope: global 或 all）
     final globalTags = await _generateFromPresetCategories(
-      preset,
+      rules,
       random,
       targetScope: TagScope.global,
       context: context,
@@ -303,7 +299,7 @@ class RandomPromptGenerator {
 
         // 生成角色特征标签（scope: character，按性别过滤）
         final characterFeatures = await _generateFromPresetCategories(
-          preset,
+          rules,
           random,
           targetScope: TagScope.character,
           characterGender: slotTag.characterTag,
@@ -325,7 +321,7 @@ class RandomPromptGenerator {
     } else {
       // 无槽位配置时，生成单角色（兼容旧配置）
       final charTags = await _generateFromPresetCategories(
-        preset,
+        rules,
         random,
         targetScope: TagScope.character,
         context: context.forCharacter('girl'),
@@ -355,7 +351,7 @@ class RandomPromptGenerator {
 
   /// 从预设生成传统单提示词结果（非 V4 模型）
   Future<RandomPromptResult> _generateLegacyFromPreset(
-    RandomPreset preset,
+    RandomPresetRules rules,
     Random random,
     int? seed,
     CharacterTagOption? tagOption,
@@ -377,7 +373,7 @@ class RandomPromptGenerator {
 
     // 生成所有类别的标签（不区分 scope）
     final tags = await _generateFromPresetCategories(
-      preset,
+      rules,
       random,
       context: context,
     );
@@ -391,7 +387,7 @@ class RandomPromptGenerator {
 
   /// 从预设生成无人场景结果
   Future<RandomPromptResult> _generateNoHumanFromPreset(
-    RandomPreset preset,
+    RandomPresetRules rules,
     Random random,
     int? seed,
     CharacterTagOption? tagOption,
@@ -408,7 +404,7 @@ class RandomPromptGenerator {
 
     // 仅生成全局标签（背景、场景、风格等）
     final globalTags = await _generateFromPresetCategories(
-      preset,
+      rules,
       random,
       targetScope: TagScope.global,
       context: context,
@@ -439,12 +435,13 @@ class RandomPromptGenerator {
   /// [targetScope] 目标作用域，用于过滤类别和词组
   /// [characterGender] 角色性别（槽位名称），用于过滤性别限定的类别和词组（仅角色提示词时传入）
   Future<List<String>> _generateFromPresetCategories(
-    RandomPreset preset,
+    RandomPresetRules rules,
     Random random, {
     TagScope targetScope = TagScope.all,
     String? characterGender,
     RandomPresetGenerationContext? context,
   }) async {
+    final preset = rules.preset;
     final results = <String>[];
     final generationContext = context ?? RandomPresetGenerationContext();
 
@@ -458,16 +455,7 @@ class RandomPromptGenerator {
       // 跳过禁用的类别
       if (!category.enabled) continue;
 
-      if (!preset.algorithmConfig.isCategoryGloballyVisible(
-            category.id,
-            generationContext.tagContext,
-          ) ||
-          !preset.algorithmConfig.isCategoryGloballyVisible(
-            category.key,
-            generationContext.tagContext,
-          )) {
-        continue;
-      }
+      if (!rules.isCategoryVisible(category, generationContext)) continue;
 
       // 作用域过滤
       if (!category.isApplicableToScope(targetScope)) continue;
@@ -487,6 +475,7 @@ class RandomPromptGenerator {
         random,
         targetScope: targetScope,
         characterGender: characterGender,
+        rules: rules,
         context: generationContext,
       );
       generationContext.addCategoryTags(
@@ -497,18 +486,14 @@ class RandomPromptGenerator {
       results.addAll(categoryTags);
     }
 
-    final processed = preset.algorithmConfig.applyGlobalPostProcessRules(
-      results,
-      generationContext.tagContext,
-      variables: generationContext.variables,
-    );
+    final processed = rules.applyPostProcess(results, generationContext);
     generationContext.reconcileProcessedTags(
       originalTags: results,
       processedTags: processed,
     );
 
     // 应用变量替换
-    final replaced = await _applyVariableReplacement(processed, preset, random);
+    final replaced = await _applyVariableReplacement(processed, rules, random);
     return _applyEmphasis(
       _stableUniqueTags(replaced),
       preset.algorithmConfig.globalEmphasisProbability,
@@ -526,6 +511,7 @@ class RandomPromptGenerator {
     Random random, {
     TagScope targetScope = TagScope.all,
     String? characterGender,
+    required RandomPresetRules rules,
     required RandomPresetGenerationContext context,
   }) async {
     // 过滤启用且符合条件的词组
@@ -537,13 +523,7 @@ class RandomPromptGenerator {
       }
       if (!g.isTimeConditionActive(context.generationTime)) return false;
       if (!g.checkVisibility(context.tagContext)) return false;
-      final dependency = g.dependencyConfig;
-      if (dependency != null &&
-          dependency.enabled &&
-          !dependency.checkDependency(context.tagContext)) {
-        return false;
-      }
-      return true;
+      return rules.isDependencySatisfied(g, context);
     }).toList();
     if (enabledGroups.isEmpty) return [];
 
@@ -565,6 +545,7 @@ class RandomPromptGenerator {
       // 从词组生成标签
       final effectiveGroup = _applyDependencySelectionCount(
         group,
+        rules,
         context,
         random,
       );
@@ -587,24 +568,18 @@ class RandomPromptGenerator {
 
   RandomTagGroup _applyDependencySelectionCount(
     RandomTagGroup group,
+    RandomPresetRules rules,
     RandomPresetGenerationContext context,
     Random random,
   ) {
-    final dependency = group.dependencyConfig;
-    if (dependency == null || !dependency.enabled) return group;
     if (group.selectionMode != SelectionMode.multipleNum) return group;
 
-    final sourceValue = dependency.sourceVariable != null
-        ? context.firstValueFor(dependency.sourceVariable!)
-        : context.firstValueFor(dependency.sourceCategoryId);
-    final effectiveSourceValue = sourceValue.isEmpty
-        ? '${context.countFor(dependency.sourceCategoryId)}'
-        : sourceValue;
-    final count = dependency.getCount(
-      effectiveSourceValue,
+    final count = rules.dependentSelectionCount(
+      group,
+      context,
       () => random.nextInt(1 << 30),
     );
-    return group.copyWith(multipleNum: count);
+    return count == null ? group : group.copyWith(multipleNum: count);
   }
 
   /// 从单个词组生成标签（支持递归嵌套）
@@ -649,7 +624,7 @@ class RandomPromptGenerator {
 
     // Pool 类型使用专门的生成逻辑
     if (group.sourceType == TagGroupSourceType.pool) {
-      return _generateFromPoolGroup(group, category, random, context);
+      return _generateFromPoolGroup(group, category, random);
     }
 
     // 获取标签列表：对于同步类型的组从缓存读取，否则使用内嵌标签
@@ -686,12 +661,6 @@ class RandomPromptGenerator {
       random,
     );
 
-    bracketedTags = group.applyPostProcessRules(
-      bracketedTags,
-      context.tagContext,
-      variables: context.variables,
-    );
-
     // 词组级打乱
     if (group.shuffle) {
       bracketedTags.shuffle(random);
@@ -711,7 +680,6 @@ class RandomPromptGenerator {
     RandomTagGroup group,
     RandomCategory category,
     Random random,
-    RandomPresetGenerationContext context,
   ) async {
     final sourceId = group.sourceId;
     if (sourceId == null || sourceId.isEmpty) {
@@ -780,22 +748,16 @@ class RandomPromptGenerator {
         : group.bracketMax;
 
     // 应用权重括号并格式化标签
-    var formattedTags = allTags.map((tag) {
+    final formattedTags = allTags.map((tag) {
       final formattedTag = tag.replaceAll('_', ' ');
       return _applyBrackets(formattedTag, bracketMin, bracketMax, random);
     }).toList();
 
-    formattedTags = _applyEmphasis(
+    return _applyEmphasis(
       formattedTags,
       group.emphasisProbability,
       group.emphasisBracketCount,
       random,
-    );
-
-    return group.applyPostProcessRules(
-      formattedTags,
-      context.tagContext,
-      variables: context.variables,
     );
   }
 
@@ -993,18 +955,19 @@ class RandomPromptGenerator {
   /// 为 VariableReplacementService 创建解析器函数
   /// 该解析器会在预设的类别和词组中查找变量名
   Future<String?> _createVariableResolver(
-    RandomPreset preset,
+    RandomPresetRules rules,
     Random random,
     String varName,
   ) async {
     // 在类别中查找匹配（按名称或 key）
     final context = RandomPresetGenerationContext();
-    for (final category in preset.categories) {
+    for (final category in rules.preset.categories) {
       // 检查类别本身
       if (category.name == varName || category.key == varName) {
         final generated = await _generateFromCategory(
           category,
           random,
+          rules: rules,
           context: context,
         );
         return generated.join(', ');
@@ -1031,13 +994,13 @@ class RandomPromptGenerator {
   /// 对生成结果进行变量替换
   Future<List<String>> _applyVariableReplacement(
     List<String> tags,
-    RandomPreset preset,
+    RandomPresetRules rules,
     Random random,
   ) async {
     // 使用 VariableReplacementService 批量替换
     return _variableReplacementService.replaceListAsync(
       tags,
-      (varName) => _createVariableResolver(preset, random, varName),
+      (varName) => _createVariableResolver(rules, random, varName),
     );
   }
 

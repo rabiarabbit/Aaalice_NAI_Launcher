@@ -6,9 +6,11 @@ import 'package:nai_launcher/data/models/prompt/algorithm_config.dart';
 import 'package:nai_launcher/data/models/prompt/character_count_config.dart';
 import 'package:nai_launcher/data/models/prompt/conditional_branch.dart';
 import 'package:nai_launcher/data/models/prompt/dependency_config.dart';
+import 'package:nai_launcher/data/models/prompt/diy_category_references.dart';
 import 'package:nai_launcher/data/models/prompt/post_process_rule.dart';
 import 'package:nai_launcher/data/models/prompt/random_category.dart';
 import 'package:nai_launcher/data/models/prompt/random_preset.dart';
+import 'package:nai_launcher/data/models/prompt/random_prompt_result.dart';
 import 'package:nai_launcher/data/models/prompt/random_tag_group.dart';
 import 'package:nai_launcher/data/models/prompt/tag_category.dart';
 import 'package:nai_launcher/data/models/prompt/tag_library.dart';
@@ -537,6 +539,469 @@ void main() {
     expect(result.mainPrompt, contains('plain clothes'));
     expect(result.mainPrompt, isNot(contains('school uniform')));
   });
+
+  group('词组上的可见性规则', () {
+    VisibilityRule hideLowerWhen(
+      String tag, {
+      String source = 'cat-pose',
+      String target = 'cat-lower',
+    }) => VisibilityRule(
+      id: 'hide_lower',
+      name: 'Hide lower',
+      sourceCategoryId: source,
+      targetCategoryId: target,
+      conditionValue: tag,
+      visibleWhenMatched: false,
+    );
+
+    RandomPreset lowerBodyPreset({
+      required String pose,
+      required List<VisibilityRule> ownerRules,
+      bool ownerEnabled = true,
+      List<VisibilityRule> shoesRules = const [],
+    }) => _preset([
+      _category(
+        id: 'cat-pose',
+        key: 'pose',
+        name: '姿势',
+        groups: [
+          _group(id: 'pose_group', tags: [pose]),
+        ],
+      ),
+      _category(
+        id: 'cat-lower',
+        key: 'lower',
+        name: '下装',
+        groups: [
+          _group(id: 'shoes', tags: ['boots'], visibilityRules: shoesRules),
+          _group(id: 'pants', tags: ['jeans']),
+        ],
+      ),
+      _category(
+        id: 'cat-extra',
+        key: 'extra',
+        groups: [
+          _group(
+            id: 'owner',
+            tags: ['smile'],
+            enabled: ownerEnabled,
+            visibilityRules: ownerRules,
+          ),
+        ],
+      ),
+    ]);
+
+    test('目标为类别时作用于该类别下全部词组', () async {
+      final result = await generator.generateFromPreset(
+        preset: lowerBodyPreset(
+          pose: 'portrait',
+          ownerRules: [hideLowerWhen('portrait')],
+        ),
+        seed: 1,
+      );
+
+      final tags = _promptTags(result.mainPrompt);
+      expect(tags, containsAll(['portrait', 'smile']));
+      expect(tags, isNot(contains('boots')));
+      expect(tags, isNot(contains('jeans')));
+    });
+
+    test('条件不成立时目标类别照常生成', () async {
+      final result = await generator.generateFromPreset(
+        preset: lowerBodyPreset(
+          pose: 'full body',
+          ownerRules: [hideLowerWhen('portrait')],
+        ),
+        seed: 1,
+      );
+
+      expect(
+        _promptTags(result.mainPrompt),
+        containsAll(['full body', 'boots', 'jeans', 'smile']),
+      );
+    });
+
+    test('按类别名称或键名保存的存量引用在生成时同样生效', () async {
+      final result = await generator.generateFromPreset(
+        preset: lowerBodyPreset(
+          pose: 'portrait',
+          ownerRules: [hideLowerWhen('portrait', source: 'pose', target: '下装')],
+        ),
+        seed: 1,
+      );
+
+      final tags = _promptTags(result.mainPrompt);
+      expect(tags, isNot(contains('boots')));
+      expect(tags, isNot(contains('jeans')));
+    });
+
+    test('默认的"条件匹配时可见"只在条件成立时生成目标', () async {
+      VisibilityRule showLowerWhenFullBody() => const VisibilityRule(
+        id: 'show_lower',
+        name: 'Show lower',
+        sourceCategoryId: 'cat-pose',
+        targetCategoryId: 'cat-lower',
+        conditionValue: 'full body',
+      );
+
+      final portrait = await generator.generateFromPreset(
+        preset: lowerBodyPreset(
+          pose: 'portrait',
+          ownerRules: [showLowerWhenFullBody()],
+        ),
+        seed: 1,
+      );
+      final fullBody = await generator.generateFromPreset(
+        preset: lowerBodyPreset(
+          pose: 'full body',
+          ownerRules: [showLowerWhenFullBody()],
+        ),
+        seed: 1,
+      );
+
+      expect(_promptTags(portrait.mainPrompt), isNot(contains('boots')));
+      expect(_promptTags(portrait.mainPrompt), isNot(contains('jeans')));
+      expect(_promptTags(fullBody.mainPrompt), containsAll(['boots', 'jeans']));
+    });
+
+    test('以本词组 ID 为目标的存量规则仍只控制该词组', () async {
+      final result = await generator.generateFromPreset(
+        preset: lowerBodyPreset(
+          pose: 'portrait',
+          ownerRules: const [],
+          shoesRules: [hideLowerWhen('portrait', target: 'shoes')],
+        ),
+        seed: 1,
+      );
+
+      final tags = _promptTags(result.mainPrompt);
+      expect(tags, isNot(contains('boots')));
+      expect(tags, contains('jeans'));
+    });
+
+    test('停用的词组不再施加它的类别规则', () async {
+      final result = await generator.generateFromPreset(
+        preset: lowerBodyPreset(
+          pose: 'portrait',
+          ownerRules: [hideLowerWhen('portrait')],
+          ownerEnabled: false,
+        ),
+        seed: 1,
+      );
+
+      expect(_promptTags(result.mainPrompt), containsAll(['boots', 'jeans']));
+    });
+  });
+
+  group('词组上的后处理规则', () {
+    RandomPreset sleepingPreset({
+      required List<String> poseTags,
+      required List<String> eyeFeatureTags,
+      required PostProcessRule rule,
+      bool ownerEnabled = true,
+    }) => _preset([
+      _category(
+        id: 'cat-eyes',
+        key: 'eyeColor',
+        name: '眼睛',
+        groups: [
+          _group(id: 'eye_color', tags: ['blue eyes']),
+          _group(id: 'eye_feature', tags: eyeFeatureTags),
+        ],
+      ),
+      _category(
+        id: 'cat-pose',
+        key: 'pose',
+        groups: [
+          _group(
+            id: 'pose_group',
+            tags: poseTags,
+            enabled: ownerEnabled,
+            postProcessRules: [rule],
+          ),
+          _group(id: 'pose_extra', tags: ['arms up']),
+        ],
+      ),
+    ]);
+
+    test('睡眠预设移除其他类别里的瞳色', () async {
+      final result = await generator.generateFromPreset(
+        preset: sleepingPreset(
+          poseTags: ['sleeping'],
+          eyeFeatureTags: const [],
+          rule: PostProcessRule.sleepingRule(targetCategoryIds: ['cat-eyes']),
+        ),
+        seed: 1,
+      );
+
+      final tags = _promptTags(result.mainPrompt);
+      expect(tags, contains('sleeping'));
+      expect(tags, isNot(contains('blue eyes')));
+    });
+
+    test('触发标签本身属于目标类别时保留，只移除同类的其他标签', () async {
+      final result = await generator.generateFromPreset(
+        preset: sleepingPreset(
+          poseTags: ['standing'],
+          eyeFeatureTags: ['closed eyes'],
+          rule: PostProcessRule.sleepingRule(targetCategoryIds: ['cat-eyes']),
+        ),
+        seed: 1,
+      );
+
+      final tags = _promptTags(result.mainPrompt);
+      expect(tags, contains('closed eyes'));
+      expect(tags, isNot(contains('blue eyes')));
+    });
+
+    test('按类别键名保存的存量目标同样生效，且不触发时不改动结果', () async {
+      final legacyRule = PostProcessRule.sleepingRule(
+        targetCategoryIds: ['eyeColor'],
+      );
+      final sleeping = await generator.generateFromPreset(
+        preset: sleepingPreset(
+          poseTags: ['sleeping'],
+          eyeFeatureTags: const [],
+          rule: legacyRule,
+        ),
+        seed: 1,
+      );
+      final awake = await generator.generateFromPreset(
+        preset: sleepingPreset(
+          poseTags: ['standing'],
+          eyeFeatureTags: const [],
+          rule: legacyRule,
+        ),
+        seed: 1,
+      );
+
+      expect(_promptTags(sleeping.mainPrompt), isNot(contains('blue eyes')));
+      expect(
+        _promptTags(awake.mainPrompt),
+        containsAll(['standing', 'blue eyes', 'arms up']),
+      );
+    });
+
+    test('停用的词组不再施加它的后处理规则', () async {
+      final result = await generator.generateFromPreset(
+        preset: sleepingPreset(
+          poseTags: ['sleeping'],
+          eyeFeatureTags: ['closed eyes'],
+          rule: PostProcessRule.sleepingRule(targetCategoryIds: ['cat-eyes']),
+          ownerEnabled: false,
+        ),
+        seed: 1,
+      );
+
+      expect(
+        _promptTags(result.mainPrompt),
+        containsAll(['blue eyes', 'closed eyes']),
+      );
+    });
+
+    test('美人鱼规则移除用户选定的腿部服装类别', () async {
+      final preset = _preset([
+        _category(
+          id: 'cat-species',
+          key: 'species',
+          groups: [
+            _group(
+              id: 'species_group',
+              tags: ['mermaid'],
+              postProcessRules: [
+                PostProcessRule.mermaidRule(targetCategoryIds: ['cat-legwear']),
+              ],
+            ),
+          ],
+        ),
+        _category(
+          id: 'cat-legwear',
+          key: 'custom3',
+          groups: [
+            _group(id: 'legwear', tags: ['thighhighs']),
+          ],
+        ),
+        _category(
+          id: 'cat-top',
+          key: 'custom4',
+          groups: [
+            _group(id: 'top', tags: ['seashell bra']),
+          ],
+        ),
+      ]);
+
+      final result = await generator.generateFromPreset(
+        preset: preset,
+        seed: 1,
+      );
+
+      final tags = _promptTags(result.mainPrompt);
+      expect(tags, containsAll(['mermaid', 'seashell bra']));
+      expect(tags, isNot(contains('thighhighs')));
+    });
+  });
+
+  group('依赖配置', () {
+    RandomPreset characterCountPreset(CharacterCountConfig countConfig) =>
+        _preset(
+          [
+            _category(
+              id: 'cat-scene',
+              key: 'scene',
+              groups: [
+                _group(
+                  id: 'with_people',
+                  tags: ['crowd'],
+                  dependencyConfig: const DependencyConfig(
+                    type: DependencyType.exists,
+                    sourceCategoryId: characterCountReference,
+                  ),
+                ),
+                _group(
+                  id: 'empty_scene',
+                  tags: ['scenery'],
+                  dependencyConfig: const DependencyConfig(
+                    type: DependencyType.excludes,
+                    sourceCategoryId: characterCountReference,
+                  ),
+                ),
+              ],
+            ),
+          ],
+          algorithmConfig: AlgorithmConfig(characterCountConfig: countConfig),
+          forceNoHumanConfig: false,
+        );
+
+    test('角色数量源：存在依赖只在有角色时生成，排斥依赖只在无人时生成', () async {
+      final solo = await generator.generateFromPreset(
+        preset: characterCountPreset(_soloGirlConfig),
+        seed: 1,
+      );
+      final noHumans = await generator.generateFromPreset(
+        preset: characterCountPreset(_noHumanConfig),
+        seed: 1,
+      );
+
+      expect(_promptTags(solo.mainPrompt), contains('crowd'));
+      expect(_promptTags(solo.mainPrompt), isNot(contains('scenery')));
+      expect(_promptTags(noHumans.mainPrompt), contains('scenery'));
+      expect(_promptTags(noHumans.mainPrompt), isNot(contains('crowd')));
+    });
+
+    test('存在依赖满足时保留词组自己的多选数量', () async {
+      final preset = _preset([
+        _category(
+          id: 'cat-pose',
+          key: 'pose',
+          groups: [
+            _group(id: 'pose_group', tags: ['standing']),
+          ],
+        ),
+        _category(
+          id: 'cat-accessory',
+          key: 'accessory',
+          groups: [
+            _group(
+              id: 'accessories',
+              tags: ['ribbon', 'hat', 'necklace'],
+              selectionMode: SelectionMode.multipleNum,
+              multipleNum: 2,
+              dependencyConfig: const DependencyConfig(
+                type: DependencyType.exists,
+                sourceCategoryId: 'cat-pose',
+              ),
+            ),
+          ],
+        ),
+      ]);
+
+      final result = await generator.generateFromPreset(
+        preset: preset,
+        seed: 1,
+      );
+
+      expect(
+        _promptTags(
+          result.mainPrompt,
+        ).where((tag) => ['ribbon', 'hat', 'necklace'].contains(tag)),
+        hasLength(2),
+      );
+    });
+
+    RandomPreset dependentAccessoryPreset({
+      required List<String> expressionTags,
+      required DependencyConfig dependency,
+    }) => _preset([
+      _category(
+        id: 'cat-expression',
+        key: 'expression',
+        groups: [_group(id: 'expression_group', tags: expressionTags)],
+      ),
+      _category(
+        id: 'cat-accessory',
+        key: 'accessory',
+        groups: [
+          _group(
+            id: 'accessories',
+            tags: ['ribbon', 'hat', 'necklace'],
+            selectionMode: SelectionMode.multipleNum,
+            multipleNum: 3,
+            dependencyConfig: dependency,
+          ),
+        ],
+      ),
+    ]);
+
+    int accessoryCount(RandomPromptResult result) => _promptTags(
+      result.mainPrompt,
+    ).where((tag) => ['ribbon', 'hat', 'necklace'].contains(tag)).length;
+
+    test('数量依赖以类别源的已选标签数查映射', () async {
+      final result = await generator.generateFromPreset(
+        preset: dependentAccessoryPreset(
+          expressionTags: ['smile', 'blush'],
+          dependency: const DependencyConfig(
+            sourceCategoryId: 'cat-expression',
+            mappingRules: {'2': '1'},
+          ),
+        ),
+        seed: 1,
+      );
+
+      expect(accessoryCount(result), 1);
+    });
+
+    test('存量的数量依赖按标签名映射时仍按已选标签生效', () async {
+      final result = await generator.generateFromPreset(
+        preset: dependentAccessoryPreset(
+          expressionTags: ['smile'],
+          dependency: const DependencyConfig(
+            sourceCategoryId: 'cat-expression',
+            mappingRules: {'smile': '2'},
+          ),
+        ),
+        seed: 1,
+      );
+
+      expect(accessoryCount(result), 2);
+    });
+
+    test('值依赖匹配类别源的任一已选标签', () async {
+      final result = await generator.generateFromPreset(
+        preset: dependentAccessoryPreset(
+          expressionTags: ['smile', 'blush'],
+          dependency: const DependencyConfig(
+            type: DependencyType.value,
+            sourceCategoryId: 'cat-expression',
+            mappingRules: {'blush': '2'},
+          ),
+        ),
+        seed: 1,
+      );
+
+      expect(accessoryCount(result), 2);
+    });
+  });
 }
 
 class _MockTagLibraryService extends Mock implements TagLibraryService {}
@@ -571,12 +1036,13 @@ RandomCategory _category({
   required String id,
   required String key,
   required List<RandomTagGroup> groups,
+  String? name,
   TagScope scope = TagScope.global,
 }) {
   return RandomCategory(
     id: id,
     key: key,
-    name: key,
+    name: name ?? key,
     groupSelectionMode: SelectionMode.all,
     shuffle: false,
     scope: scope,
@@ -587,10 +1053,12 @@ RandomCategory _category({
 RandomTagGroup _group({
   required String id,
   List<String> tags = const [],
+  bool enabled = true,
   SelectionMode selectionMode = SelectionMode.all,
   int multipleNum = 1,
   DependencyConfig? dependencyConfig,
   TimeCondition? timeCondition,
+  List<VisibilityRule> visibilityRules = const [],
   List<PostProcessRule> postProcessRules = const [],
   double emphasisProbability = 0,
   int emphasisBracketCount = 1,
@@ -598,6 +1066,7 @@ RandomTagGroup _group({
   return RandomTagGroup(
     id: id,
     name: id,
+    enabled: enabled,
     selectionMode: selectionMode,
     multipleNum: multipleNum,
     shuffle: false,
@@ -606,11 +1075,15 @@ RandomTagGroup _group({
         .toList(),
     dependencyConfig: dependencyConfig,
     timeCondition: timeCondition,
+    visibilityRules: visibilityRules,
     postProcessRules: postProcessRules,
     emphasisProbability: emphasisProbability,
     emphasisBracketCount: emphasisBracketCount,
   );
 }
+
+List<String> _promptTags(String prompt) =>
+    prompt.split(',').map((tag) => tag.trim()).toList();
 
 const _noHumanConfig = CharacterCountConfig(
   categories: [
