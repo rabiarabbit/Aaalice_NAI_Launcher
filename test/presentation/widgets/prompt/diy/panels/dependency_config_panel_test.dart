@@ -4,6 +4,7 @@ import 'package:nai_launcher/data/models/prompt/dependency_config.dart';
 import 'package:nai_launcher/l10n/app_localizations.dart';
 import 'package:nai_launcher/presentation/widgets/common/surface_ink_well.dart';
 import 'package:nai_launcher/presentation/widgets/common/themed_input.dart';
+import 'package:nai_launcher/presentation/widgets/prompt/diy/diy_category_field.dart';
 import 'package:nai_launcher/presentation/widgets/prompt/diy/panels/dependency_config_panel.dart';
 
 import '../../../../../helpers/ink_expectations.dart';
@@ -156,16 +157,12 @@ Future<void> _pumpPanel(
       ),
       home: Scaffold(
         body: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: SizedBox(
-            width: textScale >= 2 ? 600 : tester.view.physicalSize.width,
-            child: SingleChildScrollView(
-              child: DependencyConfigPanel(
-                config: const DependencyConfig(sourceCategoryId: 'characters'),
-                availableCategories: const ['characters'],
-                onConfigChanged: onChanged,
-              ),
-            ),
+          child: DependencyConfigPanel(
+            config: const DependencyConfig(sourceCategoryId: 'characters'),
+            categoryOptions: const [
+              DiyCategoryOption(id: 'characters', label: 'Characters'),
+            ],
+            onConfigChanged: onChanged,
           ),
         ),
       ),
