@@ -2,15 +2,15 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:hive/hive.dart';
 
 import '../../core/utils/app_logger.dart';
-import '../../core/utils/isolate_pool.dart';
 import '../models/gallery/nai_image_metadata.dart';
 import 'fixed_tag/fixed_tag_usage_record_store.dart';
 import 'metadata/cache_manager.dart';
 import 'metadata/hash_calculator.dart';
-import 'metadata/preloader.dart';
+import 'metadata/metadata_parse_executor.dart';
 import 'metadata/unified_metadata_parser.dart';
 
 /// 解析任务取消 Token
@@ -122,7 +122,7 @@ class ParseStatistics {
 /// - ImageMetadataService: 主服务，协调各组件
 /// - MetadataCacheManager: L1/L2 缓存管理
 /// - FileHashCalculator: 文件哈希计算
-/// - MetadataPreloader: 后台预加载队列
+/// - MetadataParseExecutor: 后台 isolate 解析
 /// - UnifiedMetadataParser: 统一元数据解析器
 ///
 /// 新特性：
@@ -138,7 +138,7 @@ class ImageMetadataService {
   // 子组件
   final _cacheManager = MetadataCacheManager();
   final _hashCalculator = FileHashCalculator();
-  final _preloader = MetadataPreloader();
+  MetadataParseExecutor _parseExecutor = const MetadataParseExecutor();
   final _fixedTagUsageRecords = FixedTagUsageRecordStore();
 
   // 并发控制
@@ -160,6 +160,12 @@ class ImageMetadataService {
   Future<void> initialize() async {
     await _cacheManager.initialize();
     await _fixedTagUsageRecords.initialize();
+  }
+
+  /// 传 null 恢复默认的后台执行器。
+  @visibleForTesting
+  void debugSetParseExecutorForTesting(MetadataParseExecutor? executor) {
+    _parseExecutor = executor ?? const MetadataParseExecutor();
   }
 
   /// 前台立即获取元数据（高优先级）
@@ -470,13 +476,7 @@ class ImageMetadataService {
 
     final stopwatch = Stopwatch()..start();
     try {
-      // PNG stealth metadata can require a full pixel decode. Keep it off the
-      // UI isolate even though the surrounding cache API is asynchronous.
-      final result = await ComputeGate().runCompute(
-        UnifiedMetadataParser.parseFromImage,
-        bytes,
-        debugLabel: 'image_metadata_from_bytes',
-      );
+      final result = await _parseExecutor.parseBytes(bytes);
       final metadata = result.success ? result.metadata : null;
       if (metadata != null && metadata.hasData) {
         try {
@@ -508,15 +508,6 @@ class ImageMetadataService {
         bytesRead: bytes.length,
       );
     }
-  }
-
-  /// 将图像加入预加载队列
-  void enqueuePreload({
-    required String taskId,
-    String? filePath,
-    Uint8List? bytes,
-  }) {
-    _preloader.enqueue(taskId: taskId, filePath: filePath, bytes: bytes);
   }
 
   /// 从缓存获取元数据（同步检查）
@@ -571,9 +562,6 @@ class ImageMetadataService {
     _hashCalculator.notifyPathChanged(oldPath, newPath);
   }
 
-  /// 预加载（简写）
-  void preload(String path) => enqueuePreload(taskId: path, filePath: path);
-
   // ==================== 统计信息 ====================
 
   /// L1 内存缓存大小
@@ -601,7 +589,6 @@ class ImageMetadataService {
   void resetStatistics() {
     _cacheManager.resetStatistics();
     _hashCalculator.resetStatistics();
-    _preloader.resetStatistics();
     _statistics.reset();
   }
 
@@ -609,14 +596,10 @@ class ImageMetadataService {
   Map<String, dynamic> getStats() => {
     ..._cacheManager.getStatistics(),
     ..._hashCalculator.getStatistics(),
-    ..._preloader.getStatistics(),
     ..._statistics.toMap(),
     'pendingTasks': _pendingTasks.length,
     'activeTimeouts': _activeTimeouts.length,
   };
-
-  /// 获取预加载队列状态
-  Map<String, dynamic> getPreloadQueueStatus() => _preloader.getStatistics();
 
   // ==================== 私有方法 ====================
 
@@ -701,11 +684,7 @@ class ImageMetadataService {
       try {
         _checkCancelled(cancelToken);
 
-        final result = UnifiedMetadataParser.parseFromFile(
-          path,
-          useGradualRead: true,
-          useCache: true,
-        );
+        final result = await _parseExecutor.parseFile(path);
 
         parseStopwatch.stop();
 
@@ -768,7 +747,7 @@ class ImageMetadataService {
         return null;
       }
 
-      final result = UnifiedMetadataParser.parseFromImage(bytes);
+      final result = await _parseExecutor.parseBytes(bytes);
       final metadata = result.success ? result.metadata : null;
 
       if (metadata != null && metadata.hasData) {
