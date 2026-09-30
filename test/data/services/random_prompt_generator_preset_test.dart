@@ -630,6 +630,293 @@ void main() {
     expect(result.characters.single.prompt, contains('blue eyes'));
   });
 
+  test('子词组与顶层词组一样求值时间、可见性、依赖与性别', () async {
+    final preset = _preset(
+      [
+        _category(
+          id: 'pose',
+          key: 'pose',
+          groups: [
+            _group(id: 'pose_group', tags: ['portrait']),
+          ],
+        ),
+        _category(
+          id: 'outfit',
+          key: 'outfit',
+          scope: TagScope.character,
+          groups: [
+            _group(id: 'outfit_parent').copyWith(
+              nodeType: TagGroupNodeType.config,
+              children: [
+                _group(id: 'plain', tags: ['shirt']),
+                _group(
+                  id: 'seasonal',
+                  tags: ['santa hat'],
+                  timeCondition: TimeCondition.christmas(),
+                ),
+                _group(
+                  id: 'hidden_in_portrait',
+                  tags: ['boots'],
+                  visibilityRules: const [
+                    VisibilityRule(
+                      id: 'hide_boots',
+                      name: 'Hide boots',
+                      targetCategoryId: 'hidden_in_portrait',
+                      sourceCategoryId: 'pose',
+                      conditionValue: 'portrait',
+                      visibleWhenMatched: false,
+                    ),
+                  ],
+                ),
+                _group(
+                  id: 'needs_missing',
+                  tags: ['cape'],
+                  dependencyConfig: const DependencyConfig(
+                    type: DependencyType.exists,
+                    sourceCategoryId: 'missing',
+                  ),
+                ),
+                _group(id: 'boys_only', tags: ['necktie']).copyWith(
+                  genderRestrictionEnabled: true,
+                  applicableGenders: const ['boy'],
+                ),
+                _group(
+                  id: 'two_by_pose',
+                  tags: ['gloves', 'scarf', 'belt'],
+                  selectionMode: SelectionMode.multipleNum,
+                  dependencyConfig: const DependencyConfig(
+                    sourceCategoryId: 'pose',
+                    mappingRules: {'1': '2'},
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ],
+      algorithmConfig: const AlgorithmConfig(
+        characterCountConfig: _soloGirlConfig,
+      ),
+      forceNoHumanConfig: false,
+    );
+
+    final result = await generator.generateFromPreset(
+      preset: preset,
+      seed: 1,
+      generationTime: DateTime(2026, 6, 1),
+    );
+    final tags = _promptTags(result.characters.single.prompt);
+
+    expect(tags, contains('shirt'));
+    expect(
+      tags,
+      isNot(anyOf(contains('santa hat'), contains('boots'), contains('cape'))),
+    );
+    expect(tags, isNot(contains('necktie')));
+    expect(
+      tags.where(const {'gloves', 'scarf', 'belt'}.contains),
+      hasLength(2),
+    );
+  });
+
+  test('子词组上以类别为目标的可见性规则作用于目标类别', () async {
+    final preset = _preset([
+      _category(
+        id: 'mood',
+        key: 'mood',
+        groups: [
+          _group(id: 'mood_parent').copyWith(
+            nodeType: TagGroupNodeType.config,
+            children: [
+              _group(
+                id: 'sleepy',
+                tags: ['sleeping'],
+                visibilityRules: const [
+                  VisibilityRule(
+                    id: 'hide_eyes',
+                    name: 'Hide eyes',
+                    targetCategoryId: 'eyes',
+                    sourceCategoryId: 'mood',
+                    conditionValue: 'sleeping',
+                    visibleWhenMatched: false,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+      _category(
+        id: 'eyes',
+        key: 'eyes',
+        groups: [
+          _group(id: 'eye_group', tags: ['blue eyes']),
+        ],
+      ),
+    ]);
+
+    final result = await generator.generateFromPreset(preset: preset, seed: 1);
+
+    expect(result.mainPrompt, contains('sleeping'));
+    expect(result.mainPrompt, isNot(contains('blue eyes')));
+  });
+
+  group('条件分支输出同类别词组', () {
+    RandomPreset outfitPreset({bool branchEnabled = true}) => _preset([
+      _category(
+        id: 'outfit',
+        key: 'outfit',
+        groups: [
+          _group(id: 'type').copyWith(
+            conditionalBranchConfig: ConditionalBranchConfig(
+              id: 'type_config',
+              name: 'Type',
+              branches: [
+                ConditionalBranch(
+                  name: 'uniform',
+                  probability: 100,
+                  tagGroupIds: const ['uniform'],
+                  enabled: branchEnabled,
+                ),
+                ConditionalBranch(
+                  name: 'casual',
+                  probability: 0,
+                  tagGroupIds: const ['casual'],
+                  enabled: branchEnabled,
+                ),
+              ],
+            ),
+          ),
+          _group(id: 'uniform', tags: ['school uniform']),
+          _group(id: 'casual', tags: ['t-shirt']),
+          _group(id: 'always', tags: ['hat']),
+        ],
+      ),
+    ]);
+
+    test('被引用的词组只在分支选中时输出，不参与常规抽取', () async {
+      final tags = _promptTags(
+        (await generator.generateFromPreset(
+          preset: outfitPreset(),
+          seed: 1,
+        )).mainPrompt,
+      );
+
+      expect(tags, containsAll(['school uniform', 'hat']));
+      expect(tags, isNot(contains('t-shirt')));
+    });
+
+    test('分支停用后被引用的词组恢复常规抽取', () async {
+      final tags = _promptTags(
+        (await generator.generateFromPreset(
+          preset: outfitPreset(branchEnabled: false),
+          seed: 1,
+        )).mainPrompt,
+      );
+
+      expect(tags, containsAll(['school uniform', 't-shirt', 'hat']));
+    });
+
+    test('存量数据里的循环引用在生成时被截断，不会无限展开', () async {
+      ConditionalBranchConfig to(String target) => ConditionalBranchConfig(
+        id: 'to_$target',
+        name: 'to $target',
+        branches: [
+          ConditionalBranch(
+            name: target,
+            probability: 100,
+            tagGroupIds: [target],
+          ),
+        ],
+      );
+      final preset = _preset([
+        _category(
+          id: 'loop',
+          key: 'loop',
+          groups: [
+            _group(id: 'root').copyWith(conditionalBranchConfig: to('a')),
+            _group(id: 'a', tags: ['a tag']).copyWith(
+              conditionalBranchConfig: to('b'),
+            ),
+            _group(id: 'b', tags: ['b tag']).copyWith(
+              conditionalBranchConfig: to('a'),
+            ),
+          ],
+        ),
+      ]);
+
+      final tags = _promptTags(
+        (await generator.generateFromPreset(preset: preset, seed: 1))
+            .mainPrompt,
+      );
+
+      expect(tags, contains('b tag'));
+      expect(tags, isNot(contains('a tag')));
+    });
+
+    test('分支条件可引用先生成的类别标签和其他词组选中的分支', () async {
+      final preset = _preset([
+        _category(
+          id: 'mood-id',
+          key: 'mood',
+          groups: [
+            _group(id: 'mood_group', tags: ['{Sleeping}']),
+          ],
+        ),
+        _category(
+          id: 'outfit',
+          key: 'outfit',
+          groups: [
+            _group(id: 'type').copyWith(
+              conditionalBranchConfig: const ConditionalBranchConfig(
+                id: 'type_config',
+                name: 'Type',
+                branches: [
+                  ConditionalBranch(
+                    name: 'pajamas',
+                    probability: 1,
+                    tagGroupIds: ['pajamas'],
+                    conditions: {'mood-id': 'sleeping'},
+                  ),
+                  ConditionalBranch(
+                    name: 'casual',
+                    probability: 100,
+                    tagGroupIds: ['casual'],
+                    conditions: {'mood-id': 'running'},
+                  ),
+                ],
+              ),
+            ),
+            _group(id: 'pajamas', tags: ['pajamas']),
+            _group(id: 'casual', tags: ['t-shirt']),
+            _group(id: 'accessory').copyWith(
+              conditionalBranchConfig: const ConditionalBranchConfig(
+                id: 'accessory_config',
+                name: 'Accessory',
+                branches: [
+                  ConditionalBranch(
+                    name: 'nightcap',
+                    tagGroupIds: ['nightcap'],
+                    conditions: {'type': 'pajamas'},
+                  ),
+                ],
+              ),
+            ),
+            _group(id: 'nightcap', tags: ['nightcap']),
+          ],
+        ),
+      ]);
+
+      final tags = _promptTags(
+        (await generator.generateFromPreset(preset: preset, seed: 1))
+            .mainPrompt,
+      );
+
+      expect(tags, containsAll(['pajamas', 'nightcap']));
+      expect(tags, isNot(contains('t-shirt')));
+    });
+  });
+
   test('disabled conditional branch config falls back to normal group tags',
       () async {
     final preset = _preset([
