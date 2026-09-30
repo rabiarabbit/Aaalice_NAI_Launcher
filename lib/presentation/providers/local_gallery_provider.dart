@@ -160,31 +160,12 @@ class LocalGalleryNotifier extends _$LocalGalleryNotifier {
   @override
   LocalGalleryState build() {
     if (_cachedState != null) return _cachedState!;
-
-    // 监听缓存清理事件
-    GalleryCacheManager().registerOnCacheCleared(_resetState);
-    ref.onDispose(() {
-      GalleryCacheManager().unregisterOnCacheCleared(_resetState);
-    });
-
     return const LocalGalleryState();
   }
 
   void _setState(LocalGalleryState newState) {
     _cachedState = newState;
     state = newState;
-  }
-
-  void _resetState() {
-    _cachedState = null;
-    _service = null;
-    _initialization = null;
-    _favoriteCountLoad = null;
-    _lastSynchronizedAt = null;
-    _filterRequestSerial++;
-    _deferredAdmissions.clear();
-    _deferredRemovals.clear();
-    _setState(const LocalGalleryState());
   }
 
   /// 获取共享服务实例，所有调用方等待同一个初始化 Future。
@@ -218,9 +199,11 @@ class LocalGalleryNotifier extends _$LocalGalleryNotifier {
     final filePaths = _deferredAdmissions.values.toList(growable: false);
     _deferredAdmissions.clear();
 
+    var addedCount = 0;
     for (final filePath in filePaths) {
       try {
-        await service.addNewImageImmediately(filePath);
+        final result = await service.addNewImageImmediately(filePath);
+        if (result == GalleryIndexAdmission.added) addedCount++;
       } catch (e) {
         AppLogger.e(
           '[AddNewImages] Failed to admit deferred image: $filePath',
@@ -230,6 +213,7 @@ class LocalGalleryNotifier extends _$LocalGalleryNotifier {
         );
       }
     }
+    if (addedCount > 0) GalleryCacheManager().invalidateStatistics();
   }
 
   /// 在途的初始化枚举可能早于删除，服务就绪后按磁盘现状再移除一次。
@@ -645,6 +629,8 @@ class LocalGalleryNotifier extends _$LocalGalleryNotifier {
         'LocalGalleryNotifier',
       );
       return GalleryIndexAdmission.failed;
+    } finally {
+      if (addedCount > 0) GalleryCacheManager().invalidateStatistics();
     }
 
     return admission;
