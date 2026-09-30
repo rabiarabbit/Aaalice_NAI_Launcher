@@ -4,7 +4,9 @@ import 'dart:typed_data';
 import 'package:image/image.dart' as img;
 
 import '../constants/api_constants.dart';
+import 'decoded_image_size.dart';
 import 'isolate_pool.dart';
+import 'jpeg_exif_orientation.dart';
 import 'pica_lanczos_resizer.dart';
 
 /// NovelAI 分辨率适配器
@@ -345,7 +347,7 @@ class NaiResolutionAdapter {
     required int targetHeight,
   }) {
     // 先读元数据：尺寸已匹配时不解码、不重采样也不重新编码。
-    if (_imageSizeMatches(imageBytes, targetWidth, targetHeight)) {
+    if (_sendsUnchanged(imageBytes, targetWidth, targetHeight)) {
       return imageBytes;
     }
 
@@ -358,7 +360,9 @@ class NaiResolutionAdapter {
     if (decoded == null) return null;
 
     if (decoded.width == targetWidth && decoded.height == targetHeight) {
-      return imageBytes;
+      return JpegExifOrientation.transformsPixels(imageBytes)
+          ? JpegExifOrientation.encodeUpload(decoded)
+          : imageBytes;
     }
 
     final resized = PicaLanczosResizer.resizeImage(
@@ -496,7 +500,7 @@ class NaiResolutionAdapter {
     required int targetHeight,
   }) {
     // 尺寸已匹配时直接短路，连 isolate 往返都省掉。
-    if (_imageSizeMatches(imageBytes, targetWidth, targetHeight)) {
+    if (_sendsUnchanged(imageBytes, targetWidth, targetHeight)) {
       return Future.value(imageBytes);
     }
     return ComputeGate().runIsolate(
@@ -573,20 +577,24 @@ class NaiResolutionAdapter {
         bytes[7] == 0x0A;
   }
 
-  static bool _imageSizeMatches(Uint8List bytes, int width, int height) {
+  // 官网只发经 canvas 转正的 PNG，带方向的 JPEG 不能原样直通
+  static bool _sendsUnchanged(Uint8List bytes, int width, int height) {
+    if (JpegExifOrientation.transformsPixels(bytes)) return false;
     final size = readImageSize(bytes);
     return size != null && size.$1 == width && size.$2 == height;
   }
 
-  /// 只解析编码头获取画布尺寸，不解码任何像素帧。
+  /// 只解析编码头得到解码后的像素宽高：JPEG 计入 EXIF 方向，
+  /// PNG/JPEG/WebP 以外的格式取编码头声明的画布尺寸。
   static (int, int)? readImageSize(Uint8List bytes) {
-    final pngSize = _tryReadPngSize(bytes);
-    if (pngSize != null) {
-      return pngSize;
-    }
+    return _tryReadPngSize(bytes) ??
+        DecodedImageSize.readHeader(bytes) ??
+        _readCanvasSize(bytes);
+  }
+
+  static (int, int)? _readCanvasSize(Uint8List bytes) {
     try {
-      final decoder = img.findDecoderForData(bytes);
-      final info = decoder?.startDecode(bytes);
+      final info = img.findDecoderForData(bytes)?.startDecode(bytes);
       if (info == null || info.width <= 0 || info.height <= 0) {
         return null;
       }
@@ -597,7 +605,7 @@ class NaiResolutionAdapter {
   }
 
   /// 从 PNG IHDR 直接读取宽高（签名 8 字节 + 长度 4 字节 + 'IHDR' + w/h）。
-  /// 非 PNG 或头部异常时返回 null，由调用方回退到完整解码。
+  /// 非 PNG 或头部异常时返回 null。
   static (int, int)? _tryReadPngSize(Uint8List bytes) {
     if (bytes.length < 24 || !_isPng(bytes)) {
       return null;
