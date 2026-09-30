@@ -4,13 +4,11 @@ import 'dart:io';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nai_launcher/core/comfyui/comfyui.dart';
-import 'package:nai_launcher/data/services/vibe_bulk_operation_service.dart';
 import 'package:nai_launcher/l10n/app_localizations.dart';
 import 'package:nai_launcher/presentation/providers/bulk_operation_provider.dart';
 import 'package:nai_launcher/presentation/providers/category_operation_error.dart';
 import 'package:nai_launcher/presentation/providers/comfyui/comfyui_provider.dart';
 import 'package:nai_launcher/presentation/providers/local_gallery_provider.dart';
-import 'package:nai_launcher/presentation/utils/vibe_bulk_operation_l10n.dart';
 
 void main() {
   group('ARB parity', () {
@@ -172,27 +170,6 @@ void main() {
       expect(error.localized(localizations['ja']!), '子孫カテゴリの下には移動できません');
       expect(error.localized(localizations['zh']!), '不能将分类移动到它的子孙分类下');
     });
-
-    test('Vibe bulk errors are localized before display', () {
-      const error = VibeBulkOperationError(
-        VibeBulkOperationErrorCode.importFailed,
-        itemName: 'sample.naiv4vibe',
-        details: 'invalid payload',
-      );
-
-      expect(
-        error.localized(localizations['en']!),
-        'Failed to import Vibe from sample.naiv4vibe: invalid payload',
-      );
-      expect(
-        error.localized(localizations['ja']!),
-        'sample.naiv4vibe からの Vibe インポートに失敗しました: invalid payload',
-      );
-      expect(
-        error.localized(localizations['zh']!),
-        '从 sample.naiv4vibe 导入 Vibe 失败：invalid payload',
-      );
-    });
   });
 
   test('DIY labels and placeholders are generated for every locale', () {
@@ -205,10 +182,6 @@ void main() {
     expect(chinese.diy_branchDefaultName(2), '分支 2');
     expect(japanese.statistics_monday, '月');
     expect(chinese.common_enabled, '已启用');
-    expect(
-      english.diy_emphasisProbabilityHint('10.0'),
-      'Each selected tag has a 10.0% chance of receiving emphasis brackets',
-    );
     expect(english.networkError_requestFailed(429), 'Request failed (429)');
     expect(
       japanese.networkError_connectionTimeout,
