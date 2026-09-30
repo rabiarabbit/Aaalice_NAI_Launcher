@@ -4376,19 +4376,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tooltip_increaseWeight => 'Increase Weight [+5%]';
 
   @override
-  String get tooltip_edit => 'Edit';
-
-  @override
   String get tooltip_copy => 'Copy';
-
-  @override
-  String get tooltip_delete => 'Delete';
-
-  @override
-  String get tooltip_enable => 'Enable';
-
-  @override
-  String get tooltip_disable => 'Disable';
 
   @override
   String get tooltip_resetWeight => 'Click to reset to 100%';
@@ -4494,33 +4482,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get weight_title => 'Weight';
-
-  @override
-  String get weight_reset => 'Reset';
-
-  @override
-  String get weight_done => 'Done';
-
-  @override
-  String get weight_noBrackets => 'No brackets';
-
-  @override
-  String get weight_editTag => 'Edit Tag';
-
-  @override
-  String get weight_tagName => 'Tag Name';
-
-  @override
-  String get weight_tagNameHint => 'Enter tag name...';
-
-  @override
-  String get tag_enable => 'Enable';
-
-  @override
-  String get tag_disable => 'Disable';
-
-  @override
-  String get tag_delete => 'Delete';
 
   @override
   String get tag_addTag => 'Add Tag';
@@ -6562,26 +6523,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get collectionSelect_dialogTitle => 'Select Collection';
-
-  @override
   String get collectionSelect_filterHint => 'Search collections...';
-
-  @override
-  String get collectionSelect_noCollections => 'No collections';
-
-  @override
-  String get collectionSelect_createCollectionHint =>
-      'Create a collection first';
-
-  @override
-  String get collectionSelect_noFilterResults =>
-      'No matching collections found';
-
-  @override
-  String collectionSelect_imageCount(int count) {
-    return '$count images';
-  }
 
   @override
   String get statistics_chartTopTags => 'Top Tags';
@@ -9413,85 +9355,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String vibeBulk_errorEntryNotFoundOrDeleteFailed(String item) {
-    return '$item was not found or could not be deleted';
-  }
-
-  @override
-  String vibeBulk_errorDeleteFailed(String item, String error) {
-    return 'Failed to delete $item: $error';
-  }
-
-  @override
-  String vibeBulk_errorEntryNotFound(String item) {
-    return 'Entry not found: $item';
-  }
-
-  @override
-  String vibeBulk_errorMoveFailed(String item, String error) {
-    return 'Failed to move $item: $error';
-  }
-
-  @override
-  String vibeBulk_errorFavoriteFailed(String item) {
-    return 'Failed to update favorite status: $item';
-  }
-
-  @override
-  String vibeBulk_errorFavoriteFailedWithDetails(String item, String error) {
-    return 'Failed to update favorite status for $item: $error';
-  }
-
-  @override
-  String vibeBulk_errorAddTagsFailed(String item) {
-    return 'Failed to add tags: $item';
-  }
-
-  @override
-  String vibeBulk_errorAddTagsFailedWithDetails(String item, String error) {
-    return 'Failed to add tags to $item: $error';
-  }
-
-  @override
-  String vibeBulk_errorRemoveTagsFailed(String item) {
-    return 'Failed to remove tags: $item';
-  }
-
-  @override
-  String vibeBulk_errorRemoveTagsFailedWithDetails(String item, String error) {
-    return 'Failed to remove tags from $item: $error';
-  }
-
-  @override
-  String get vibeBulk_errorExportNoFile =>
-      'Export failed because no file was created';
-
-  @override
-  String vibeBulk_errorExportFailed(String error) {
-    return 'Export failed: $error';
-  }
-
-  @override
-  String vibeBulk_errorFileNotFound(String item) {
-    return 'File not found: $item';
-  }
-
-  @override
-  String vibeBulk_errorNoVibeData(String item) {
-    return 'No valid Vibe data was found in $item';
-  }
-
-  @override
-  String vibeBulk_errorImportFailed(String item, String error) {
-    return 'Failed to import Vibe from $item: $error';
-  }
-
-  @override
-  String vibeBulk_errorProcessFileFailed(String item, String error) {
-    return 'Failed to process $item: $error';
-  }
-
-  @override
   String get vibeBulkTag_actionPreview => 'Change preview';
 
   @override
@@ -11747,206 +11610,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pagination_itemUnit => 'items';
 
   @override
-  String get diyGuide_title => 'DIY Feature Guide';
-
-  @override
-  String get diyGuide_subtitle =>
-      'Learn advanced features and create your own library';
-
-  @override
-  String get diyGuide_intro =>
-      'This guide explains the core concepts and advanced features of the DIY system, helping you build powerful dynamic prompt libraries.';
-
-  @override
-  String get diyGuide_exampleLabel => 'Example';
-
-  @override
-  String get diyGuide_hierarchyTitle => 'Hierarchy';
-
-  @override
-  String get diyGuide_hierarchyDescription =>
-      'The DIY system uses a three-level category structure to organize prompts for easier management and lookup.';
-
-  @override
-  String get diyGuide_hierarchyExample =>
-      'Category: Character features\n  -> Group: Hairstyle\n      -> Tag: long hair, short hair, twintails';
-
-  @override
-  String get diyGuide_selectionModeTitle => 'Selection Mode';
-
-  @override
-  String get diyGuide_selectionModeDescription =>
-      'Controls how many tags are selected from a group.';
-
-  @override
-  String get diyGuide_selectionModeExample =>
-      '• Random: select one item each time, such as a random hair color\n• All: select every tag in the group, such as a fixed feature set';
-
-  @override
-  String get diyGuide_weightTitle => 'Weight Control';
-
-  @override
-  String get diyGuide_weightDescription =>
-      'Adjusts the influence of specific prompts during generation.';
-
-  @override
-  String get diyGuide_weightExample =>
-      '• Boost: curly brackets around masterpiece = 1.05x weight\n• Strong boost: triple curly brackets around masterpiece = 1.16x weight\n• Weaken: [bad hands] = 0.95x weight';
-
-  @override
-  String get diyGuide_genderTitle => 'Gender Restriction';
-
-  @override
-  String get diyGuide_genderDescription =>
-      'Limits tags to specific character genders to avoid incompatible generated features.';
-
-  @override
-  String get diyGuide_genderExample =>
-      '• Female: only female characters, such as skirt\n• Male: only male characters, such as beard\n• Any: universal, such as T-shirt';
-
-  @override
-  String get diyGuide_scopeTitle => 'Scope';
-
-  @override
-  String get diyGuide_scopeDescription =>
-      'Defines whether a tag applies to the character, background, or the whole image.';
-
-  @override
-  String get diyGuide_scopeExample =>
-      '• Character: character features, such as eyes and hair\n• Background: environment descriptions, such as blue sky and indoors\n• Global: art style and quality tags, such as best quality';
-
-  @override
-  String get diyGuide_conditionalTitle => 'Conditional Branch';
-
-  @override
-  String get diyGuide_conditionalDescription =>
-      'Dynamically chooses later tags based on selected tags or other conditions.';
-
-  @override
-  String get diyGuide_conditionalExample =>
-      'IF selected \"rain\"\n  THEN add \"umbrella\" and \"wet clothes\"\n  ELSE add \"sunny\"';
-
-  @override
-  String get diyGuide_dependenciesTitle => 'Dependencies';
-
-  @override
-  String get diyGuide_dependenciesDescription =>
-      'Creates links between tags so related tags are automatically introduced when one tag is selected.';
-
-  @override
-  String get diyGuide_dependenciesExample =>
-      'Selecting \"JK uniform\" -> automatically adds \"school background\" and \"school bag\"';
-
-  @override
-  String get diyGuide_visibilityTitle => 'Visibility Rules';
-
-  @override
-  String get diyGuide_visibilityDescription =>
-      'Controls when tags are shown in the UI or become active during generation.';
-
-  @override
-  String get diyGuide_visibilityExample =>
-      'Only show the \"magic wand\" option group when the \"magical girl\" category is selected';
-
-  @override
-  String get diyGuide_timeTitle => 'Time Condition';
-
-  @override
-  String get diyGuide_timeDescription =>
-      'Triggers specific tags based on real time or configured simulated time.';
-
-  @override
-  String get diyGuide_timeExample =>
-      '• 06:00-18:00 -> add \"daylight\"\n• 18:00-06:00 -> add \"night\"';
-
-  @override
-  String get diyGuide_postProcessingTitle => 'Post-processing Rules';
-
-  @override
-  String get diyGuide_postProcessingDescription =>
-      'Runs text replacement or cleanup at the final stage of prompt generation.';
-
-  @override
-  String get diyGuide_postProcessingExample =>
-      'Replace every \"blue eyes\" with \"azure eyes\" for a more distinctive description';
-
-  @override
-  String get diyGuide_emphasisTitle => 'Emphasis Probability';
-
-  @override
-  String get diyGuide_emphasisDescription =>
-      'Randomly adds weight syntax to tags to increase output variety.';
-
-  @override
-  String get diyGuide_emphasisExample =>
-      'Set a 30% probability: about 1/3 of outputs use a weighted tag and 2/3 output the plain tag';
-
-  @override
-  String get naiRules_title => 'NAI Random Rules';
-
-  @override
-  String get naiRules_characterCountProbability =>
-      'Character Count Probability';
-
-  @override
-  String get naiRules_solo => '1 person (Solo)';
-
-  @override
-  String get naiRules_duo => '2 people (Duo)';
-
-  @override
-  String get naiRules_trio => '3 people (Trio)';
-
-  @override
-  String get naiRules_group => '4 people (Group)';
-
-  @override
-  String get naiRules_genderRules => 'Gender Rules';
-
-  @override
-  String get naiRules_female => 'Female';
-
-  @override
-  String get naiRules_male => 'Male';
-
-  @override
-  String get naiRules_mixed => 'Mixed / Other';
-
-  @override
-  String get naiRules_categoryProbability => 'Category Probability';
-
-  @override
-  String get naiRules_dynamicTagWeightTitle => 'Dynamic Tag Weight Adjustment';
-
-  @override
-  String get naiRules_dynamicTagWeightSubtitle =>
-      'Randomly combines multiple dimensions such as action, clothing, expression, and background, then adjusts category weights based on the image theme.';
-
-  @override
-  String get naiRules_specialMechanisms => 'Special Mechanisms';
-
-  @override
-  String get naiRules_tagStrengthening => 'Tag Strengthening';
-
-  @override
-  String get naiRules_seasonalLibraryTitle => 'Seasonal Library';
-
-  @override
-  String get naiRules_seasonalLibrarySubtitle =>
-      'Automatically matches seasonal features, including seasonal clothing, weather, lighting, and atmosphere.';
-
-  @override
-  String get naiRules_v4CharacterPositioning =>
-      'V4 Multi-character Positioning';
-
-  @override
-  String get naiRules_smartPositionTitle => 'Smart Position Assignment';
-
-  @override
-  String get naiRules_smartPositionSubtitle =>
-      'With V4 models, character positioning syntax is used to precisely control multi-character placement.';
-
-  @override
   String get comfyImport_detectedTitle =>
       'Detected ComfyUI multi-character prompt';
 
@@ -12551,9 +12214,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get diy_editDependencyTitle => 'Edit Dependency';
-
-  @override
   String get diy_dependencyTitle => 'Dependency Settings';
 
   @override
@@ -12570,10 +12230,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diy_selectSourceCategory => 'Select a source category';
 
   @override
-  String get diy_sourceCategoryId => 'Source Category ID';
+  String get diy_sourceCharacterCount => 'Character count';
 
   @override
-  String get diy_enterCategoryId => 'Enter a category ID';
+  String diy_categoryUnavailable(String reference) {
+    return 'Unavailable: $reference';
+  }
 
   @override
   String get diy_mappingRules => 'Mapping Rules';
@@ -12639,9 +12301,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get diy_dependencyExcludesDescription =>
       'Do not apply when the source category has a selected tag';
-
-  @override
-  String get diy_editConditionalTitle => 'Edit Conditional Branches';
 
   @override
   String get diy_conditionalDefaultName => 'Conditional Branches';
@@ -12759,10 +12418,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diy_targetCategories => 'Target Categories';
 
   @override
-  String get diy_commaSeparatedCategoryIdsHint =>
-      'Comma-separated category ID list';
-
-  @override
   String get diy_targetTags => 'Target Tags';
 
   @override
@@ -12784,38 +12439,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String diy_actionSummary(String triggers, String action) {
     return 'When [$triggers] matches: $action';
   }
-
-  @override
-  String get diy_emphasisTitle => 'Global Emphasis';
-
-  @override
-  String get diy_emphasisSubtitle => 'Adjust tag emphasis effects';
-
-  @override
-  String get diy_emphasisProbability => 'Emphasis Probability';
-
-  @override
-  String diy_emphasisProbabilityHint(String percent) {
-    return 'Each selected tag has a $percent% chance of receiving emphasis brackets';
-  }
-
-  @override
-  String get diy_bracketCount => 'Bracket Layers';
-
-  @override
-  String diy_bracketLayers(int count) {
-    return '$count layers';
-  }
-
-  @override
-  String get diy_effectPreview => 'Effect Preview';
-
-  @override
-  String get diy_exampleTag => 'example tag';
-
-  @override
-  String get diy_emphasisExplanation =>
-      'Emphasis brackets increase tag weight; more layers apply a higher weight';
 
   @override
   String diy_presetExportFailed(String error) {
@@ -12910,9 +12533,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get diy_conditionValueNotInList => 'Value Is Not in List';
-
-  @override
-  String get diy_editTimeConditionTitle => 'Edit Time Condition';
 
   @override
   String get diy_timeDefaultName => 'Time Condition';

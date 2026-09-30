@@ -23,6 +23,10 @@ class InpaintMaskUtils {
     return mask == null ? bytes : BinaryMaskCodec.encode(mask);
   }
 
+  static Future<Uint8List> normalizeMaskBytesAsync(Uint8List bytes) {
+    return ComputeGate().runIsolate(() => normalizeMaskBytes(bytes));
+  }
+
   /// 将蒙版按最近邻重采样到编辑器工作画布，保持硬边和二值语义。
   static Uint8List resizeMaskBytes(
     Uint8List bytes, {
@@ -163,6 +167,16 @@ class InpaintMaskUtils {
     return _encodeBinaryMask(binaryMask, width, height);
   }
 
+  static Future<Uint8List> encodeBinaryMaskAsync(
+    Uint8List binaryMask,
+    int width,
+    int height,
+  ) {
+    return ComputeGate().runIsolate(
+      () => encodeBinaryMask(binaryMask, width, height),
+    );
+  }
+
   static Future<Uint8List> encodeEditorOverlayFromBinaryMaskAsync(
     Uint8List binaryMask, {
     required int width,
@@ -197,6 +211,10 @@ class InpaintMaskUtils {
     return binaryMask.any((value) => value == 1);
   }
 
+  static Future<bool> hasMaskedPixelsAsync(Uint8List bytes) {
+    return ComputeGate().runIsolate(() => hasMaskedPixels(bytes));
+  }
+
   /// 单次解码得到 0/1 二值蒙版数组及尺寸；解码失败返回 null。
   ///
   /// 供需要同时做"归一化 + 空蒙版检查 + 像素扫描"的调用方使用，
@@ -207,6 +225,11 @@ class InpaintMaskUtils {
     final decoded = BinaryMaskCodec.decode(bytes);
     if (decoded == null) return null;
     return (mask: decoded.pixels, width: decoded.width, height: decoded.height);
+  }
+
+  static Future<({Uint8List mask, int width, int height})?>
+  decodeBinaryMaskAsync(Uint8List bytes) {
+    return ComputeGate().runIsolate(() => decodeBinaryMask(bytes));
   }
 
   /// 将 0/1 二值蒙版渲染为黑白 RGBA 图像（白=蒙版区域），不做 PNG 编码。

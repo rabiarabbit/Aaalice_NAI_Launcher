@@ -3,11 +3,20 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hive/hive.dart';
 import 'package:image/image.dart' as img;
+import 'package:mocktail/mocktail.dart';
+import 'package:nai_launcher/core/cache/local_file_image.dart';
 import 'package:nai_launcher/data/models/gallery/local_image_record.dart';
 import 'package:nai_launcher/data/models/gallery/nai_image_metadata.dart';
+import 'package:nai_launcher/data/services/image_metadata_service.dart';
+import 'package:nai_launcher/data/services/metadata/isolate_metadata_service.dart';
+import 'package:nai_launcher/data/services/metadata/metadata_parse_executor.dart';
+import 'package:nai_launcher/data/services/metadata/unified_metadata_parser.dart';
 import 'package:nai_launcher/presentation/widgets/common/image_detail/file_image_detail_data.dart';
 import 'package:nai_launcher/presentation/widgets/common/image_detail/image_detail_data.dart';
+
+class _MockParseExecutor extends Mock implements MetadataParseExecutor {}
 
 void main() {
   test(
@@ -123,5 +132,114 @@ void main() {
     expect(resized.width, 4096);
     expect(resized.height, 4096);
     expect(resized.policy, ResizeImagePolicy.fit);
+    expect(
+      resized.imageProvider,
+      const LocalFileImage('C:\\tmp\\large_plain.png'),
+    );
   });
+
+  group('local detail metadata resolution', () {
+    late Directory directory;
+    late _MockParseExecutor executor;
+    final service = ImageMetadataService();
+
+    setUp(() async {
+      directory = await Directory.systemTemp.createTemp('local_detail_');
+      Hive.init(directory.path);
+      await service.initialize();
+      executor = _MockParseExecutor();
+      service.debugSetParseExecutorForTesting(executor);
+    });
+
+    tearDown(() async {
+      service.debugSetParseExecutorForTesting(null);
+      await service.clearCache();
+      await Hive.close();
+      await directory.delete(recursive: true);
+    });
+
+    LocalImageRecord recordFor(File file, {NaiImageMetadata? metadata}) {
+      return LocalImageRecord(
+        path: file.path,
+        metadata: metadata,
+        size: file.lengthSync(),
+        modifiedAt: DateTime(2026),
+      );
+    }
+
+    test('an image without metadata is parsed exactly once', () async {
+      final file = File('${directory.path}/plain.png')
+        ..writeAsBytesSync(img.encodePng(img.Image(width: 4, height: 4)));
+      when(() => executor.parseFile(any())).thenAnswer(
+        (_) async => MetadataParseResult.failed(const [
+          'NovelAI stealth_pngcomp',
+        ], 'No NovelAI stealth_pngcomp metadata found'),
+      );
+
+      final metadata = await LocalImageDetailData(
+        recordFor(file),
+      ).getMetadataAsync();
+
+      expect(metadata, isNull);
+      verify(() => executor.parseFile(file.path)).called(1);
+      expect(IsolateMetadataService.instance.getStatistics()['totalTasks'], 0);
+    });
+
+    test('record metadata is returned without parsing the file', () async {
+      final file = File('${directory.path}/recorded.png')
+        ..writeAsBytesSync(img.encodePng(img.Image(width: 4, height: 4)));
+      const recorded = NaiImageMetadata(prompt: 'from record');
+
+      final metadata = await LocalImageDetailData(
+        recordFor(file, metadata: recorded),
+      ).getMetadataAsync();
+
+      expect(metadata?.prompt, 'from record');
+      verifyNever(() => executor.parseFile(any()));
+    });
+  });
+
+  test(
+    'detail providers key file images by identity and keep the 4096 cap',
+    () {
+      const wide = NaiImageMetadata(width: 6000, height: 3000);
+      const tall = NaiImageMetadata(width: 3000, height: 6000);
+      const small = NaiImageMetadata(width: 1024, height: 1536);
+      final providers = <(ImageProvider, int?, int?)>[
+        (
+          LocalImageDetailData(
+            LocalImageRecord(
+              path: 'C:/tmp/wide.png',
+              metadata: wide,
+              size: 1,
+              modifiedAt: DateTime(2026),
+            ),
+          ).getImageProvider(),
+          4096,
+          null,
+        ),
+        (
+          FileImageDetailData(
+            filePath: 'C:/tmp/tall.png',
+            initialMetadata: tall,
+          ).getImageProvider(),
+          null,
+          4096,
+        ),
+      ];
+
+      for (final (provider, width, height) in providers) {
+        final resized = provider as ResizeImage;
+        expect((resized.width, resized.height), (width, height));
+        expect(resized.imageProvider, isA<LocalFileImage>());
+      }
+      expect(
+        FileImageDetailData(
+          filePath: 'C:/tmp/small.png',
+          initialMetadata: small,
+        ).getImageProvider(),
+        const LocalFileImage('C:/tmp/small.png'),
+      );
+    },
+  );
 }

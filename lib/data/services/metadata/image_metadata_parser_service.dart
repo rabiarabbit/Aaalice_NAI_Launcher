@@ -10,7 +10,7 @@ import 'metadata_parse_result.dart';
 import 'metadata_text_decoder.dart';
 import 'webp_exif_metadata_extractor.dart';
 
-/// Coordinates container decoding, text interpretation, files, cache and stats.
+/// Coordinates container decoding, text interpretation, files and stats.
 class ImageMetadataParserService {
   ImageMetadataParserService({
     MetadataTextDecoder? textDecoder,
@@ -22,14 +22,12 @@ class ImageMetadataParserService {
 
   final MetadataTextDecoder _textDecoder;
   final MetadataFileRepository _fileRepository;
-  final Map<String, MetadataParseResult> _resultCache = {};
   final ParseStatistics statistics = ParseStatistics();
 
   MetadataParseResult parseFromFile(
     String filePath, {
     int? maxBytes,
     bool useGradualRead = true,
-    bool useCache = true,
   }) {
     final stopwatch = Stopwatch()..start();
     statistics.totalAttempts++;
@@ -57,11 +55,8 @@ class ImageMetadataParserService {
         useGradualRead: useGradualRead,
         statistics: statistics,
         parseBytes: (bytes, path) =>
-            parseFromImage(bytes, filePathForLog: path, useCache: false),
+            parseFromImage(bytes, filePathForLog: path),
       );
-      if (useCache && result.success && result.metadata != null) {
-        _cacheFileResult(filePath, result);
-      }
       _updateStatistics(result, stopwatch.elapsed);
       return result;
     } on FileSystemException catch (error) {
@@ -83,21 +78,12 @@ class ImageMetadataParserService {
   MetadataParseResult parseFromImage(
     Uint8List bytes, {
     String? filePathForLog,
-    bool useCache = false,
   }) {
     if (ImageMetadataContainerCodec.isPngHeader(bytes)) {
-      return parseFromPng(
-        bytes,
-        filePathForLog: filePathForLog,
-        useCache: useCache,
-      );
+      return parseFromPng(bytes, filePathForLog: filePathForLog);
     }
     if (WebpExifMetadataExtractor.hasWebpHeader(bytes)) {
-      return parseFromWebp(
-        bytes,
-        filePathForLog: filePathForLog,
-        useCache: useCache,
-      );
+      return parseFromWebp(bytes, filePathForLog: filePathForLog);
     }
 
     final stopwatch = Stopwatch()..start();
@@ -113,38 +99,59 @@ class ImageMetadataParserService {
     return result;
   }
 
-  MetadataParseResult parseFromPng(
-    Uint8List bytes, {
-    String? filePathForLog,
-    bool useCache = false,
-  }) {
+  MetadataParseResult parseFromPng(Uint8List bytes, {String? filePathForLog}) {
     final stopwatch = Stopwatch()..start();
     statistics.totalAttempts++;
-    final cacheKey = _bytesCacheKey(bytes);
-    if (useCache) {
-      final cached = _resultCache[cacheKey];
-      if (cached != null) {
-        _updateStatistics(cached, stopwatch.elapsed);
-        return cached;
-      }
-    }
+    final result = _parsePng(
+      bytes,
+      stopwatch,
+      filePathForLog: filePathForLog,
+      includeStealth: true,
+    )!;
+    _updateStatistics(result, stopwatch.elapsed);
+    return result;
+  }
 
+  /// Returns the same result as [parseFromImage] without any pixel decode, or
+  /// null when that result depends on the stealth payload in the PNG pixels.
+  MetadataParseResult? parseFromImageWithoutPixelDecode(Uint8List bytes) {
+    if (ImageMetadataContainerCodec.isPngHeader(bytes)) {
+      return parseFromPngWithoutPixelDecode(bytes);
+    }
+    return parseFromImage(bytes);
+  }
+
+  /// PNG-only counterpart of [parseFromImageWithoutPixelDecode].
+  MetadataParseResult? parseFromPngWithoutPixelDecode(Uint8List bytes) {
+    final stopwatch = Stopwatch()..start();
+    final result = _parsePng(bytes, stopwatch, includeStealth: false);
+    if (result != null) {
+      statistics.totalAttempts++;
+      _updateStatistics(result, stopwatch.elapsed);
+    }
+    return result;
+  }
+
+  MetadataParseResult? _parsePng(
+    Uint8List bytes,
+    Stopwatch stopwatch, {
+    String? filePathForLog,
+    required bool includeStealth,
+  }) {
     final fileInfo = filePathForLog != null ? 'file=$filePathForLog, ' : '';
     try {
       if (!ImageMetadataContainerCodec.isPngHeader(bytes)) {
-        final result = MetadataParseResult.failed(
+        return MetadataParseResult.failed(
           const [],
           'Not a valid PNG file header, ${fileInfo}bytes length=${bytes.length}',
           parseTime: stopwatch.elapsed,
           bytesRead: bytes.length,
         );
-        _updateStatistics(result, stopwatch.elapsed);
-        return result;
       }
 
       final info = img.PngDecoder().startDecode(bytes);
       if (info == null) {
-        final result = MetadataParseResult.failed(
+        return MetadataParseResult.failed(
           const [],
           bytes.length < 1024 * 1024
               ? 'Failed to decode PNG (incomplete data?)'
@@ -152,69 +159,51 @@ class ImageMetadataParserService {
           parseTime: stopwatch.elapsed,
           bytesRead: bytes.length,
         );
-        _updateStatistics(result, stopwatch.elapsed);
-        return result;
       }
 
       final pngInfo = info as img.PngInfo;
-      var result = _parseTextData(
+      final result = _parseTextData(
         ImageMetadataContainerCodec.extractPngTextData(
           bytes,
           decoderTextData: pngInfo.textData,
         ),
       );
-      if (!result.success) {
-        final stealthText =
-            ImageMetadataContainerCodec.extractStealthMetadataText(bytes);
-        if (stealthText != null) {
-          final stealthResult = _parseTextData({'Comment': stealthText});
-          if (stealthResult.success && stealthResult.metadata != null) {
-            result = MetadataParseResult.success(
-              stealthResult.metadata!,
-              'NovelAI stealth_pngcomp',
-              stealthText,
-              [...result.triedParsers, 'NovelAI stealth_pngcomp'],
-              parseTime: stopwatch.elapsed,
-              bytesRead: bytes.length,
-            );
-          }
+      if (result.success) return result;
+      if (!includeStealth) return null;
+
+      final stealthText = ImageMetadataContainerCodec.extractStealthMetadataText(
+        bytes,
+      );
+      if (stealthText != null) {
+        final stealthResult = _parseTextData({'Comment': stealthText});
+        if (stealthResult.success && stealthResult.metadata != null) {
+          return MetadataParseResult.success(
+            stealthResult.metadata!,
+            'NovelAI stealth_pngcomp',
+            stealthText,
+            [...result.triedParsers, 'NovelAI stealth_pngcomp'],
+            parseTime: stopwatch.elapsed,
+            bytesRead: bytes.length,
+          );
         }
       }
-
-      if (useCache && result.success) _resultCache[cacheKey] = result;
-      _updateStatistics(result, stopwatch.elapsed);
       return result;
     } catch (error, stackTrace) {
       final message =
           'Error parsing metadata from PNG (${fileInfo}bytes=${bytes.length}): $error';
       PortableLogger.e(message, error, stackTrace, _tag);
-      final result = MetadataParseResult.failed(
+      return MetadataParseResult.failed(
         const [],
         message,
         parseTime: stopwatch.elapsed,
         bytesRead: bytes.length,
       );
-      _updateStatistics(result, stopwatch.elapsed);
-      return result;
     }
   }
 
-  MetadataParseResult parseFromWebp(
-    Uint8List bytes, {
-    String? filePathForLog,
-    bool useCache = false,
-  }) {
+  MetadataParseResult parseFromWebp(Uint8List bytes, {String? filePathForLog}) {
     final stopwatch = Stopwatch()..start();
     statistics.totalAttempts++;
-    final cacheKey = _bytesCacheKey(bytes);
-    if (useCache) {
-      final cached = _resultCache[cacheKey];
-      if (cached != null) {
-        _updateStatistics(cached, stopwatch.elapsed);
-        return cached;
-      }
-    }
-
     try {
       final extraction = WebpExifMetadataExtractor.extract(bytes);
       if (extraction.errorMessage != null || !extraction.hasMetadata) {
@@ -245,7 +234,6 @@ class ImageMetadataParserService {
               parseTime: stopwatch.elapsed,
               bytesRead: bytes.length,
             );
-      if (useCache && result.success) _resultCache[cacheKey] = result;
       _updateStatistics(result, stopwatch.elapsed);
       return result;
     } catch (error, stackTrace) {
@@ -323,20 +311,6 @@ class ImageMetadataParserService {
   }
 
   void resetStatistics() => statistics.reset();
-
-  void clearCache() => _resultCache.clear();
-
-  void _cacheFileResult(String filePath, MetadataParseResult result) {
-    final key =
-        '$filePath:${result.bytesRead}:${result.metadata?.prompt.hashCode ?? 0}';
-    _resultCache[key] = result;
-    if (_resultCache.length > 100) _resultCache.remove(_resultCache.keys.first);
-  }
-
-  String _bytesCacheKey(Uint8List bytes) {
-    final data = bytes.length > 1024 ? bytes.sublist(0, 1024) : bytes;
-    return data.hashCode.toString();
-  }
 
   void _updateStatistics(MetadataParseResult result, Duration elapsed) {
     statistics.totalParseTime += elapsed;
