@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:image/image.dart' as img;
 
+import 'color_channel_normalizer.dart';
 import 'isolate_pool.dart';
 
 /// JPEG 与 WebP 的 EXIF 方向：Flutter 引擎显示时会把它转进像素，PNG 的 eXIf 不处理。
@@ -33,16 +34,19 @@ abstract final class ExifOrientation {
     return orientation != null && orientation >= 5 && orientation <= 8;
   }
 
-  /// 解码出与 Flutter 显示一致的像素：JPEG 解码器已按方向转正，WebP 在这里补转。
+  /// 解码出与 Flutter 显示一致的像素：JPEG 解码器已按方向转正，WebP 在这里补转，
+  /// 并规范成像素 getter 可靠的颜色布局。
   static img.Image? decodeUpright(Uint8List bytes) {
     final decoded = img.decodeImage(bytes);
-    if (decoded == null || !_isWebp(bytes)) return decoded;
+    if (decoded == null) return null;
+    final color = ColorChannelNormalizer.normalize(decoded);
+    if (!_isWebp(bytes)) return color;
     final orientation = read(bytes);
     if (orientation == null || orientation < 2 || orientation > 8) {
-      return decoded;
+      return color;
     }
-    decoded.exif.imageIfd.orientation = orientation;
-    return img.bakeOrientation(decoded);
+    color.exif.imageIfd.orientation = orientation;
+    return img.bakeOrientation(color);
   }
 
   /// `img.decodeImage` 结果转正后的宽高，只需尺寸时省去 [decodeUpright] 的整图旋转。
