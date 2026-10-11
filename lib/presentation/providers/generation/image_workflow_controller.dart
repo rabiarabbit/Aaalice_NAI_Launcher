@@ -15,6 +15,7 @@ import '../../../core/utils/nai_resolution_adapter.dart';
 import '../../../data/models/image/image_params.dart';
 import 'generation_panel_expansion_provider.dart';
 import 'generation_params_notifier.dart';
+import 'generation_request_preparation_service.dart';
 
 enum ImageWorkflowMode { base, inpaint, enhance, upscale }
 
@@ -429,6 +430,13 @@ class ImageWorkflowState {
   bool get isEnhance => mode == ImageWorkflowMode.enhance;
   bool get isInpaint => mode == ImageWorkflowMode.inpaint;
   bool get isUpscale => mode == ImageWorkflowMode.upscale;
+
+  GenerationFocusedSnapshot get focusedSnapshot => GenerationFocusedSnapshot(
+    enabled: focusedInpaintEnabled,
+    minimumContextMegaPixels: minimumContextMegaPixels,
+    selectionRect: focusedSelectionRect,
+    contextCrop: focusedContextCrop,
+  );
 
   ImageWorkflowState copyWith({
     ImageWorkflowMode? mode,
