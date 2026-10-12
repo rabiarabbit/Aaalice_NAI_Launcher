@@ -5,7 +5,8 @@ import '../../../../core/utils/localization_extension.dart';
 class SettingsFormFooter extends StatelessWidget {
   const SettingsFormFooter({super.key, required this.onSave, this.leading});
 
-  final VoidCallback onSave;
+  /// 为 null 时保存按钮禁用，用于表单尚未通过校验的状态。
+  final VoidCallback? onSave;
   final Widget? leading;
 
   @override
