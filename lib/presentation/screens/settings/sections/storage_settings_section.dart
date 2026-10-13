@@ -13,6 +13,7 @@ import '../../../../core/utils/localization_extension.dart';
 import '../../../../core/utils/vibe_library_path_helper.dart';
 import '../../../../data/services/local_onnx_model_service.dart';
 import '../../../providers/image_save_settings_provider.dart';
+import '../../../providers/local_tagger_models_provider.dart';
 import '../../../widgets/common/app_toast.dart';
 import '../../../widgets/common/themed_confirm_dialog.dart';
 import '../widgets/cache_statistics_tile.dart';
@@ -66,9 +67,11 @@ class _StorageSettingsSectionState
       final result = await FilePicker.platform.getDirectoryPath(
         dialogTitle: context.l10n.settings_selectLocalOnnxTaggerFolder,
       );
-      if (result == null) return;
+      if (result == null || !mounted) return;
       final service = ref.read(localOnnxModelServiceProvider);
+      final container = ProviderScope.containerOf(context, listen: false);
       await service.setTaggerDirectory(result);
+      invalidateLocalTaggerCaches(container);
       if (mounted) {
         setState(() {});
         AppToast.success(
@@ -87,6 +90,9 @@ class _StorageSettingsSectionState
   }
 
   Future<void> _importLocalOnnxTaggerFiles() async {
+    // 导入可能在设置页关闭后才结束，失效模型缓存不能依赖已卸载的 ref
+    final container = ProviderScope.containerOf(context, listen: false);
+    var importStarted = false;
     try {
       final selection = await FilePicker.platform.pickFiles(
         dialogTitle: context.l10n.settings_importLocalOnnxTaggerFiles,
@@ -104,7 +110,8 @@ class _StorageSettingsSectionState
           )
           .toList(growable: false);
       if (mounted) setState(() => _importingLocalOnnx = true);
-      final importedCount = await ref
+      importStarted = true;
+      final importedCount = await container
           .read(localOnnxModelServiceProvider)
           .importTaggerSelections(sources);
       if (mounted) {
@@ -122,6 +129,7 @@ class _StorageSettingsSectionState
         );
       }
     } finally {
+      if (importStarted) invalidateLocalTaggerCaches(container);
       if (mounted && _importingLocalOnnx) {
         setState(() => _importingLocalOnnx = false);
       }
@@ -138,8 +146,12 @@ class _StorageSettingsSectionState
       type: ThemedConfirmDialogType.danger,
       icon: Icons.delete_outline,
     );
-    if (!confirmed) return;
-    await ref.read(localOnnxModelServiceProvider).clearManagedTaggerFiles();
+    if (!confirmed || !mounted) return;
+    final container = ProviderScope.containerOf(context, listen: false);
+    await container
+        .read(localOnnxModelServiceProvider)
+        .clearManagedTaggerFiles();
+    invalidateLocalTaggerCaches(container);
     if (mounted) setState(() {});
   }
 
@@ -287,7 +299,9 @@ class _StorageSettingsSectionState
                 subtitle:
                     PlatformCapabilities.current.supportsManagedFileImports
                     ? FutureBuilder<int>(
-                        future: localOnnxService.managedFileCount(),
+                        future: ref.watch(
+                          localTaggerManagedFileCountProvider.future,
+                        ),
                         builder: (context, snapshot) {
                           final count = snapshot.data ?? 0;
                           return Text(
