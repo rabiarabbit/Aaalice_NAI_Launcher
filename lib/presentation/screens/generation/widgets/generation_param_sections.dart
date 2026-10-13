@@ -577,7 +577,6 @@ class _SeedSectionState extends ConsumerState<SeedSection> {
 ///
 /// 经典布局包在「高级选项」ExpansionTile 里；
 /// 官网式布局在参数抽屉内平铺展示。
-/// 两处都按 [ImageParamsExtension.hasAdvancedSamplingOptions] 决定是否渲染。
 class AdvancedSamplingOptions extends ConsumerWidget {
   const AdvancedSamplingOptions({super.key});
 
