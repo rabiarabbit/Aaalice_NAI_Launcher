@@ -588,8 +588,16 @@ class _ImagePreviewWidgetState extends ConsumerState<ImagePreviewWidget> {
     ThemeData theme,
   ) {
     final comparisonAvailable = image.canCompareWithSource;
+    // 对比会遮住选中态，批量选择期间暂停对比，避免操作看不见的已选图
+    final selectionActive = ref.watch(
+      generationImageCardSelectionProvider.select(
+        (selection) => selection.isActive,
+      ),
+    );
     final comparisonEnabled =
-        comparisonAvailable && ref.watch(generationComparisonEnabledProvider);
+        comparisonAvailable &&
+        !selectionActive &&
+        ref.watch(generationComparisonEnabledProvider);
 
     // 信息条紧贴图片下沿并与图片左对齐（官网 bottom.start 口径），
     // 因此先扣掉信息条高度再按比例算卡片尺寸，避免二者互相挤压。
@@ -637,14 +645,7 @@ class _ImagePreviewWidgetState extends ConsumerState<ImagePreviewWidget> {
                   image: image,
                   comparisonEnabled: comparisonEnabled,
                   onComparisonChanged: comparisonAvailable
-                      ? (enabled) =>
-                            ref
-                                    .read(
-                                      generationComparisonEnabledProvider
-                                          .notifier,
-                                    )
-                                    .state =
-                                enabled
+                      ? (enabled) => _setComparisonEnabled(ref, enabled)
                       : null,
                 ),
               ),
@@ -653,6 +654,13 @@ class _ImagePreviewWidgetState extends ConsumerState<ImagePreviewWidget> {
         );
       },
     );
+  }
+
+  void _setComparisonEnabled(WidgetRef ref, bool enabled) {
+    if (enabled && ref.read(generationImageCardSelectionProvider).isActive) {
+      ref.read(generationImageCardSelectionProvider.notifier).exit();
+    }
+    ref.read(generationComparisonEnabledProvider.notifier).state = enabled;
   }
 
   Widget _buildGeneratedImageCard({
@@ -701,9 +709,8 @@ class _ImagePreviewWidgetState extends ConsumerState<ImagePreviewWidget> {
       enableHoverScale: !comparisonEnabled,
       enableSelection: canSelect,
       showSelectionOnHover: false,
-      // 对比占满整张卡片，选中色罩会改变对比时看到的颜色
-      selectionMode: !comparisonEnabled && cardSelection.isActive,
-      isSelected: !comparisonEnabled && cardSelection.isSelected(image.id),
+      selectionMode: cardSelection.isActive,
+      isSelected: cardSelection.isSelected(image.id),
       allowRepeatedModifierTaps: true,
       onSelectionChanged: image.canBulkSelect
           ? (selected) {
