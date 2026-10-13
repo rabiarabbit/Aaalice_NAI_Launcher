@@ -59,6 +59,9 @@ import '../../../utils/image_detail_opener.dart';
 import '../../../utils/krita_send_helper.dart';
 import '../../../utils/precise_ref_library_import_helper.dart';
 import '../../tag_library_page/widgets/entry_add_dialog.dart';
+import '../../../widgets/common/image_card_frame.dart';
+import '../../../widgets/common/image_card_size.dart';
+import '../../../widgets/common/image_comparison_toolbar.dart';
 import '../../../widgets/common/image_comparison_view.dart';
 import 'preview_info_bar.dart';
 
@@ -601,9 +604,13 @@ class _ImagePreviewWidgetState extends ConsumerState<ImagePreviewWidget> {
                 constraints.maxHeight - PreviewInfoBar.heightFor(context) - gap,
               )
             : constraints.maxHeight;
-        final cardSize = _fitAspectRatio(
+        final comparisonFooterHeight = comparisonEnabled
+            ? ImageComparisonToolbar.singleRowHeight(context)
+            : 0.0;
+        final cardSize = fitImageCardSize(
           aspectRatio: image.aspectRatio,
           maxSize: Size(constraints.maxWidth, availableHeight),
+          footerHeight: comparisonFooterHeight,
         );
 
         return Column(
@@ -618,6 +625,7 @@ class _ImagePreviewWidgetState extends ConsumerState<ImagePreviewWidget> {
                 image: image,
                 showIndex: false,
                 comparisonEnabled: comparisonEnabled,
+                comparisonFooterHeight: comparisonFooterHeight,
               ),
             ),
             SizedBox(height: gap),
@@ -654,10 +662,14 @@ class _ImagePreviewWidgetState extends ConsumerState<ImagePreviewWidget> {
     required bool showIndex,
     int? index,
     bool comparisonEnabled = false,
+    double comparisonFooterHeight = 0,
   }) {
     final imageBytes = image.bytes;
     final canUseAsInput = image.canUseAsGenerationInput;
     final isFailedSnapshot = image.isFailedStreamSnapshot;
+    final transparencyStyle = ref.watch(previewTransparencyNotifierProvider);
+    final cardSelection = ref.watch(generationImageCardSelectionProvider);
+    final canSelect = image.canBulkSelect && !comparisonEnabled;
 
     final card = SelectableImageCard(
       imageBytes: imageBytes,
@@ -666,9 +678,7 @@ class _ImagePreviewWidgetState extends ConsumerState<ImagePreviewWidget> {
       index: index,
       showIndex: showIndex,
       // 透明像素透出所选底色（棋盘格/纯色），与官网结果区一致
-      underlay: TransparencyBackgroundLayer(
-        style: ref.watch(previewTransparencyNotifierProvider),
-      ),
+      underlay: TransparencyBackgroundLayer(style: transparencyStyle),
       completionPreview: ref.watch(
         imageGenerationNotifierProvider.select(
           (state) => state.completionPreviews[image.id],
@@ -679,16 +689,21 @@ class _ImagePreviewWidgetState extends ConsumerState<ImagePreviewWidget> {
               key: ValueKey('generation-image-comparison-${image.id}'),
               sourceImageBytes: image.comparisonSource!.bytes,
               generatedImageBytes: imageBytes,
+              fit: BoxFit.contain,
+              surfaceRadius: ImageCardFrame.defaultRadius,
+              imageBackdrop: TransparencyBackgroundLayer(
+                style: transparencyStyle,
+              ),
             )
           : null,
+      imageContentFooterHeight: comparisonFooterHeight,
       hoverEffectsEnabled: !comparisonEnabled,
       enableHoverScale: !comparisonEnabled,
-      enableSelection: image.canBulkSelect && !comparisonEnabled,
+      enableSelection: canSelect,
       showSelectionOnHover: false,
-      selectionMode: ref.watch(generationImageCardSelectionProvider).isActive,
-      isSelected: ref
-          .watch(generationImageCardSelectionProvider)
-          .isSelected(image.id),
+      // 对比占满整张卡片，选中色罩会改变对比时看到的颜色
+      selectionMode: !comparisonEnabled && cardSelection.isActive,
+      isSelected: !comparisonEnabled && cardSelection.isSelected(image.id),
       allowRepeatedModifierTaps: true,
       onSelectionChanged: image.canBulkSelect
           ? (selected) {
@@ -700,7 +715,7 @@ class _ImagePreviewWidgetState extends ConsumerState<ImagePreviewWidget> {
                   : selection.deselect(image.id);
             }
           : null,
-      onLongPress: image.canBulkSelect
+      onLongPress: canSelect
           ? () => ref
                 .read(generationImageCardSelectionProvider.notifier)
                 .enterAndSelect(image.id)
@@ -976,7 +991,7 @@ class _ImagePreviewWidgetState extends ConsumerState<ImagePreviewWidget> {
   }) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final cardSize = _fitAspectRatio(
+        final cardSize = fitImageCardSize(
           aspectRatio: aspectRatio,
           maxSize: Size(constraints.maxWidth, constraints.maxHeight),
         );
@@ -989,28 +1004,6 @@ class _ImagePreviewWidgetState extends ConsumerState<ImagePreviewWidget> {
           ),
         );
       },
-    );
-  }
-
-  Size _fitAspectRatio({required double aspectRatio, required Size maxSize}) {
-    final safeAspectRatio = aspectRatio.isFinite && aspectRatio > 0
-        ? aspectRatio
-        : 1.0;
-    final maxWidth = maxSize.width.isFinite ? max(0.0, maxSize.width) : 500.0;
-    final maxHeight = maxSize.height.isFinite
-        ? max(0.0, maxSize.height)
-        : 650.0;
-
-    var width = maxWidth;
-    var height = width / safeAspectRatio;
-    if (height > maxHeight) {
-      height = maxHeight;
-      width = height * safeAspectRatio;
-    }
-
-    return Size(
-      width.clamp(0.0, maxWidth).toDouble(),
-      height.clamp(0.0, maxHeight).toDouble(),
     );
   }
 
