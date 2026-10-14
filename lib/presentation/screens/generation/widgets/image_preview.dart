@@ -827,6 +827,7 @@ class _ImagePreviewWidgetState extends ConsumerState<ImagePreviewWidget> {
       fileName: _previewImageFileName(image),
       sourceFilePath: image.filePath,
       enabled: !comparisonEnabled,
+      preheatHistoryShareFile: true,
       child: card,
     );
   }
