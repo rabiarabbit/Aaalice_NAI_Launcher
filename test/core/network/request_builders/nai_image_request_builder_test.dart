@@ -1464,13 +1464,7 @@ void main() {
 
         await expectLater(
           builder.build(sampler: 'k_euler'),
-          throwsA(
-            isA<EmptyInpaintMaskException>().having(
-              (error) => error.latentGridSize,
-              'latentGridSize',
-              8,
-            ),
-          ),
+          throwsA(isA<EmptyInpaintMaskException>()),
           reason: entry.key,
         );
       }

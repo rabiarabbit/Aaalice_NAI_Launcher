@@ -81,6 +81,9 @@ class MaskFillRegionResult {
   final MaskOverlayPatch? addedPatch;
 }
 
+/// NovelAI samples inpaint masks to a 1/8 latent grid for every model.
+const novelAiLatentGridSize = 8;
+
 class NovelAiInpaintMaskArtifacts {
   const NovelAiInpaintMaskArtifacts({
     required this.requestMaskBytes,
@@ -90,7 +93,6 @@ class NovelAiInpaintMaskArtifacts {
     required this.requestHeight,
     required this.latentWidth,
     required this.latentHeight,
-    required this.latentGridSize,
     required this.isLatentMaskEmpty,
   });
 
@@ -101,6 +103,5 @@ class NovelAiInpaintMaskArtifacts {
   final int requestHeight;
   final int latentWidth;
   final int latentHeight;
-  final int latentGridSize;
   final bool isLatentMaskEmpty;
 }
