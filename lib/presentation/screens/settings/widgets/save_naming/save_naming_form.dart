@@ -7,10 +7,10 @@ import '../../../../../core/save_naming/save_name_template.dart';
 import '../../../../../core/utils/localization_extension.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../adaptive/adaptive_presenter.dart';
+import '../../../../adaptive/adaptive_form_footer.dart';
 import '../../../../adaptive/content_sized_adaptive_form.dart';
 import '../../../../themes/design_tokens.dart';
 import '../settings_card.dart';
-import '../settings_form_footer.dart';
 import 'save_naming_messages.dart';
 import 'save_naming_preview_sample.dart';
 import 'save_naming_rule_section.dart';
@@ -240,12 +240,17 @@ class _SaveNamingFormState extends ConsumerState<SaveNamingForm> {
               showSaveNamingSyntaxHelp(context, sample: sample.context),
         ),
       ],
-      footer: SettingsFormFooter(
-        onSave: valid ? _save : null,
-        leading: TextButton(
-          key: const ValueKey('save-naming-restore-defaults'),
-          onPressed: _restoreDefaults,
-          child: Text(l10n.settings_saveNamingRestoreDefaults),
+      footer: AdaptiveFormFooter(
+        leading: [
+          TextButton(
+            key: const ValueKey('save-naming-restore-defaults'),
+            onPressed: _restoreDefaults,
+            child: Text(l10n.settings_saveNamingRestoreDefaults),
+          ),
+        ],
+        primary: FilledButton(
+          onPressed: valid ? _save : null,
+          child: Text(context.l10n.common_save),
         ),
       ),
     );
