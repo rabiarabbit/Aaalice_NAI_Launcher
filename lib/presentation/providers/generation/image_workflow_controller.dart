@@ -438,6 +438,12 @@ class ImageWorkflowState {
     contextCrop: focusedContextCrop,
   );
 
+  /// 聚焦重绘既没有选区也没有取景框，聚焦区域取蒙版外接矩形。
+  bool get focusesOnMaskExtent =>
+      focusedInpaintEnabled &&
+      focusedSelectionRect == null &&
+      focusedContextCrop == null;
+
   ImageWorkflowState copyWith({
     ImageWorkflowMode? mode,
     int? sourceWidth,
