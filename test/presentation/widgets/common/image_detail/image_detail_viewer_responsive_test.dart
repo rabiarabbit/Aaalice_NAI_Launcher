@@ -427,7 +427,7 @@ class _ManualImageStreamCompleter extends ImageStreamCompleter {
   void deliver(ImageInfo info) => setImage(info);
 }
 
-class _TestImageData implements ImageDetailData {
+class _TestImageData extends ImageDetailData {
   _TestImageData._(this.identifier, this.bytes, this._provider);
 
   _TestImageData.ready(String identifier, ui.Image image)
