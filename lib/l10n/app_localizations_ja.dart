@@ -12242,9 +12242,6 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get diy_dependencyTitle => '依存関係設定';
-
-  @override
   String get diy_dependencySubtitle => 'タグ選択間の依存関係を設定します';
 
   @override
@@ -12355,9 +12352,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String diy_branchDefaultName(int index) {
     return '分岐 $index';
   }
-
-  @override
-  String get diy_conditionalTitle => '条件分岐';
 
   @override
   String get diy_conditionalSubtitle => '確率に基づいて分岐を選択します';
@@ -12493,9 +12487,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get diy_enableRule => 'このルールを有効化';
 
   @override
-  String get diy_postProcessTitle => '後処理ルール';
-
-  @override
   String get diy_postProcessSubtitle => 'タグの競合を自動的に解決します';
 
   @override
@@ -12603,9 +12594,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get diy_totalTagCount => 'タグ総数';
 
   @override
-  String get diy_visibilityTitle => '表示ルール';
-
-  @override
   String get diy_visibilitySubtitle => '条件に基づいてカテゴリの表示を制御します';
 
   @override
@@ -12655,9 +12643,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get diy_timeDefaultName => '時間条件';
-
-  @override
-  String get diy_timeTitle => '時間条件';
 
   @override
   String get diy_timeSubtitle => '指定した日付範囲内で有効化します';

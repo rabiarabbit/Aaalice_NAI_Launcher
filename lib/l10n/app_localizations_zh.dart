@@ -12021,9 +12021,6 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get diy_dependencyTitle => '依赖配置';
-
-  @override
   String get diy_dependencySubtitle => '配置标签选择之间的依赖关系';
 
   @override
@@ -12134,9 +12131,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String diy_branchDefaultName(int index) {
     return '分支 $index';
   }
-
-  @override
-  String get diy_conditionalTitle => '条件分支配置';
 
   @override
   String get diy_conditionalSubtitle => '根据概率选择不同分支';
@@ -12271,9 +12265,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diy_enableRule => '启用此规则';
 
   @override
-  String get diy_postProcessTitle => '后处理规则';
-
-  @override
   String get diy_postProcessSubtitle => '自动处理标签冲突';
 
   @override
@@ -12381,9 +12372,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diy_totalTagCount => '总标签数';
 
   @override
-  String get diy_visibilityTitle => '可见性规则';
-
-  @override
   String get diy_visibilitySubtitle => '根据条件控制类别可见性';
 
   @override
@@ -12433,9 +12421,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diy_timeDefaultName => '时间条件';
-
-  @override
-  String get diy_timeTitle => '时间条件';
 
   @override
   String get diy_timeSubtitle => '在指定日期范围内激活';
@@ -27533,9 +27518,6 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   }
 
   @override
-  String get diy_dependencyTitle => '依賴配置';
-
-  @override
   String get diy_dependencySubtitle => '配置標籤選擇之間的依賴關係';
 
   @override
@@ -27646,9 +27628,6 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String diy_branchDefaultName(int index) {
     return '分支 $index';
   }
-
-  @override
-  String get diy_conditionalTitle => '條件分支配置';
 
   @override
   String get diy_conditionalSubtitle => '根據機率選擇不同分支';
@@ -27783,9 +27762,6 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get diy_enableRule => '啟用此規則';
 
   @override
-  String get diy_postProcessTitle => '後處理規則';
-
-  @override
   String get diy_postProcessSubtitle => '自動處理標籤衝突';
 
   @override
@@ -27893,9 +27869,6 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get diy_totalTagCount => '總標籤數';
 
   @override
-  String get diy_visibilityTitle => '可見性規則';
-
-  @override
   String get diy_visibilitySubtitle => '根據條件控制類別可見性';
 
   @override
@@ -27945,9 +27918,6 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get diy_timeDefaultName => '時間條件';
-
-  @override
-  String get diy_timeTitle => '時間條件';
 
   @override
   String get diy_timeSubtitle => '在指定日期範圍內啟用';

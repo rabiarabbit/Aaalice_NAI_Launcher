@@ -12560,9 +12560,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get diy_dependencyTitle => 'Dependency Settings';
-
-  @override
   String get diy_dependencySubtitle =>
       'Configure dependencies between tag selections';
 
@@ -12679,9 +12676,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String diy_branchDefaultName(int index) {
     return 'Branch $index';
   }
-
-  @override
-  String get diy_conditionalTitle => 'Conditional Branches';
 
   @override
   String get diy_conditionalSubtitle => 'Choose a branch by probability';
@@ -12818,9 +12812,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diy_enableRule => 'Enable This Rule';
 
   @override
-  String get diy_postProcessTitle => 'Post-processing Rules';
-
-  @override
   String get diy_postProcessSubtitle => 'Automatically resolve tag conflicts';
 
   @override
@@ -12932,9 +12923,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diy_totalTagCount => 'Total Tags';
 
   @override
-  String get diy_visibilityTitle => 'Visibility Rules';
-
-  @override
   String get diy_visibilitySubtitle =>
       'Control category visibility with conditions';
 
@@ -12986,9 +12974,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get diy_timeDefaultName => 'Time Condition';
-
-  @override
-  String get diy_timeTitle => 'Time Condition';
 
   @override
   String get diy_timeSubtitle => 'Activate within a specific date range';
