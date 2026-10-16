@@ -6,7 +6,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:image/image.dart' as img;
 import 'package:nai_launcher/core/utils/exif_orientation.dart';
 import 'package:nai_launcher/core/utils/isolate_pool.dart';
-import 'package:nai_launcher/data/services/metadata/image_metadata_container_codec.dart';
 
 import '../../helpers/exif_orientation_fixture.dart';
 import '../../helpers/shared_compute_gate.dart';
@@ -298,11 +297,10 @@ Uint8List _rawPng(img.Format format, int channels) {
   return Uint8List.fromList(img.encodePng(image));
 }
 
-Uint8List _pngWithExif({required int orientation}) =>
-    ImageMetadataContainerCodec.copySupportedMetadata(
-      source: orientedCameraJpeg(orientation: orientation),
-      targetPng: _png(6, 4),
-    );
+Uint8List _pngWithExif({required int orientation}) => withPngExif(
+  _png(6, 4),
+  jpegExifPayload(orientedCameraJpeg(orientation: orientation)),
+);
 
 Future<img.Image> _flutterDecode(Uint8List bytes) async {
   final codec = await ui.instantiateImageCodec(bytes);

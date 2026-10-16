@@ -455,7 +455,6 @@ class MosaicRenderService {
       output = UnifiedMetadataParser.copySupportedMetadata(
         source: source,
         targetPng: output,
-        orientationApplied: true,
       );
     } on FormatException catch (error) {
       throw MosaicRenderException(
