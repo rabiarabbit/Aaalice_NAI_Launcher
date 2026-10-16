@@ -8,6 +8,7 @@ import 'package:super_drag_and_drop/super_drag_and_drop.dart';
 
 import '../../../../../core/platform/platform_capabilities.dart';
 import '../../../../../core/utils/app_logger.dart';
+import '../../../../../core/utils/picture_png_encoder.dart';
 import '../../../../adaptive/interaction_policy.dart';
 import '../../../../utils/card_drop_reader.dart';
 import '../../../../utils/native_drop_callback.dart';
@@ -130,8 +131,6 @@ class _VibePreviewDropZoneState extends State<VibePreviewDropZone> {
   static Future<Uint8List> _resizeImage(Uint8List bytes) async {
     ui.Codec? codec;
     ui.Image? image;
-    ui.Picture? picture;
-    ui.Image? resized;
     try {
       codec = await ui.instantiateImageCodec(bytes);
       image = (await codec.getNextFrame()).image;
@@ -147,29 +146,11 @@ class _VibePreviewDropZoneState extends State<VibePreviewDropZone> {
       final dstW = (srcW * scale).round();
       final dstH = (srcH * scale).round();
 
-      final recorder = ui.PictureRecorder();
-      final canvas = Canvas(
-        recorder,
-        Rect.fromLTWH(0, 0, dstW.toDouble(), dstH.toDouble()),
-      );
-      canvas.drawImageRect(
-        image,
-        Rect.fromLTWH(0, 0, srcW.toDouble(), srcH.toDouble()),
-        Rect.fromLTWH(0, 0, dstW.toDouble(), dstH.toDouble()),
-        Paint()..filterQuality = FilterQuality.medium,
-      );
-
-      picture = recorder.endRecording();
-      resized = await picture.toImage(dstW, dstH);
-      final byteData = await resized.toByteData(format: ui.ImageByteFormat.png);
-
-      return byteData?.buffer.asUint8List() ?? bytes;
+      return await resampleImageAsPng(image, width: dstW, height: dstH);
     } catch (e) {
       AppLogger.w('Failed to resize image: $e', 'VibePreviewDropZone');
       return bytes;
     } finally {
-      resized?.dispose();
-      picture?.dispose();
       image?.dispose();
       codec?.dispose();
     }
